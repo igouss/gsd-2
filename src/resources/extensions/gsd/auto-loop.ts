@@ -697,6 +697,277 @@ async function closeoutAndStop(
   await deps.stopAuto(ctx, pi, reason);
 }
 
+// ─── runUnitPhase ─────────────────────────────────────────────────────────────
+
+/**
+ * Phase 4: Unit execution — dispatch prompt, await agent_end, closeout, artifact verify.
+ * Returns break or next with unitStartedAt for downstream phases.
+ */
+async function runUnitPhase(
+  ic: IterationContext,
+  iterData: IterationData,
+  loopState: LoopState,
+  sidecarItem?: SidecarItem,
+): Promise<PhaseResult<{ unitStartedAt: number }>> {
+  const { ctx, pi, s, deps, prefs } = ic;
+  const { unitType, unitId, prompt, observabilityIssues, state, mid } = iterData;
+
+  debugLog("autoLoop", {
+    phase: "unit-execution",
+    iteration: ic.iteration,
+    unitType,
+    unitId,
+  });
+
+  // Detect retry and capture previous tier for escalation
+  const isRetry = !!(
+    s.currentUnit &&
+    s.currentUnit.type === unitType &&
+    s.currentUnit.id === unitId
+  );
+  const previousTier = s.currentUnitRouting?.tier;
+
+  s.currentUnit = { type: unitType, id: unitId, startedAt: Date.now() };
+  deps.captureAvailableSkills();
+  deps.writeUnitRuntimeRecord(
+    s.basePath,
+    unitType,
+    unitId,
+    s.currentUnit.startedAt,
+    {
+      phase: "dispatched",
+      wrapupWarningSent: false,
+      timeoutAt: null,
+      lastProgressAt: s.currentUnit.startedAt,
+      progressCount: 0,
+      lastProgressKind: "dispatch",
+    },
+  );
+
+  // Status bar + progress widget
+  ctx.ui.setStatus("gsd-auto", "auto");
+  if (mid)
+    deps.updateSliceProgressCache(s.basePath, mid, state.activeSlice?.id);
+  deps.updateProgressWidget(ctx, unitType, unitId, state);
+
+  deps.ensurePreconditions(unitType, unitId, s.basePath, state);
+
+  // Prompt injection
+  let finalPrompt = prompt;
+
+  if (s.pendingVerificationRetry) {
+    const retryCtx = s.pendingVerificationRetry;
+    s.pendingVerificationRetry = null;
+    const capped =
+      retryCtx.failureContext.length > MAX_RECOVERY_CHARS
+        ? retryCtx.failureContext.slice(0, MAX_RECOVERY_CHARS) +
+          "\n\n[...failure context truncated]"
+        : retryCtx.failureContext;
+    finalPrompt = `**VERIFICATION FAILED — AUTO-FIX ATTEMPT ${retryCtx.attempt}**\n\nThe verification gate ran after your previous attempt and found failures. Fix these issues before completing the task.\n\n${capped}\n\n---\n\n${finalPrompt}`;
+  }
+
+  if (s.pendingCrashRecovery) {
+    const capped =
+      s.pendingCrashRecovery.length > MAX_RECOVERY_CHARS
+        ? s.pendingCrashRecovery.slice(0, MAX_RECOVERY_CHARS) +
+          "\n\n[...recovery briefing truncated to prevent memory exhaustion]"
+        : s.pendingCrashRecovery;
+    finalPrompt = `${capped}\n\n---\n\n${finalPrompt}`;
+    s.pendingCrashRecovery = null;
+  } else if ((s.unitDispatchCount.get(`${unitType}/${unitId}`) ?? 0) > 1) {
+    const diagnostic = deps.getDeepDiagnostic(s.basePath);
+    if (diagnostic) {
+      const cappedDiag =
+        diagnostic.length > MAX_RECOVERY_CHARS
+          ? diagnostic.slice(0, MAX_RECOVERY_CHARS) +
+            "\n\n[...diagnostic truncated to prevent memory exhaustion]"
+          : diagnostic;
+      finalPrompt = `**RETRY — your previous attempt did not produce the required artifact.**\n\nDiagnostic from previous attempt:\n${cappedDiag}\n\nFix whatever went wrong and make sure you write the required file this time.\n\n---\n\n${finalPrompt}`;
+    }
+  }
+
+  const repairBlock =
+    deps.buildObservabilityRepairBlock(observabilityIssues);
+  if (repairBlock) {
+    finalPrompt = `${finalPrompt}${repairBlock}`;
+  }
+
+  // Prompt char measurement
+  s.lastPromptCharCount = finalPrompt.length;
+  s.lastBaselineCharCount = undefined;
+  if (deps.isDbAvailable()) {
+    try {
+      const { inlineGsdRootFile } = await importExtensionModule<typeof import("./auto-prompts.js")>(import.meta.url, "./auto-prompts.js");
+      const [decisionsContent, requirementsContent, projectContent] =
+        await Promise.all([
+          inlineGsdRootFile(s.basePath, "decisions.md", "Decisions"),
+          inlineGsdRootFile(s.basePath, "requirements.md", "Requirements"),
+          inlineGsdRootFile(s.basePath, "project.md", "Project"),
+        ]);
+      s.lastBaselineCharCount =
+        (decisionsContent?.length ?? 0) +
+        (requirementsContent?.length ?? 0) +
+        (projectContent?.length ?? 0);
+    } catch {
+      // Non-fatal
+    }
+  }
+
+  // Cache-optimize prompt section ordering
+  try {
+    finalPrompt = deps.reorderForCaching(finalPrompt);
+  } catch (reorderErr) {
+    const msg =
+      reorderErr instanceof Error ? reorderErr.message : String(reorderErr);
+    process.stderr.write(
+      `[gsd] prompt reorder failed (non-fatal): ${msg}\n`,
+    );
+  }
+
+  // Select and apply model (with tier escalation on retry — normal units only)
+  const modelResult = await deps.selectAndApplyModel(
+    ctx,
+    pi,
+    unitType,
+    unitId,
+    s.basePath,
+    prefs,
+    s.verbose,
+    s.autoModeStartModel,
+    sidecarItem ? undefined : { isRetry, previousTier },
+  );
+  s.currentUnitRouting =
+    modelResult.routing as AutoSession["currentUnitRouting"];
+
+  // Start unit supervision
+  deps.clearUnitTimeout();
+  deps.startUnitSupervision({
+    s,
+    ctx,
+    pi,
+    unitType,
+    unitId,
+    prefs,
+    buildSnapshotOpts: () => deps.buildSnapshotOpts(unitType, unitId),
+    buildRecoveryContext: () => ({}),
+    pauseAuto: deps.pauseAuto,
+  });
+
+  // Session + send + await
+  const sessionFile = deps.getSessionFile(ctx);
+  deps.updateSessionLock(
+    deps.lockBase(),
+    unitType,
+    unitId,
+    s.completedUnits.length,
+    sessionFile,
+  );
+  deps.writeLock(
+    deps.lockBase(),
+    unitType,
+    unitId,
+    s.completedUnits.length,
+    sessionFile,
+  );
+
+  debugLog("autoLoop", {
+    phase: "runUnit-start",
+    iteration: ic.iteration,
+    unitType,
+    unitId,
+  });
+  const unitResult = await runUnit(
+    ctx,
+    pi,
+    s,
+    unitType,
+    unitId,
+    finalPrompt,
+  );
+  debugLog("autoLoop", {
+    phase: "runUnit-end",
+    iteration: ic.iteration,
+    unitType,
+    unitId,
+    status: unitResult.status,
+  });
+
+  // Tag the most recent window entry with error info for stuck detection
+  if (unitResult.status === "error" || unitResult.status === "cancelled") {
+    const lastEntry = loopState.recentUnits[loopState.recentUnits.length - 1];
+    if (lastEntry) {
+      lastEntry.error = `${unitResult.status}:${unitType}/${unitId}`;
+    }
+  } else if (unitResult.event?.messages?.length) {
+    const lastMsg = unitResult.event.messages[unitResult.event.messages.length - 1];
+    const msgStr = typeof lastMsg === "string" ? lastMsg : JSON.stringify(lastMsg);
+    if (/error|fail|exception/i.test(msgStr)) {
+      const lastEntry = loopState.recentUnits[loopState.recentUnits.length - 1];
+      if (lastEntry) {
+        lastEntry.error = msgStr.slice(0, 200);
+      }
+    }
+  }
+
+  if (unitResult.status === "cancelled") {
+    ctx.ui.notify(
+      `Session creation timed out or was cancelled for ${unitType} ${unitId}. Will retry.`,
+      "warning",
+    );
+    await deps.stopAuto(ctx, pi, "Session creation failed");
+    debugLog("autoLoop", { phase: "exit", reason: "session-failed" });
+    return { action: "break", reason: "session-failed" };
+  }
+
+  // ── Immediate unit closeout (metrics, activity log, memory) ────────
+  // Run right after runUnit() returns so telemetry is never lost to a
+  // crash between iterations.
+  await deps.closeoutUnit(
+    ctx,
+    s.basePath,
+    unitType,
+    unitId,
+    s.currentUnit.startedAt,
+    deps.buildSnapshotOpts(unitType, unitId),
+  );
+
+  if (s.currentUnitRouting) {
+    deps.recordOutcome(
+      unitType,
+      s.currentUnitRouting.tier as "light" | "standard" | "heavy",
+      true, // success assumed; dispatch will re-dispatch if artifact missing
+    );
+  }
+
+  const isHookUnit = unitType.startsWith("hook/");
+  const artifactVerified =
+    isHookUnit ||
+    deps.verifyExpectedArtifact(unitType, unitId, s.basePath);
+  if (artifactVerified) {
+    s.completedUnits.push({
+      type: unitType,
+      id: unitId,
+      startedAt: s.currentUnit.startedAt,
+      finishedAt: Date.now(),
+    });
+    if (s.completedUnits.length > 200) {
+      s.completedUnits = s.completedUnits.slice(-200);
+    }
+    // Flush completed-units to disk so the record survives crashes
+    try {
+      const completedKeysPath = join(gsdRoot(s.basePath), "completed-units.json");
+      const keys = s.completedUnits.map((u) => `${u.type}/${u.id}`);
+      atomicWriteSync(completedKeysPath, JSON.stringify(keys, null, 2));
+    } catch { /* non-fatal: disk flush failure */ }
+
+    deps.clearUnitRuntimeRecord(s.basePath, unitType, unitId);
+    s.unitDispatchCount.delete(`${unitType}/${unitId}`);
+    s.unitRecoveryCount.delete(`${unitType}/${unitId}`);
+  }
+
+  return { action: "next", data: { unitStartedAt: s.currentUnit.startedAt } };
+}
+
 // ─── runFinalize ──────────────────────────────────────────────────────────────
 
 /**
@@ -1511,269 +1782,19 @@ export async function autoLoop(
 
       // ── Phase 4: Unit execution ─────────────────────────────────────────
 
-      debugLog("autoLoop", {
-        phase: "unit-execution",
-        iteration,
-        unitType,
-        unitId,
-      });
-
-      // Detect retry and capture previous tier for escalation
-      const isRetry = !!(
-        s.currentUnit &&
-        s.currentUnit.type === unitType &&
-        s.currentUnit.id === unitId
-      );
-      const previousTier = s.currentUnitRouting?.tier;
-
-      s.currentUnit = { type: unitType, id: unitId, startedAt: Date.now() };
-      deps.captureAvailableSkills();
-      deps.writeUnitRuntimeRecord(
-        s.basePath,
-        unitType,
-        unitId,
-        s.currentUnit.startedAt,
-        {
-          phase: "dispatched",
-          wrapupWarningSent: false,
-          timeoutAt: null,
-          lastProgressAt: s.currentUnit.startedAt,
-          progressCount: 0,
-          lastProgressKind: "dispatch",
-        },
-      );
-
-      // Status bar + progress widget
-      ctx.ui.setStatus("gsd-auto", "auto");
-      if (mid)
-        deps.updateSliceProgressCache(s.basePath, mid, state.activeSlice?.id);
-      deps.updateProgressWidget(ctx, unitType, unitId, state);
-
-      deps.ensurePreconditions(unitType, unitId, s.basePath, state);
-
-      // Prompt injection
-      let finalPrompt = prompt;
-
-      if (s.pendingVerificationRetry) {
-        const retryCtx = s.pendingVerificationRetry;
-        s.pendingVerificationRetry = null;
-        const capped =
-          retryCtx.failureContext.length > MAX_RECOVERY_CHARS
-            ? retryCtx.failureContext.slice(0, MAX_RECOVERY_CHARS) +
-              "\n\n[...failure context truncated]"
-            : retryCtx.failureContext;
-        finalPrompt = `**VERIFICATION FAILED — AUTO-FIX ATTEMPT ${retryCtx.attempt}**\n\nThe verification gate ran after your previous attempt and found failures. Fix these issues before completing the task.\n\n${capped}\n\n---\n\n${finalPrompt}`;
-      }
-
-      if (s.pendingCrashRecovery) {
-        const capped =
-          s.pendingCrashRecovery.length > MAX_RECOVERY_CHARS
-            ? s.pendingCrashRecovery.slice(0, MAX_RECOVERY_CHARS) +
-              "\n\n[...recovery briefing truncated to prevent memory exhaustion]"
-            : s.pendingCrashRecovery;
-        finalPrompt = `${capped}\n\n---\n\n${finalPrompt}`;
-        s.pendingCrashRecovery = null;
-      } else if ((s.unitDispatchCount.get(`${unitType}/${unitId}`) ?? 0) > 1) {
-        const diagnostic = deps.getDeepDiagnostic(s.basePath);
-        if (diagnostic) {
-          const cappedDiag =
-            diagnostic.length > MAX_RECOVERY_CHARS
-              ? diagnostic.slice(0, MAX_RECOVERY_CHARS) +
-                "\n\n[...diagnostic truncated to prevent memory exhaustion]"
-              : diagnostic;
-          finalPrompt = `**RETRY — your previous attempt did not produce the required artifact.**\n\nDiagnostic from previous attempt:\n${cappedDiag}\n\nFix whatever went wrong and make sure you write the required file this time.\n\n---\n\n${finalPrompt}`;
-        }
-      }
-
-      const repairBlock =
-        deps.buildObservabilityRepairBlock(observabilityIssues);
-      if (repairBlock) {
-        finalPrompt = `${finalPrompt}${repairBlock}`;
-      }
-
-      // Prompt char measurement
-      s.lastPromptCharCount = finalPrompt.length;
-      s.lastBaselineCharCount = undefined;
-      if (deps.isDbAvailable()) {
-        try {
-          const { inlineGsdRootFile } = await importExtensionModule<typeof import("./auto-prompts.js")>(import.meta.url, "./auto-prompts.js");
-          const [decisionsContent, requirementsContent, projectContent] =
-            await Promise.all([
-              inlineGsdRootFile(s.basePath, "decisions.md", "Decisions"),
-              inlineGsdRootFile(s.basePath, "requirements.md", "Requirements"),
-              inlineGsdRootFile(s.basePath, "project.md", "Project"),
-            ]);
-          s.lastBaselineCharCount =
-            (decisionsContent?.length ?? 0) +
-            (requirementsContent?.length ?? 0) +
-            (projectContent?.length ?? 0);
-        } catch {
-          // Non-fatal
-        }
-      }
-
-      // Cache-optimize prompt section ordering
-      try {
-        finalPrompt = deps.reorderForCaching(finalPrompt);
-      } catch (reorderErr) {
-        const msg =
-          reorderErr instanceof Error ? reorderErr.message : String(reorderErr);
-        process.stderr.write(
-          `[gsd] prompt reorder failed (non-fatal): ${msg}\n`,
-        );
-      }
-
-      // Select and apply model (with tier escalation on retry — normal units only)
-      const modelResult = await deps.selectAndApplyModel(
-        ctx,
-        pi,
-        unitType,
-        unitId,
-        s.basePath,
-        prefs,
-        s.verbose,
-        s.autoModeStartModel,
-        sidecarItem ? undefined : { isRetry, previousTier },
-      );
-      s.currentUnitRouting =
-        modelResult.routing as AutoSession["currentUnitRouting"];
-
-      // Start unit supervision
-      deps.clearUnitTimeout();
-      deps.startUnitSupervision({
-        s,
-        ctx,
-        pi,
-        unitType,
-        unitId,
-        prefs,
-        buildSnapshotOpts: () => deps.buildSnapshotOpts(unitType, unitId),
-        buildRecoveryContext: () => ({}),
-        pauseAuto: deps.pauseAuto,
-      });
-
-      // Session + send + await
-      const sessionFile = deps.getSessionFile(ctx);
-      deps.updateSessionLock(
-        deps.lockBase(),
-        unitType,
-        unitId,
-        s.completedUnits.length,
-        sessionFile,
-      );
-      deps.writeLock(
-        deps.lockBase(),
-        unitType,
-        unitId,
-        s.completedUnits.length,
-        sessionFile,
-      );
-
-      debugLog("autoLoop", {
-        phase: "runUnit-start",
-        iteration,
-        unitType,
-        unitId,
-      });
-      const unitResult = await runUnit(
-        ctx,
-        pi,
-        s,
-        unitType,
-        unitId,
-        finalPrompt,
-      );
-      debugLog("autoLoop", {
-        phase: "runUnit-end",
-        iteration,
-        unitType,
-        unitId,
-        status: unitResult.status,
-      });
-
-      // Tag the most recent window entry with error info for stuck detection
-      if (unitResult.status === "error" || unitResult.status === "cancelled") {
-        const lastEntry = recentUnits[recentUnits.length - 1];
-        if (lastEntry) {
-          lastEntry.error = `${unitResult.status}:${unitType}/${unitId}`;
-        }
-      } else if (unitResult.event?.messages?.length) {
-        const lastMsg = unitResult.event.messages[unitResult.event.messages.length - 1];
-        const msgStr = typeof lastMsg === "string" ? lastMsg : JSON.stringify(lastMsg);
-        if (/error|fail|exception/i.test(msgStr)) {
-          const lastEntry = recentUnits[recentUnits.length - 1];
-          if (lastEntry) {
-            lastEntry.error = msgStr.slice(0, 200);
-          }
-        }
-      }
-
-      if (unitResult.status === "cancelled") {
-        ctx.ui.notify(
-          `Session creation timed out or was cancelled for ${unitType} ${unitId}. Will retry.`,
-          "warning",
-        );
-        await deps.stopAuto(ctx, pi, "Session creation failed");
-        debugLog("autoLoop", { phase: "exit", reason: "session-failed" });
-        break;
-      }
-
-      // ── Immediate unit closeout (metrics, activity log, memory) ────────
-      // Run right after runUnit() returns so telemetry is never lost to a
-      // crash between iterations.
-      await deps.closeoutUnit(
-        ctx,
-        s.basePath,
-        unitType,
-        unitId,
-        s.currentUnit.startedAt,
-        deps.buildSnapshotOpts(unitType, unitId),
-      );
-
-      if (s.currentUnitRouting) {
-        deps.recordOutcome(
-          unitType,
-          s.currentUnitRouting.tier as "light" | "standard" | "heavy",
-          true, // success assumed; dispatch will re-dispatch if artifact missing
-        );
-      }
-
-      const isHookUnit = unitType.startsWith("hook/");
-      const artifactVerified =
-        isHookUnit ||
-        deps.verifyExpectedArtifact(unitType, unitId, s.basePath);
-      if (artifactVerified) {
-        s.completedUnits.push({
-          type: unitType,
-          id: unitId,
-          startedAt: s.currentUnit.startedAt,
-          finishedAt: Date.now(),
-        });
-        if (s.completedUnits.length > 200) {
-          s.completedUnits = s.completedUnits.slice(-200);
-        }
-        // Flush completed-units to disk so the record survives crashes
-        try {
-          const completedKeysPath = join(gsdRoot(s.basePath), "completed-units.json");
-          const keys = s.completedUnits.map((u) => `${u.type}/${u.id}`);
-          atomicWriteSync(completedKeysPath, JSON.stringify(keys, null, 2));
-        } catch { /* non-fatal: disk flush failure */ }
-
-        deps.clearUnitRuntimeRecord(s.basePath, unitType, unitId);
-        s.unitDispatchCount.delete(`${unitType}/${unitId}`);
-        s.unitRecoveryCount.delete(`${unitType}/${unitId}`);
-      }
+      const ic: IterationContext = { ctx, pi, s, deps, prefs, iteration };
+      const loopState: LoopState = { recentUnits, stuckRecoveryAttempts };
+      const iterData: IterationData = {
+        unitType, unitId, prompt, finalPrompt: prompt,
+        pauseAfterUatDispatch, observabilityIssues,
+        state, mid, midTitle,
+        isRetry: false, previousTier: undefined,
+      };
+      const unitPhaseResult = await runUnitPhase(ic, iterData, loopState, sidecarItem);
+      if (unitPhaseResult.action === "break") break;
 
       // ── Phase 5: Finalize ───────────────────────────────────────────────
 
-      const ic: IterationContext = { ctx, pi, s, deps, prefs, iteration };
-      const iterData: IterationData = {
-        unitType, unitId, prompt, finalPrompt,
-        pauseAfterUatDispatch, observabilityIssues,
-        state, mid, midTitle,
-        isRetry: !!(s.currentUnit && s.currentUnit.type === unitType && s.currentUnit.id === unitId),
-        previousTier: s.currentUnitRouting?.tier,
-      };
       const finalizeResult = await runFinalize(ic, iterData, sidecarItem);
       if (finalizeResult.action === "break") break;
       if (finalizeResult.action === "continue") continue;
