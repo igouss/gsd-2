@@ -1016,7 +1016,7 @@ export async function autoLoop(
             const msg = `Budget ceiling ${deps.formatCost(budgetCeiling)} reached (spent ${deps.formatCost(totalCost)}).`;
             if (budgetEnforcementAction === "halt") {
               deps.sendDesktopNotification("GSD", msg, "error", "budget");
-              await deps.stopAuto(ctx, pi, "Budget ceiling reached");
+              await deps.stopAuto(ctx, pi, threshold.label);
               debugLog("autoLoop", { phase: "exit", reason: "budget-halt" });
               break;
             }
