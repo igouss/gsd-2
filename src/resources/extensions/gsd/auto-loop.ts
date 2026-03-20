@@ -697,6 +697,340 @@ async function closeoutAndStop(
   await deps.stopAuto(ctx, pi, reason);
 }
 
+// ─── runPreDispatch ───────────────────────────────────────────────────────────
+
+/**
+ * Phase 1: Pre-dispatch — resource guard, health gate, state derivation,
+ * milestone transition, terminal conditions.
+ * Returns break to exit the loop, or next with PreDispatchData on success.
+ */
+async function runPreDispatch(
+  ic: IterationContext,
+  loopState: LoopState,
+): Promise<PhaseResult<PreDispatchData>> {
+  const { ctx, pi, s, deps, prefs } = ic;
+
+  // Resource version guard
+  const staleMsg = deps.checkResourcesStale(s.resourceVersionOnStart);
+  if (staleMsg) {
+    await deps.stopAuto(ctx, pi, staleMsg);
+    debugLog("autoLoop", { phase: "exit", reason: "resources-stale" });
+    return { action: "break", reason: "resources-stale" };
+  }
+
+  deps.invalidateAllCaches();
+  s.lastPromptCharCount = undefined;
+  s.lastBaselineCharCount = undefined;
+
+  // Pre-dispatch health gate
+  try {
+    const healthGate = await deps.preDispatchHealthGate(s.basePath);
+    if (healthGate.fixesApplied.length > 0) {
+      ctx.ui.notify(
+        `Pre-dispatch: ${healthGate.fixesApplied.join(", ")}`,
+        "info",
+      );
+    }
+    if (!healthGate.proceed) {
+      ctx.ui.notify(
+        healthGate.reason ?? "Pre-dispatch health check failed.",
+        "error",
+      );
+      await deps.pauseAuto(ctx, pi);
+      debugLog("autoLoop", { phase: "exit", reason: "health-gate-failed" });
+      return { action: "break", reason: "health-gate-failed" };
+    }
+  } catch {
+    // Non-fatal
+  }
+
+  // Sync project root artifacts into worktree
+  if (
+    s.originalBasePath &&
+    s.basePath !== s.originalBasePath &&
+    s.currentMilestoneId
+  ) {
+    deps.syncProjectRootToWorktree(
+      s.originalBasePath,
+      s.basePath,
+      s.currentMilestoneId,
+    );
+  }
+
+  // Derive state
+  let state = await deps.deriveState(s.basePath);
+  deps.syncCmuxSidebar(prefs, state);
+  let mid = state.activeMilestone?.id;
+  let midTitle = state.activeMilestone?.title;
+  debugLog("autoLoop", {
+    phase: "state-derived",
+    iteration: ic.iteration,
+    mid,
+    statePhase: state.phase,
+  });
+
+  // ── Milestone transition ────────────────────────────────────────────
+  if (mid && s.currentMilestoneId && mid !== s.currentMilestoneId) {
+    ctx.ui.notify(
+      `Milestone ${s.currentMilestoneId} complete. Advancing to ${mid}: ${midTitle}.`,
+      "info",
+    );
+    deps.sendDesktopNotification(
+      "GSD",
+      `Milestone ${s.currentMilestoneId} complete!`,
+      "success",
+      "milestone",
+    );
+    deps.logCmuxEvent(
+      prefs,
+      `Milestone ${s.currentMilestoneId} complete. Advancing to ${mid}.`,
+      "success",
+    );
+
+    const vizPrefs = prefs;
+    if (vizPrefs?.auto_visualize) {
+      ctx.ui.notify("Run /gsd visualize to see progress overview.", "info");
+    }
+    if (vizPrefs?.auto_report !== false) {
+      try {
+        await generateMilestoneReport(s, ctx, s.currentMilestoneId!);
+      } catch (err) {
+        ctx.ui.notify(
+          `Report generation failed: ${err instanceof Error ? err.message : String(err)}`,
+          "warning",
+        );
+      }
+    }
+
+    // Reset dispatch counters for new milestone
+    s.unitDispatchCount.clear();
+    s.unitRecoveryCount.clear();
+    s.unitLifetimeDispatches.clear();
+    loopState.recentUnits.length = 0;
+    loopState.stuckRecoveryAttempts = 0;
+
+    // Worktree lifecycle on milestone transition — merge current, enter next
+    deps.resolver.mergeAndExit(s.currentMilestoneId!, ctx.ui);
+
+    // Opt-in: create draft PR on milestone completion
+    if (prefs?.git?.auto_pr) {
+      try {
+        const { createDraftPR } = await import("./git-service.js");
+        const prUrl = createDraftPR(
+          s.basePath,
+          s.currentMilestoneId!,
+          `[GSD] ${s.currentMilestoneId} complete`,
+          `Milestone ${s.currentMilestoneId} completed by GSD auto-mode.\n\nSee .gsd/${s.currentMilestoneId}/ for details.`,
+        );
+        if (prUrl) {
+          ctx.ui.notify(`Draft PR created: ${prUrl}`, "info");
+        }
+      } catch {
+        // Non-fatal — PR creation is best-effort
+      }
+    }
+
+    deps.invalidateAllCaches();
+
+    state = await deps.deriveState(s.basePath);
+    mid = state.activeMilestone?.id;
+    midTitle = state.activeMilestone?.title;
+
+    if (mid) {
+      if (deps.getIsolationMode() !== "none") {
+        deps.captureIntegrationBranch(s.basePath, mid, {
+          commitDocs: prefs?.git?.commit_docs,
+        });
+      }
+      deps.resolver.enterMilestone(mid, ctx.ui);
+    } else {
+      // mid is undefined — no milestone to capture integration branch for
+    }
+
+    const pendingIds = state.registry
+      .filter(
+        (m: { status: string }) =>
+          m.status !== "complete" && m.status !== "parked",
+      )
+      .map((m: { id: string }) => m.id);
+    deps.pruneQueueOrder(s.basePath, pendingIds);
+  }
+
+  if (mid) {
+    s.currentMilestoneId = mid;
+    deps.setActiveMilestoneId(s.basePath, mid);
+  }
+
+  // ── Terminal conditions ──────────────────────────────────────────────
+
+  if (!mid) {
+    if (s.currentUnit) {
+      await deps.closeoutUnit(
+        ctx,
+        s.basePath,
+        s.currentUnit.type,
+        s.currentUnit.id,
+        s.currentUnit.startedAt,
+        deps.buildSnapshotOpts(s.currentUnit.type, s.currentUnit.id),
+      );
+    }
+
+    const incomplete = state.registry.filter(
+      (m: { status: string }) =>
+        m.status !== "complete" && m.status !== "parked",
+    );
+    if (incomplete.length === 0 && state.registry.length > 0) {
+      // All milestones complete — merge milestone branch before stopping
+      if (s.currentMilestoneId) {
+        deps.resolver.mergeAndExit(s.currentMilestoneId, ctx.ui);
+
+        // Opt-in: create draft PR on milestone completion
+        if (prefs?.git?.auto_pr) {
+          try {
+            const { createDraftPR } = await import("./git-service.js");
+            const prUrl = createDraftPR(
+              s.basePath,
+              s.currentMilestoneId,
+              `[GSD] ${s.currentMilestoneId} complete`,
+              `Milestone ${s.currentMilestoneId} completed by GSD auto-mode.\n\nSee .gsd/${s.currentMilestoneId}/ for details.`,
+            );
+            if (prUrl) {
+              ctx.ui.notify(`Draft PR created: ${prUrl}`, "info");
+            }
+          } catch {
+            // Non-fatal — PR creation is best-effort
+          }
+        }
+      }
+      deps.sendDesktopNotification(
+        "GSD",
+        "All milestones complete!",
+        "success",
+        "milestone",
+      );
+      deps.logCmuxEvent(
+        prefs,
+        "All milestones complete.",
+        "success",
+      );
+      await deps.stopAuto(ctx, pi, "All milestones complete");
+    } else if (incomplete.length === 0 && state.registry.length === 0) {
+      // Empty registry — no milestones visible, likely a path resolution bug
+      const diag = `basePath=${s.basePath}, phase=${state.phase}`;
+      ctx.ui.notify(
+        `No milestones visible in current scope. Possible path resolution issue.\n   Diagnostic: ${diag}`,
+        "error",
+      );
+      await deps.stopAuto(
+        ctx,
+        pi,
+        `No milestones found — check basePath resolution`,
+      );
+    } else if (state.phase === "blocked") {
+      const blockerMsg = `Blocked: ${state.blockers.join(", ")}`;
+      await deps.stopAuto(ctx, pi, blockerMsg);
+      ctx.ui.notify(`${blockerMsg}. Fix and run /gsd auto.`, "warning");
+      deps.sendDesktopNotification("GSD", blockerMsg, "error", "attention");
+      deps.logCmuxEvent(prefs, blockerMsg, "error");
+    } else {
+      const ids = incomplete.map((m: { id: string }) => m.id).join(", ");
+      const diag = `basePath=${s.basePath}, milestones=[${state.registry.map((m: { id: string; status: string }) => `${m.id}:${m.status}`).join(", ")}], phase=${state.phase}`;
+      ctx.ui.notify(
+        `Unexpected: ${incomplete.length} incomplete milestone(s) (${ids}) but no active milestone.\n   Diagnostic: ${diag}`,
+        "error",
+      );
+      await deps.stopAuto(
+        ctx,
+        pi,
+        `No active milestone — ${incomplete.length} incomplete (${ids}), see diagnostic above`,
+      );
+    }
+    debugLog("autoLoop", { phase: "exit", reason: "no-active-milestone" });
+    return { action: "break", reason: "no-active-milestone" };
+  }
+
+  if (!midTitle) {
+    midTitle = mid;
+    ctx.ui.notify(
+      `Milestone ${mid} has no title in roadmap — using ID as fallback.`,
+      "warning",
+    );
+  }
+
+  // Mid-merge safety check
+  if (deps.reconcileMergeState(s.basePath, ctx)) {
+    deps.invalidateAllCaches();
+    state = await deps.deriveState(s.basePath);
+    mid = state.activeMilestone?.id;
+    midTitle = state.activeMilestone?.title;
+  }
+
+  if (!mid || !midTitle) {
+    const noMilestoneReason = !mid
+      ? "No active milestone after merge reconciliation"
+      : `Milestone ${mid} has no title after reconciliation`;
+    await closeoutAndStop(ctx, pi, s, deps, noMilestoneReason);
+    debugLog("autoLoop", {
+      phase: "exit",
+      reason: "no-milestone-after-reconciliation",
+    });
+    return { action: "break", reason: "no-milestone-after-reconciliation" };
+  }
+
+  // Terminal: complete
+  if (state.phase === "complete") {
+    // Milestone merge on complete (before closeout so branch state is clean)
+    if (s.currentMilestoneId) {
+      deps.resolver.mergeAndExit(s.currentMilestoneId, ctx.ui);
+
+      // Opt-in: create draft PR on milestone completion
+      if (prefs?.git?.auto_pr) {
+        try {
+          const { createDraftPR } = await import("./git-service.js");
+          const prUrl = createDraftPR(
+            s.basePath,
+            s.currentMilestoneId,
+            `[GSD] ${s.currentMilestoneId} complete`,
+            `Milestone ${s.currentMilestoneId} completed by GSD auto-mode.\n\nSee .gsd/${s.currentMilestoneId}/ for details.`,
+          );
+          if (prUrl) {
+            ctx.ui.notify(`Draft PR created: ${prUrl}`, "info");
+          }
+        } catch {
+          // Non-fatal — PR creation is best-effort
+        }
+      }
+    }
+    deps.sendDesktopNotification(
+      "GSD",
+      `Milestone ${mid} complete!`,
+      "success",
+      "milestone",
+    );
+    deps.logCmuxEvent(
+      prefs,
+      `Milestone ${mid} complete.`,
+      "success",
+    );
+    await closeoutAndStop(ctx, pi, s, deps, `Milestone ${mid} complete`);
+    debugLog("autoLoop", { phase: "exit", reason: "milestone-complete" });
+    return { action: "break", reason: "milestone-complete" };
+  }
+
+  // Terminal: blocked
+  if (state.phase === "blocked") {
+    const blockerMsg = `Blocked: ${state.blockers.join(", ")}`;
+    await closeoutAndStop(ctx, pi, s, deps, blockerMsg);
+    ctx.ui.notify(`${blockerMsg}. Fix and run /gsd auto.`, "warning");
+    deps.sendDesktopNotification("GSD", blockerMsg, "error", "attention");
+    deps.logCmuxEvent(prefs, blockerMsg, "error");
+    debugLog("autoLoop", { phase: "exit", reason: "blocked" });
+    return { action: "break", reason: "blocked" };
+  }
+
+  return { action: "next", data: { state, mid, midTitle } };
+}
+
 // ─── runDispatch ──────────────────────────────────────────────────────────────
 
 /**
@@ -1408,7 +1742,6 @@ export async function autoLoop(
   let iteration = 0;
   // ── Sliding-window stuck detection ──
   const recentUnits: Array<{ key: string; error?: string }> = [];
-  const STUCK_WINDOW_SIZE = 6;
   let stuckRecoveryAttempts = 0;
 
   let consecutiveErrors = 0;
@@ -1472,354 +1805,25 @@ export async function autoLoop(
         }
       }
 
-      // Variables shared between the sidecar and normal paths
-      let unitType: string;
-      let unitId: string;
-      let prompt: string;
-      let pauseAfterUatDispatch = false;
-      let state: GSDState;
-      let mid: string | undefined;
-      let midTitle: string | undefined;
-      let observabilityIssues: unknown[] = [];
-
-      if (!sidecarItem) {
-      // ── Phase 1: Pre-dispatch ───────────────────────────────────────────
-
-      // Resource version guard
-      const staleMsg = deps.checkResourcesStale(s.resourceVersionOnStart);
-      if (staleMsg) {
-        await deps.stopAuto(ctx, pi, staleMsg);
-        debugLog("autoLoop", { phase: "exit", reason: "resources-stale" });
-        break;
-      }
-
-      deps.invalidateAllCaches();
-      s.lastPromptCharCount = undefined;
-      s.lastBaselineCharCount = undefined;
-
-      // Pre-dispatch health gate
-      try {
-        const healthGate = await deps.preDispatchHealthGate(s.basePath);
-        if (healthGate.fixesApplied.length > 0) {
-          ctx.ui.notify(
-            `Pre-dispatch: ${healthGate.fixesApplied.join(", ")}`,
-            "info",
-          );
-        }
-        if (!healthGate.proceed) {
-          ctx.ui.notify(
-            healthGate.reason ?? "Pre-dispatch health check failed.",
-            "error",
-          );
-          await deps.pauseAuto(ctx, pi);
-          debugLog("autoLoop", { phase: "exit", reason: "health-gate-failed" });
-          break;
-        }
-      } catch {
-        // Non-fatal
-      }
-
-      // Sync project root artifacts into worktree
-      if (
-        s.originalBasePath &&
-        s.basePath !== s.originalBasePath &&
-        s.currentMilestoneId
-      ) {
-        deps.syncProjectRootToWorktree(
-          s.originalBasePath,
-          s.basePath,
-          s.currentMilestoneId,
-        );
-      }
-
-      // Derive state
-      state = await deps.deriveState(s.basePath);
-      deps.syncCmuxSidebar(prefs, state);
-      mid = state.activeMilestone?.id;
-      midTitle = state.activeMilestone?.title;
-      debugLog("autoLoop", {
-        phase: "state-derived",
-        iteration,
-        mid,
-        statePhase: state.phase,
-      });
-
-      // ── Milestone transition ────────────────────────────────────────────
-      if (mid && s.currentMilestoneId && mid !== s.currentMilestoneId) {
-        ctx.ui.notify(
-          `Milestone ${s.currentMilestoneId} complete. Advancing to ${mid}: ${midTitle}.`,
-          "info",
-        );
-        deps.sendDesktopNotification(
-          "GSD",
-          `Milestone ${s.currentMilestoneId} complete!`,
-          "success",
-          "milestone",
-        );
-        deps.logCmuxEvent(
-          prefs,
-          `Milestone ${s.currentMilestoneId} complete. Advancing to ${mid}.`,
-          "success",
-        );
-
-        const vizPrefs = prefs;
-        if (vizPrefs?.auto_visualize) {
-          ctx.ui.notify("Run /gsd visualize to see progress overview.", "info");
-        }
-        if (vizPrefs?.auto_report !== false) {
-          try {
-            await generateMilestoneReport(s, ctx, s.currentMilestoneId!);
-          } catch (err) {
-            ctx.ui.notify(
-              `Report generation failed: ${err instanceof Error ? err.message : String(err)}`,
-              "warning",
-            );
-          }
-        }
-
-        // Reset dispatch counters for new milestone
-        s.unitDispatchCount.clear();
-        s.unitRecoveryCount.clear();
-        s.unitLifetimeDispatches.clear();
-        recentUnits.length = 0;
-        stuckRecoveryAttempts = 0;
-
-        // Worktree lifecycle on milestone transition — merge current, enter next
-        deps.resolver.mergeAndExit(s.currentMilestoneId!, ctx.ui);
-
-        // Opt-in: create draft PR on milestone completion
-        if (prefs?.git?.auto_pr) {
-          try {
-            const { createDraftPR } = await import("./git-service.js");
-            const prUrl = createDraftPR(
-              s.basePath,
-              s.currentMilestoneId!,
-              `[GSD] ${s.currentMilestoneId} complete`,
-              `Milestone ${s.currentMilestoneId} completed by GSD auto-mode.\n\nSee .gsd/${s.currentMilestoneId}/ for details.`,
-            );
-            if (prUrl) {
-              ctx.ui.notify(`Draft PR created: ${prUrl}`, "info");
-            }
-          } catch {
-            // Non-fatal — PR creation is best-effort
-          }
-        }
-
-        deps.invalidateAllCaches();
-
-        state = await deps.deriveState(s.basePath);
-        mid = state.activeMilestone?.id;
-        midTitle = state.activeMilestone?.title;
-
-        if (mid) {
-          if (deps.getIsolationMode() !== "none") {
-            deps.captureIntegrationBranch(s.basePath, mid, {
-              commitDocs: prefs?.git?.commit_docs,
-            });
-          }
-          deps.resolver.enterMilestone(mid, ctx.ui);
-        } else {
-          // mid is undefined — no milestone to capture integration branch for
-        }
-
-        const pendingIds = state.registry
-          .filter(
-            (m: { status: string }) =>
-              m.status !== "complete" && m.status !== "parked",
-          )
-          .map((m: { id: string }) => m.id);
-        deps.pruneQueueOrder(s.basePath, pendingIds);
-      }
-
-      if (mid) {
-        s.currentMilestoneId = mid;
-        deps.setActiveMilestoneId(s.basePath, mid);
-      }
-
-      // ── Terminal conditions ──────────────────────────────────────────────
-
-      if (!mid) {
-        if (s.currentUnit) {
-          await deps.closeoutUnit(
-            ctx,
-            s.basePath,
-            s.currentUnit.type,
-            s.currentUnit.id,
-            s.currentUnit.startedAt,
-            deps.buildSnapshotOpts(s.currentUnit.type, s.currentUnit.id),
-          );
-        }
-
-        const incomplete = state.registry.filter(
-          (m: { status: string }) =>
-            m.status !== "complete" && m.status !== "parked",
-        );
-        if (incomplete.length === 0 && state.registry.length > 0) {
-          // All milestones complete — merge milestone branch before stopping
-          if (s.currentMilestoneId) {
-            deps.resolver.mergeAndExit(s.currentMilestoneId, ctx.ui);
-
-            // Opt-in: create draft PR on milestone completion
-            if (prefs?.git?.auto_pr) {
-              try {
-                const { createDraftPR } = await import("./git-service.js");
-                const prUrl = createDraftPR(
-                  s.basePath,
-                  s.currentMilestoneId,
-                  `[GSD] ${s.currentMilestoneId} complete`,
-                  `Milestone ${s.currentMilestoneId} completed by GSD auto-mode.\n\nSee .gsd/${s.currentMilestoneId}/ for details.`,
-                );
-                if (prUrl) {
-                  ctx.ui.notify(`Draft PR created: ${prUrl}`, "info");
-                }
-              } catch {
-                // Non-fatal — PR creation is best-effort
-              }
-            }
-          }
-          deps.sendDesktopNotification(
-            "GSD",
-            "All milestones complete!",
-            "success",
-            "milestone",
-          );
-          deps.logCmuxEvent(
-            prefs,
-            "All milestones complete.",
-            "success",
-          );
-          await deps.stopAuto(ctx, pi, "All milestones complete");
-        } else if (incomplete.length === 0 && state.registry.length === 0) {
-          // Empty registry — no milestones visible, likely a path resolution bug
-          const diag = `basePath=${s.basePath}, phase=${state.phase}`;
-          ctx.ui.notify(
-            `No milestones visible in current scope. Possible path resolution issue.\n   Diagnostic: ${diag}`,
-            "error",
-          );
-          await deps.stopAuto(
-            ctx,
-            pi,
-            `No milestones found — check basePath resolution`,
-          );
-        } else if (state.phase === "blocked") {
-          const blockerMsg = `Blocked: ${state.blockers.join(", ")}`;
-          await deps.stopAuto(ctx, pi, blockerMsg);
-          ctx.ui.notify(`${blockerMsg}. Fix and run /gsd auto.`, "warning");
-          deps.sendDesktopNotification("GSD", blockerMsg, "error", "attention");
-          deps.logCmuxEvent(prefs, blockerMsg, "error");
-        } else {
-          const ids = incomplete.map((m: { id: string }) => m.id).join(", ");
-          const diag = `basePath=${s.basePath}, milestones=[${state.registry.map((m: { id: string; status: string }) => `${m.id}:${m.status}`).join(", ")}], phase=${state.phase}`;
-          ctx.ui.notify(
-            `Unexpected: ${incomplete.length} incomplete milestone(s) (${ids}) but no active milestone.\n   Diagnostic: ${diag}`,
-            "error",
-          );
-          await deps.stopAuto(
-            ctx,
-            pi,
-            `No active milestone — ${incomplete.length} incomplete (${ids}), see diagnostic above`,
-          );
-        }
-        debugLog("autoLoop", { phase: "exit", reason: "no-active-milestone" });
-        break;
-      }
-
-      if (!midTitle) {
-        midTitle = mid;
-        ctx.ui.notify(
-          `Milestone ${mid} has no title in roadmap — using ID as fallback.`,
-          "warning",
-        );
-      }
-
-      // Mid-merge safety check
-      if (deps.reconcileMergeState(s.basePath, ctx)) {
-        deps.invalidateAllCaches();
-        state = await deps.deriveState(s.basePath);
-        mid = state.activeMilestone?.id;
-        midTitle = state.activeMilestone?.title;
-      }
-
-      if (!mid || !midTitle) {
-        const noMilestoneReason = !mid
-          ? "No active milestone after merge reconciliation"
-          : `Milestone ${mid} has no title after reconciliation`;
-        await closeoutAndStop(ctx, pi, s, deps, noMilestoneReason);
-        debugLog("autoLoop", {
-          phase: "exit",
-          reason: "no-milestone-after-reconciliation",
-        });
-        break;
-      }
-
-      // Terminal: complete
-      if (state.phase === "complete") {
-        // Milestone merge on complete (before closeout so branch state is clean)
-        if (s.currentMilestoneId) {
-          deps.resolver.mergeAndExit(s.currentMilestoneId, ctx.ui);
-
-          // Opt-in: create draft PR on milestone completion
-          if (prefs?.git?.auto_pr) {
-            try {
-              const { createDraftPR } = await import("./git-service.js");
-              const prUrl = createDraftPR(
-                s.basePath,
-                s.currentMilestoneId,
-                `[GSD] ${s.currentMilestoneId} complete`,
-                `Milestone ${s.currentMilestoneId} completed by GSD auto-mode.\n\nSee .gsd/${s.currentMilestoneId}/ for details.`,
-              );
-              if (prUrl) {
-                ctx.ui.notify(`Draft PR created: ${prUrl}`, "info");
-              }
-            } catch {
-              // Non-fatal — PR creation is best-effort
-            }
-          }
-        }
-        deps.sendDesktopNotification(
-          "GSD",
-          `Milestone ${mid} complete!`,
-          "success",
-          "milestone",
-        );
-        deps.logCmuxEvent(
-          prefs,
-          `Milestone ${mid} complete.`,
-          "success",
-        );
-        await closeoutAndStop(ctx, pi, s, deps, `Milestone ${mid} complete`);
-        debugLog("autoLoop", { phase: "exit", reason: "milestone-complete" });
-        break;
-      }
-
-      // Terminal: blocked
-      if (state.phase === "blocked") {
-        const blockerMsg = `Blocked: ${state.blockers.join(", ")}`;
-        await closeoutAndStop(ctx, pi, s, deps, blockerMsg);
-        ctx.ui.notify(`${blockerMsg}. Fix and run /gsd auto.`, "warning");
-        deps.sendDesktopNotification("GSD", blockerMsg, "error", "attention");
-        deps.logCmuxEvent(prefs, blockerMsg, "error");
-        debugLog("autoLoop", { phase: "exit", reason: "blocked" });
-        break;
-      }
-
-      // ── Phase 2: Guards ─────────────────────────────────────────────────
-
-      {
-        const guardsResult = await runGuards({ ctx, pi, s, deps, prefs, iteration }, mid);
-        if (guardsResult.action === "break") break;
-      }
-
-      } // end if (!sidecarItem)
-
-      // ── Phase 3 + 4: Dispatch → Unit execution ─────────────────────────
-
       const ic: IterationContext = { ctx, pi, s, deps, prefs, iteration };
       const loopState: LoopState = { recentUnits, stuckRecoveryAttempts };
       let iterData: IterationData;
 
       if (!sidecarItem) {
-        const dispatchResult = await runDispatch(ic, { state, mid, midTitle: midTitle! }, loopState);
+        // ── Phase 1: Pre-dispatch ─────────────────────────────────────────
+        const preDispatchResult = await runPreDispatch(ic, loopState);
+        stuckRecoveryAttempts = loopState.stuckRecoveryAttempts;
+        if (preDispatchResult.action === "break") break;
+        if (preDispatchResult.action === "continue") continue;
+
+        const preData = preDispatchResult.data;
+
+        // ── Phase 2: Guards ───────────────────────────────────────────────
+        const guardsResult = await runGuards(ic, preData.mid);
+        if (guardsResult.action === "break") break;
+
+        // ── Phase 3: Dispatch ─────────────────────────────────────────────
+        const dispatchResult = await runDispatch(ic, preData, loopState);
         // Sync stuckRecoveryAttempts back from loopState (number is copied by value)
         stuckRecoveryAttempts = loopState.stuckRecoveryAttempts;
         if (dispatchResult.action === "break") break;
