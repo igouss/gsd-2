@@ -74,6 +74,47 @@ export interface UnitResult {
   event?: AgentEndEvent;
 }
 
+// ─── Phase pipeline types ────────────────────────────────────────────────────
+
+type PhaseResult<T = void> =
+  | { action: "continue" }
+  | { action: "break"; reason: string }
+  | { action: "next"; data: T }
+
+interface IterationContext {
+  ctx: ExtensionContext;
+  pi: ExtensionAPI;
+  s: AutoSession;
+  deps: LoopDeps;
+  prefs: GSDPreferences | undefined;
+  iteration: number;
+}
+
+interface LoopState {
+  recentUnits: Array<{ key: string; error?: string }>;
+  stuckRecoveryAttempts: number;
+}
+
+interface PreDispatchData {
+  state: GSDState;
+  mid: string;
+  midTitle: string;
+}
+
+interface IterationData {
+  unitType: string;
+  unitId: string;
+  prompt: string;
+  finalPrompt: string;
+  pauseAfterUatDispatch: boolean;
+  observabilityIssues: unknown[];
+  state: GSDState;
+  mid: string | undefined;
+  midTitle: string | undefined;
+  isRetry: boolean;
+  previousTier: string | undefined;
+}
+
 // ─── Per-unit one-shot promise state ────────────────────────────────────────
 //
 // A single module-level resolve function scoped to the current unit execution.
