@@ -96,20 +96,17 @@ describe("continue-here", () => {
       { name: "1M", contextWindow: 1_000_000 },
     ];
 
-    it("128K model produces continueThresholdPercent of 70", () => {
-      const budget = computeBudgets(128_000);
-      assert.equal(budget.continueThresholdPercent, 70, "128K model should have 70% threshold");
-    });
-
-    it("200K model produces continueThresholdPercent of 70", () => {
-      const budget = computeBudgets(200_000);
-      assert.equal(budget.continueThresholdPercent, 70, "200K model should have 70% threshold");
-    });
-
-    it("1M model produces continueThresholdPercent of 70", () => {
-      const budget = computeBudgets(1_000_000);
-      assert.equal(budget.continueThresholdPercent, 70, "1M model should have 70% threshold");
-    });
+    const thresholdCases: Array<[string, number]> = [
+      ["128K", 128_000],
+      ["200K", 200_000],
+      ["1M", 1_000_000],
+    ];
+    for (const [name, contextWindow] of thresholdCases) {
+      it(`${name} model produces continueThresholdPercent of 70`, () => {
+        const budget = computeBudgets(contextWindow);
+        assert.equal(budget.continueThresholdPercent, 70, `${name} model should have 70% threshold`);
+      });
+    }
 
     it("larger models produce larger verificationBudgetChars", () => {
       const budgets = modelSizes.map(({ contextWindow }) => computeBudgets(contextWindow));

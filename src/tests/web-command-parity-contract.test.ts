@@ -89,9 +89,8 @@ test("authoritative built-ins never fall through to prompt/follow_up in browser 
 
   for (const builtin of BUILTIN_SLASH_COMMANDS) {
     const expectedKind = EXPECTED_BUILTIN_OUTCOMES.get(builtin.name)
+    const outcome = dispatchBrowserSlashCommand(`/${builtin.name}`)
     await t.test(`/${builtin.name} -> ${expectedKind}`, () => {
-      const outcome = dispatchBrowserSlashCommand(`/${builtin.name}`)
-
       assert.ok(expectedKind, `missing explicit browser expectation for /${builtin.name}`)
       assert.notEqual(
         outcome.kind,
@@ -101,7 +100,7 @@ test("authoritative built-ins never fall through to prompt/follow_up in browser 
       assert.equal(outcome.kind, expectedKind, `/${builtin.name} resolved to ${outcome.kind}`)
     })
 
-    if (expectedKind === "reject") {
+    if (outcome.kind === "reject") {
       await t.test(`/${builtin.name} reject notice is browser-visible`, () => {
         const outcome = dispatchBrowserSlashCommand(`/${builtin.name}`)
         const notice = getBrowserSlashCommandTerminalNotice(outcome)
@@ -148,11 +147,13 @@ test("registered GSD command roots stay on the prompt/extension path", async () 
     "browser parity contract only expects the current GSD command roots",
   )
 
-  // Non-gsd roots are extension commands that pass through to the bridge
-  assertPromptPassthrough("/exit")
-  assertPromptPassthrough("/kill")
-  assertPromptPassthrough("/worktree")
-  assertPromptPassthrough("/wt")
+  // Non-gsd roots are extension commands that pass through to the bridge.
+  // Derived dynamically so adding a new registration fails this assertion loudly.
+  const nonGsdRoots = registeredRoots.filter((r) => r !== "gsd")
+  assert.equal(nonGsdRoots.length, 4, "expected exactly 4 non-gsd passthrough roots; update this count when adding registrations")
+  for (const root of nonGsdRoots) {
+    assertPromptPassthrough(`/${root}`)
+  }
 
   // Bare /gsd passes through to bridge (equivalent to /gsd next)
   const bareGsd = dispatchBrowserSlashCommand("/gsd")
