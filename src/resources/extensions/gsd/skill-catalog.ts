@@ -275,7 +275,7 @@ export const SKILL_CATALOG: SkillPack[] = [
       "vue-router-best-practices",
       "vue-testing-best-practices",
     ],
-    matchFiles: ["nuxt.config.ts", "nuxt.config.js"],
+    matchFiles: ["nuxt.config.ts", "nuxt.config.js", "vue.config.js", "vue.config.ts", "*.vue"],
   },
   // ── Svelte / SvelteKit ────────────────────────────────────────────────────
   {
@@ -380,19 +380,26 @@ export const SKILL_CATALOG: SkillPack[] = [
     repo: "anthropics/skills",
     skills: ["python-best-practices"],
     matchLanguages: ["python"],
-    matchFiles: ["pyproject.toml", "setup.py"],
+    matchFiles: ["pyproject.toml", "setup.py", "requirements.txt"],
   },
   {
     label: "Python Advanced",
-    description: "Python performance, testing, async patterns, uv package manager, and FastAPI",
+    description: "Python performance, testing, async patterns, and uv package manager",
     repo: "wshobson/agents",
     skills: [
       "python-performance-optimization",
       "python-testing-patterns",
       "async-python-patterns",
       "uv-package-manager",
-      "fastapi-templates",
     ],
+    matchLanguages: ["python"],
+    matchFiles: ["pyproject.toml", "setup.py", "requirements.txt"],
+  },
+  {
+    label: "FastAPI",
+    description: "Production-ready FastAPI projects with async patterns and error handling",
+    repo: "wshobson/agents",
+    skills: ["fastapi-templates"],
     matchLanguages: ["python"],
     matchFiles: ["pyproject.toml", "setup.py", "requirements.txt"],
   },
@@ -562,15 +569,23 @@ export const SKILL_CATALOG: SkillPack[] = [
       "spark-optimization",
       "data-quality-frameworks",
     ],
-    matchFiles: ["dbt_project.yml"],
+    matchFiles: ["dbt_project.yml", "airflow.cfg"],
   },
-  // ── Game Development (wshobson/agents — 2 skills) ──────────────────────────
+  // ── Game Development — Unity (wshobson/agents) ─────────────────────────────
   {
-    label: "Game Development",
-    description: "Unity ECS patterns and Godot GDScript best practices",
+    label: "Unity",
+    description: "Unity ECS patterns for high-performance game systems",
     repo: "wshobson/agents",
-    skills: ["unity-ecs-patterns", "godot-gdscript-patterns"],
-    matchFiles: ["ProjectSettings/ProjectVersion.txt", "project.godot"],
+    skills: ["unity-ecs-patterns"],
+    matchFiles: ["ProjectSettings/ProjectVersion.txt"],
+  },
+  // ── Game Development — Godot (wshobson/agents) ─────────────────────────────
+  {
+    label: "Godot",
+    description: "Godot GDScript best practices and scene composition",
+    repo: "wshobson/agents",
+    skills: ["godot-gdscript-patterns"],
+    matchFiles: ["project.godot"],
   },
   // ── Essential (all projects) ────────────────────────────────────────────
   {
@@ -661,7 +676,7 @@ export const GREENFIELD_STACKS: Array<{
     id: "react-web",
     label: "React Web",
     description: "React, Next.js, shadcn/ui, web frontend",
-    packs: ["React & Web Frontend", "TypeScript & JS Development", "React State & Patterns", "shadcn/ui", "Frontend Design & UX"],
+    packs: ["React & Web Frontend", "TypeScript & JS Development", "React State & Patterns", "Tailwind CSS", "shadcn/ui", "Frontend Design & UX"],
   },
   {
     id: "react-native",
@@ -673,7 +688,7 @@ export const GREENFIELD_STACKS: Array<{
     id: "fullstack-js",
     label: "Full-Stack JavaScript/TypeScript",
     description: "Node.js backend + React frontend",
-    packs: ["React & Web Frontend", "TypeScript & JS Development", "React State & Patterns", "shadcn/ui", "Frontend Design & UX"],
+    packs: ["React & Web Frontend", "TypeScript & JS Development", "React State & Patterns", "Tailwind CSS", "shadcn/ui", "Frontend Design & UX", "Prisma"],
   },
   {
     id: "rust",
@@ -727,13 +742,13 @@ export const GREENFIELD_STACKS: Array<{
     id: "svelte",
     label: "Svelte / SvelteKit",
     description: "Svelte 5 and SvelteKit patterns",
-    packs: ["Svelte", "Frontend Design & UX"],
+    packs: ["Svelte", "Tailwind CSS", "Frontend Design & UX"],
   },
   {
     id: "nextjs",
     label: "Next.js",
     description: "Next.js app router, React, and Vercel deployment",
-    packs: ["Next.js", "Next.js App Router Patterns", "React & Web Frontend", "TypeScript & JS Development", "shadcn/ui"],
+    packs: ["Next.js", "Next.js App Router Patterns", "React & Web Frontend", "TypeScript & JS Development", "Tailwind CSS", "shadcn/ui"],
   },
   {
     id: "flutter",
@@ -769,7 +784,7 @@ export const GREENFIELD_STACKS: Array<{
     id: "android",
     label: "Android / Kotlin",
     description: "Android app development with Material Design 3",
-    packs: ["Android", "Java & Spring Boot"],
+    packs: ["Android"],
   },
   {
     id: "kubernetes",
@@ -788,6 +803,18 @@ export const GREENFIELD_STACKS: Array<{
     label: "Data Engineering",
     description: "dbt, Airflow, Spark, and data quality",
     packs: ["Data Engineering", "Python", "Python Advanced"],
+  },
+  {
+    id: "unity",
+    label: "Unity",
+    description: "Unity game development with ECS patterns",
+    packs: ["Unity"],
+  },
+  {
+    id: "godot",
+    label: "Godot",
+    description: "Godot game development with GDScript",
+    packs: ["Godot"],
   },
   {
     id: "other",

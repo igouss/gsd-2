@@ -118,6 +118,9 @@ export const PROJECT_FILES = [
   "nuxt.config.js",
   "svelte.config.js",
   "svelte.config.ts",
+  // Vue CLI config files
+  "vue.config.js",
+  "vue.config.ts",
   // Frontend tooling
   "tailwind.config.js",
   "tailwind.config.ts",
@@ -143,6 +146,7 @@ export const PROJECT_FILES = [
   "foundry.toml",
   // Data engineering markers
   "dbt_project.yml",
+  "airflow.cfg",
   // Game engine markers
   "ProjectSettings/ProjectVersion.txt",
   "project.godot",
@@ -160,6 +164,9 @@ const SQL_EXTENSIONS = [".sql"] as const;
 /** File extensions that indicate .NET / C# projects. */
 const DOTNET_EXTENSIONS = [".csproj", ".sln", ".fsproj"] as const;
 
+/** File extensions that indicate Vue.js single-file components. */
+const VUE_EXTENSIONS = [".vue"] as const;
+
 const LANGUAGE_MAP: Record<string, string> = {
   "package.json": "javascript/typescript",
   "Cargo.toml": "rust",
@@ -170,6 +177,8 @@ const LANGUAGE_MAP: Record<string, string> = {
   "pom.xml": "java",
   "build.gradle": "java/kotlin",
   "build.gradle.kts": "kotlin",
+  "app/build.gradle": "java/kotlin",
+  "app/build.gradle.kts": "kotlin",
   "CMakeLists.txt": "c/c++",
   "composer.json": "php",
   "pubspec.yaml": "dart/flutter",
@@ -348,6 +357,15 @@ export function detectProjectSignals(basePath: string): ProjectSignals {
     if (rootEntries.some((e) => DOTNET_EXTENSIONS.some((ext) => e.endsWith(ext)))) {
       detectedFiles.push("*.csproj");
       if (!primaryLanguage) primaryLanguage = "csharp";
+    }
+    // Vue.js: scan src/ dir for .vue files (Vite-based Vue projects have no vue.config.*)
+    try {
+      const srcEntries = readdirSync(join(basePath, "src"));
+      if (srcEntries.some((e) => VUE_EXTENSIONS.some((ext) => e.endsWith(ext)))) {
+        detectedFiles.push("*.vue");
+      }
+    } catch {
+      // no src/ directory — skip Vue scan
     }
   } catch {
     // unreadable root — skip extension scan
