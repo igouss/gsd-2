@@ -58,7 +58,7 @@ import { initRoutingHistory } from "./routing-history.js";
 import { restoreHookState, resetHookState } from "./post-unit-hooks.js";
 import { resetProactiveHealing, setLevelChangeCallback } from "./doctor-proactive.js";
 import { snapshotSkills } from "./skill-discovery.js";
-import { isDbAvailable } from "./gsd-db.js";
+import { isDbAvailable, getMilestone } from "./gsd-db.js";
 import { hideFooter } from "./auto-dashboard.js";
 import {
   debugLog,
@@ -683,6 +683,12 @@ export async function bootstrapAutoSession(
         if (milestoneIds.length > 1) {
           const issues: string[] = [];
           for (const id of milestoneIds) {
+            // Skip completed/parked milestones — a leftover CONTEXT-DRAFT.md
+            // on a finished milestone is harmless residue, not an actionable warning.
+            if (isDbAvailable()) {
+              const ms = getMilestone(id);
+              if (ms?.status === "complete" || ms?.status === "parked") continue;
+            }
             const draft = resolveMilestoneFile(base, id, "CONTEXT-DRAFT");
             if (draft)
               issues.push(
