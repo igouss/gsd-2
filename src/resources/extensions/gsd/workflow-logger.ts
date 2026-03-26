@@ -47,7 +47,6 @@ export interface LogEntry {
 const MAX_BUFFER = 100;
 let _buffer: LogEntry[] = [];
 let _auditBasePath: string | null = null;
-let _auditDirEnsured = false;
 
 /**
  * Set the base path for persistent audit log writes.
@@ -56,7 +55,6 @@ let _auditDirEnsured = false;
  */
 export function setLogBasePath(basePath: string): void {
   _auditBasePath = basePath;
-  _auditDirEnsured = false;
 }
 
 // ─── Public API ─────────────────────────────────────────────────────────
@@ -234,10 +232,7 @@ function _push(
   if (_auditBasePath) {
     try {
       const auditDir = join(_auditBasePath, ".gsd");
-      if (!_auditDirEnsured) {
-        mkdirSync(auditDir, { recursive: true });
-        _auditDirEnsured = true;
-      }
+      mkdirSync(auditDir, { recursive: true });
       appendFileSync(join(auditDir, "audit-log.jsonl"), JSON.stringify(entry) + "\n", "utf-8");
     } catch (auditErr) {
       // Best-effort — never let audit write failures bubble up
