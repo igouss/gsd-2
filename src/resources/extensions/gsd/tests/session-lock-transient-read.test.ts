@@ -46,14 +46,14 @@ async function main(): Promise<void> {
         unitType: 'execute-task',
         unitId: 'M001/S01/T01',
         unitStartedAt: new Date().toISOString(),
-        completedUnits: 3,
+        sessionFile: 'test-session.json',
       };
       writeFileSync(lockFile, JSON.stringify(lockData, null, 2));
 
       const result = readExistingLockDataWithRetry(lockFile);
       assertTrue(result !== null, 'data returned for readable file');
       assertEq(result!.pid, process.pid, 'correct PID read');
-      assertEq(result!.completedUnits, 3, 'correct completedUnits read');
+      assertEq(result!.sessionFile, 'test-session.json', 'correct sessionFile read');
     } finally {
       rmSync(base, { recursive: true, force: true });
     }
@@ -90,7 +90,7 @@ async function main(): Promise<void> {
         unitType: 'execute-task',
         unitId: 'M001/S01/T01',
         unitStartedAt: new Date().toISOString(),
-        completedUnits: 7,
+        sessionFile: 'recovery-session.json',
       };
       writeFileSync(lockFile, JSON.stringify(lockData, null, 2));
 
@@ -105,7 +105,7 @@ async function main(): Promise<void> {
       assertTrue(result !== null, 'data recovered after transient unavailability');
       if (result) {
         assertEq(result.pid, process.pid, 'correct PID after recovery');
-        assertEq(result.completedUnits, 7, 'correct completedUnits after recovery');
+        assertEq(result.sessionFile, 'recovery-session.json', 'correct sessionFile after recovery');
       }
     } finally {
       rmSync(base, { recursive: true, force: true });
@@ -126,7 +126,7 @@ async function main(): Promise<void> {
         unitType: 'execute-task',
         unitId: 'M001/S01/T01',
         unitStartedAt: new Date().toISOString(),
-        completedUnits: 5,
+        sessionFile: 'perm-session.json',
       };
       writeFileSync(lockFile, JSON.stringify(lockData, null, 2));
 
@@ -202,7 +202,7 @@ async function main(): Promise<void> {
         unitType: 'execute-task',
         unitId: 'M001/S01/T01',
         unitStartedAt: new Date().toISOString(),
-        completedUnits: 0,
+        sessionFile: 'status-session.json',
       };
       writeFileSync(lockFile, JSON.stringify(lockData, null, 2));
 
