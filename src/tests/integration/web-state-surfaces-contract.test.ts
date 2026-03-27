@@ -384,11 +384,11 @@ const MOCK_DATA_PATTERNS = [
   /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.*Z["'](?:.*,\s*$)/m,  // hardcoded ISO timestamps in array literals
 ];
 
-const webRoot = resolve(import.meta.dirname, "../../web");
+const webRoot = resolve(import.meta.dirname, "../../../web");
 
 test("view components contain no static mock data arrays", () => {
   for (const filePath of VIEW_FILES) {
-    const fullPath = resolve(import.meta.dirname, "../..", filePath);
+    const fullPath = resolve(import.meta.dirname, "../../..", filePath);
     const source = readFileSync(fullPath, "utf-8");
     for (const pattern of MOCK_DATA_PATTERNS) {
       const match = source.match(pattern);
@@ -416,7 +416,7 @@ test("view components read from real data sources (store or API)", () => {
   ];
 
   for (const filePath of STORE_VIEWS) {
-    const fullPath = resolve(import.meta.dirname, "../..", filePath);
+    const fullPath = resolve(import.meta.dirname, "../../..", filePath);
     const source = readFileSync(fullPath, "utf-8");
     assert.ok(
       source.includes("gsd-workspace-store"),
@@ -425,7 +425,7 @@ test("view components read from real data sources (store or API)", () => {
   }
 
   for (const { path: filePath, apiPattern } of API_VIEWS) {
-    const fullPath = resolve(import.meta.dirname, "../..", filePath);
+    const fullPath = resolve(import.meta.dirname, "../../..", filePath);
     const source = readFileSync(fullPath, "utf-8");
     assert.ok(
       source.includes(apiPattern),
@@ -438,7 +438,7 @@ test("view components read from real data sources (store or API)", () => {
 // from the dashboard. Live signals are visible in the terminal/power mode instead.
 
 test("status bar consumes statusTexts from store", () => {
-  const statusBarPath = resolve(import.meta.dirname, "../../web/components/gsd/status-bar.tsx");
+  const statusBarPath = resolve(import.meta.dirname, "../../../web/components/gsd/status-bar.tsx");
   const source = readFileSync(statusBarPath, "utf-8");
 
   assert.ok(
@@ -453,9 +453,9 @@ test("status bar consumes statusTexts from store", () => {
 
 test("browser shell renders title overrides, widgets, and editor prefills from store-backed state", () => {
   const storePath = resolve(import.meta.dirname, "../../../web/lib/gsd-workspace-store.tsx");
-  const appShellPath = resolve(import.meta.dirname, "../../web/components/gsd/app-shell.tsx");
-  const statusBarPath = resolve(import.meta.dirname, "../../web/components/gsd/status-bar.tsx");
-  const terminalPath = resolve(import.meta.dirname, "../../web/components/gsd/terminal.tsx");
+  const appShellPath = resolve(import.meta.dirname, "../../../web/components/gsd/app-shell.tsx");
+  const statusBarPath = resolve(import.meta.dirname, "../../../web/components/gsd/status-bar.tsx");
+  const terminalPath = resolve(import.meta.dirname, "../../../web/components/gsd/terminal.tsx");
 
   const storeSource = readFileSync(storePath, "utf-8");
   const appShellSource = readFileSync(appShellPath, "utf-8");
@@ -478,7 +478,7 @@ test("browser shell renders title overrides, widgets, and editor prefills from s
 });
 
 test("terminal consumes activeToolExecution from store", () => {
-  const terminalPath = resolve(import.meta.dirname, "../../web/components/gsd/terminal.tsx");
+  const terminalPath = resolve(import.meta.dirname, "../../../web/components/gsd/terminal.tsx");
   const source = readFileSync(terminalPath, "utf-8");
 
   assert.ok(
@@ -490,10 +490,10 @@ test("terminal consumes activeToolExecution from store", () => {
 test("live browser panels consume live selectors and expose inspectable freshness markers", () => {
   const contractPath = resolve(import.meta.dirname, "../../../web/lib/command-surface-contract.ts")
   const storePath = resolve(import.meta.dirname, "../../../web/lib/gsd-workspace-store.tsx")
-  const dashboardPath = resolve(import.meta.dirname, "../../web/components/gsd/dashboard.tsx")
-  const sidebarPath = resolve(import.meta.dirname, "../../web/components/gsd/sidebar.tsx")
-  const roadmapPath = resolve(import.meta.dirname, "../../web/components/gsd/roadmap.tsx")
-  const statusBarPath = resolve(import.meta.dirname, "../../web/components/gsd/status-bar.tsx")
+  const dashboardPath = resolve(import.meta.dirname, "../../../web/components/gsd/dashboard.tsx")
+  const sidebarPath = resolve(import.meta.dirname, "../../../web/components/gsd/sidebar.tsx")
+  const roadmapPath = resolve(import.meta.dirname, "../../../web/components/gsd/roadmap.tsx")
+  const statusBarPath = resolve(import.meta.dirname, "../../../web/components/gsd/status-bar.tsx")
 
   const contractSource = readFileSync(contractPath, "utf-8")
   const storeSource = readFileSync(storePath, "utf-8")
@@ -528,9 +528,9 @@ test("live browser panels consume live selectors and expose inspectable freshnes
 })
 
 test("workflow action surfaces route new-milestone CTAs through the shared command path", () => {
-  const dashboardPath = resolve(import.meta.dirname, "../../web/components/gsd/dashboard.tsx")
-  const sidebarPath = resolve(import.meta.dirname, "../../web/components/gsd/sidebar.tsx")
-  const chatPath = resolve(import.meta.dirname, "../../web/components/gsd/chat-mode.tsx")
+  const dashboardPath = resolve(import.meta.dirname, "../../../web/components/gsd/dashboard.tsx")
+  const sidebarPath = resolve(import.meta.dirname, "../../../web/components/gsd/sidebar.tsx")
+  const chatPath = resolve(import.meta.dirname, "../../../web/components/gsd/chat-mode.tsx")
 
   const dashboardSource = readFileSync(dashboardPath, "utf-8")
   const sidebarSource = readFileSync(sidebarPath, "utf-8")
@@ -551,8 +551,8 @@ test("workflow action surfaces route new-milestone CTAs through the shared comma
 test("sidebar Git affordance opens a real git-summary surface with visible repo/not-repo/error states", () => {
   const contractPath = resolve(import.meta.dirname, "../../../web/lib/command-surface-contract.ts");
   const storePath = resolve(import.meta.dirname, "../../../web/lib/gsd-workspace-store.tsx");
-  const surfacePath = resolve(import.meta.dirname, "../../web/components/gsd/command-surface.tsx");
-  const sidebarPath = resolve(import.meta.dirname, "../../web/components/gsd/sidebar.tsx");
+  const surfacePath = resolve(import.meta.dirname, "../../../web/components/gsd/command-surface.tsx");
+  const sidebarPath = resolve(import.meta.dirname, "../../../web/components/gsd/sidebar.tsx");
 
   const contractSource = readFileSync(contractPath, "utf-8");
   const storeSource = readFileSync(storePath, "utf-8");
@@ -575,9 +575,9 @@ test("sidebar Git affordance opens a real git-summary surface with visible repo/
 test("recovery diagnostics surface stays on a dedicated route with explicit stale and action state", () => {
   const contractPath = resolve(import.meta.dirname, "../../../web/lib/command-surface-contract.ts");
   const storePath = resolve(import.meta.dirname, "../../../web/lib/gsd-workspace-store.tsx");
-  const surfacePath = resolve(import.meta.dirname, "../../web/components/gsd/command-surface.tsx");
-  const dashboardPath = resolve(import.meta.dirname, "../../web/components/gsd/dashboard.tsx");
-  const sidebarPath = resolve(import.meta.dirname, "../../web/components/gsd/sidebar.tsx");
+  const surfacePath = resolve(import.meta.dirname, "../../../web/components/gsd/command-surface.tsx");
+  const dashboardPath = resolve(import.meta.dirname, "../../../web/components/gsd/dashboard.tsx");
+  const sidebarPath = resolve(import.meta.dirname, "../../../web/components/gsd/sidebar.tsx");
 
   const contractSource = readFileSync(contractPath, "utf-8");
   const storeSource = readFileSync(storePath, "utf-8");

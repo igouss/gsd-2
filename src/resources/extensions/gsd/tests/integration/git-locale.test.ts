@@ -101,7 +101,7 @@ describe('git-locale', async () => {
     // We verify indirectly: the source code must pass env: GIT_NO_PROMPT_ENV.
     // Read the source and check for the pattern. This is a static check.
     const src = readFileSync(
-      join(import.meta.dirname, "..", "native-git-bridge.ts"),
+      join(import.meta.dirname, "../..", "native-git-bridge.ts"),
       "utf-8"
     );
 

@@ -124,7 +124,7 @@ test("worktree swap on milestone transition: merge old, create new", () => {
 
 test("auto/phases.ts milestone transition block contains worktree lifecycle", () => {
   const phasesSrc = readFileSync(
-    join(__dirname, "..", "auto", "phases.ts"),
+    join(__dirname, "../..", "auto", "phases.ts"),
     "utf-8",
   );
 
@@ -147,7 +147,7 @@ test("auto/phases.ts milestone transition block contains worktree lifecycle", ()
 
 test("worktree-resolver mergeAndExit preserves branch when roadmap is missing (#1573)", () => {
   const resolverSrc = readFileSync(
-    join(__dirname, "..", "worktree-resolver.ts"),
+    join(__dirname, "../..", "worktree-resolver.ts"),
     "utf-8",
   );
 

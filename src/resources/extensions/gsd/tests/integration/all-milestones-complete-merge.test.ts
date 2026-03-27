@@ -78,9 +78,9 @@ function createMilestoneArtifacts(dir: string, mid: string): void {
 // ─── Source-level: verify the merge code exists in the "all complete" path ────
 
 test("auto-loop 'all milestones complete' path merges before stopping (#962)", () => {
-  const loopSrc = readFileSync(join(__dirname, "..", "auto", "phases.ts"), "utf-8");
+  const loopSrc = readFileSync(join(__dirname, "../..", "auto", "phases.ts"), "utf-8");
   const resolverSrc = readFileSync(
-    join(__dirname, "..", "worktree-resolver.ts"),
+    join(__dirname, "../..", "worktree-resolver.ts"),
     "utf-8",
   );
 

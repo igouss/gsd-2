@@ -10,7 +10,7 @@ import { resolveSliceFile } from '../../paths.ts';
 import { checkNeedsRunUat } from '../../auto-prompts.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const worktreePromptsDir = join(__dirname, '..', 'prompts');
+const worktreePromptsDir = join(__dirname, '../..', 'prompts');
 
 function loadPromptFromWorktree(name: string, vars: Record<string, string> = {}): string {
   const path = join(worktreePromptsDir, `${name}.md`);
