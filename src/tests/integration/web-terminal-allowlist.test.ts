@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-const sessionsRoute = await import("../../web/app/api/terminal/sessions/route.ts");
-const streamRoute = await import("../../web/app/api/terminal/stream/route.ts");
+const sessionsRoute = await import("../../../web/app/api/terminal/sessions/route.ts");
+const streamRoute = await import("../../../web/app/api/terminal/stream/route.ts");
 
 test("terminal session creation rejects disallowed commands", async () => {
   const response = await sessionsRoute.POST(

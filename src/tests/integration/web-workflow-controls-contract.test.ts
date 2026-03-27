@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 // ─── Import ──────────────────────────────────────────────────────────
-const { deriveWorkflowAction } = await import("../../web/lib/workflow-actions.ts");
+const { deriveWorkflowAction } = await import("../../../web/lib/workflow-actions.ts");
 
 // ─── Helpers ──────────────────────────────────────────────────────────
 function baseInput(overrides: Partial<Parameters<typeof deriveWorkflowAction>[0]> = {}) {

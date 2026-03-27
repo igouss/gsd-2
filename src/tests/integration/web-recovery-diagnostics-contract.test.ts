@@ -9,7 +9,7 @@ import { StringDecoder } from "node:string_decoder"
 
 const repoRoot = process.cwd()
 const bridge = await import("../../web/bridge-service.ts")
-const recoveryRoute = await import("../../web/app/api/recovery/route.ts")
+const recoveryRoute = await import("../../../web/app/api/recovery/route.ts")
 
 class FakeRpcChild extends EventEmitter {
   stdin = new PassThrough()

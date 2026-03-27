@@ -10,7 +10,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const WEB_ROOT = resolve(import.meta.dirname, '../../web')
+const WEB_ROOT = resolve(import.meta.dirname, '../../../web')
 
 function readComponent(relativePath: string): string {
   return readFileSync(resolve(WEB_ROOT, relativePath), 'utf-8')

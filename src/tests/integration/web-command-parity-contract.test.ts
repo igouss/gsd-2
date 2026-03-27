@@ -3,19 +3,19 @@ import assert from "node:assert/strict"
 import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
 
-const { BUILTIN_SLASH_COMMANDS } = await import("../../packages/pi-coding-agent/src/core/slash-commands.ts")
+const { BUILTIN_SLASH_COMMANDS } = await import("../../../packages/pi-coding-agent/src/core/slash-commands.ts")
 const {
   dispatchBrowserSlashCommand,
   getBrowserSlashCommandTerminalNotice,
-} = await import("../../web/lib/browser-slash-command-dispatch.ts")
+} = await import("../../../web/lib/browser-slash-command-dispatch.ts")
 const {
   applyCommandSurfaceActionResult,
   createInitialCommandSurfaceState,
   openCommandSurfaceState,
   setCommandSurfacePending,
   surfaceOutcomeToOpenRequest,
-} = await import("../../web/lib/command-surface-contract.ts")
-const gsdExtension = await import("../resources/extensions/gsd/index.ts")
+} = await import("../../../web/lib/command-surface-contract.ts")
+const gsdExtension = await import("../../resources/extensions/gsd/index.ts")
 
 const EXPECTED_BUILTIN_OUTCOMES = new Map<string, "rpc" | "surface" | "reject">([
   ["settings", "surface"],

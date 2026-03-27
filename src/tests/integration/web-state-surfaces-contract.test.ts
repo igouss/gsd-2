@@ -8,10 +8,10 @@ import { join, resolve } from "node:path";
 const workspaceIndex = await import(
   "../../resources/extensions/gsd/workspace-index.ts"
 );
-const filesRoute = await import("../../web/app/api/files/route.ts");
+const filesRoute = await import("../../../web/app/api/files/route.ts");
 
 // Re-import status helpers from the web-side module
-const workspaceStatus = await import("../../web/lib/workspace-status.ts");
+const workspaceStatus = await import("../../../web/lib/workspace-status.ts");
 
 // ─── Helpers ──────────────────────────────────────────────────────────
 function makeGsdFixture(): { root: string; gsdDir: string; cleanup: () => void } {
@@ -452,7 +452,7 @@ test("status bar consumes statusTexts from store", () => {
 });
 
 test("browser shell renders title overrides, widgets, and editor prefills from store-backed state", () => {
-  const storePath = resolve(import.meta.dirname, "../../web/lib/gsd-workspace-store.tsx");
+  const storePath = resolve(import.meta.dirname, "../../../web/lib/gsd-workspace-store.tsx");
   const appShellPath = resolve(import.meta.dirname, "../../web/components/gsd/app-shell.tsx");
   const statusBarPath = resolve(import.meta.dirname, "../../web/components/gsd/status-bar.tsx");
   const terminalPath = resolve(import.meta.dirname, "../../web/components/gsd/terminal.tsx");
@@ -488,8 +488,8 @@ test("terminal consumes activeToolExecution from store", () => {
 });
 
 test("live browser panels consume live selectors and expose inspectable freshness markers", () => {
-  const contractPath = resolve(import.meta.dirname, "../../web/lib/command-surface-contract.ts")
-  const storePath = resolve(import.meta.dirname, "../../web/lib/gsd-workspace-store.tsx")
+  const contractPath = resolve(import.meta.dirname, "../../../web/lib/command-surface-contract.ts")
+  const storePath = resolve(import.meta.dirname, "../../../web/lib/gsd-workspace-store.tsx")
   const dashboardPath = resolve(import.meta.dirname, "../../web/components/gsd/dashboard.tsx")
   const sidebarPath = resolve(import.meta.dirname, "../../web/components/gsd/sidebar.tsx")
   const roadmapPath = resolve(import.meta.dirname, "../../web/components/gsd/roadmap.tsx")
@@ -549,8 +549,8 @@ test("workflow action surfaces route new-milestone CTAs through the shared comma
 })
 
 test("sidebar Git affordance opens a real git-summary surface with visible repo/not-repo/error states", () => {
-  const contractPath = resolve(import.meta.dirname, "../../web/lib/command-surface-contract.ts");
-  const storePath = resolve(import.meta.dirname, "../../web/lib/gsd-workspace-store.tsx");
+  const contractPath = resolve(import.meta.dirname, "../../../web/lib/command-surface-contract.ts");
+  const storePath = resolve(import.meta.dirname, "../../../web/lib/gsd-workspace-store.tsx");
   const surfacePath = resolve(import.meta.dirname, "../../web/components/gsd/command-surface.tsx");
   const sidebarPath = resolve(import.meta.dirname, "../../web/components/gsd/sidebar.tsx");
 
@@ -573,8 +573,8 @@ test("sidebar Git affordance opens a real git-summary surface with visible repo/
 });
 
 test("recovery diagnostics surface stays on a dedicated route with explicit stale and action state", () => {
-  const contractPath = resolve(import.meta.dirname, "../../web/lib/command-surface-contract.ts");
-  const storePath = resolve(import.meta.dirname, "../../web/lib/gsd-workspace-store.tsx");
+  const contractPath = resolve(import.meta.dirname, "../../../web/lib/command-surface-contract.ts");
+  const storePath = resolve(import.meta.dirname, "../../../web/lib/gsd-workspace-store.tsx");
   const surfacePath = resolve(import.meta.dirname, "../../web/components/gsd/command-surface.tsx");
   const dashboardPath = resolve(import.meta.dirname, "../../web/components/gsd/dashboard.tsx");
   const sidebarPath = resolve(import.meta.dirname, "../../web/components/gsd/sidebar.tsx");

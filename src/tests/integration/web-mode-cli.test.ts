@@ -6,8 +6,8 @@ import { tmpdir } from 'node:os'
 
 const projectRoot = process.cwd()
 
-const cliWeb = await import('../cli-web-branch.ts')
-const webMode = await import('../web-mode.ts')
+const cliWeb = await import('../../cli-web-branch.ts')
+const webMode = await import('../../web-mode.ts')
 
 test('parseCliArgs recognizes --web explicitly', () => {
   const flags = cliWeb.parseCliArgs(['node', 'dist/loader.js', '--web'])

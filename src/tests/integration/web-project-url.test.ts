@@ -1,7 +1,7 @@
 import test from "node:test"
 import assert from "node:assert/strict"
 
-import { buildProjectAbsoluteUrl, buildProjectPath } from "../../web/lib/project-url.ts"
+import { buildProjectAbsoluteUrl, buildProjectPath } from "../../../web/lib/project-url.ts"
 
 test("buildProjectPath leaves non-project routes unchanged", () => {
   assert.equal(buildProjectPath("/api/terminal/input"), "/api/terminal/input")

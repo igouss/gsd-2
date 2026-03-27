@@ -5,7 +5,7 @@ const {
   derivePendingWorkflowCommandLabel,
   executeWorkflowActionInPowerMode,
   navigateToGSDView,
-} = await import("../../web/lib/workflow-action-execution.ts")
+} = await import("../../../web/lib/workflow-action-execution.ts")
 
 test("derivePendingWorkflowCommandLabel prefers the latest input line while a command is in flight", () => {
   const label = derivePendingWorkflowCommandLabel({

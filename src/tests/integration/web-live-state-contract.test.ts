@@ -8,13 +8,13 @@ import { PassThrough } from "node:stream";
 import { StringDecoder } from "node:string_decoder";
 
 const repoRoot = process.cwd();
-const bridge = await import("../web/bridge-service.ts");
-const onboarding = await import("../web/onboarding-service.ts");
+const bridge = await import("../../web/bridge-service.ts");
+const onboarding = await import("../../web/onboarding-service.ts");
 const { AuthStorage } = await import("@gsd/pi-coding-agent");
-const commandRoute = await import("../../web/app/api/session/command/route.ts");
-const manageRoute = await import("../../web/app/api/session/manage/route.ts");
-const eventsRoute = await import("../../web/app/api/session/events/route.ts");
-const liveStateRoute = await import("../../web/app/api/live-state/route.ts");
+const commandRoute = await import("../../../web/app/api/session/command/route.ts");
+const manageRoute = await import("../../../web/app/api/session/manage/route.ts");
+const eventsRoute = await import("../../../web/app/api/session/events/route.ts");
+const liveStateRoute = await import("../../../web/app/api/live-state/route.ts");
 
 class FakeRpcChild extends EventEmitter {
   stdin = new PassThrough();

@@ -25,18 +25,18 @@ import type {
   SkillHealthReport,
   SkillHealthEntry,
   SkillHealSuggestion,
-} from "../../web/lib/diagnostics-types.ts"
+} from "../../../web/lib/diagnostics-types.ts"
 
 const {
   createInitialCommandSurfaceState,
   commandSurfaceSectionForRequest,
-} = await import("../../web/lib/command-surface-contract.ts")
+} = await import("../../../web/lib/command-surface-contract.ts")
 
 const {
   dispatchBrowserSlashCommand,
-} = await import("../../web/lib/browser-slash-command-dispatch.ts")
+} = await import("../../../web/lib/browser-slash-command-dispatch.ts")
 
-const { GSDWorkspaceStore } = await import("../../web/lib/gsd-workspace-store.tsx")
+const { GSDWorkspaceStore } = await import("../../../web/lib/gsd-workspace-store.tsx")
 
 // ─── Block 1: Type exports (R103, R104, R105) ───────────────────────────────
 

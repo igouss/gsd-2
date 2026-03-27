@@ -11,9 +11,9 @@ import { StringDecoder } from "node:string_decoder"
 const repoRoot = process.cwd()
 const bridge = await import("../../web/bridge-service.ts")
 const onboarding = await import("../../web/onboarding-service.ts")
-const browserRoute = await import("../../web/app/api/session/browser/route.ts")
-const manageRoute = await import("../../web/app/api/session/manage/route.ts")
-const gitRoute = await import("../../web/app/api/git/route.ts")
+const browserRoute = await import("../../../web/app/api/session/browser/route.ts")
+const manageRoute = await import("../../../web/app/api/session/manage/route.ts")
+const gitRoute = await import("../../../web/app/api/git/route.ts")
 const { AuthStorage } = await import("@gsd/pi-coding-agent")
 
 class FakeRpcChild extends EventEmitter {
@@ -635,12 +635,12 @@ test("/api/git exposes an explicit not-a-repo state instead of failing silently"
 })
 
 test("browser session, settings, and git surfaces keep inspectable browse/manage/state markers on the shared surface", () => {
-  const rpcTypesSource = readFileSync(resolve(import.meta.dirname, "../../packages/pi-coding-agent/src/modes/rpc/rpc-types.ts"), "utf8")
-  const contractSource = readFileSync(resolve(import.meta.dirname, "../../web/lib/command-surface-contract.ts"), "utf8")
-  const storeSource = readFileSync(resolve(import.meta.dirname, "../../web/lib/gsd-workspace-store.tsx"), "utf8")
+  const rpcTypesSource = readFileSync(resolve(import.meta.dirname, "../../../packages/pi-coding-agent/src/modes/rpc/rpc-types.ts"), "utf8")
+  const contractSource = readFileSync(resolve(import.meta.dirname, "../../../web/lib/command-surface-contract.ts"), "utf8")
+  const storeSource = readFileSync(resolve(import.meta.dirname, "../../../web/lib/gsd-workspace-store.tsx"), "utf8")
   const surfaceSource = readFileSync(resolve(import.meta.dirname, "../../web/components/gsd/command-surface.tsx"), "utf8")
   const sidebarSource = readFileSync(resolve(import.meta.dirname, "../../web/components/gsd/sidebar.tsx"), "utf8")
-  const gitRouteSource = readFileSync(resolve(import.meta.dirname, "../../web/app/api/git/route.ts"), "utf8")
+  const gitRouteSource = readFileSync(resolve(import.meta.dirname, "../../../web/app/api/git/route.ts"), "utf8")
 
   assert.match(rpcTypesSource, /autoRetryEnabled: boolean/, "rpc-types.ts must expose retry-enabled state in get_state")
   assert.match(rpcTypesSource, /retryInProgress: boolean/, "rpc-types.ts must expose retry-in-progress state in get_state")
