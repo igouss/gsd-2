@@ -6,7 +6,7 @@ import { join, resolve } from "node:path";
 
 // ─── Imports ──────────────────────────────────────────────────────────
 const workspaceIndex = await import(
-  "../resources/extensions/gsd/workspace-index.ts"
+  "../../resources/extensions/gsd/workspace-index.ts"
 );
 const filesRoute = await import("../../web/app/api/files/route.ts");
 

@@ -4,8 +4,9 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 
-import { discoverProjects } from "../web/project-discovery-service.ts";
-import { detectMonorepo } from "../web/bridge-service.ts";
+
+import { discoverProjects } from "../../web/project-discovery-service.ts";
+import { detectMonorepo } from "../../web/bridge-service.ts";
 
 // ---------------------------------------------------------------------------
 // Fixture setup — standard multi-project root

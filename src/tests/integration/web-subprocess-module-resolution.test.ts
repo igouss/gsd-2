@@ -5,7 +5,7 @@ import { join } from "node:path"
 import {
   isUnderNodeModules,
   resolveSubprocessModule,
-} from "../web/ts-subprocess-flags.ts"
+} from "../../web/ts-subprocess-flags.ts"
 
 // ---------------------------------------------------------------------------
 // isUnderNodeModules — exported utility
