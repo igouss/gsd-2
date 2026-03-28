@@ -115,6 +115,27 @@ export interface BootstrapDeps {
 const _consecutiveCompleteBootstraps = new Map<string, number>();
 const MAX_CONSECUTIVE_COMPLETE_BOOTSTRAPS = 2;
 
+/** @internal Test-seam: returns the current counter value for a given basePath. */
+export function _getConsecutiveCompleteCount(basePath: string): number {
+  return _consecutiveCompleteBootstraps.get(basePath) ?? 0;
+}
+
+/** @internal Test-seam: resets the counter for one or all basePaths (for test isolation). */
+export function _resetConsecutiveCompleteBootstraps(basePath?: string): void {
+  if (basePath !== undefined) {
+    _consecutiveCompleteBootstraps.delete(basePath);
+  } else {
+    _consecutiveCompleteBootstraps.clear();
+  }
+}
+
+/** @internal Test-seam: increments the counter for a given basePath and returns the new value. */
+export function _incrementConsecutiveCompleteCount(basePath: string): number {
+  const next = (_consecutiveCompleteBootstraps.get(basePath) ?? 0) + 1;
+  _consecutiveCompleteBootstraps.set(basePath, next);
+  return next;
+}
+
 async function openProjectDbIfPresent(basePath: string): Promise<void> {
   const gsdDbPath = resolveProjectRootDbPath(basePath);
   if (!existsSync(gsdDbPath) || isDbAvailable()) return;
