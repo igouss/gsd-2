@@ -324,6 +324,7 @@ export class EventBridge {
           collector.stop('resolved');
         } catch (err) {
           const errMsg = err instanceof Error ? err.message : String(err);
+          if (errMsg.includes('No pending blocker')) return; // R008 — stale click, silent no-op
           this.logger.error('bridge: blocker resolve failed', { sessionId, error: errMsg });
           await interaction.reply({
             content: `❌ Failed to resolve blocker: ${errMsg}`,

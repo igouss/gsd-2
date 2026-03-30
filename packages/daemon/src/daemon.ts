@@ -5,6 +5,8 @@ import { scanForProjects } from './project-scanner.js';
 import { DiscordBot, validateDiscordConfig } from './discord-bot.js';
 import { EventBridge } from './event-bridge.js';
 import { Orchestrator } from './orchestrator.js';
+import { DBusBlockerBridge } from './dbus-bridge-blocker.js';
+import { SecretServiceAdapter } from './secret-service.js';
 
 /**
  * Core daemon class — ties config + logger together with lifecycle management.
@@ -19,20 +21,29 @@ export class Daemon {
   private sessionManager: SessionManager | undefined;
   private discordBot: DiscordBot | undefined;
   private eventBridge: EventBridge | undefined;
+  private dbusBridge: DBusBlockerBridge | undefined;
   private orchestrator: Orchestrator | undefined;
+
+  private readonly secretAdapter: SecretServiceAdapter;
 
   constructor(
     private readonly config: DaemonConfig,
     private readonly logger: Logger,
     private readonly healthIntervalMs: number = 300_000,
+    secretAdapter?: SecretServiceAdapter,
   ) {
     this.onSigterm = () => void this.shutdown();
     this.onSigint = () => void this.shutdown();
+    this.secretAdapter = secretAdapter ?? new SecretServiceAdapter();
   }
 
   /** Start the daemon: log startup info, register signal handlers, start keepalive. */
   async start(): Promise<void> {
     this.sessionManager = new SessionManager(this.logger);
+
+    if (process.platform === 'linux') {
+      await this.loadKeyringCredentials();
+    }
 
     this.logger.info('daemon started', {
       log_level: this.config.log.level,
@@ -108,6 +119,16 @@ export class Daemon {
       }
     }
 
+    // Wire up DBusEventBridge for native Linux desktop notifications
+    if (process.platform === 'linux' && !!process.env.DBUS_SESSION_BUS_ADDRESS) {
+      this.dbusBridge = new DBusBlockerBridge({
+        sessionManager: this.sessionManager,
+        logger: this.logger,
+      });
+      await this.dbusBridge.start();
+      // start() never throws — D-Bus unavailability is logged as warn internally
+    }
+
     // Health heartbeat — logs uptime, session count, Discord status, memory
     const startTime = Date.now();
     this.healthTimer = setInterval(() => {
@@ -122,6 +143,22 @@ export class Daemon {
         memory_rss_mb: Math.round(process.memoryUsage().rss / 1024 / 1024),
       });
     }, this.healthIntervalMs);
+  }
+
+  /** Load credentials from the org.freedesktop.secrets keyring and inject into process.env / config. */
+  private async loadKeyringCredentials(): Promise<void> {
+    const [anthropicKey, discordToken] = await Promise.all([
+      this.secretAdapter.getCredential('ANTHROPIC_API_KEY'),
+      this.secretAdapter.getCredential('DISCORD_TOKEN'),
+    ]);
+    if (anthropicKey) process.env['ANTHROPIC_API_KEY'] = anthropicKey;
+    if (discordToken && this.config.discord) {
+      this.config.discord = { ...this.config.discord, token: discordToken };
+    }
+    this.logger.info('keyring credentials loaded', {
+      anthropic_key_found: !!anthropicKey,
+      discord_token_found: !!discordToken,
+    });
   }
 
   /** Scan configured project roots for project directories. */
@@ -180,6 +217,12 @@ export class Daemon {
     if (this.eventBridge) {
       await this.eventBridge.stop();
       this.eventBridge = undefined;
+    }
+
+    // Stop DBusEventBridge before session cleanup
+    if (this.dbusBridge) {
+      await this.dbusBridge.stop();
+      this.dbusBridge = undefined;
     }
 
     // Destroy Discord bot before session cleanup

@@ -895,6 +895,11 @@ function resolveExtensionEntries(dir: string): string[] | null {
 	return null;
 }
 
+/** Dirent.isDirectory() returns false for symlinks; this covers both. */
+function isDirLike(entry: { isDirectory(): boolean; isSymbolicLink(): boolean }): boolean {
+	return entry.isDirectory() || entry.isSymbolicLink();
+}
+
 /**
  * Discover extensions in a directory.
  *
@@ -925,7 +930,7 @@ function discoverExtensionsInDir(dir: string): string[] {
 			}
 
 			// 2 & 3. Subdirectories
-			if (entry.isDirectory() || entry.isSymbolicLink()) {
+			if (isDirLike(entry)) {
 				const entries = resolveExtensionEntries(entryPath);
 				if (entries) {
 					discovered.push(...entries);

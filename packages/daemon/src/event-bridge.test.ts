@@ -386,7 +386,7 @@ describe('EventBridge', () => {
       assert.equal(mockFn(mockInteraction.reply).mock.callCount(), 1);
     });
 
-    it('posts error when resolveBlocker throws', async () => {
+    it('silently ignores stale click when resolveBlocker throws "No pending blocker" (R008)', async () => {
       const { bridge, sessionManager, channelManager } = buildBridge();
       sessionManager.resolveBlocker = mock.fn(async () => { throw new Error('No pending blocker'); });
       bridge.start();
@@ -417,9 +417,8 @@ describe('EventBridge', () => {
       collector.emit('collect', mockInteraction);
       await tick();
 
-      assert.equal(mockFn(mockInteraction.reply).mock.callCount(), 1);
-      const replyArg = mockFn(mockInteraction.reply).mock.calls[0]!.arguments[0] as Record<string, unknown>;
-      assert.ok(String(replyArg.content).includes('Failed to resolve'));
+      // R008: stale click must be a silent no-op — no Discord reply, no error logged
+      assert.equal(mockFn(mockInteraction.reply).mock.callCount(), 0);
     });
   });
 

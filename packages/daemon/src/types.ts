@@ -24,6 +24,22 @@ export interface LogEntry {
   data?: Record<string, unknown>;
 }
 
+// ---------------------------------------------------------------------------
+// Linux systemd platform config
+// ---------------------------------------------------------------------------
+
+/**
+ * Optional Linux-specific configuration block in the daemon YAML.
+ * All fields are optional — defaults are derived from the environment at
+ * install time if not specified.
+ */
+export interface LinuxConfig {
+  /** Path to the Node.js binary used in ExecStart (defaults to process.execPath) */
+  nodePath?: string;
+  /** Override the systemd user unit directory (defaults to ~/.config/systemd/user) */
+  unitDir?: string;
+}
+
 /**
  * Top-level daemon configuration, loaded from YAML.
  */
@@ -50,6 +66,8 @@ export interface DaemonConfig {
     level: LogLevel;
     max_size_mb: number;
   };
+  /** Linux-specific configuration (optional, only relevant on Linux) */
+  linux?: LinuxConfig;
 }
 
 // ---------------------------------------------------------------------------

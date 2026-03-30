@@ -30,6 +30,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",
     "@gsd-build/rpc-client": "^2.52.0",
+    "dbus-next": "^0.10.2",
     "discord.js": "^14.25.1",
     "yaml": "^2.8.0",
     "zod": "^3.24.0"

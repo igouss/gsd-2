@@ -11,6 +11,7 @@ import { resolveConfigPath, loadConfig, validateConfig } from './config.js';
 import { Logger } from './logger.js';
 import { Daemon } from './daemon.js';
 import { SessionManager } from './session-manager.js';
+import { SecretServiceAdapter } from './secret-service.js';
 import type { DaemonConfig, LogEntry } from './types.js';
 
 // ---------- helpers ----------
@@ -367,15 +368,17 @@ describe('Daemon', () => {
 
     const content = readFileSync(logPath, 'utf-8');
     const lines = content.trim().split('\n');
+    const entries = lines.map((l) => JSON.parse(l) as LogEntry);
 
-    // First line: daemon started
-    const startEntry: LogEntry = JSON.parse(lines[0]!);
-    assert.equal(startEntry.msg, 'daemon started');
+    // Find 'daemon started' entry (keyring credentials loaded may appear first on Linux)
+    const startEntry = entries.find((e) => e.msg === 'daemon started')!;
+    assert.ok(startEntry, 'expected daemon started log entry');
     assert.equal(startEntry.data?.scan_roots, 2);
     assert.equal(startEntry.data?.discord_configured, false);
 
-    // Second line: daemon shutting down
-    const stopEntry: LogEntry = JSON.parse(lines[1]!);
+    // Last line: daemon shutting down (dbus bridge may emit lines between start and shutdown)
+    const stopEntry = entries.find((e) => e.msg === 'daemon shutting down')!;
+    assert.ok(stopEntry, 'expected daemon shutting down log entry');
     assert.equal(stopEntry.msg, 'daemon shutting down');
   });
 
@@ -759,5 +762,177 @@ describe('Daemon integration', () => {
     const content = readFileSync(logPath, 'utf-8');
     assert.ok(content.includes('daemon started'));
     assert.ok(content.includes('daemon shutting down'));
+  });
+});
+
+// ---------- Keyring credential lookup ----------
+
+// Mock SecretServiceAdapter that returns controlled values without any D-Bus involvement.
+class MockSecretAdapter extends SecretServiceAdapter {
+  private readonly responses: Map<string, string | null>;
+  callCount = 0;
+
+  constructor(responses: Map<string, string | null>) {
+    // Pass a no-op BusFactory — we override getCredential so it never runs
+    super(() => { throw new Error('should not connect'); });
+    this.responses = responses;
+  }
+
+  override async getCredential(key: string): Promise<string | null> {
+    this.callCount++;
+    return this.responses.get(key) ?? null;
+  }
+}
+
+describe('Keyring credential lookup', () => {
+  it('credentials found path: env and config patched, log reflects found=true', async () => {
+    const dir = tmpDir();
+    cleanupDirs.push(dir);
+    const logPath = join(dir, 'keyring-found.log');
+
+    const config: DaemonConfig = {
+      discord: { token: 'old-token', guild_id: 'g1', owner_id: 'o1' },
+      projects: { scan_roots: [] },
+      log: { file: logPath, level: 'info', max_size_mb: 50 },
+    };
+
+    const mockAdapter = new MockSecretAdapter(new Map([
+      ['ANTHROPIC_API_KEY', 'test-api-key'],
+      ['DISCORD_TOKEN', 'test-discord-token'],
+    ]));
+
+    const logger = new Logger({ filePath: logPath, level: 'info' });
+    const daemon = new Daemon(config, logger, 300_000, mockAdapter);
+
+    // Override platform to linux for this test
+    const origPlatform = process.platform;
+    Object.defineProperty(process, 'platform', { value: 'linux', configurable: true });
+
+    const savedApiKey = process.env['ANTHROPIC_API_KEY'];
+    delete process.env['ANTHROPIC_API_KEY'];
+
+    const origExit = process.exit;
+    // @ts-expect-error — overriding process.exit for test
+    process.exit = () => {};
+
+    try {
+      await daemon.start();
+
+      // Verify env was patched
+      assert.equal(process.env['ANTHROPIC_API_KEY'], 'test-api-key');
+
+      // Verify config.discord.token was patched
+      assert.equal(config.discord?.token, 'test-discord-token');
+
+      await daemon.shutdown();
+
+      // Read log after shutdown so the write stream has been flushed and closed
+      const lines = readFileSync(logPath, 'utf-8').trim().split('\n');
+      const entries = lines.map((l) => JSON.parse(l) as LogEntry);
+      const keyringEntry = entries.find((e) => e.msg === 'keyring credentials loaded');
+      assert.ok(keyringEntry, 'expected keyring credentials loaded log entry');
+      assert.equal(keyringEntry.data?.anthropic_key_found, true);
+      assert.equal(keyringEntry.data?.discord_token_found, true);
+    } finally {
+      process.exit = origExit;
+      Object.defineProperty(process, 'platform', { value: origPlatform, configurable: true });
+      if (savedApiKey === undefined) delete process.env['ANTHROPIC_API_KEY'];
+      else process.env['ANTHROPIC_API_KEY'] = savedApiKey;
+    }
+  });
+
+  it('keyring unavailable path: getCredential returns null, daemon starts without throwing', async () => {
+    const dir = tmpDir();
+    cleanupDirs.push(dir);
+    const logPath = join(dir, 'keyring-unavail.log');
+
+    const config: DaemonConfig = {
+      discord: undefined,
+      projects: { scan_roots: [] },
+      log: { file: logPath, level: 'info', max_size_mb: 50 },
+    };
+
+    // All keys return null — simulates keyring unavailable or entries missing
+    const mockAdapter = new MockSecretAdapter(new Map([
+      ['ANTHROPIC_API_KEY', null],
+      ['DISCORD_TOKEN', null],
+    ]));
+
+    const logger = new Logger({ filePath: logPath, level: 'info' });
+    const daemon = new Daemon(config, logger, 300_000, mockAdapter);
+
+    const origPlatform = process.platform;
+    Object.defineProperty(process, 'platform', { value: 'linux', configurable: true });
+
+    const origExit = process.exit;
+    // @ts-expect-error — overriding process.exit for test
+    process.exit = () => {};
+
+    try {
+      // Must not throw even with null returns
+      await daemon.start();
+
+      await daemon.shutdown();
+
+      // Read log after shutdown so the write stream has been flushed and closed
+      const lines = readFileSync(logPath, 'utf-8').trim().split('\n');
+      const entries = lines.map((l) => JSON.parse(l) as LogEntry);
+      const keyringEntry = entries.find((e) => e.msg === 'keyring credentials loaded');
+      assert.ok(keyringEntry, 'expected keyring credentials loaded log entry');
+      assert.equal(keyringEntry.data?.anthropic_key_found, false);
+      assert.equal(keyringEntry.data?.discord_token_found, false);
+    } finally {
+      process.exit = origExit;
+      Object.defineProperty(process, 'platform', { value: origPlatform, configurable: true });
+    }
+  });
+
+  it('non-Linux platform: getCredential never called, daemon starts normally', async () => {
+    const dir = tmpDir();
+    cleanupDirs.push(dir);
+    const logPath = join(dir, 'keyring-nonlinux.log');
+
+    const config: DaemonConfig = {
+      discord: undefined,
+      projects: { scan_roots: [] },
+      log: { file: logPath, level: 'info', max_size_mb: 50 },
+    };
+
+    const mockAdapter = new MockSecretAdapter(new Map([
+      ['ANTHROPIC_API_KEY', 'should-not-be-used'],
+      ['DISCORD_TOKEN', 'should-not-be-used'],
+    ]));
+
+    const logger = new Logger({ filePath: logPath, level: 'info' });
+    const daemon = new Daemon(config, logger, 300_000, mockAdapter);
+
+    const origPlatform = process.platform;
+    Object.defineProperty(process, 'platform', { value: 'darwin', configurable: true });
+
+    const origExit = process.exit;
+    // @ts-expect-error — overriding process.exit for test
+    process.exit = () => {};
+
+    try {
+      await daemon.start();
+
+      // getCredential must never have been called
+      assert.equal(mockAdapter.callCount, 0, 'getCredential should not be called on non-Linux');
+
+      await daemon.shutdown();
+
+      // Read log after shutdown so the write stream has been flushed and closed
+      const lines = readFileSync(logPath, 'utf-8').trim().split('\n');
+      const entries = lines.map((l) => JSON.parse(l) as LogEntry);
+      const keyringEntry = entries.find((e) => e.msg === 'keyring credentials loaded');
+      assert.equal(keyringEntry, undefined, 'should not have keyring log entry on non-Linux');
+
+      // daemon started entry should still be present
+      const startEntry = entries.find((e) => e.msg === 'daemon started');
+      assert.ok(startEntry, 'daemon started log entry should be present');
+    } finally {
+      process.exit = origExit;
+      Object.defineProperty(process, 'platform', { value: origPlatform, configurable: true });
+    }
   });
 });

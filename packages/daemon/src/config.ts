@@ -2,7 +2,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
 import { parse as parseYaml } from 'yaml';
-import type { DaemonConfig, LogLevel } from './types.js';
+import type { DaemonConfig, LinuxConfig, LogLevel } from './types.js';
 
 const VALID_LOG_LEVELS: ReadonlySet<string> = new Set(['debug', 'info', 'warn', 'error']);
 
@@ -107,10 +107,21 @@ export function validateConfig(raw: unknown): DaemonConfig {
     }
   }
 
+  // --- linux ---
+  let linux: LinuxConfig | undefined = undefined;
+  if (obj['linux'] != null && typeof obj['linux'] === 'object') {
+    const lx = obj['linux'] as Record<string, unknown>;
+    linux = {
+      ...(typeof lx['nodePath'] === 'string' ? { nodePath: lx['nodePath'] } : {}),
+      ...(typeof lx['unitDir'] === 'string' ? { unitDir: expandTilde(lx['unitDir']) } : {}),
+    };
+  }
+
   return {
     discord,
     projects: { scan_roots: scanRoots },
     log: { file: logFile, level: logLevel, max_size_mb: maxSizeMb },
+    ...(linux !== undefined ? { linux } : {}),
   };
 }
 
