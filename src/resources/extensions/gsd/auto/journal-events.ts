@@ -6,6 +6,8 @@
  *
  * Each builder stamps `ts: new Date().toISOString()` at call time and returns
  * a complete JournalEntry ready to pass to `deps.emitJournalEvent`.
+ *
+ * ci-retrigger: 2026-03-31
  */
 
 import type { JournalEntry } from "../journal.js";
