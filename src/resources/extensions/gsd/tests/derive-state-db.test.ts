@@ -1077,6 +1077,8 @@ describe('derive-state-db', async () => {
       insertMilestone({ id: 'M001', title: 'First', status: 'complete' });
       // No M002 row — simulates DB row loss during worktree teardown
 
+      // Reconcile disk→DB before querying (CQS: deriveStateFromDb is read-only)
+      reconcileDbMilestones(base);
       invalidateStateCache();
       const dbState = await deriveStateFromDb(base);
 
@@ -1112,6 +1114,8 @@ describe('derive-state-db', async () => {
       // isGhostMilestone should NOT treat M002 as ghost when DB row exists
       assert.ok(!isGhostMilestone(base, 'M002'), 'ghost-dbrow: M002 with DB row is NOT a ghost');
 
+      // Reconcile disk→DB before querying (CQS: deriveStateFromDb is read-only)
+      reconcileDbMilestones(base);
       invalidateStateCache();
       const dbState = await deriveStateFromDb(base);
 

@@ -16,7 +16,7 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
-import { deriveStateFromDb, invalidateStateCache } from "../state.ts";
+import { deriveStateFromDb, invalidateStateCache, reconcileDbMilestones } from "../state.ts";
 import {
   openDatabase,
   closeDatabase,
@@ -93,6 +93,7 @@ async function testMissingSlicesCauseBlock(): Promise<void> {
     writeFile(base, "milestones/M001/S02/SUMMARY.md", "# S02 Summary\nDone.");
     writeFile(base, "milestones/M001/S03/PLAN.md", "# S03 Plan\n");
 
+    reconcileDbMilestones(base);
     invalidateStateCache();
     const state = await deriveStateFromDb(base);
 
@@ -167,6 +168,7 @@ async function testSliceReconciliationIdempotent(): Promise<void> {
     writeFile(base, "milestones/M001/S02/PLAN.md", "# S02 Plan\n");
     writeFile(base, "milestones/M001/S02/SUMMARY.md", "# S02 Summary\nDone.");
 
+    reconcileDbMilestones(base);
     invalidateStateCache();
     await deriveStateFromDb(base);
 
@@ -203,6 +205,7 @@ async function testNoRoadmapSkipsReconciliation(): Promise<void> {
     // Only a CONTEXT file, no ROADMAP
     writeFile(base, "milestones/M001/CONTEXT.md", CONTEXT_CONTENT);
 
+    reconcileDbMilestones(base);
     invalidateStateCache();
     const state = await deriveStateFromDb(base);
 
@@ -218,7 +221,7 @@ async function testNoRoadmapSkipsReconciliation(): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  console.log("\n=== #2533: deriveStateFromDb reconciles disk slices ===");
+  console.log("\n=== #2533: reconcileDbMilestones reconciles disk slices ===");
 
   await testMissingSlicesCauseBlock();
   await testSliceReconciliationIdempotent();

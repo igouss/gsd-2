@@ -52,6 +52,7 @@ import {
   getReplanHistory,
   getSlice,
   insertMilestone,
+  insertSlice,
   updateTaskStatus,
   getPendingSliceGateCount,
   type SliceRow,
@@ -141,6 +142,35 @@ export function reconcileDbMilestones(basePath: string): void {
   for (const diskId of diskIds) {
     if (!dbIdSet.has(diskId) && !isGhostMilestone(basePath, diskId)) {
       insertMilestone({ id: diskId, status: 'active' });
+    }
+  }
+
+  // Slice reconciliation (#2533): slices defined in ROADMAP.md but missing from
+  // the DB cause permanent "No slice eligible" blocks. Insert any missing slices
+  // with status derived from disk artifacts. insertSlice uses INSERT OR IGNORE.
+  const reconciledMilestoneIds = findMilestoneIds(basePath);
+  for (const mid of reconciledMilestoneIds) {
+    if (isGhostMilestone(basePath, mid)) continue;
+    const roadmapPath = resolveMilestoneFile(basePath, mid, "ROADMAP");
+    if (!roadmapPath) continue;
+
+    const dbSlices = getMilestoneSlices(mid);
+    const dbSliceIds = new Set(dbSlices.map(s => s.id));
+
+    let roadmapContent: string;
+    try { roadmapContent = readFileSync(roadmapPath, "utf-8"); }
+    catch { continue; }
+
+    const parsed = parseRoadmap(roadmapContent);
+    for (const s of parsed.slices) {
+      if (dbSliceIds.has(s.id)) continue;
+      const summaryPath = resolveSliceFile(basePath, mid, s.id, "SUMMARY");
+      const sliceStatus = (s.done || summaryPath) ? "complete" : "pending";
+      insertSlice({
+        id: s.id, milestoneId: mid, title: s.title,
+        status: sliceStatus, risk: s.risk,
+        depends: s.depends, demo: s.demo,
+      });
     }
   }
 }
