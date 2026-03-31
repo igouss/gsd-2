@@ -1,3 +1,4 @@
+// ci-retrigger: 2026-03-31
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
