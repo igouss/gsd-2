@@ -31,6 +31,9 @@ export function resolvePreferredModelConfig(
   const routingConfig = resolveDynamicRoutingConfig();
   if (!routingConfig.enabled || !routingConfig.tier_models) return undefined;
 
+  // Don't synthesize a routing config for flat-rate providers (#3453).
+  if (autoModeStartModel && isFlatRateProvider(autoModeStartModel.provider)) return undefined;
+
   const ceilingModel = routingConfig.tier_models.heavy
     ?? (autoModeStartModel ? `${autoModeStartModel.provider}/${autoModeStartModel.id}` : undefined);
   if (!ceilingModel) return undefined;
@@ -70,6 +73,16 @@ export async function selectAndApplyModel(
     const routingConfig = resolveDynamicRoutingConfig();
     let effectiveModelConfig = modelConfig;
     let routingTierLabel = "";
+
+    // Disable routing for flat-rate providers like GitHub Copilot (#3453).
+    // All models cost the same per request, so downgrading to a cheaper
+    // model provides no cost benefit — it only degrades quality.
+    if (routingConfig.enabled) {
+      const primaryModel = resolveModelId(modelConfig.primary, availableModels, ctx.model?.provider);
+      if (primaryModel && isFlatRateProvider(primaryModel.provider)) {
+        routingConfig.enabled = false;
+      }
+    }
 
     if (routingConfig.enabled) {
       let budgetPct: number | undefined;
@@ -319,4 +332,14 @@ export function resolveModelId<T extends { id: string; provider: string }>(
 
   // Fall back to first non-extension candidate, or any candidate
   return candidates.find(m => !EXTENSION_PROVIDERS.has(m.provider)) ?? candidates[0];
+}
+
+/**
+ * Flat-rate providers charge the same per request regardless of model.
+ * Dynamic routing provides no cost benefit — it only degrades quality (#3453).
+ */
+const FLAT_RATE_PROVIDERS = new Set(["github-copilot"]);
+
+export function isFlatRateProvider(provider: string): boolean {
+  return FLAT_RATE_PROVIDERS.has(provider);
 }
