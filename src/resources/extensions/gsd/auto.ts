@@ -606,6 +606,18 @@ export async function stopAuto(
       debugLog("stop-cleanup-locks", { error: e instanceof Error ? e.message : String(e) });
     }
 
+    // ── Step 1b: Flush queued follow-up messages (#3512) ──
+    // Late async notifications (async_job_result, gsd-auto-wrapup) can trigger
+    // extra LLM turns after stop. Flush them the same way run-unit.ts does.
+    try {
+      const cmdCtxAny = s.cmdCtx as Record<string, unknown> | null;
+      if (typeof cmdCtxAny?.clearQueue === "function") {
+        (cmdCtxAny.clearQueue as () => unknown)();
+      }
+    } catch (e) {
+      debugLog("stop-cleanup-queue", { error: e instanceof Error ? e.message : String(e) });
+    }
+
     // ── Step 2: Skill state ──
     try {
       clearSkillSnapshot();
@@ -834,6 +846,19 @@ export async function pauseAuto(
 ): Promise<void> {
   if (!s.active) return;
   clearUnitTimeout();
+
+  // Flush queued follow-up messages (#3512).
+  // Late async notifications (async_job_result, gsd-auto-wrapup) can trigger
+  // extra LLM turns after pause. Flush them the same way run-unit.ts does.
+  try {
+    const cmdCtxAny = s.cmdCtx as Record<string, unknown> | null;
+    if (typeof cmdCtxAny?.clearQueue === "function") {
+      (cmdCtxAny.clearQueue as () => unknown)();
+    }
+  } catch (e) {
+    debugLog("pause-cleanup-queue", { error: e instanceof Error ? e.message : String(e) });
+  }
+
   // Unblock any pending unit promise so the auto-loop is not orphaned.
   // Pass errorContext so runUnitPhase can distinguish user-initiated pause
   // from provider-error pause and avoid hard-stopping (#2762).
