@@ -83,6 +83,7 @@
     "sync-pkg-version": "node scripts/sync-pkg-version.cjs",
     "sync-platform-versions": "node native/scripts/sync-platform-versions.cjs",
     "validate-pack": "node scripts/validate-pack.js",
+    "typecheck": "tsc --noEmit && tsc --noEmit --project tsconfig.extensions.json",
     "typecheck:extensions": "tsc --noEmit --project tsconfig.extensions.json",
     "pipeline:version-stamp": "node scripts/version-stamp.mjs",
     "release:changelog": "node scripts/generate-changelog.mjs",
