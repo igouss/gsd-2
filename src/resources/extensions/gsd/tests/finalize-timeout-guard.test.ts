@@ -19,6 +19,7 @@
 import { createTestContext } from "./test-helpers.ts";
 import {
   withTimeout,
+  FINALIZE_PRE_TIMEOUT_MS,
   FINALIZE_POST_TIMEOUT_MS,
 } from "../auto/finalize-timeout.ts";
 
@@ -78,6 +79,25 @@ const { assertTrue, assertEq, report } = createTestContext();
   assertTrue(caught, "rejection should propagate");
 }
 
+// ═══ Test: FINALIZE_PRE_TIMEOUT_MS is defined and reasonable ═════════════════
+
+{
+  console.log("\n=== #3757: pre-verification timeout constant is defined and reasonable ===");
+
+  assertTrue(
+    typeof FINALIZE_PRE_TIMEOUT_MS === "number",
+    "FINALIZE_PRE_TIMEOUT_MS should be a number",
+  );
+  assertTrue(
+    FINALIZE_PRE_TIMEOUT_MS >= 30_000,
+    `pre timeout should be >= 30s (got ${FINALIZE_PRE_TIMEOUT_MS}ms)`,
+  );
+  assertTrue(
+    FINALIZE_PRE_TIMEOUT_MS <= 120_000,
+    `pre timeout should be <= 120s (got ${FINALIZE_PRE_TIMEOUT_MS}ms)`,
+  );
+}
+
 // ═══ Test: FINALIZE_POST_TIMEOUT_MS is defined and reasonable ═════════════════
 
 {
@@ -111,6 +131,49 @@ const { assertTrue, assertEq, report } = createTestContext();
   );
   assertEq(result.value, "delayed", "should resolve with delayed value");
   assertEq(result.timedOut, false, "should not time out");
+}
+
+// ═══ Test: runFinalize wraps BOTH pre and post verification with withTimeout ═
+
+{
+  console.log("\n=== #3757: runFinalize wraps preVerification with timeout guard ===");
+
+  const { readFileSync } = await import("node:fs");
+  const phasesSource = readFileSync(
+    new URL("../auto/phases.ts", import.meta.url),
+    "utf-8",
+  );
+
+  // Find the runFinalize function body
+  const fnIdx = phasesSource.indexOf("export async function runFinalize(");
+  assertTrue(fnIdx > 0, "runFinalize function should exist in phases.ts");
+
+  const fnBody = phasesSource.slice(fnIdx, fnIdx + 5000);
+
+  // postUnitPreVerification must be wrapped in withTimeout
+  const preTimeoutIdx = fnBody.indexOf("withTimeout(");
+  assertTrue(preTimeoutIdx > 0, "withTimeout should appear in runFinalize");
+
+  const preVerIdx = fnBody.indexOf("postUnitPreVerification");
+  assertTrue(preVerIdx > 0, "postUnitPreVerification should appear in runFinalize");
+
+  // The first withTimeout should wrap postUnitPreVerification (not postUnitPostVerification)
+  const firstWithTimeout = fnBody.slice(preTimeoutIdx, preTimeoutIdx + 200);
+  assertTrue(
+    firstWithTimeout.includes("postUnitPreVerification"),
+    "first withTimeout in runFinalize should wrap postUnitPreVerification",
+  );
+
+  // postUnitPostVerification must also be wrapped
+  const postVerIdx = fnBody.indexOf("postUnitPostVerification");
+  assertTrue(postVerIdx > 0, "postUnitPostVerification should appear in runFinalize");
+
+  // Count withTimeout occurrences — should be at least 2 (pre + post)
+  const timeoutCount = (fnBody.match(/withTimeout\(/g) || []).length;
+  assertTrue(
+    timeoutCount >= 2,
+    `runFinalize should have at least 2 withTimeout guards (found ${timeoutCount})`,
+  );
 }
 
 report();

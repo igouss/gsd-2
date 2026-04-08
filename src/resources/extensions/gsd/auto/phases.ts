@@ -33,7 +33,7 @@ import { gsdRoot } from "../paths.js";
 import { atomicWriteSync } from "../atomic-write.js";
 import { verifyExpectedArtifact, diagnoseExpectedArtifact, buildLoopRemediationSteps } from "../auto-recovery.js";
 import { writeUnitRuntimeRecord } from "../unit-runtime.js";
-import { withTimeout, FINALIZE_POST_TIMEOUT_MS } from "./finalize-timeout.js";
+import { withTimeout, FINALIZE_PRE_TIMEOUT_MS, FINALIZE_POST_TIMEOUT_MS } from "./finalize-timeout.js";
 import { getEligibleSlices } from "../slice-parallel-eligibility.js";
 import { startSliceParallel } from "../slice-parallel-orchestrator.js";
 import { isDbAvailable, getMilestoneSlices } from "../gsd-db.js";
@@ -1450,13 +1450,36 @@ export async function runFinalize(
   };
 
   // Pre-verification processing (commit, doctor, state rebuild, etc.)
+  // Timeout guard: if postUnitPreVerification hangs (e.g., safety harness
+  // deadlock, browser teardown hang, worktree sync stall), force-continue
+  // after timeout so the auto-loop is not permanently frozen (#3757).
   // Sidecar items use lightweight pre-verification opts
   const preVerificationOpts: PreVerificationOpts | undefined = sidecarItem
     ? sidecarItem.kind === "hook"
       ? { skipSettleDelay: true, skipWorktreeSync: true }
       : { skipSettleDelay: true }
     : undefined;
-  const preResult = await deps.postUnitPreVerification(postUnitCtx, preVerificationOpts);
+  const preResultGuard = await withTimeout(
+    deps.postUnitPreVerification(postUnitCtx, preVerificationOpts),
+    FINALIZE_PRE_TIMEOUT_MS,
+    "postUnitPreVerification",
+  );
+
+  if (preResultGuard.timedOut) {
+    debugLog("autoLoop", {
+      phase: "pre-verification-timeout",
+      iteration: ic.iteration,
+      unitType: iterData.unitType,
+      unitId: iterData.unitId,
+    });
+    ctx.ui.notify(
+      `postUnitPreVerification timed out after ${FINALIZE_PRE_TIMEOUT_MS / 1000}s for ${iterData.unitType} ${iterData.unitId} — continuing to next iteration`,
+      "warning",
+    );
+    return { action: "next", data: undefined as void };
+  }
+
+  const preResult = preResultGuard.value;
   if (preResult === "dispatched") {
     debugLog("autoLoop", {
       phase: "exit",
