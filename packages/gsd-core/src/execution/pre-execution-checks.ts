@@ -17,8 +17,8 @@
 import { existsSync } from "node:fs";
 import { spawn } from "node:child_process";
 import { resolve } from "node:path";
-import type { TaskRow } from "./gsd-db.ts";
-import type { PreExecutionCheckJSON } from "./verification/verification-evidence.js";
+import type { TaskRow } from "../gsd-db.ts";
+import type { PreExecutionCheckJSON } from "../verification/verification-evidence.js";
 
 // ─── Result Types ────────────────────────────────────────────────────────────
 

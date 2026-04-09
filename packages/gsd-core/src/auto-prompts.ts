@@ -34,7 +34,7 @@ import { existsSync } from "node:fs";
 import { computeBudgets, resolveExecutorContextWindow, truncateAtSectionBoundary } from "./context-budget.js";
 import { getPendingGates } from "./gsd-db.js";
 import { formatDecisionsCompact, formatRequirementsCompact } from "./reporting/structured-data-formatter.js";
-import { readPhaseAnchor, formatAnchorForPrompt } from "./phase-anchor.js";
+import { readPhaseAnchor, formatAnchorForPrompt } from "./execution/phase-anchor.js";
 import { logWarning } from "./workflow-logger.js";
 
 // ─── Preamble Cap ─────────────────────────────────────────────────────────────

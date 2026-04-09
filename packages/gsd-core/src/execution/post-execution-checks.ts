@@ -15,7 +15,7 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { resolve, dirname, join, extname } from "node:path";
-import type { TaskRow } from "./gsd-db.ts";
+import type { TaskRow } from "../gsd-db.ts";
 
 // ─── Result Types ────────────────────────────────────────────────────────────
 
@@ -54,7 +54,7 @@ export function extractRelativeImports(
   const lines = source.split("\n");
 
   // Match:
-  //   import ... from './path'
+  //   import ... from '../path'
   //   import ... from "../path"
   //   import './path'
   //   require('./path')

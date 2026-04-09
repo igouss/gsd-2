@@ -1286,7 +1286,7 @@ export async function runUnitPhase(
   const anchorPhases = new Set(["research-milestone", "research-slice", "plan-milestone", "plan-slice"]);
   if (artifactVerified && mid && anchorPhases.has(unitType)) {
     try {
-      const { writePhaseAnchor } = await import("../phase-anchor.js");
+      const { writePhaseAnchor } = await import("../execution/phase-anchor.js");
       writePhaseAnchor(s.basePath, mid, {
         phase: unitType,
         milestoneId: mid,

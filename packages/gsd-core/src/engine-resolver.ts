@@ -8,11 +8,11 @@
  */
 
 import type { WorkflowEngine } from "./workflow-engine.js";
-import type { ExecutionPolicy } from "./execution-policy.js";
+import type { ExecutionPolicy } from "./execution/execution-policy.js";
 import { DevWorkflowEngine } from "./dev-workflow-engine.js";
-import { DevExecutionPolicy } from "./dev-execution-policy.js";
+import { DevExecutionPolicy } from "./execution/dev-execution-policy.js";
 import { CustomWorkflowEngine } from "./custom-workflow-engine.js";
-import { CustomExecutionPolicy } from "./custom-execution-policy.js";
+import { CustomExecutionPolicy } from "./execution/custom-execution-policy.js";
 
 /** A resolved engine + policy pair ready for the auto-loop. */
 export interface ResolvedEngine {

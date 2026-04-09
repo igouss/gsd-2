@@ -181,7 +181,7 @@ export async function checkRuntimeHealth(
           });
 
           if (shouldFix("stale_hook_state")) {
-            const { clearPersistedHookState } = await import("./post-unit-hooks.js");
+            const { clearPersistedHookState } = await import("./execution/post-unit-hooks.js");
             clearPersistedHookState(basePath);
             fixesApplied.push("cleared stale hook-state.json");
           }
