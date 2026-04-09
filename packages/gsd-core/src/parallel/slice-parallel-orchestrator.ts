@@ -23,15 +23,15 @@ import {
 } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { gsdRoot } from "./paths.js";
-import { createWorktree, worktreePath, removeWorktree } from "./worktree-manager.js";
-import { autoWorktreeBranch, runWorktreePostCreateHook } from "./auto-worktree.js";
+import { gsdRoot } from "../paths.js";
+import { createWorktree, worktreePath, removeWorktree } from "../worktree-manager.js";
+import { autoWorktreeBranch, runWorktreePostCreateHook } from "../auto-worktree.js";
 import {
   writeSessionStatus,
   removeSessionStatus,
-} from "./session/session-status-io.js";
+} from "../session/session-status-io.js";
 import { hasFileConflict } from "./slice-parallel-conflict.js";
-import { getErrorMessage } from "./error-utils.js";
+import { getErrorMessage } from "../error-utils.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 

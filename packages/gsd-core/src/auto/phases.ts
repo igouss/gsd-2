@@ -34,8 +34,8 @@ import { verifyExpectedArtifact, buildLoopRemediationSteps } from "../auto-recov
 import { diagnoseExpectedArtifact } from "../auto-artifact-paths.js";
 import { writeUnitRuntimeRecord } from "../unit-runtime.js";
 import { withTimeout, FINALIZE_PRE_TIMEOUT_MS, FINALIZE_POST_TIMEOUT_MS } from "./finalize-timeout.js";
-import { getEligibleSlices } from "../slice-parallel-eligibility.js";
-import { startSliceParallel } from "../slice-parallel-orchestrator.js";
+import { getEligibleSlices } from "../parallel/slice-parallel-eligibility.js";
+import { startSliceParallel } from "../parallel/slice-parallel-orchestrator.js";
 import { isDbAvailable, getMilestoneSlices } from "../gsd-db.js";
 import { resetEvidence } from "../safety/evidence-collector.js";
 import { createCheckpoint, cleanupCheckpoint, rollbackToCheckpoint } from "../safety/git-checkpoint.js";

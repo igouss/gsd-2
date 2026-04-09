@@ -8,14 +8,14 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
-import { loadFile } from "./files.js";
-import { resolveMilestoneFile } from "./paths.js";
-import { mergeMilestoneToMain } from "./auto-worktree.js";
-import { MergeConflictError } from "./git-service.js";
-import { removeSessionStatus } from "./session/session-status-io.js";
+import { loadFile } from "../files.js";
+import { resolveMilestoneFile } from "../paths.js";
+import { mergeMilestoneToMain } from "../auto-worktree.js";
+import { MergeConflictError } from "../git-service.js";
+import { removeSessionStatus } from "../session/session-status-io.js";
 import type { WorkerInfo } from "./parallel-orchestrator.js";
-import { getErrorMessage } from "./error-utils.js";
-import { logWarning } from "./workflow-logger.js";
+import { getErrorMessage } from "../error-utils.js";
+import { logWarning } from "../workflow-logger.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 

@@ -5,11 +5,11 @@
  * dependency satisfaction and file overlap across slice plans.
  */
 
-import { deriveState } from "./state.js";
-import { resolveMilestoneFile, resolveSliceFile } from "./paths.js";
-import { findMilestoneIds } from "./guided-flow.js";
-import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "./gsd-db.js";
-import type { MilestoneRegistryEntry } from "./types.js";
+import { deriveState } from "../state.js";
+import { resolveMilestoneFile, resolveSliceFile } from "../paths.js";
+import { findMilestoneIds } from "../guided-flow.js";
+import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../gsd-db.js";
+import type { MilestoneRegistryEntry } from "../types.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
