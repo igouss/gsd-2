@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { appendFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { atomicWriteSync } from "../atomic-write.js";
+import { atomicWriteSync } from "../persistence/atomic-write.js";
 import { logWarning } from "../workflow/workflow-logger.js";
 
 // ─── Session ID ───────────────────────────────────────────────────────────

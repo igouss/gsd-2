@@ -6,9 +6,9 @@
  */
 
 import { readFileSync } from "node:fs";
-import { atomicWriteSync } from "../atomic-write.js";
-import { resolveMilestoneFile } from "../paths.js";
-import { clearParseCache } from "../files.js";
+import { atomicWriteSync } from "../persistence/atomic-write.js";
+import { resolveMilestoneFile } from "../persistence/paths.js";
+import { clearParseCache } from "../persistence/files.js";
 
 /**
  * Mark a slice as done ([x]) in the milestone roadmap.

@@ -11,9 +11,9 @@
 
 import type { GSDState } from "../domain/types.js";
 import type { GSDPreferences } from "../preferences/preferences.js";
-import type { UatType } from "../files.js";
-import { loadFile, extractUatType, loadActiveOverrides } from "../files.js";
-import { isDbAvailable, getMilestoneSlices, getPendingGates, markAllGatesOmitted, getMilestone } from "../gsd-db.js";
+import type { UatType } from "../persistence/files.js";
+import { loadFile, extractUatType, loadActiveOverrides } from "../persistence/files.js";
+import { isDbAvailable, getMilestoneSlices, getPendingGates, markAllGatesOmitted, getMilestone } from "../persistence/gsd-db.js";
 import { extractVerdict, isAcceptableUatVerdict } from "../verdict-parser.js";
 
 import {
@@ -26,7 +26,7 @@ import {
   relSliceFile,
   buildMilestoneFileName,
   buildSliceFileName,
-} from "../paths.js";
+} from "../persistence/paths.js";
 import { parseRoadmap } from "../parsers-legacy.js";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { logWarning, logError } from "../workflow/workflow-logger.js";
@@ -191,7 +191,7 @@ export const DISPATCH_RULES: DispatchRule[] = [
       if (pendingOverrides.length === 0) return null;
       const count = getRewriteCount(basePath);
       if (count >= MAX_REWRITE_ATTEMPTS) {
-        const { resolveAllOverrides } = await import("../files.js");
+        const { resolveAllOverrides } = await import("../persistence/files.js");
         await resolveAllOverrides(basePath);
         setRewriteCount(basePath, 0);
         return null;

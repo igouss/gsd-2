@@ -21,10 +21,10 @@ import {
   getMilestone,
   updateSliceStatus,
   setSliceSummaryMd,
-} from "../gsd-db.js";
-import { resolveSliceFile, resolveSlicePath, clearPathCache } from "../paths.js";
+} from "../persistence/gsd-db.js";
+import { resolveSliceFile, resolveSlicePath, clearPathCache } from "../persistence/paths.js";
 import { checkOwnership, sliceUnitKey } from "../unit-ownership.js";
-import { saveFile, clearParseCache } from "../files.js";
+import { saveFile, clearParseCache } from "../persistence/files.js";
 import { invalidateStateCache } from "../state.js";
 import { renderRoadmapCheckboxes } from "../reporting/markdown-renderer.js";
 import { renderAllProjections } from "../workflow/workflow-projections.js";

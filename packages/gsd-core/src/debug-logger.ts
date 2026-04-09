@@ -4,7 +4,7 @@
 
 import { appendFileSync, mkdirSync, readdirSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
-import { gsdRoot } from './paths.js';
+import { gsdRoot } from './persistence/paths.js';
 
 // ─── State ────────────────────────────────────────────────────────────────────
 

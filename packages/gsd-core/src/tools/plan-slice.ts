@@ -1,4 +1,4 @@
-import { clearParseCache } from "../files.js";
+import { clearParseCache } from "../persistence/files.js";
 import { isClosedStatus } from "../domain/status-guards.js";
 import { isNonEmptyString, validateStringArray } from "../verification/validation.js";
 import {
@@ -9,7 +9,7 @@ import {
   upsertSlicePlanning,
   upsertTaskPlanning,
   insertGateRow,
-} from "../gsd-db.js";
+} from "../persistence/gsd-db.js";
 import type { GateId } from "../domain/types.js";
 import { invalidateStateCache } from "../state.js";
 import { renderPlanFromDb } from "../reporting/markdown-renderer.js";

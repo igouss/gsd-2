@@ -36,7 +36,7 @@ export { handleReopenMilestone } from "./tools/reopen-milestone.js";
 export { handleValidateMilestone } from "./tools/validate-milestone.js";
 
 // DB operations
-export { saveDecisionToDb, saveRequirementToDb, updateRequirementInDb } from "./db-writer.js";
+export { saveDecisionToDb, saveRequirementToDb, updateRequirementInDb } from "./persistence/db-writer.js";
 
 // Types
 export type { CompleteTaskParams, CompleteSliceParams } from "./domain/types.js";

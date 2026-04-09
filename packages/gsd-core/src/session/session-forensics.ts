@@ -20,10 +20,10 @@
 
 import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { basename, join } from "node:path";
-import { gsdRoot } from "../paths.js";
+import { gsdRoot } from "../persistence/paths.js";
 import { truncateWithEllipsis } from "../shared/format-utils.js";
 import { nativeParseJsonlTail } from "../git/native-parser-bridge.js";
-import { MAX_JSONL_BYTES, parseJSONL } from "../jsonl-utils.js";
+import { MAX_JSONL_BYTES, parseJSONL } from "../persistence/jsonl-utils.js";
 import { nativeWorkingTreeStatus, nativeDiffStat } from "../git/native-git-bridge.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────

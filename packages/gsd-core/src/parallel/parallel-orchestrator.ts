@@ -19,7 +19,7 @@ import {
 } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { gsdRoot } from "../paths.js";
+import { gsdRoot } from "../persistence/paths.js";
 import { createWorktree, worktreePath } from "../git/worktree-manager.js";
 import { autoWorktreeBranch, runWorktreePostCreateHook, syncGsdStateToWorktree } from "../auto/auto-worktree.js";
 import { nativeBranchExists } from "../git/native-git-bridge.js";

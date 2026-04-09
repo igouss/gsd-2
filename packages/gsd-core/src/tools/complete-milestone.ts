@@ -15,10 +15,10 @@ import {
   getMilestoneSlices,
   getSliceTasks,
   updateMilestoneStatus,
-} from "../gsd-db.js";
-import { resolveMilestonePath, clearPathCache } from "../paths.js";
+} from "../persistence/gsd-db.js";
+import { resolveMilestonePath, clearPathCache } from "../persistence/paths.js";
 import { isClosedStatus } from "../domain/status-guards.js";
-import { saveFile, clearParseCache } from "../files.js";
+import { saveFile, clearParseCache } from "../persistence/files.js";
 import { invalidateStateCache } from "../state.js";
 import { renderAllProjections, stripIdPrefix } from "../workflow/workflow-projections.js";
 import { writeManifest } from "../workflow/workflow-manifest.js";

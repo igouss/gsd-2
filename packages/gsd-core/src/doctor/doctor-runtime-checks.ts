@@ -3,14 +3,14 @@ import { basename, dirname, join } from "node:path";
 
 import type { DoctorIssue, DoctorIssueCode } from "./doctor-types.js";
 import { cleanNumberedGsdVariants } from "../git/repo-identity.js";
-import { milestonesDir, gsdRoot, resolveGsdRootFile } from "../paths.js";
+import { milestonesDir, gsdRoot, resolveGsdRootFile } from "../persistence/paths.js";
 import { deriveState } from "../state.js";
-import { saveFile } from "../files.js";
+import { saveFile } from "../persistence/files.js";
 import { nativeIsRepo, nativeForEachRef, nativeUpdateRef } from "../git/native-git-bridge.js";
 import { readCrashLock, isLockProcessAlive, clearLock } from "../session/crash-recovery.js";
 import { ensureGitignore } from "../git/gitignore.js";
 import { readAllSessionStatuses, isSessionStale, removeSessionStatus } from "../session/session-status-io.js";
-import { recoverFailedMigration } from "../migrate-external.js";
+import { recoverFailedMigration } from "../persistence/migrate-external.js";
 
 export async function checkRuntimeHealth(
   basePath: string,

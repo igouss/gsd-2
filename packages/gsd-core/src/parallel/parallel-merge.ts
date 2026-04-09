@@ -8,8 +8,8 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
-import { loadFile } from "../files.js";
-import { resolveMilestoneFile } from "../paths.js";
+import { loadFile } from "../persistence/files.js";
+import { resolveMilestoneFile } from "../persistence/paths.js";
 import { mergeMilestoneToMain } from "../auto/auto-worktree.js";
 import { MergeConflictError } from "../git/git-service.js";
 import { removeSessionStatus } from "../session/session-status-io.js";

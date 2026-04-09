@@ -16,9 +16,9 @@ import {
   insertAssessment,
   deleteAssessmentByScope,
   getMilestoneSlices,
-} from "../gsd-db.js";
-import { resolveMilestonePath, clearPathCache } from "../paths.js";
-import { saveFile, clearParseCache } from "../files.js";
+} from "../persistence/gsd-db.js";
+import { resolveMilestonePath, clearPathCache } from "../persistence/paths.js";
+import { saveFile, clearParseCache } from "../persistence/files.js";
 import { invalidateStateCache } from "../state.js";
 import { VALIDATION_VERDICTS, isValidMilestoneVerdict } from "../verdict-parser.js";
 import { insertMilestoneValidationGates } from "../milestone/milestone-validation-gates.js";

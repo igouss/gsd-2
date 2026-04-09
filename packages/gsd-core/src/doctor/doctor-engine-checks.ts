@@ -2,8 +2,8 @@ import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 import type { DoctorIssue } from "./doctor-types.js";
-import { isDbAvailable, _getAdapter } from "../gsd-db.js";
-import { resolveMilestoneFile } from "../paths.js";
+import { isDbAvailable, _getAdapter } from "../persistence/gsd-db.js";
+import { resolveMilestoneFile } from "../persistence/paths.js";
 import { deriveState } from "../state.js";
 import { readEvents } from "../workflow/workflow-events.js";
 import { renderAllProjections } from "../workflow/workflow-projections.js";

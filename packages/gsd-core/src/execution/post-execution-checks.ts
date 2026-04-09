@@ -15,7 +15,7 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { resolve, dirname, join, extname } from "node:path";
-import type { TaskRow } from "../gsd-db.ts";
+import type { TaskRow } from "../persistence/gsd-db.js";
 
 // ─── Result Types ────────────────────────────────────────────────────────────
 

@@ -5,7 +5,7 @@
 // All functions degrade gracefully: return empty results when DB unavailable, never throw.
 
 import { isDbAvailable, _getAdapter } from './gsd-db.js';
-import type { Decision, Requirement } from './domain/types.js';
+import type { Decision, Requirement } from '../domain/types.js';
 
 // ─── Query Functions ───────────────────────────────────────────────────────
 
@@ -58,7 +58,7 @@ export function queryDecisions(opts?: DecisionQueryOpts): Decision[] {
       choice: row['choice'] as string,
       rationale: row['rationale'] as string,
       revisable: row['revisable'] as string,
-      made_by: (row['made_by'] as string as import('./domain/types.js').DecisionMadeBy) ?? 'agent',
+      made_by: (row['made_by'] as string as import('../domain/types.js').DecisionMadeBy) ?? 'agent',
       superseded_by: null,
     }));
   } catch {

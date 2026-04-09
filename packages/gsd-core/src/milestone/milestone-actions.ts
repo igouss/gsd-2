@@ -17,10 +17,10 @@ import {
   resolveMilestonePath,
   resolveMilestoneFile,
   buildMilestoneFileName,
-} from "../paths.js";
+} from "../persistence/paths.js";
 import { invalidateAllCaches } from "../cache.js";
 import { loadQueueOrder, saveQueueOrder } from "../queue-order.js";
-import { isDbAvailable, updateMilestoneStatus } from "../gsd-db.js";
+import { isDbAvailable, updateMilestoneStatus } from "../persistence/gsd-db.js";
 import { logWarning } from "../workflow/workflow-logger.js";
 
 // ─── Park ──────────────────────────────────────────────────────────────────

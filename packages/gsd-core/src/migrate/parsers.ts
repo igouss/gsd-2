@@ -2,7 +2,7 @@
 // Pure functions that take file content (string) and return typed data.
 // Zero Pi dependencies — uses only exported helpers from files.ts.
 
-import { splitFrontmatter, parseFrontmatterMap, extractBoldField } from '../files.js';
+import { splitFrontmatter, parseFrontmatterMap, extractBoldField } from '../persistence/files.js';
 import { normalizeStringArray } from "../shared/format-utils.js";
 
 import type {

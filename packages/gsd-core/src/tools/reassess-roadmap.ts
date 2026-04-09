@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { existsSync, unlinkSync } from "node:fs";
-import { clearParseCache } from "../files.js";
+import { clearParseCache } from "../persistence/files.js";
 import { isClosedStatus } from "../domain/status-guards.js";
 import { isNonEmptyString } from "../verification/validation.js";
 import {
@@ -13,7 +13,7 @@ import {
   insertAssessment,
   deleteAssessmentByScope,
   deleteSlice,
-} from "../gsd-db.js";
+} from "../persistence/gsd-db.js";
 import { invalidateStateCache } from "../state.js";
 import { renderRoadmapFromDb, renderAssessmentFromDb } from "../reporting/markdown-renderer.js";
 import { renderAllProjections } from "../workflow/workflow-projections.js";

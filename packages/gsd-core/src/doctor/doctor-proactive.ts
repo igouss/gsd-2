@@ -16,7 +16,7 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { gsdRoot, resolveGsdRootFile } from "../paths.js";
+import { gsdRoot, resolveGsdRootFile } from "../persistence/paths.js";
 import { readCrashLock, isLockProcessAlive, clearLock } from "../session/crash-recovery.js";
 import { abortAndReset } from "../git/git-self-heal.js";
 import { rebuildState } from "./doctor.js";

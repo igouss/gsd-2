@@ -10,7 +10,7 @@ import { join } from "node:path";
 import { execFileSync } from "node:child_process";
 import { existsSync, lstatSync, readFileSync, writeFileSync } from "node:fs";
 import { nativeRmCached, nativeLsFiles } from "./native-git-bridge.js";
-import { gsdRoot } from "../paths.js";
+import { gsdRoot } from "../persistence/paths.js";
 import { GIT_NO_PROMPT_ENV } from "./git-constants.js";
 
 /**

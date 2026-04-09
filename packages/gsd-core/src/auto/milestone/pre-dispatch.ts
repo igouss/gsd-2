@@ -19,11 +19,11 @@ import { MergeConflictError } from "../../git/git-service.js";
 import { join, basename } from "node:path";
 import { existsSync, cpSync } from "node:fs";
 import { logWarning, logError } from "../../workflow/workflow-logger.js";
-import { gsdRoot } from "../../paths.js";
-import { atomicWriteSync } from "../../atomic-write.js";
+import { gsdRoot } from "../../persistence/paths.js";
+import { atomicWriteSync } from "../../persistence/atomic-write.js";
 import { getEligibleSlices } from "../../parallel/slice-parallel-eligibility.js";
 import { startSliceParallel } from "../../parallel/slice-parallel-orchestrator.js";
-import { isDbAvailable, getMilestoneSlices } from "../../gsd-db.js";
+import { isDbAvailable, getMilestoneSlices } from "../../persistence/gsd-db.js";
 
 /**
  * Phase 1: Pre-dispatch — resource guard, health gate, state derivation,

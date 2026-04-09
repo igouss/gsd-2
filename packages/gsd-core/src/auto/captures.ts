@@ -11,7 +11,7 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
 import { randomUUID } from "node:crypto";
-import { gsdRoot } from "../paths.js";
+import { gsdRoot } from "../persistence/paths.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

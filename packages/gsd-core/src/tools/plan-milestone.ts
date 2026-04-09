@@ -1,4 +1,4 @@
-import { clearParseCache } from "../files.js";
+import { clearParseCache } from "../persistence/files.js";
 import { isClosedStatus } from "../domain/status-guards.js";
 import { isNonEmptyString, validateStringArray } from "../verification/validation.js";
 import {
@@ -10,7 +10,7 @@ import {
   insertSlice,
   upsertMilestonePlanning,
   upsertSlicePlanning,
-} from "../gsd-db.js";
+} from "../persistence/gsd-db.js";
 import { invalidateStateCache } from "../state.js";
 import { renderRoadmapFromDb } from "../reporting/markdown-renderer.js";
 import { renderAllProjections } from "../workflow/workflow-projections.js";

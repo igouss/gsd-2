@@ -8,9 +8,9 @@
 import { createRequire } from "node:module";
 import { existsSync, copyFileSync, mkdirSync, realpathSync } from "node:fs";
 import { dirname } from "node:path";
-import type { Decision, Requirement, GateRow, GateId, GateScope, GateStatus, GateVerdict } from "./domain/types.js";
-import { GSDError, GSD_STALE_STATE } from "./domain/errors.js";
-import { logError, logWarning } from "./workflow/workflow-logger.js";
+import type { Decision, Requirement, GateRow, GateId, GateScope, GateStatus, GateVerdict } from "../domain/types.js";
+import { GSDError, GSD_STALE_STATE } from "../domain/errors.js";
+import { logError, logWarning } from "../workflow/workflow-logger.js";
 
 const _require = createRequire(import.meta.url);
 
@@ -916,7 +916,7 @@ export function getDecisionById(id: string): Decision | null {
     choice: row["choice"] as string,
     rationale: row["rationale"] as string,
     revisable: row["revisable"] as string,
-    made_by: (row["made_by"] as string as import("./domain/types.js").DecisionMadeBy) ?? "agent",
+    made_by: (row["made_by"] as string as import("../domain/types.js").DecisionMadeBy) ?? "agent",
     superseded_by: (row["superseded_by"] as string) ?? null,
   };
 }
@@ -933,7 +933,7 @@ export function getActiveDecisions(): Decision[] {
     choice: row["choice"] as string,
     rationale: row["rationale"] as string,
     revisable: row["revisable"] as string,
-    made_by: (row["made_by"] as string as import("./domain/types.js").DecisionMadeBy) ?? "agent",
+    made_by: (row["made_by"] as string as import("../domain/types.js").DecisionMadeBy) ?? "agent",
     superseded_by: null,
   }));
 }

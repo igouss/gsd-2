@@ -7,8 +7,8 @@
  */
 
 import { join } from "node:path";
-import { gsdRoot } from "../paths.js";
-import { loadJsonFileOrNull } from "../json-persistence.js";
+import { gsdRoot } from "../persistence/paths.js";
+import { loadJsonFileOrNull } from "../persistence/json-persistence.js";
 import { parseUnitId } from "../domain/unit-id.js";
 
 // Re-export from shared

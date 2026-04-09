@@ -24,10 +24,10 @@ import {
   updateTaskStatus,
   setTaskSummaryMd,
   deleteVerificationEvidence,
-} from "../gsd-db.js";
-import { resolveSliceFile, resolveTasksDir, clearPathCache } from "../paths.js";
+} from "../persistence/gsd-db.js";
+import { resolveSliceFile, resolveTasksDir, clearPathCache } from "../persistence/paths.js";
 import { checkOwnership, taskUnitKey } from "../unit-ownership.js";
-import { saveFile, clearParseCache } from "../files.js";
+import { saveFile, clearParseCache } from "../persistence/files.js";
 import { invalidateStateCache } from "../state.js";
 import { renderPlanCheckboxes } from "../reporting/markdown-renderer.js";
 import { renderAllProjections, renderSummaryContent } from "../workflow/workflow-projections.js";
@@ -42,7 +42,7 @@ export interface CompleteTaskResult {
   summaryPath: string;
 }
 
-import type { TaskRow } from "../gsd-db.js";
+import type { TaskRow } from "../persistence/gsd-db.js";
 
 /**
  * Normalize a list parameter that may arrive as a string (newline-delimited

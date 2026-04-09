@@ -12,7 +12,7 @@ import {
   buildMilestoneFileName,
   buildSliceFileName,
   buildTaskFileName,
-} from "../paths.js";
+} from "../persistence/paths.js";
 import { parseUnitId } from "../domain/unit-id.js";
 import { join } from "node:path";
 

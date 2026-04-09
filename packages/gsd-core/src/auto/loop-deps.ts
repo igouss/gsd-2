@@ -14,7 +14,7 @@ import type { SessionLockStatus } from "../session/session-lock.js";
 import type { DispatchAction } from "./auto-dispatch.js";
 import type { WorktreeResolver } from "../git/worktree-resolver.js";
 import type { CmuxLogLevel } from "../cmux/index.js";
-import type { JournalEntry } from "../journal.js";
+import type { JournalEntry } from "../persistence/journal.js";
 
 // ─── Types needed by CoreLoopDeps (originally in harness-coupled modules) ───
 

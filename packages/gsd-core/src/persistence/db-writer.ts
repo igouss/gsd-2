@@ -10,12 +10,12 @@
 
 import { join, resolve } from 'node:path';
 import { readFileSync, existsSync, statSync } from 'node:fs';
-import type { Decision, Requirement } from './domain/types.js';
+import type { Decision, Requirement } from '../domain/types.js';
 import { resolveGsdRootFile } from './paths.js';
 import { saveFile } from './files.js';
-import { GSDError, GSD_STALE_STATE, GSD_IO_ERROR } from './domain/errors.js';
-import { logWarning, logError } from './workflow/workflow-logger.js';
-import { invalidateStateCache } from './state.js';
+import { GSDError, GSD_STALE_STATE, GSD_IO_ERROR } from '../domain/errors.js';
+import { logWarning, logError } from '../workflow/workflow-logger.js';
+import { invalidateStateCache } from '../state.js';
 import { clearPathCache } from './paths.js';
 import { clearParseCache } from './files.js';
 
@@ -373,7 +373,7 @@ export interface SaveDecisionFields {
   rationale: string;
   revisable?: string;
   when_context?: string;
-  made_by?: import('./domain/types.js').DecisionMadeBy;
+  made_by?: import('../domain/types.js').DecisionMadeBy;
 }
 
 /**
@@ -436,7 +436,7 @@ export async function saveDecisionToDb(
         choice: row['choice'] as string,
         rationale: row['rationale'] as string,
         revisable: row['revisable'] as string,
-        made_by: (row['made_by'] as string as import('./domain/types.js').DecisionMadeBy) ?? 'agent',
+        made_by: (row['made_by'] as string as import('../domain/types.js').DecisionMadeBy) ?? 'agent',
         superseded_by: (row['superseded_by'] as string) ?? null,
       }));
     }

@@ -6,7 +6,7 @@
 //
 // NOT used in the dispatch loop or any hot-path runtime code.
 
-import { extractSection, parseBullets, extractBoldField, extractAllSections, registerCacheClearCallback } from './files.js';
+import { extractSection, parseBullets, extractBoldField, extractAllSections, registerCacheClearCallback } from './persistence/files.js';
 import { splitFrontmatter } from "./shared/frontmatter.js";
 import { nativeParseRoadmap, nativeParsePlanFile } from './git/native-parser-bridge.js';
 import { debugTime, debugCount } from './debug-logger.js';

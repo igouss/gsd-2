@@ -16,13 +16,13 @@ import {
   upsertDecision,
   openDatabase,
   setTaskBlockerDiscovered,
-} from "../gsd-db.js";
+} from "../persistence/gsd-db.js";
 import { isClosedStatus } from "../domain/status-guards.js";
 import { invalidateStateCache } from "../state.js";
-import { clearPathCache } from "../paths.js";
-import { clearParseCache } from "../files.js";
+import { clearPathCache } from "../persistence/paths.js";
+import { clearParseCache } from "../persistence/files.js";
 import { writeManifest } from "./workflow-manifest.js";
-import { atomicWriteSync } from "../atomic-write.js";
+import { atomicWriteSync } from "../persistence/atomic-write.js";
 import { acquireSyncLock, releaseSyncLock } from "../session/sync-lock.js";
 
 // ─── Replay Helpers ──────────────────────────────────────────────────────────

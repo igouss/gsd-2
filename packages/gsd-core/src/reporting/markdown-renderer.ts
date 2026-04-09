@@ -23,8 +23,8 @@ import {
   getArtifact,
   insertArtifact,
   getGateResults,
-} from "../gsd-db.js";
-import type { MilestoneRow, SliceRow, TaskRow, ArtifactRow } from "../gsd-db.js";
+} from "../persistence/gsd-db.js";
+import type { MilestoneRow, SliceRow, TaskRow, ArtifactRow } from "../persistence/gsd-db.js";
 import type { GateRow } from "../domain/types.js";
 import {
   resolveMilestoneFile,
@@ -34,10 +34,10 @@ import {
   gsdRoot,
   buildTaskFileName,
   buildSliceFileName,
-} from "../paths.js";
-import { saveFile, clearParseCache } from "../files.js";
+} from "../persistence/paths.js";
+import { saveFile, clearParseCache } from "../persistence/files.js";
 import { invalidateStateCache } from "../state.js";
-import { clearPathCache } from "../paths.js";
+import { clearPathCache } from "../persistence/paths.js";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 

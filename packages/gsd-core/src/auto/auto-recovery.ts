@@ -8,7 +8,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { parseUnitId } from "../domain/unit-id.js";
-import { relSliceFile, relMilestoneFile } from "../paths.js";
+import { relSliceFile, relMilestoneFile } from "../persistence/paths.js";
 
 /**
  * Check whether implementation artifacts exist for the current unit.

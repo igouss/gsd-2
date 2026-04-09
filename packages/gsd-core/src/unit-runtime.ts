@@ -6,8 +6,8 @@ import {
   relTaskFile,
   resolveSliceFile,
   resolveTaskFile,
-} from "./paths.js";
-import { loadFile, parseTaskPlanMustHaves, countMustHavesMentionedInSummary } from "./files.js";
+} from "./persistence/paths.js";
+import { loadFile, parseTaskPlanMustHaves, countMustHavesMentionedInSummary } from "./persistence/files.js";
 import { parseUnitId } from "./domain/unit-id.js";
 
 export type UnitRuntimePhase =

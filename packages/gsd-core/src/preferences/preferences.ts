@@ -14,7 +14,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-import { gsdRoot } from "../paths.js";
+import { gsdRoot } from "../persistence/paths.js";
 import { parse as parseYaml } from "yaml";
 import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile } from "../domain/types.js";
 import type { DynamicRoutingConfig } from "../routing/model-router.js";

@@ -21,7 +21,7 @@ import {
   loadFile,
   parseRequirementCounts,
   parseContextDependsOn,
-} from './files.js';
+} from './persistence/files.js';
 
 import {
   resolveMilestonePath,
@@ -32,7 +32,7 @@ import {
   resolveTasksDir,
   resolveGsdRootFile,
   gsdRoot,
-} from './paths.js';
+} from './persistence/paths.js';
 
 import { findMilestoneIds } from './milestone/milestone-ids.js';
 import { loadQueueOrder, sortByQueueOrder } from './queue-order.js';
@@ -61,7 +61,7 @@ import {
   type MilestoneRow,
   type SliceRow,
   type TaskRow,
-} from './gsd-db.js';
+} from './persistence/gsd-db.js';
 
 /**
  * A "ghost" milestone directory contains only META.json (and no substantive

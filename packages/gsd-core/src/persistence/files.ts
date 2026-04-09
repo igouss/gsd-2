@@ -7,7 +7,7 @@ import { promises as fs } from 'node:fs';
 import { resolve } from 'node:path';
 import { atomicWriteAsync } from './atomic-write.js';
 import { resolveMilestoneFile, relMilestoneFile, resolveGsdRootFile } from './paths.js';
-import { milestoneIdSort, findMilestoneIds } from './milestone/milestone-ids.js';
+import { milestoneIdSort, findMilestoneIds } from '../milestone/milestone-ids.js';
 
 import type {
   TaskPlanFile, TaskPlanFrontmatter,
@@ -17,12 +17,12 @@ import type {
   TaskIO,
   SecretsManifest, SecretsManifestEntry, SecretsManifestEntryStatus,
   ManifestStatus,
-} from './domain/types.js';
+} from '../domain/types.js';
 
-import { checkExistingEnvKeys } from './env-utils.js';
-import { nativeExtractSection, nativeParseSummaryFile, NATIVE_UNAVAILABLE } from './git/native-parser-bridge.js';
-import { CACHE_MAX } from './domain/constants.js';
-import { splitFrontmatter, parseFrontmatterMap } from "./shared/frontmatter.js";
+import { checkExistingEnvKeys } from '../env-utils.js';
+import { nativeExtractSection, nativeParseSummaryFile, NATIVE_UNAVAILABLE } from '../git/native-parser-bridge.js';
+import { CACHE_MAX } from '../domain/constants.js';
+import { splitFrontmatter, parseFrontmatterMap } from "../shared/frontmatter.js";
 
 // Re-export for downstream consumers
 export { splitFrontmatter, parseFrontmatterMap };

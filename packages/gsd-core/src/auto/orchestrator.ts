@@ -27,7 +27,7 @@ import { runFinalize } from "./finalize/finalize.js";
 import { debugLog } from "../debug-logger.js";
 import { isInfrastructureError } from "./infra-errors.js";
 import { resolveEngine } from "../routing/engine-resolver.js";
-import type { JournalEventType } from "../journal.js";
+import type { JournalEventType } from "../persistence/journal.js";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

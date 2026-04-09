@@ -17,7 +17,7 @@ import {
   updateSliceStatus,
   updateTaskStatus,
   transaction,
-} from "../gsd-db.js";
+} from "../persistence/gsd-db.js";
 import { invalidateStateCache } from "../state.js";
 import { isClosedStatus } from "../domain/status-guards.js";
 import { renderAllProjections } from "../workflow/workflow-projections.js";
@@ -27,7 +27,7 @@ import { logWarning } from "../workflow/workflow-logger.js";
 import { debugLog } from "../debug-logger.js";
 import { existsSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
-import { resolveMilestonePath, resolveSlicePath, resolveTasksDir, clearPathCache } from "../paths.js";
+import { resolveMilestonePath, resolveSlicePath, resolveTasksDir, clearPathCache } from "../persistence/paths.js";
 
 export interface ReopenMilestoneParams {
   milestoneId: string;

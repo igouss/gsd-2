@@ -1,7 +1,7 @@
 import { join } from "node:path";
 
-import { loadFile } from "./files.js";
-import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "./gsd-db.js";
+import { loadFile } from "./persistence/files.js";
+import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "./persistence/gsd-db.js";
 import { parseRoadmap, parsePlan } from "./parsers-legacy.js";
 import {
   resolveMilestoneFile,
@@ -9,7 +9,7 @@ import {
   resolveSlicePath,
   resolveTaskFile,
   resolveTasksDir,
-} from "./paths.js";
+} from "./persistence/paths.js";
 import { deriveState } from "./state.js";
 import { extractVerdict } from "./verdict-parser.js";
 import { milestoneIdSort, findMilestoneIds } from "./auto/guided-flow.js";

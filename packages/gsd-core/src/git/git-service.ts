@@ -11,7 +11,7 @@
 import { execFileSync, execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { gsdRoot } from "../paths.js";
+import { gsdRoot } from "../persistence/paths.js";
 import { GIT_NO_PROMPT_ENV } from "./git-constants.js";
 import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
 

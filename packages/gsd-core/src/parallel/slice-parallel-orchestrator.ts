@@ -23,7 +23,7 @@ import {
 } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { gsdRoot } from "../paths.js";
+import { gsdRoot } from "../persistence/paths.js";
 import { createWorktree, worktreePath, removeWorktree } from "../git/worktree-manager.js";
 import { autoWorktreeBranch, runWorktreePostCreateHook } from "../auto/auto-worktree.js";
 import {

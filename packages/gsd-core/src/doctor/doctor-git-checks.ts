@@ -2,10 +2,10 @@ import { existsSync, readdirSync, realpathSync, rmSync, statSync } from "node:fs
 import { join, sep } from "node:path";
 
 import type { DoctorIssue, DoctorIssueCode } from "./doctor-types.js";
-import { loadFile } from "../files.js";
+import { loadFile } from "../persistence/files.js";
 import { parseRoadmap as parseLegacyRoadmap } from "../parsers-legacy.js";
-import { isDbAvailable, getMilestoneSlices } from "../gsd-db.js";
-import { resolveMilestoneFile } from "../paths.js";
+import { isDbAvailable, getMilestoneSlices } from "../persistence/gsd-db.js";
+import { resolveMilestoneFile } from "../persistence/paths.js";
 import { deriveState, isMilestoneComplete } from "../state.js";
 import { listWorktrees, resolveGitDir, worktreesDir } from "../git/worktree-manager.js";
 import { abortAndReset } from "../git/git-self-heal.js";

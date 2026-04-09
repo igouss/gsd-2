@@ -26,11 +26,11 @@ import {
   isDbAvailable,
   getMilestone,
   getMilestoneSlices,
-} from "../gsd-db.js";
-import { atomicWriteSync } from "../atomic-write.js";
+} from "../persistence/gsd-db.js";
+import { atomicWriteSync } from "../persistence/atomic-write.js";
 import { execFileSync } from "node:child_process";
-import { safeCopy, safeCopyRecursive } from "../safe-fs.js";
-import { gsdRoot } from "../paths.js";
+import { safeCopy, safeCopyRecursive } from "../persistence/safe-fs.js";
+import { gsdRoot } from "../persistence/paths.js";
 import {
   createWorktree,
   removeWorktree,
