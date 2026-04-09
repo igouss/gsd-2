@@ -1002,13 +1002,28 @@ export async function checkNeedsRunUat(
 export async function buildDiscussMilestonePrompt(mid: string, midTitle: string, base: string): Promise<string> {
   const discussTemplates = inlineTemplate("context", "Context");
 
+  // Build prior context so the agent knows what decisions,
+  // requirements, and knowledge already exist.
+  const inlined: string[] = [];
+  const projectInline = await inlineProjectFromDb(base);
+  if (projectInline) inlined.push(projectInline);
+  const decisionsInline = await inlineDecisionsFromDb(base, mid);
+  if (decisionsInline) inlined.push(decisionsInline);
+  const requirementsInline = await inlineRequirementsFromDb(base, mid);
+  if (requirementsInline) inlined.push(requirementsInline);
+  const knowledgeInline = await inlineGsdRootFile(base, "knowledge.md", "Project Knowledge");
+  if (knowledgeInline) inlined.push(knowledgeInline);
+
+  const inlinedContext = inlined.length > 0
+    ? capPreamble(`## Inlined Context (preloaded — do not re-read these files)\n\n${inlined.join("\n\n---\n\n")}`)
+    : "";
+
   const basePrompt = loadPrompt("guided-discuss-milestone", {
     milestoneId: mid,
     milestoneTitle: midTitle,
     inlinedTemplates: discussTemplates,
-    structuredQuestionsAvailable: "true",
+    inlinedContext,
     commitInstruction: "Do not commit planning artifacts — .gsd/ is managed externally.",
-    fastPathInstruction: "",
   });
 
   // If a CONTEXT-DRAFT.md exists, append it as seed material
@@ -1016,7 +1031,7 @@ export async function buildDiscussMilestonePrompt(mid: string, midTitle: string,
   const draftContent = draftPath ? await loadFile(draftPath) : null;
 
   if (draftContent) {
-    return `${basePrompt}\n\n## Prior Discussion (Draft Seed)\n\nThe following draft was captured from a prior multi-milestone discussion. Use it as seed material — the user has already provided this context. Start with a brief reflection on what the draft covers, then probe for any gaps or open questions before writing the full CONTEXT.md.\n\n${draftContent}`;
+    return `${basePrompt}\n\n## Prior Discussion (Draft Seed)\n\nThe following draft was captured from a prior discussion. Use it as seed material — incorporate what's relevant and investigate any gaps.\n\n${draftContent}`;
   }
 
   return basePrompt;
