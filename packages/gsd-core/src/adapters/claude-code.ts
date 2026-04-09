@@ -211,7 +211,11 @@ export class ClaudeCodeAdapter implements HarnessAdapter {
           for (const line of chunk.split("\n").filter(Boolean)) {
             try {
               const event = JSON.parse(line);
-              lastResultLine = line;  // keep last for final parse
+              // Only keep "result" lines — other types (e.g. "user" when
+              // the agent asks a question) must not overwrite the result.
+              if (event.type === "result" || !lastResultLine) {
+                lastResultLine = line;
+              }
               this.handleStreamEvent(event, request);
             } catch {
               // Not JSON — ignore partial lines
@@ -395,12 +399,17 @@ function parseClaudeResult(stdout: string): UnitDispatchResult {
   }
 
   if (parsed.type !== "result") {
+    // "user" means the agent tried to ask a question in headless mode —
+    // treat as transient so the orchestrator can retry.
+    const isUserPrompt = parsed.type === "user";
     return {
       status: "error",
       errorContext: {
-        message: `Unexpected output type: ${parsed.type}`,
-        category: "unknown",
-        isTransient: false,
+        message: isUserPrompt
+          ? "Agent asked a user question in headless mode (no interactive input available)"
+          : `Unexpected output type: ${parsed.type}`,
+        category: isUserPrompt ? "idle" : "unknown",
+        isTransient: isUserPrompt,
       },
     };
   }
