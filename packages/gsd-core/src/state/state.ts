@@ -6,7 +6,6 @@ import type {
   GSDState,
   ActiveRef,
   Roadmap,
-  RoadmapSliceEntry,
   SlicePlan,
   MilestoneRegistryEntry,
 } from '../domain/types.js';
@@ -24,7 +23,6 @@ import {
 } from '../persistence/files.js';
 
 import {
-  resolveMilestonePath,
   resolveMilestoneFile,
   resolveSlicePath,
   resolveSliceFile,
@@ -37,7 +35,7 @@ import {
 import { findMilestoneIds } from '../milestone/milestone-ids.js';
 import { loadQueueOrder, sortByQueueOrder } from './queue-order.js';
 import { isClosedStatus, isDeferredStatus } from '../domain/status-guards.js';
-import { nativeBatchParseGsdFiles, type BatchParsedFile } from '../git/native-parser-bridge.js';
+import { nativeBatchParseGsdFiles } from '../git/native-parser-bridge.js';
 
 import { join, resolve } from 'path';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
@@ -150,11 +148,6 @@ interface StateCache {
 const CACHE_TTL_MS = 100;
 let _stateCache: StateCache | null = null;
 
-// ── Telemetry counters for derive-path observability ────────────────────────
-let _telemetry = { dbDeriveCount: 0, markdownDeriveCount: 0 };
-export function getDeriveTelemetry() { return { ..._telemetry }; }
-export function resetDeriveTelemetry() { _telemetry = { dbDeriveCount: 0, markdownDeriveCount: 0 }; }
-
 /**
  * Invalidate the deriveState() cache. Call this whenever planning files on disk
  * may have changed (unit completion, merges, file writes).
@@ -264,16 +257,13 @@ export async function deriveState(basePath: string): Promise<GSDState> {
       const stopDbTimer = debugTime("derive-state-db");
       result = await deriveStateFromDb(basePath);
       stopDbTimer({ phase: result.phase, milestone: result.activeMilestone?.id });
-      _telemetry.dbDeriveCount++;
     } else {
       // DB open but no milestones on disk either — use filesystem path
       result = await _deriveStateImpl(basePath);
-      _telemetry.markdownDeriveCount++;
     }
   } else {
     logWarning("state", "DB unavailable — using filesystem state derivation (degraded mode)");
     result = await _deriveStateImpl(basePath);
-    _telemetry.markdownDeriveCount++;
   }
 
   stopTimer({ phase: result.phase, milestone: result.activeMilestone?.id });
@@ -282,10 +272,6 @@ export async function deriveState(basePath: string): Promise<GSDState> {
   return result;
 }
 
-/**
- * Extract milestone title from CONTEXT.md or CONTEXT-DRAFT.md heading.
- * Falls back to the provided fallback (usually the milestone ID).
- */
 /**
  * Strip the "M001: " prefix from a milestone title to get the human-readable name.
  * Used by both DB and filesystem paths for consistency.
