@@ -351,6 +351,12 @@ export class ClaudeCodeAdapter implements HarnessAdapter {
         `  ✓ ${subtype}${cost ? ` ($${cost.toFixed(4)})` : ""}`,
         subtype === "success" ? "success" : "warning",
       );
+    } else if (type !== "system") {
+      // Log unknown event types so we notice new CLI output formats
+      this.events.notify(
+        `  ⚠ Unknown CLI output type: ${type} — ${JSON.stringify(event).slice(0, 200)}`,
+        "warning",
+      );
     }
   }
 
