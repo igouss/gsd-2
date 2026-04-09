@@ -330,20 +330,25 @@ export class ClaudeCodeAdapter implements HarnessAdapter {
           }
         }
       }
-    } else if (type === "user") {
-      // Agent asked a question in headless mode — fatal error, means
-      // requirements are underspecified. Log the full question.
-      const questionText = extractQuestionText(event);
-      this.events.notify(
-        `FATAL: Agent asked user question in headless mode — requirements are underspecified`,
-        "error",
-      );
-      this.events.notify(
-        `Question: ${questionText}`,
-        "error",
-      );
     } else if (type === "tool_result" || type === "tool_execution_end") {
-      // Tool completed
+      // Tool completed — no action needed
+    } else if (type === "rate_limit_event") {
+      const info = event.rate_limit_info as Record<string, unknown> | undefined;
+      const status = info?.status as string | undefined;
+      if (status && status !== "allowed") {
+        const resetsAt = info?.resetsAt as number | undefined;
+        const resetTime = resetsAt ? new Date(resetsAt * 1000).toISOString() : "unknown";
+        this.events.notify(
+          `Rate limited (status: ${status}, resets: ${resetTime}). Stopping execution.`,
+          "warning",
+        );
+        // Kill the process — no point continuing under rate limit
+        this.currentProc?.kill("SIGTERM");
+      }
+    } else if (type === "user" || type === "system") {
+      // Expected stream events:
+      // - "user": the prompt / conversation turn echoed back (normal in stream-json)
+      // - "system": system messages
     } else if (type === "result") {
       const subtype = event.subtype as string;
       const cost = event.total_cost_usd as number | undefined;
@@ -351,10 +356,10 @@ export class ClaudeCodeAdapter implements HarnessAdapter {
         `  ✓ ${subtype}${cost ? ` ($${cost.toFixed(4)})` : ""}`,
         subtype === "success" ? "success" : "warning",
       );
-    } else if (type !== "system") {
-      // Log unknown event types so we notice new CLI output formats
+    } else {
+      // Unknown event type — log so we notice new CLI output formats
       this.events.notify(
-        `  ⚠ Unknown CLI output type: ${type} — ${JSON.stringify(event).slice(0, 200)}`,
+        `Unknown CLI event type: ${type} — ${JSON.stringify(event).slice(0, 200)}`,
         "warning",
       );
     }
@@ -419,7 +424,8 @@ function extractQuestionText(parsed: ClaudeUserOutput | Record<string, unknown>)
   }
   const result = (parsed as ClaudeUserOutput).result;
   if (typeof result === "string") return result.slice(0, 500);
-  return "(could not extract question text)";
+  // Fallback: dump raw JSON so we can debug the structure
+  return `(unknown structure) ${JSON.stringify(parsed).slice(0, 500)}`;
 }
 
 function parseClaudeResult(stdout: string): UnitDispatchResult {
