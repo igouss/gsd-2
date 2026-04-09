@@ -51,7 +51,7 @@ import {
   buildParallelResearchSlicesPrompt,
   checkNeedsReassessment,
   checkNeedsRunUat,
-} from "./auto-prompts.js";
+} from "./prompt/auto-prompts.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────
 

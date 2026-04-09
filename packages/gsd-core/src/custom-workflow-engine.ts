@@ -31,7 +31,7 @@ import {
   expandIteration,
   type WorkflowGraph,
 } from "./graph.js";
-import { injectContext } from "./context-injector.js";
+import { injectContext } from "./prompt/context-injector.js";
 import type { WorkflowDefinition, StepDefinition } from "./definition-loader.js";
 import { parseUnitId } from "./unit-id.js";
 

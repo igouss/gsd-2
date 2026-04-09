@@ -6,20 +6,20 @@
  * utility.
  */
 
-import { loadFile, parseContinue, parseSummary, loadActiveOverrides, formatOverridesSection, parseTaskPlanFile } from "./files.js";
-import type { Override, UatType } from "./files.js";
-import { hasVerdict, getUatType } from "./verdict-parser.js";
+import { loadFile, parseContinue, parseSummary, loadActiveOverrides, formatOverridesSection, parseTaskPlanFile } from "../files.js";
+import type { Override, UatType } from "../files.js";
+import { hasVerdict, getUatType } from "../verdict-parser.js";
 import { loadPrompt, inlineTemplate } from "./prompt-loader.js";
 import {
   resolveMilestoneFile, resolveSliceFile, resolveSlicePath,
   resolveTasksDir, resolveTaskFiles, resolveTaskFile,
   relMilestoneFile, relSliceFile, relSlicePath, relMilestonePath,
   resolveGsdRootFile, relGsdRootFile, resolveRuntimeFile,
-} from "./paths.js";
-import { resolveSkillDiscoveryMode, resolveInlineLevel, loadEffectiveGSDPreferences, resolveAllSkillReferences } from "./preferences.js";
-import { parseRoadmap } from "./parsers-legacy.js";
-import type { GSDState, InlineLevel } from "./types.js";
-import type { GSDPreferences } from "./preferences.js";
+} from "../paths.js";
+import { resolveSkillDiscoveryMode, resolveInlineLevel, loadEffectiveGSDPreferences, resolveAllSkillReferences } from "../preferences.js";
+import { parseRoadmap } from "../parsers-legacy.js";
+import type { GSDState, InlineLevel } from "../types.js";
+import type { GSDPreferences } from "../preferences.js";
 /** Minimal Skill shape needed by prompt builders — mirrors @gsd/pi-coding-agent's Skill. */
 export interface Skill {
 	name: string;
@@ -32,10 +32,10 @@ export interface Skill {
 import { join, basename } from "node:path";
 import { existsSync } from "node:fs";
 import { computeBudgets, resolveExecutorContextWindow, truncateAtSectionBoundary } from "./context-budget.js";
-import { getPendingGates } from "./gsd-db.js";
-import { formatDecisionsCompact, formatRequirementsCompact } from "./reporting/structured-data-formatter.js";
-import { readPhaseAnchor, formatAnchorForPrompt } from "./execution/phase-anchor.js";
-import { logWarning } from "./workflow-logger.js";
+import { getPendingGates } from "../gsd-db.js";
+import { formatDecisionsCompact, formatRequirementsCompact } from "../reporting/structured-data-formatter.js";
+import { readPhaseAnchor, formatAnchorForPrompt } from "../execution/phase-anchor.js";
+import { logWarning } from "../workflow-logger.js";
 
 // ─── Preamble Cap ─────────────────────────────────────────────────────────────
 
@@ -199,7 +199,7 @@ export async function inlineDependencySummaries(
   // DB primary path — get slice depends directly
   let depends: string[] | null = null;
   try {
-    const { isDbAvailable, getSlice } = await import("./gsd-db.js");
+    const { isDbAvailable, getSlice } = await import("../gsd-db.js");
     if (isDbAvailable()) {
       const slice = getSlice(mid, sid);
       if (slice) {
@@ -281,9 +281,9 @@ export async function inlineDecisionsFromDb(
 ): Promise<string | null> {
   const inlineLevel = level ?? resolveInlineLevel();
   try {
-    const { isDbAvailable } = await import("./gsd-db.js");
+    const { isDbAvailable } = await import("../gsd-db.js");
     if (isDbAvailable()) {
-      const { queryDecisions, formatDecisionsForPrompt } = await import("./context-store.js");
+      const { queryDecisions, formatDecisionsForPrompt } = await import("../context-store.js");
 
       // First query: try with both milestoneId and scope (if scope provided)
       let decisions = queryDecisions({ milestoneId, scope });
@@ -319,9 +319,9 @@ export async function inlineRequirementsFromDb(
 ): Promise<string | null> {
   const inlineLevel = level ?? resolveInlineLevel();
   try {
-    const { isDbAvailable } = await import("./gsd-db.js");
+    const { isDbAvailable } = await import("../gsd-db.js");
     if (isDbAvailable()) {
-      const { queryRequirements, formatRequirementsForPrompt } = await import("./context-store.js");
+      const { queryRequirements, formatRequirementsForPrompt } = await import("../context-store.js");
       const requirements = queryRequirements({ milestoneId, sliceId });
       if (requirements.length > 0) {
         // Use compact format for non-full levels to save ~40% tokens
@@ -345,9 +345,9 @@ export async function inlineProjectFromDb(
   base: string,
 ): Promise<string | null> {
   try {
-    const { isDbAvailable } = await import("./gsd-db.js");
+    const { isDbAvailable } = await import("../gsd-db.js");
     if (isDbAvailable()) {
-      const { queryProject } = await import("./context-store.js");
+      const { queryProject } = await import("../context-store.js");
       const content = queryProject();
       if (content) {
         return `### Project\nSource: \`.gsd/PROJECT.md\`\n\n${content}`;
@@ -448,7 +448,7 @@ export async function inlineKnowledgeScoped(
   if (!content) return null;
 
   // Import queryKnowledge from context-store
-  const { queryKnowledge } = await import("./context-store.js");
+  const { queryKnowledge } = await import("../context-store.js");
   const scoped = await queryKnowledge(content, keywords);
 
   // Return null if no sections matched (empty string from queryKnowledge)
@@ -475,7 +475,7 @@ export async function inlineRoadmapExcerpt(
   if (!content) return null;
 
   // Import formatRoadmapExcerpt from context-store
-  const { formatRoadmapExcerpt } = await import("./context-store.js");
+  const { formatRoadmapExcerpt } = await import("../context-store.js");
   const excerpt = formatRoadmapExcerpt(content, sid, roadmapRel);
 
   // Return null if slice not found in roadmap
@@ -873,7 +873,7 @@ export async function checkNeedsReassessment(
 ): Promise<{ sliceId: string } | null> {
   // DB primary path — fall through to file-based when DB has no data for this milestone
   try {
-    const { isDbAvailable, getMilestoneSlices } = await import("./gsd-db.js");
+    const { isDbAvailable, getMilestoneSlices } = await import("../gsd-db.js");
     if (isDbAvailable()) {
       const slices = getMilestoneSlices(mid);
       if (slices.length > 0) {
@@ -929,7 +929,7 @@ export async function checkNeedsRunUat(
 ): Promise<{ sliceId: string; uatType: UatType } | null> {
   // DB primary path — fall through to file-based when DB has no data for this milestone
   try {
-    const { isDbAvailable, getMilestoneSlices } = await import("./gsd-db.js");
+    const { isDbAvailable, getMilestoneSlices } = await import("../gsd-db.js");
     if (isDbAvailable()) {
       const slices = getMilestoneSlices(mid);
       if (slices.length > 0) {
@@ -1074,7 +1074,7 @@ export async function buildPlanMilestonePrompt(mid: string, midTitle: string, ba
   inlined.push(await inlineFile(contextPath, contextRel, "Milestone Context"));
   const researchInline = await inlineFileOptional(researchPath, researchRel, "Milestone Research");
   if (researchInline) inlined.push(researchInline);
-  const { inlinePriorMilestoneSummary } = await import("./files.js");
+  const { inlinePriorMilestoneSummary } = await import("../files.js");
   const priorSummaryInline = await inlinePriorMilestoneSummary(mid, base);
   if (priorSummaryInline) inlined.push(priorSummaryInline);
   if (inlineLevel !== "minimal") {
@@ -1517,7 +1517,7 @@ export async function buildCompleteMilestonePrompt(
   // Inline all slice summaries (deduplicated by slice ID)
   let sliceIds: string[] = [];
   try {
-    const { isDbAvailable, getMilestoneSlices } = await import("./gsd-db.js");
+    const { isDbAvailable, getMilestoneSlices } = await import("../gsd-db.js");
     if (isDbAvailable()) {
       sliceIds = getMilestoneSlices(mid).map(s => s.id);
     }
@@ -1590,7 +1590,7 @@ export async function buildValidateMilestonePrompt(
 
   // Inline verification classes from planning (if available in DB)
   try {
-    const { isDbAvailable, getMilestone } = await import("./gsd-db.js");
+    const { isDbAvailable, getMilestone } = await import("../gsd-db.js");
     if (isDbAvailable()) {
       const milestone = getMilestone(mid);
       if (milestone) {
@@ -1611,7 +1611,7 @@ export async function buildValidateMilestonePrompt(
   // Inline all slice summaries and UAT results
   let valSliceIds: string[] = [];
   try {
-    const { isDbAvailable, getMilestoneSlices } = await import("./gsd-db.js");
+    const { isDbAvailable, getMilestoneSlices } = await import("../gsd-db.js");
     if (isDbAvailable()) {
       valSliceIds = getMilestoneSlices(mid).map(s => s.id);
     }
@@ -1753,7 +1753,7 @@ export async function buildReplanSlicePrompt(
   // Build capture context for replan prompt (captures that triggered this replan)
   let captureContext = "(none)";
   try {
-    const { loadReplanCaptures } = await import("./triage-resolution.js");
+    const { loadReplanCaptures } = await import("../triage-resolution.js");
     const replanCaptures = loadReplanCaptures(base);
     if (replanCaptures.length > 0) {
       captureContext = replanCaptures.map(c =>
@@ -1858,7 +1858,7 @@ export async function buildReassessRoadmapPrompt(
   // Build deferred captures context for reassess prompt
   let deferredCaptures = "(none)";
   try {
-    const { loadDeferredCaptures } = await import("./triage-resolution.js");
+    const { loadDeferredCaptures } = await import("../triage-resolution.js");
     const deferred = loadDeferredCaptures(base);
     if (deferred.length > 0) {
       deferredCaptures = deferred.map(c =>
@@ -1896,7 +1896,7 @@ export async function buildReactiveExecutePrompt(
   mid: string, midTitle: string, sid: string, sTitle: string,
   readyTaskIds: string[], base: string,
 ): Promise<string> {
-  const { loadSliceTaskIO, deriveTaskGraph, graphMetrics } = await import("./reactive-graph.js");
+  const { loadSliceTaskIO, deriveTaskGraph, graphMetrics } = await import("../reactive-graph.js");
 
   // Build graph for context
   const taskIO = await loadSliceTaskIO(base, mid, sid);
@@ -2106,7 +2106,7 @@ export async function buildRewriteDocsPrompt(
         // DB primary path — get incomplete tasks
         let incompleteTasks: { id: string }[] | null = null;
         try {
-          const { isDbAvailable, getSliceTasks } = await import("./gsd-db.js");
+          const { isDbAvailable, getSliceTasks } = await import("../gsd-db.js");
           if (isDbAvailable()) {
             incompleteTasks = getSliceTasks(mid, sid)
               .filter(t => t.status !== "complete" && t.status !== "done")

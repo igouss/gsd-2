@@ -165,7 +165,7 @@ export async function runUnitPhase(
   s.lastBaselineCharCount = undefined;
   if (deps.isDbAvailable()) {
     try {
-      const { inlineGsdRootFile } = await import("../../auto-prompts.js");
+      const { inlineGsdRootFile } = await import("../../prompt/auto-prompts.js");
       const [decisionsContent, requirementsContent, projectContent] =
         await Promise.all([
           inlineGsdRootFile(s.basePath, "decisions.md", "Decisions"),
