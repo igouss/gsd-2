@@ -36,7 +36,20 @@ export { handleReopenMilestone } from "./tools/reopen-milestone.js";
 export { handleValidateMilestone } from "./tools/validate-milestone.js";
 
 // DB operations
-export { saveDecisionToDb, saveRequirementToDb, updateRequirementInDb } from "./persistence/db-writer.js";
+export { saveDecisionToDb, saveRequirementToDb, updateRequirementInDb, saveArtifactToDb } from "./persistence/db-writer.js";
+export type { SaveArtifactOpts } from "./persistence/db-writer.js";
+
+// DB — direct access for MCP tools
+export { updateSliceStatus, saveGateResult } from "./persistence/gsd-db.js";
+
+// State derivation
+export { deriveState } from "./state/state.js";
+
+// Milestone IDs
+export { nextMilestoneId, findMilestoneIds } from "./milestone/milestone-ids.js";
+
+// Journal
+export { queryJournal } from "./persistence/journal.js";
 
 // Types
 export type { CompleteTaskParams, CompleteSliceParams } from "./domain/types.js";

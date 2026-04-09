@@ -81,6 +81,13 @@ import {
   saveDecisionToDb,
   saveRequirementToDb,
   updateRequirementInDb,
+  saveArtifactToDb,
+  updateSliceStatus,
+  saveGateResult,
+  deriveState,
+  nextMilestoneId,
+  findMilestoneIds,
+  queryJournal,
 } from '@gsd-build/gsd-core';
 
 // ---------------------------------------------------------------------------
@@ -537,6 +544,236 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
         return errorContent(err instanceof Error ? err.message : String(err));
       }
     },
+  );
+
+  // =====================================================================
+  // ALIAS: gsd_complete_slice → gsd_slice_complete
+  // Some prompts reference gsd_complete_slice, server registers gsd_slice_complete.
+  // Register the alias so agents using either name succeed.
+  // =====================================================================
+
+  server.tool(
+    'gsd_complete_slice',
+    'Alias for gsd_slice_complete — mark a slice as complete.',
+    {
+      sliceId: z.string().describe('Slice ID'),
+      milestoneId: z.string().describe('Milestone ID'),
+      sliceTitle: z.string().describe('Human-readable slice title'),
+      oneLiner: z.string().describe('One-line summary'),
+      narrative: z.string().describe('Detailed narrative'),
+      verification: z.string().describe('Verification summary'),
+      uatContent: z.string().describe('User acceptance test content'),
+      keyFiles: z.array(z.string()).optional().describe('Key files modified'),
+      keyDecisions: z.array(z.string()).optional().describe('Key decisions'),
+      patternsEstablished: z.array(z.string()).optional().describe('Patterns established'),
+      deviations: z.string().optional().describe('Deviations from plan'),
+      knownLimitations: z.string().optional().describe('Known limitations'),
+      followUps: z.string().optional().describe('Follow-up items'),
+      requirementsAdvanced: z.array(z.object({ id: z.string(), how: z.string() })).optional(),
+      requirementsValidated: z.array(z.object({ id: z.string(), proof: z.string() })).optional(),
+      requirementsSurfaced: z.array(z.string()).optional(),
+    },
+    wrapHandler(projectDir, async (args, basePath) => {
+      return handleCompleteSlice(args as any, basePath);
+    }),
+  );
+
+  // =====================================================================
+  // ARTIFACT PERSISTENCE — gsd_summary_save
+  // =====================================================================
+
+  server.tool(
+    'gsd_summary_save',
+    'Save a GSD artifact (CONTEXT, RESEARCH, SUMMARY, ASSESSMENT, etc.) to both disk and database. ' +
+    'Computes the file path from milestone/slice/task IDs and artifact_type. ' +
+    'This is the primary way agents persist research, context, summaries, and other structured markdown.',
+    {
+      milestone_id: z.string().describe('Milestone ID (e.g. "M001")'),
+      artifact_type: z.string().describe('Artifact type: CONTEXT, RESEARCH, SUMMARY, ASSESSMENT, CONTEXT-DRAFT, UAT, etc.'),
+      content: z.string().describe('Full markdown content to persist'),
+      slice_id: z.string().optional().describe('Slice ID (e.g. "S01") — required for slice/task artifacts'),
+      task_id: z.string().optional().describe('Task ID (e.g. "T1") — required for task artifacts'),
+    },
+    wrapHandler(projectDir, async (args, basePath) => {
+      const milestoneId = args.milestone_id as string;
+      const artifactType = args.artifact_type as string;
+      const content = args.content as string;
+      const sliceId = args.slice_id as string | undefined;
+      const taskId = args.task_id as string | undefined;
+
+      // Compute the relative path within .gsd/
+      let path: string;
+      if (taskId && sliceId) {
+        path = `milestones/${milestoneId}/slices/${sliceId}/tasks/${sliceId}${taskId}-${artifactType}.md`;
+      } else if (sliceId) {
+        path = `milestones/${milestoneId}/slices/${sliceId}/${sliceId}-${artifactType}.md`;
+      } else {
+        path = `milestones/${milestoneId}/${milestoneId}-${artifactType}.md`;
+      }
+
+      await saveArtifactToDb(
+        { path, artifact_type: artifactType, content, milestone_id: milestoneId, slice_id: sliceId, task_id: taskId },
+        basePath,
+      );
+      return { saved: true, path: `.gsd/${path}` };
+    }),
+  );
+
+  // =====================================================================
+  // MILESTONE ID GENERATION — gsd_milestone_generate_id
+  // =====================================================================
+
+  server.tool(
+    'gsd_milestone_generate_id',
+    'Generate the next milestone ID. Scans existing milestone directories and returns the next sequential ID. ' +
+    'Never invent milestone IDs manually — always use this tool.',
+    {
+      // No params — scans the project directory
+    },
+    wrapHandler(projectDir, async (_args, basePath) => {
+      const existingIds = findMilestoneIds(basePath);
+      const newId = nextMilestoneId(existingIds);
+      return { milestoneId: newId, existingIds };
+    }),
+  );
+
+  // =====================================================================
+  // MILESTONE STATUS QUERY — gsd_milestone_status
+  // =====================================================================
+
+  server.tool(
+    'gsd_milestone_status',
+    'Get structured milestone and slice status from the database. ' +
+    'Use this instead of direct DB access for reading project state.',
+    {
+      milestoneId: z.string().optional().describe('Filter to a specific milestone (omit for all milestones)'),
+    },
+    wrapHandler(projectDir, async (args, basePath) => {
+      const state = await deriveState(basePath);
+      const milestoneId = args.milestoneId as string | undefined;
+
+      if (milestoneId) {
+        const entry = state.registry.find((m) => m.id === milestoneId);
+        if (!entry) return { error: `Milestone ${milestoneId} not found` };
+        return {
+          milestone: {
+            id: entry.id,
+            title: entry.title,
+            status: entry.status,
+          },
+          phase: state.phase,
+          activeMilestone: state.activeMilestone,
+          activeSlice: state.activeSlice,
+          activeTask: state.activeTask,
+        };
+      }
+
+      return {
+        phase: state.phase,
+        activeMilestone: state.activeMilestone,
+        activeSlice: state.activeSlice,
+        activeTask: state.activeTask,
+        registry: state.registry,
+        progress: state.progress,
+        requirements: state.requirements,
+      };
+    }),
+  );
+
+  // =====================================================================
+  // SKIP SLICE — gsd_skip_slice
+  // =====================================================================
+
+  server.tool(
+    'gsd_skip_slice',
+    'Mark a slice as skipped so auto-mode advances past it without executing. ' +
+    'This is a permanent DB operation — the prompt enforces user confirmation before calling.',
+    {
+      milestoneId: z.string().describe('Milestone ID'),
+      sliceId: z.string().describe('Slice ID to skip'),
+      reason: z.string().describe('Why this slice is being skipped'),
+    },
+    wrapHandler(projectDir, async (args, basePath) => {
+      const milestoneId = args.milestoneId as string;
+      const sliceId = args.sliceId as string;
+      const reason = args.reason as string;
+
+      updateSliceStatus(milestoneId, sliceId, 'skipped');
+
+      // Also save a decision recording why it was skipped
+      await saveDecisionToDb(
+        {
+          scope: 'slice',
+          decision: `Skip slice ${sliceId} in ${milestoneId}`,
+          choice: 'skipped',
+          rationale: reason,
+          made_by: 'agent',
+        },
+        basePath,
+      );
+
+      return { skipped: true, milestoneId, sliceId, reason };
+    }),
+  );
+
+  // =====================================================================
+  // JOURNAL QUERY — gsd_journal_query
+  // =====================================================================
+
+  server.tool(
+    'gsd_journal_query',
+    'Query the execution journal for structured event history. ' +
+    'Use this instead of direct JSONL file reads.',
+    {
+      flowId: z.string().optional().describe('Filter by flow ID'),
+      eventType: z.string().optional().describe('Filter by event type (e.g. "unit-start", "unit-end")'),
+      unitId: z.string().optional().describe('Filter by unit ID'),
+      after: z.string().optional().describe('ISO-8601 lower bound (inclusive)'),
+      before: z.string().optional().describe('ISO-8601 upper bound (inclusive)'),
+      limit: z.number().optional().describe('Max entries to return (default: 100)'),
+    },
+    wrapHandler(projectDir, async (args, basePath) => {
+      const filters: Record<string, string | undefined> = {};
+      if (args.flowId) filters.flowId = args.flowId as string;
+      if (args.eventType) filters.eventType = args.eventType as string;
+      if (args.unitId) filters.unitId = args.unitId as string;
+      if (args.after) filters.after = args.after as string;
+      if (args.before) filters.before = args.before as string;
+
+      const entries = queryJournal(basePath, filters as any);
+      const limit = (args.limit as number | undefined) ?? 100;
+      return { entries: entries.slice(-limit), totalCount: entries.length };
+    }),
+  );
+
+  // =====================================================================
+  // GATE RESULT — gsd_save_gate_result
+  // =====================================================================
+
+  server.tool(
+    'gsd_save_gate_result',
+    'Save the result of a quality gate evaluation (verification check).',
+    {
+      milestoneId: z.string().describe('Milestone ID'),
+      sliceId: z.string().describe('Slice ID'),
+      gateId: z.string().describe('Gate ID (e.g. "contract", "integration", "operational")'),
+      verdict: z.enum(['pass', 'flag', 'omitted']).describe('Gate verdict: pass, flag (issue found), or omitted (skipped)'),
+      rationale: z.string().describe('Why this verdict was given'),
+      findings: z.string().describe('Detailed findings from the evaluation'),
+      taskId: z.string().optional().describe('Task ID if task-scoped'),
+    },
+    wrapHandler(projectDir, async (args) => {
+      saveGateResult({
+        milestoneId: args.milestoneId as string,
+        sliceId: args.sliceId as string,
+        gateId: args.gateId as string,
+        taskId: args.taskId as string | undefined,
+        verdict: args.verdict as "pass" | "flag" | "omitted",
+        rationale: args.rationale as string,
+        findings: args.findings as string,
+      });
+      return { saved: true, gateId: args.gateId, verdict: args.verdict };
+    }),
   );
 
   return { server };
