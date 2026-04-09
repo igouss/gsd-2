@@ -20,6 +20,10 @@ Pay particular attention to **Forward Intelligence** sections — they contain h
 
 You have full tool access. Before decomposing, explore the relevant code to ground your plan in reality.
 
+### Existing Plan
+
+If an existing slice plan was preloaded above, you MUST preserve its task IDs (T1, T2, etc.) and structure. Refine the plan — improve descriptions, add verification, fill missing fields — but do NOT rename or renumber existing tasks. You may add new tasks after the existing ones if the scope requires it.
+
 ### Verify Roadmap Assumptions
 
 Check prior slice summaries (inlined above as dependency summaries, if present). If prior slices discovered constraints, changed approaches, or flagged fragility, adjust your plan accordingly. The roadmap description may be stale — verify it against the current codebase state.

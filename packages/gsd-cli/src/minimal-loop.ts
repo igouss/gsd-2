@@ -9,7 +9,7 @@
  */
 
 import { join } from "node:path";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 
 import type {
   HarnessAdapter,
@@ -17,7 +17,7 @@ import type {
   UnitDispatchResult,
 } from "@gsd-build/gsd-core";
 
-import { GSD_SYSTEM_PROMPT } from "./system-prompt.js";
+import { buildSystemPrompt, buildProjectContext } from "./system-prompt.js";
 
 // All imports below are from gsd-core's internal modules.
 // Since gsd-core only re-exports a subset from index.ts, we import
@@ -32,6 +32,7 @@ export interface MinimalLoopOptions {
   events: OrchestratorEventSink;
   projectDir: string;
   mcpConfigPath: string;
+  templatesDir: string;
   maxIterations?: number;
 }
 
@@ -42,6 +43,8 @@ export interface MinimalLoopOptions {
 interface CoreModules {
   deriveState: (basePath: string) => Promise<any>;
   invalidateStateCache: () => void;
+  clearPathCache: () => void;
+  clearParseCache: () => void;
   resolveDispatch: (ctx: any) => Promise<any>;
   openDatabase: (path: string) => boolean;
   closeDatabase: () => void;
@@ -52,17 +55,21 @@ interface CoreModules {
 }
 
 async function loadCoreModules(): Promise<CoreModules> {
-  const [stateMod, dispatchMod, dbMod, prefsMod, lockMod] = await Promise.all([
+  const [stateMod, dispatchMod, dbMod, prefsMod, lockMod, pathsMod, filesMod] = await Promise.all([
     import("@gsd-build/gsd-core/dist/state.js"),
     import("@gsd-build/gsd-core/dist/auto-dispatch.js"),
     import("@gsd-build/gsd-core/dist/gsd-db.js"),
     import("@gsd-build/gsd-core/dist/preferences.js"),
     import("@gsd-build/gsd-core/dist/session-lock.js"),
+    import("@gsd-build/gsd-core/dist/paths.js"),
+    import("@gsd-build/gsd-core/dist/files.js"),
   ]);
 
   return {
     deriveState: stateMod.deriveState,
     invalidateStateCache: stateMod.invalidateStateCache,
+    clearPathCache: pathsMod.clearPathCache,
+    clearParseCache: filesMod.clearParseCache,
     resolveDispatch: dispatchMod.resolveDispatch,
     openDatabase: dbMod.openDatabase,
     closeDatabase: dbMod.closeDatabase,
@@ -80,10 +87,13 @@ async function loadCoreModules(): Promise<CoreModules> {
 const MAX_ITERATIONS = 200;
 
 export async function minimalLoop(opts: MinimalLoopOptions): Promise<void> {
-  const { adapter, events, projectDir, mcpConfigPath } = opts;
+  const { adapter, events, projectDir, mcpConfigPath, templatesDir } = opts;
   const maxIter = opts.maxIterations ?? MAX_ITERATIONS;
 
   const core = await loadCoreModules();
+
+  // Build system prompt once at startup (skills + template)
+  const systemPrompt = buildSystemPrompt({ templatesDir, projectDir });
 
   // Open DB (creates + initializes schema if it doesn't exist)
   const dbPath = join(projectDir, ".gsd", "gsd.db");
@@ -114,6 +124,8 @@ export async function minimalLoop(opts: MinimalLoopOptions): Promise<void> {
     while (running && iteration < maxIter) {
       iteration++;
       core.invalidateStateCache();
+      core.clearPathCache();
+      core.clearParseCache();
 
       // 1. Derive state
       const state = await core.deriveState(projectDir);
@@ -155,10 +167,10 @@ export async function minimalLoop(opts: MinimalLoopOptions): Promise<void> {
       events.progress({ unitType, unitId, phase: "dispatching", iteration });
       events.notify(`[${iteration}] ${unitType} ${unitId}`, "info");
 
-      // 3. Inject system context into prompt
-      const systemContext = buildSystemContext(projectDir, mid);
-      const fullPrompt = systemContext
-        ? `${systemContext}\n\n---\n\n${prompt}`
+      // 3. Build project context (refreshed each iteration — decisions/requirements may change)
+      const projectContext = buildProjectContext(projectDir, mid);
+      const fullPrompt = projectContext
+        ? `${projectContext}\n\n---\n\n${prompt}`
         : prompt;
 
       // 4. Dispatch to harness
@@ -168,7 +180,7 @@ export async function minimalLoop(opts: MinimalLoopOptions): Promise<void> {
           unitType,
           unitId,
           prompt: fullPrompt,
-          systemPrompt: GSD_SYSTEM_PROMPT,
+          systemPrompt,
           mcpConfigPath,
           cwd: projectDir,
         });
@@ -221,39 +233,3 @@ export async function minimalLoop(opts: MinimalLoopOptions): Promise<void> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// System context builder — inject project/decisions/requirements into prompt
-// ---------------------------------------------------------------------------
-
-function buildSystemContext(projectDir: string, milestoneId: string): string | null {
-  const gsdDir = join(projectDir, ".gsd");
-  const sections: string[] = [];
-
-  // Project description
-  const projectPath = join(gsdDir, "PROJECT.md");
-  if (existsSync(projectPath)) {
-    sections.push(`## Project\n\n${readFileSync(projectPath, "utf-8")}`);
-  }
-
-  // Decisions
-  const decisionsPath = join(gsdDir, "DECISIONS.md");
-  if (existsSync(decisionsPath)) {
-    sections.push(`## Decisions\n\n${readFileSync(decisionsPath, "utf-8")}`);
-  }
-
-  // Requirements
-  const requirementsPath = join(gsdDir, "REQUIREMENTS.md");
-  if (existsSync(requirementsPath)) {
-    sections.push(`## Requirements\n\n${readFileSync(requirementsPath, "utf-8")}`);
-  }
-
-  // Roadmap
-  const roadmapPath = join(gsdDir, "milestones", milestoneId, `${milestoneId}-ROADMAP.md`);
-  if (existsSync(roadmapPath)) {
-    sections.push(`## Roadmap\n\n${readFileSync(roadmapPath, "utf-8")}`);
-  }
-
-  if (sections.length === 0) return null;
-
-  return `# GSD Context\n\n${sections.join("\n\n---\n\n")}`;
-}

@@ -19,10 +19,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./dist/*": "./dist/*"
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp -r src/templates dist/templates && cp -r src/prompts dist/prompts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {},

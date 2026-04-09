@@ -169,11 +169,18 @@ export async function run(): Promise<void> {
   const { minimalLoop } = await import("./minimal-loop.js");
 
   try {
+    // Resolve templates dir from gsd-core package
+    const { createRequire } = await import("node:module");
+    const require_ = createRequire(import.meta.url);
+    const gsdCorePkg = require_.resolve("@gsd-build/gsd-core/package.json");
+    const templatesDir = resolve(gsdCorePkg, "..", "dist", "templates");
+
     await minimalLoop({
       adapter,
       events,
       projectDir: args.projectDir,
       mcpConfigPath: mcpHost.mcpConfigPath,
+      templatesDir,
     });
   } finally {
     await adapter.shutdown();

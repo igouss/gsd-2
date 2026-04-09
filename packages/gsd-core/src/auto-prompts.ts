@@ -1239,6 +1239,13 @@ export async function buildPlanSlicePrompt(
   if (sliceCtxInline) inlined.push(sliceCtxInline);
   const researchInline = await inlineFileOptional(researchPath, researchRel, "Slice Research");
   if (researchInline) inlined.push(researchInline);
+
+  // Inject existing plan so the agent preserves existing task IDs and structure
+  const existingPlanPath = resolveSliceFile(base, mid, sid, "PLAN");
+  const existingPlanRel = relSliceFile(base, mid, sid, "PLAN");
+  const existingPlanInline = await inlineFileOptional(existingPlanPath, existingPlanRel, "Existing Slice Plan (preserve task IDs and structure — refine, don't replace)");
+  if (existingPlanInline) inlined.push(existingPlanInline);
+
   if (inlineLevel !== "minimal") {
     // Derive scope from slice title for decision filtering (R005)
     const derivedScopePS = deriveSliceScope(sTitle);
