@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-import { loadRegistry } from "../workflow-templates.js";
+import { loadRegistry } from "../workflow/workflow-templates.js";
 import { resolveProjectRoot } from "../git/worktree.js";
 
 const gsdHome = process.env.GSD_HOME || join(homedir(), ".gsd");

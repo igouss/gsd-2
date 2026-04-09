@@ -20,9 +20,9 @@ import {
 } from "../gsd-db.js";
 import { invalidateStateCache } from "../state.js";
 import { isClosedStatus } from "../status-guards.js";
-import { renderAllProjections } from "../workflow-projections.js";
-import { writeManifest } from "../workflow-manifest.js";
-import { appendEvent } from "../workflow-events.js";
+import { renderAllProjections } from "../workflow/workflow-projections.js";
+import { writeManifest } from "../workflow/workflow-manifest.js";
+import { appendEvent } from "../workflow/workflow-events.js";
 import { logWarning } from "../workflow/workflow-logger.js";
 import { debugLog } from "../debug-logger.js";
 import { existsSync, unlinkSync } from "node:fs";

@@ -18,7 +18,7 @@ import type {
 } from './types.js';
 
 // Re-export parseRoadmapSlices so callers can import all legacy parsers from one module
-import { parseRoadmapSlices } from './roadmap-slices.js';
+import { parseRoadmapSlices } from './workflow/roadmap-slices.js';
 export { parseRoadmapSlices };
 
 // ─── Parse Cache (local to this module) ───────────────────────────────────

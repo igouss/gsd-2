@@ -19,7 +19,7 @@ import type {
   CompletedStep,
   ReconcileResult,
   DisplayMetadata,
-} from "./routing/engine-types.js";
+} from "../routing/engine-types.js";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse } from "yaml";
@@ -31,9 +31,9 @@ import {
   expandIteration,
   type WorkflowGraph,
 } from "./graph.js";
-import { injectContext } from "./prompt/context-injector.js";
+import { injectContext } from "../prompt/context-injector.js";
 import type { WorkflowDefinition, StepDefinition } from "./definition-loader.js";
-import { parseUnitId } from "./unit-id.js";
+import { parseUnitId } from "../unit-id.js";
 
 /** Read and parse the frozen DEFINITION.yaml from a run directory. */
 export function readFrozenDefinition(runDir: string): WorkflowDefinition {

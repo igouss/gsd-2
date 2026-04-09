@@ -1,4 +1,4 @@
-import type { RoadmapSliceEntry, RiskLevel } from "./types.js";
+import type { RoadmapSliceEntry, RiskLevel } from "../types.js";
 
 /**
  * Expand dependency shorthand into individual slice IDs.

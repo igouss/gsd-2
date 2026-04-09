@@ -20,9 +20,9 @@ import { resolveMilestonePath, clearPathCache } from "../paths.js";
 import { isClosedStatus } from "../status-guards.js";
 import { saveFile, clearParseCache } from "../files.js";
 import { invalidateStateCache } from "../state.js";
-import { renderAllProjections, stripIdPrefix } from "../workflow-projections.js";
-import { writeManifest } from "../workflow-manifest.js";
-import { appendEvent } from "../workflow-events.js";
+import { renderAllProjections, stripIdPrefix } from "../workflow/workflow-projections.js";
+import { writeManifest } from "../workflow/workflow-manifest.js";
+import { appendEvent } from "../workflow/workflow-events.js";
 import { logWarning, logError } from "../workflow/workflow-logger.js";
 
 export interface CompleteMilestoneParams {

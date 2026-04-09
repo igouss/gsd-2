@@ -9,13 +9,13 @@
  * The `loadSliceTaskIO` loader at the bottom is the only async/IO function.
  */
 
-import type { TaskIO, DerivedTaskNode, ReactiveExecutionState } from "./types.js";
-import { loadFile, parseTaskPlanIO } from "./files.js";
-import { isDbAvailable, getSliceTasks } from "./gsd-db.js";
-import { parsePlan } from "./parsers-legacy.js";
-import { resolveTasksDir, resolveTaskFiles } from "./paths.js";
+import type { TaskIO, DerivedTaskNode, ReactiveExecutionState } from "../types.js";
+import { loadFile, parseTaskPlanIO } from "../files.js";
+import { isDbAvailable, getSliceTasks } from "../gsd-db.js";
+import { parsePlan } from "../parsers-legacy.js";
+import { resolveTasksDir, resolveTaskFiles } from "../paths.js";
 import { join } from "node:path";
-import { loadJsonFileOrNull, saveJsonFile } from "./json-persistence.js";
+import { loadJsonFileOrNull, saveJsonFile } from "../json-persistence.js";
 import { existsSync, unlinkSync } from "node:fs";
 
 // ─── Graph Construction ───────────────────────────────────────────────────
@@ -203,7 +203,7 @@ export async function loadSliceTaskIO(
   mid: string,
   sid: string,
 ): Promise<TaskIO[]> {
-  const { resolveSliceFile } = await import("./paths.js");
+  const { resolveSliceFile } = await import("../paths.js");
   const slicePlanPath = resolveSliceFile(basePath, mid, sid, "PLAN");
   const planContent = slicePlanPath ? await loadFile(slicePlanPath) : null;
   if (!planContent) return [];

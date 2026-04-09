@@ -1896,7 +1896,7 @@ export async function buildReactiveExecutePrompt(
   mid: string, midTitle: string, sid: string, sTitle: string,
   readyTaskIds: string[], base: string,
 ): Promise<string> {
-  const { loadSliceTaskIO, deriveTaskGraph, graphMetrics } = await import("../reactive-graph.js");
+  const { loadSliceTaskIO, deriveTaskGraph, graphMetrics } = await import("../workflow/reactive-graph.js");
 
   // Build graph for context
   const taskIO = await loadSliceTaskIO(base, mid, sid);

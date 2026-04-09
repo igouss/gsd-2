@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { mkdirSync, existsSync, readFileSync, unlinkSync } from "node:fs";
-import { logWarning, logError } from "./workflow/workflow-logger.js";
+import { logWarning, logError } from "../workflow/workflow-logger.js";
 import { readEvents, findForkPoint, appendEvent, getSessionId } from "./workflow-events.js";
 import type { WorkflowEvent } from "./workflow-events.js";
 import {
@@ -16,14 +16,14 @@ import {
   upsertDecision,
   openDatabase,
   setTaskBlockerDiscovered,
-} from "./gsd-db.js";
-import { isClosedStatus } from "./status-guards.js";
-import { invalidateStateCache } from "./state.js";
-import { clearPathCache } from "./paths.js";
-import { clearParseCache } from "./files.js";
+} from "../gsd-db.js";
+import { isClosedStatus } from "../status-guards.js";
+import { invalidateStateCache } from "../state.js";
+import { clearPathCache } from "../paths.js";
+import { clearParseCache } from "../files.js";
 import { writeManifest } from "./workflow-manifest.js";
-import { atomicWriteSync } from "./atomic-write.js";
-import { acquireSyncLock, releaseSyncLock } from "./session/sync-lock.js";
+import { atomicWriteSync } from "../atomic-write.js";
+import { acquireSyncLock, releaseSyncLock } from "../session/sync-lock.js";
 
 // ─── Replay Helpers ──────────────────────────────────────────────────────────
 

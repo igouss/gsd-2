@@ -559,7 +559,7 @@ export const DISPATCH_RULES: DispatchRule[] = [
           getReadyTasks,
           chooseNonConflictingSubset,
           graphMetrics,
-        } = await import("./reactive-graph.js");
+        } = await import("./workflow/reactive-graph.js");
 
         const taskIO = await loadSliceTaskIO(basePath, mid, sid);
         if (taskIO.length < 2) return null; // single task, no point
@@ -592,7 +592,7 @@ export const DISPATCH_RULES: DispatchRule[] = [
 
         // Persist dispatched batch so verification and recovery can check
         // exactly which tasks were sent.
-        const { saveReactiveState } = await import("./reactive-graph.js");
+        const { saveReactiveState } = await import("./workflow/reactive-graph.js");
         saveReactiveState(basePath, mid, sid, {
           sliceId: sid,
           completed: [...completed],

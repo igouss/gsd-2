@@ -10,15 +10,15 @@ import {
   getMilestoneSlices,
   getSliceTasks,
   getVerificationEvidence,
-} from "./gsd-db.js";
-import type { MilestoneRow, SliceRow, TaskRow, VerificationEvidenceRow } from "./gsd-db.js";
-import { atomicWriteSync } from "./atomic-write.js";
+} from "../gsd-db.js";
+import type { MilestoneRow, SliceRow, TaskRow, VerificationEvidenceRow } from "../gsd-db.js";
+import { atomicWriteSync } from "../atomic-write.js";
 import { join } from "node:path";
 import { mkdirSync, existsSync } from "node:fs";
-import { logWarning } from "./workflow/workflow-logger.js";
-import { isClosedStatus } from "./status-guards.js";
-import { deriveState } from "./state.js";
-import type { GSDState } from "./types.js";
+import { logWarning } from "../workflow/workflow-logger.js";
+import { isClosedStatus } from "../status-guards.js";
+import { deriveState } from "../state.js";
+import type { GSDState } from "../types.js";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────
 

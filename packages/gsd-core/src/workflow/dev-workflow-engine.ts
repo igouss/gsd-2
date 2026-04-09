@@ -13,13 +13,13 @@ import type {
   CompletedStep,
   ReconcileResult,
   DisplayMetadata,
-} from "./routing/engine-types.js";
-import type { GSDState } from "./types.js";
-import type { DispatchAction, DispatchContext } from "./auto-dispatch.js";
+} from "../routing/engine-types.js";
+import type { GSDState } from "../types.js";
+import type { DispatchAction, DispatchContext } from "../auto-dispatch.js";
 
-import { deriveState } from "./state.js";
-import { resolveDispatch } from "./auto-dispatch.js";
-import { loadEffectiveGSDPreferences } from "./preferences/preferences.js";
+import { deriveState } from "../state.js";
+import { resolveDispatch } from "../auto-dispatch.js";
+import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
 
 // ─── Bridge: DispatchAction → EngineDispatchAction ────────────────────────
 

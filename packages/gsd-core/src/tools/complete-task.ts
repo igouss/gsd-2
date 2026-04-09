@@ -30,9 +30,9 @@ import { checkOwnership, taskUnitKey } from "../unit-ownership.js";
 import { saveFile, clearParseCache } from "../files.js";
 import { invalidateStateCache } from "../state.js";
 import { renderPlanCheckboxes } from "../reporting/markdown-renderer.js";
-import { renderAllProjections, renderSummaryContent } from "../workflow-projections.js";
-import { writeManifest } from "../workflow-manifest.js";
-import { appendEvent } from "../workflow-events.js";
+import { renderAllProjections, renderSummaryContent } from "../workflow/workflow-projections.js";
+import { writeManifest } from "../workflow/workflow-manifest.js";
+import { appendEvent } from "../workflow/workflow-events.js";
 import { logWarning, logError } from "../workflow/workflow-logger.js";
 
 export interface CompleteTaskResult {

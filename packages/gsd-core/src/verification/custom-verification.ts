@@ -21,8 +21,8 @@ import { logWarning } from "../workflow/workflow-logger.js";
 import { readFileSync, existsSync, statSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
 import { spawnSync } from "node:child_process";
-import type { StepDefinition, VerifyPolicy } from "../definition-loader.js";
-import { readFrozenDefinition } from "../custom-workflow-engine.js";
+import type { StepDefinition, VerifyPolicy } from "../workflow/definition-loader.js";
+import { readFrozenDefinition } from "../workflow/custom-workflow-engine.js";
 import { rewriteCommandWithRtk } from "../shared/rtk.js";
 
 /** Verification outcome type — matches ExecutionPolicy.verify() return type. */
