@@ -9,7 +9,7 @@ import { randomInt } from "node:crypto";
 import { logWarning } from "../workflow/workflow-logger.js";
 import { readdirSync, existsSync } from "node:fs";
 import { milestonesDir } from "../persistence/paths.js";
-import { loadQueueOrder, sortByQueueOrder } from "../queue-order.js";
+import { loadQueueOrder, sortByQueueOrder } from "../state/queue-order.js";
 import { getErrorMessage } from "../domain/error-utils.js";
 
 // ─── Regex ──────────────────────────────────────────────────────────────────

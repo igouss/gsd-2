@@ -11,7 +11,7 @@ import {
   upsertMilestonePlanning,
   upsertSlicePlanning,
 } from "../persistence/gsd-db.js";
-import { invalidateStateCache } from "../state.js";
+import { invalidateStateCache } from "../state/state.js";
 import { renderRoadmapFromDb } from "../reporting/markdown-renderer.js";
 import { renderAllProjections } from "../workflow/workflow-projections.js";
 import { writeManifest } from "../workflow/workflow-manifest.js";

@@ -10,9 +10,9 @@
  */
 
 import { join } from "node:path";
-import { gsdRoot } from "./persistence/paths.js";
-import { milestoneIdSort } from "./milestone/milestone-ids.js";
-import { loadJsonFileOrNull, saveJsonFile } from "./persistence/json-persistence.js";
+import { gsdRoot } from "../persistence/paths.js";
+import { milestoneIdSort } from "../milestone/milestone-ids.js";
+import { loadJsonFileOrNull, saveJsonFile } from "../persistence/json-persistence.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

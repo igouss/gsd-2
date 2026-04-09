@@ -18,8 +18,8 @@ import {
   resolveMilestoneFile,
   buildMilestoneFileName,
 } from "../persistence/paths.js";
-import { invalidateAllCaches } from "../cache.js";
-import { loadQueueOrder, saveQueueOrder } from "../queue-order.js";
+import { invalidateAllCaches } from "../state/cache.js";
+import { loadQueueOrder, saveQueueOrder } from "../state/queue-order.js";
 import { isDbAvailable, updateMilestoneStatus } from "../persistence/gsd-db.js";
 import { logWarning } from "../workflow/workflow-logger.js";
 

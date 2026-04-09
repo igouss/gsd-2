@@ -2,7 +2,7 @@ import { clearParseCache } from "../persistence/files.js";
 import { isClosedStatus } from "../domain/status-guards.js";
 import { isNonEmptyString, validateStringArray } from "../verification/validation.js";
 import { transaction, getSlice, getTask, insertTask, upsertTaskPlanning } from "../persistence/gsd-db.js";
-import { invalidateStateCache } from "../state.js";
+import { invalidateStateCache } from "../state/state.js";
 import { renderTaskPlanFromDb } from "../reporting/markdown-renderer.js";
 import { renderAllProjections } from "../workflow/workflow-projections.js";
 import { writeManifest } from "../workflow/workflow-manifest.js";

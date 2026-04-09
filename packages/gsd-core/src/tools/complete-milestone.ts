@@ -19,7 +19,7 @@ import {
 import { resolveMilestonePath, clearPathCache } from "../persistence/paths.js";
 import { isClosedStatus } from "../domain/status-guards.js";
 import { saveFile, clearParseCache } from "../persistence/files.js";
-import { invalidateStateCache } from "../state.js";
+import { invalidateStateCache } from "../state/state.js";
 import { renderAllProjections, stripIdPrefix } from "../workflow/workflow-projections.js";
 import { writeManifest } from "../workflow/workflow-manifest.js";
 import { appendEvent } from "../workflow/workflow-events.js";

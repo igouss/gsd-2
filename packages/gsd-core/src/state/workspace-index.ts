@@ -1,7 +1,7 @@
 import { join } from "node:path";
 
-import { loadFile } from "./persistence/files.js";
-import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "./persistence/gsd-db.js";
+import { loadFile } from "../persistence/files.js";
+import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../persistence/gsd-db.js";
 import { parseRoadmap, parsePlan } from "./parsers-legacy.js";
 import {
   resolveMilestoneFile,
@@ -9,12 +9,12 @@ import {
   resolveSlicePath,
   resolveTaskFile,
   resolveTasksDir,
-} from "./persistence/paths.js";
+} from "../persistence/paths.js";
 import { deriveState } from "./state.js";
-import { extractVerdict } from "./verdict-parser.js";
-import { milestoneIdSort, findMilestoneIds } from "./auto/guided-flow.js";
-import type { RiskLevel } from "./domain/types.js";
-import { getSliceBranchName, detectWorktreeName } from "./git/worktree.js";
+import { extractVerdict } from "../verdict-parser.js";
+import { milestoneIdSort, findMilestoneIds } from "../auto/guided-flow.js";
+import type { RiskLevel } from "../domain/types.js";
+import { getSliceBranchName, detectWorktreeName } from "../git/worktree.js";
 
 export interface WorkspaceTaskTarget {
   id: string;

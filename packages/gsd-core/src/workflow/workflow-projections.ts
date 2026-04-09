@@ -17,7 +17,7 @@ import { join } from "node:path";
 import { mkdirSync, existsSync } from "node:fs";
 import { logWarning } from "../workflow/workflow-logger.js";
 import { isClosedStatus } from "../domain/status-guards.js";
-import { deriveState } from "../state.js";
+import { deriveState } from "../state/state.js";
 import type { GSDState } from "../domain/types.js";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────

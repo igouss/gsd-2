@@ -23,9 +23,9 @@ import {
   setSliceSummaryMd,
 } from "../persistence/gsd-db.js";
 import { resolveSliceFile, resolveSlicePath, clearPathCache } from "../persistence/paths.js";
-import { checkOwnership, sliceUnitKey } from "../unit-ownership.js";
+import { checkOwnership, sliceUnitKey } from "../state/unit-ownership.js";
 import { saveFile, clearParseCache } from "../persistence/files.js";
-import { invalidateStateCache } from "../state.js";
+import { invalidateStateCache } from "../state/state.js";
 import { renderRoadmapCheckboxes } from "../reporting/markdown-renderer.js";
 import { renderAllProjections } from "../workflow/workflow-projections.js";
 import { writeManifest } from "../workflow/workflow-manifest.js";

@@ -2,10 +2,10 @@
 
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { deriveState } from '../state.js';
+import { deriveState } from '../state/state.js';
 import { parseSummary, loadFile } from '../persistence/files.js';
 import { isDbAvailable, getMilestoneSlices, getSliceTasks } from '../persistence/gsd-db.js';
-import { parseRoadmap, parsePlan } from '../parsers-legacy.js';
+import { parseRoadmap, parsePlan } from '../state/parsers-legacy.js';
 import { findMilestoneIds } from '../milestone/milestone-ids.js';
 import { resolveMilestoneFile, resolveSliceFile, resolveGsdRootFile, gsdRoot } from '../persistence/paths.js';
 import {

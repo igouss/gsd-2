@@ -18,7 +18,7 @@ import {
   setTaskBlockerDiscovered,
 } from "../persistence/gsd-db.js";
 import { isClosedStatus } from "../domain/status-guards.js";
-import { invalidateStateCache } from "../state.js";
+import { invalidateStateCache } from "../state/state.js";
 import { clearPathCache } from "../persistence/paths.js";
 import { clearParseCache } from "../persistence/files.js";
 import { writeManifest } from "./workflow-manifest.js";

@@ -19,7 +19,7 @@ import {
   updateTaskStatus,
   transaction,
 } from "../persistence/gsd-db.js";
-import { invalidateStateCache } from "../state.js";
+import { invalidateStateCache } from "../state/state.js";
 import { isClosedStatus } from "../domain/status-guards.js";
 import { renderAllProjections } from "../workflow/workflow-projections.js";
 import { writeManifest } from "../workflow/workflow-manifest.js";

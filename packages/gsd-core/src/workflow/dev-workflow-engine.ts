@@ -17,7 +17,7 @@ import type {
 import type { GSDState } from "../domain/types.js";
 import type { DispatchAction, DispatchContext } from "../auto/auto-dispatch.js";
 
-import { deriveState } from "../state.js";
+import { deriveState } from "../state/state.js";
 import { resolveDispatch } from "../auto/auto-dispatch.js";
 import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
 

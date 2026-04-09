@@ -29,7 +29,7 @@ import {
   resolveTaskFiles,
 } from './paths.js';
 import { findMilestoneIds } from '../auto/guided-flow.js';
-import { parseRoadmap, parsePlan } from '../parsers-legacy.js';
+import { parseRoadmap, parsePlan } from '../state/parsers-legacy.js';
 import { parseContextDependsOn } from './files.js';
 import { logWarning } from '../workflow/workflow-logger.js';
 

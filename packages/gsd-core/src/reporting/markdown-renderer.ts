@@ -36,7 +36,7 @@ import {
   buildSliceFileName,
 } from "../persistence/paths.js";
 import { saveFile, clearParseCache } from "../persistence/files.js";
-import { invalidateStateCache } from "../state.js";
+import { invalidateStateCache } from "../state/state.js";
 import { clearPathCache } from "../persistence/paths.js";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────

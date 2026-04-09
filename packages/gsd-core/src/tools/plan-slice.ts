@@ -11,7 +11,7 @@ import {
   insertGateRow,
 } from "../persistence/gsd-db.js";
 import type { GateId } from "../domain/types.js";
-import { invalidateStateCache } from "../state.js";
+import { invalidateStateCache } from "../state/state.js";
 import { renderPlanFromDb } from "../reporting/markdown-renderer.js";
 import { renderAllProjections } from "../workflow/workflow-projections.js";
 import { writeManifest } from "../workflow/workflow-manifest.js";

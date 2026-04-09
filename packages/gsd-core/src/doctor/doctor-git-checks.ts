@@ -3,10 +3,10 @@ import { join, sep } from "node:path";
 
 import type { DoctorIssue, DoctorIssueCode } from "./doctor-types.js";
 import { loadFile } from "../persistence/files.js";
-import { parseRoadmap as parseLegacyRoadmap } from "../parsers-legacy.js";
+import { parseRoadmap as parseLegacyRoadmap } from "../state/parsers-legacy.js";
 import { isDbAvailable, getMilestoneSlices } from "../persistence/gsd-db.js";
 import { resolveMilestoneFile } from "../persistence/paths.js";
-import { deriveState, isMilestoneComplete } from "../state.js";
+import { deriveState, isMilestoneComplete } from "../state/state.js";
 import { listWorktrees, resolveGitDir, worktreesDir } from "../git/worktree-manager.js";
 import { abortAndReset } from "../git/git-self-heal.js";
 import { RUNTIME_EXCLUSION_PATHS, resolveMilestoneIntegrationBranch, writeIntegrationBranch } from "../git/git-service.js";

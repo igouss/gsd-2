@@ -27,7 +27,7 @@ import {
   buildMilestoneFileName,
   buildSliceFileName,
 } from "../persistence/paths.js";
-import { parseRoadmap } from "../parsers-legacy.js";
+import { parseRoadmap } from "../state/parsers-legacy.js";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { logWarning, logError } from "../workflow/workflow-logger.js";
 import { join } from "node:path";

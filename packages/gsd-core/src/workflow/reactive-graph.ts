@@ -12,7 +12,7 @@
 import type { TaskIO, DerivedTaskNode, ReactiveExecutionState } from "../domain/types.js";
 import { loadFile, parseTaskPlanIO } from "../persistence/files.js";
 import { isDbAvailable, getSliceTasks } from "../persistence/gsd-db.js";
-import { parsePlan } from "../parsers-legacy.js";
+import { parsePlan } from "../state/parsers-legacy.js";
 import { resolveTasksDir, resolveTaskFiles } from "../persistence/paths.js";
 import { join } from "node:path";
 import { loadJsonFileOrNull, saveJsonFile } from "../persistence/json-persistence.js";

@@ -14,7 +14,7 @@ import {
   deleteAssessmentByScope,
   deleteSlice,
 } from "../persistence/gsd-db.js";
-import { invalidateStateCache } from "../state.js";
+import { invalidateStateCache } from "../state/state.js";
 import { renderRoadmapFromDb, renderAssessmentFromDb } from "../reporting/markdown-renderer.js";
 import { renderAllProjections } from "../workflow/workflow-projections.js";
 import { writeManifest } from "../workflow/workflow-manifest.js";

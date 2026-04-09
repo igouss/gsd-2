@@ -6,19 +6,19 @@
 //
 // NOT used in the dispatch loop or any hot-path runtime code.
 
-import { extractSection, parseBullets, extractBoldField, extractAllSections, registerCacheClearCallback } from './persistence/files.js';
-import { splitFrontmatter } from "./shared/frontmatter.js";
-import { nativeParseRoadmap, nativeParsePlanFile } from './git/native-parser-bridge.js';
-import { debugTime, debugCount } from './debug-logger.js';
-import { CACHE_MAX } from './domain/constants.js';
+import { extractSection, parseBullets, extractBoldField, extractAllSections, registerCacheClearCallback } from '../persistence/files.js';
+import { splitFrontmatter } from "../shared/frontmatter.js";
+import { nativeParseRoadmap, nativeParsePlanFile } from '../git/native-parser-bridge.js';
+import { debugTime, debugCount } from '../debug-logger.js';
+import { CACHE_MAX } from '../domain/constants.js';
 
 import type {
   Roadmap, BoundaryMapEntry,
   SlicePlan, TaskPlanEntry,
-} from './domain/types.js';
+} from '../domain/types.js';
 
 // Re-export parseRoadmapSlices so callers can import all legacy parsers from one module
-import { parseRoadmapSlices } from './workflow/roadmap-slices.js';
+import { parseRoadmapSlices } from '../workflow/roadmap-slices.js';
 export { parseRoadmapSlices };
 
 // ─── Parse Cache (local to this module) ───────────────────────────────────

@@ -9,7 +9,7 @@ import type {
   RoadmapSliceEntry,
   SlicePlan,
   MilestoneRegistryEntry,
-} from './domain/types.js';
+} from '../domain/types.js';
 
 import {
   parseRoadmap,
@@ -21,7 +21,7 @@ import {
   loadFile,
   parseRequirementCounts,
   parseContextDependsOn,
-} from './persistence/files.js';
+} from '../persistence/files.js';
 
 import {
   resolveMilestonePath,
@@ -32,18 +32,18 @@ import {
   resolveTasksDir,
   resolveGsdRootFile,
   gsdRoot,
-} from './persistence/paths.js';
+} from '../persistence/paths.js';
 
-import { findMilestoneIds } from './milestone/milestone-ids.js';
+import { findMilestoneIds } from '../milestone/milestone-ids.js';
 import { loadQueueOrder, sortByQueueOrder } from './queue-order.js';
-import { isClosedStatus, isDeferredStatus } from './domain/status-guards.js';
-import { nativeBatchParseGsdFiles, type BatchParsedFile } from './git/native-parser-bridge.js';
+import { isClosedStatus, isDeferredStatus } from '../domain/status-guards.js';
+import { nativeBatchParseGsdFiles, type BatchParsedFile } from '../git/native-parser-bridge.js';
 
 import { join, resolve } from 'path';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { debugCount, debugTime } from './debug-logger.js';
-import { logWarning, logError } from './workflow/workflow-logger.js';
-import { extractVerdict } from './verdict-parser.js';
+import { debugCount, debugTime } from '../debug-logger.js';
+import { logWarning, logError } from '../workflow/workflow-logger.js';
+import { extractVerdict } from '../verdict-parser.js';
 
 import {
   isDbAvailable,
@@ -61,7 +61,7 @@ import {
   type MilestoneRow,
   type SliceRow,
   type TaskRow,
-} from './persistence/gsd-db.js';
+} from '../persistence/gsd-db.js';
 
 /**
  * A "ghost" milestone directory contains only META.json (and no substantive

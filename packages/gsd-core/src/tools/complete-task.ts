@@ -26,9 +26,9 @@ import {
   deleteVerificationEvidence,
 } from "../persistence/gsd-db.js";
 import { resolveSliceFile, resolveTasksDir, clearPathCache } from "../persistence/paths.js";
-import { checkOwnership, taskUnitKey } from "../unit-ownership.js";
+import { checkOwnership, taskUnitKey } from "../state/unit-ownership.js";
 import { saveFile, clearParseCache } from "../persistence/files.js";
-import { invalidateStateCache } from "../state.js";
+import { invalidateStateCache } from "../state/state.js";
 import { renderPlanCheckboxes } from "../reporting/markdown-renderer.js";
 import { renderAllProjections, renderSummaryContent } from "../workflow/workflow-projections.js";
 import { writeManifest } from "../workflow/workflow-manifest.js";

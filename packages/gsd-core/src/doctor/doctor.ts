@@ -2,11 +2,11 @@ import { existsSync, mkdirSync, lstatSync, readdirSync, readFileSync } from "nod
 import { join } from "node:path";
 
 import { loadFile, parseSummary, saveFile, parseTaskPlanMustHaves, countMustHavesMentionedInSummary } from "../persistence/files.js";
-import { parseRoadmap as parseLegacyRoadmap, parsePlan as parseLegacyPlan } from "../parsers-legacy.js";
+import { parseRoadmap as parseLegacyRoadmap, parsePlan as parseLegacyPlan } from "../state/parsers-legacy.js";
 import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../persistence/gsd-db.js";
 import { resolveMilestoneFile, resolveMilestonePath, resolveSliceFile, resolveSlicePath, resolveTaskFile, resolveTasksDir, milestonesDir, gsdRoot, relMilestoneFile, relSliceFile, relTaskFile, relSlicePath, relGsdRootFile, resolveGsdRootFile, relMilestonePath } from "../persistence/paths.js";
-import { deriveState, isMilestoneComplete } from "../state.js";
-import { invalidateAllCaches } from "../cache.js";
+import { deriveState, isMilestoneComplete } from "../state/state.js";
+import { invalidateAllCaches } from "../state/cache.js";
 import { loadEffectiveGSDPreferences, type GSDPreferences } from "../preferences/preferences.js";
 
 import type { DoctorIssue, DoctorIssueCode, DoctorReport } from "./doctor-types.js";

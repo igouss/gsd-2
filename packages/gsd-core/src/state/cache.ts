@@ -10,9 +10,9 @@
 // single function that clears all three atomically.
 
 import { invalidateStateCache } from './state.js';
-import { clearPathCache } from './persistence/paths.js';
-import { clearParseCache } from './persistence/files.js';
-import { clearArtifacts } from './persistence/gsd-db.js';
+import { clearPathCache } from '../persistence/paths.js';
+import { clearParseCache } from '../persistence/files.js';
+import { clearArtifacts } from '../persistence/gsd-db.js';
 
 /**
  * Invalidate all GSD runtime caches in one call.

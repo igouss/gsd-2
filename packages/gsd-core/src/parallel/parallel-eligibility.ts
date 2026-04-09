@@ -5,7 +5,7 @@
  * dependency satisfaction and file overlap across slice plans.
  */
 
-import { deriveState } from "../state.js";
+import { deriveState } from "../state/state.js";
 import { resolveMilestoneFile, resolveSliceFile } from "../persistence/paths.js";
 import { findMilestoneIds } from "../auto/guided-flow.js";
 import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../persistence/gsd-db.js";

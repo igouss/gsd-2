@@ -32,7 +32,7 @@ import { gsdRoot } from "../persistence/paths.js";
 import { atomicWriteSync } from "../persistence/atomic-write.js";
 import { verifyExpectedArtifact, buildLoopRemediationSteps } from "./auto-recovery.js";
 import { diagnoseExpectedArtifact } from "./auto-artifact-paths.js";
-import { writeUnitRuntimeRecord } from "../unit-runtime.js";
+import { writeUnitRuntimeRecord } from "../state/unit-runtime.js";
 import { withTimeout, FINALIZE_PRE_TIMEOUT_MS, FINALIZE_POST_TIMEOUT_MS } from "./finalize-timeout.js";
 import { getEligibleSlices } from "../parallel/slice-parallel-eligibility.js";
 import { startSliceParallel } from "../parallel/slice-parallel-orchestrator.js";

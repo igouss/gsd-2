@@ -9,7 +9,7 @@ import {
   insertReplanHistory,
   deleteTask,
 } from "../persistence/gsd-db.js";
-import { invalidateStateCache } from "../state.js";
+import { invalidateStateCache } from "../state/state.js";
 import { isClosedStatus } from "../domain/status-guards.js";
 import { isNonEmptyString } from "../verification/validation.js";
 import { renderPlanFromDb, renderReplanFromDb } from "../reporting/markdown-renderer.js";
