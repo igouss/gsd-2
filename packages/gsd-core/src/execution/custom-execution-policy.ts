@@ -12,7 +12,7 @@
  */
 
 import type { ExecutionPolicy } from "./execution-policy.js";
-import type { RecoveryAction, CloseoutResult } from "../engine-types.js";
+import type { RecoveryAction, CloseoutResult } from "../routing/engine-types.js";
 import { runCustomVerification } from "../verification/custom-verification.js";
 import { parseUnitId } from "../unit-id.js";
 

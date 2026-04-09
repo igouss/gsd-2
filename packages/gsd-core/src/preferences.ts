@@ -17,7 +17,7 @@ import { join } from "node:path";
 import { gsdRoot } from "./paths.js";
 import { parse as parseYaml } from "yaml";
 import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile } from "./types.js";
-import type { DynamicRoutingConfig } from "./model-router.js";
+import type { DynamicRoutingConfig } from "./routing/model-router.js";
 import { normalizeStringArray } from "./shared/format-utils.js";
 import { logWarning } from "./workflow-logger.js";
 import { resolveProfileDefaults as _resolveProfileDefaults } from "./preferences-models.js";

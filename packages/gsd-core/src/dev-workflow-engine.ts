@@ -13,7 +13,7 @@ import type {
   CompletedStep,
   ReconcileResult,
   DisplayMetadata,
-} from "./engine-types.js";
+} from "./routing/engine-types.js";
 import type { GSDState } from "./types.js";
 import type { DispatchAction, DispatchContext } from "./auto-dispatch.js";
 

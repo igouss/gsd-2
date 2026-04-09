@@ -3,9 +3,9 @@
 // classification accuracy over time.
 
 import { join } from "node:path";
-import { gsdRoot } from "./paths.js";
-import type { ComplexityTier } from "./types.js";
-import { loadJsonFile, saveJsonFile } from "./json-persistence.js";
+import { gsdRoot } from "../paths.js";
+import type { ComplexityTier } from "../types.js";
+import { loadJsonFile, saveJsonFile } from "../json-persistence.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

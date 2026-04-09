@@ -11,7 +11,7 @@ import type {
   CompletedStep,
   ReconcileResult,
   DisplayMetadata,
-} from "./engine-types.js";
+} from "./routing/engine-types.js";
 
 /** A pluggable workflow engine that drives the auto-loop. */
 export interface WorkflowEngine {

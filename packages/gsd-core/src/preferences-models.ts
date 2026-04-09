@@ -7,8 +7,8 @@
  */
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import type { DynamicRoutingConfig } from "./model-router.js";
-import { defaultRoutingConfig } from "./model-router.js";
+import type { DynamicRoutingConfig } from "./routing/model-router.js";
+import { defaultRoutingConfig } from "./routing/model-router.js";
 import type { TokenProfile, InlineLevel } from "./types.js";
 
 import type {

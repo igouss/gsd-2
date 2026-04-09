@@ -20,7 +20,7 @@ import type {
   ReactiveExecutionConfig,
   GateEvaluationConfig,
 } from "./types.js";
-import type { DynamicRoutingConfig } from "./model-router.js";
+import type { DynamicRoutingConfig } from "./routing/model-router.js";
 
 export interface ContextManagementConfig {
   observation_masking?: boolean;          // default: true

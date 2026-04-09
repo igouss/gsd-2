@@ -5,7 +5,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { gsdRoot } from "./paths.js";
-import { getAdaptiveTierAdjustment } from "./routing-history.js";
+import { getAdaptiveTierAdjustment } from "./routing/routing-history.js";
 import { parseUnitId } from "./unit-id.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────

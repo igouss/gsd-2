@@ -19,7 +19,7 @@ import type {
   CompletedStep,
   ReconcileResult,
   DisplayMetadata,
-} from "./engine-types.js";
+} from "./routing/engine-types.js";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse } from "yaml";

@@ -28,7 +28,7 @@ import {
 } from "./phases.js";
 import { debugLog } from "../debug-logger.js";
 import { isInfrastructureError } from "./infra-errors.js";
-import { resolveEngine } from "../engine-resolver.js";
+import { resolveEngine } from "../routing/engine-resolver.js";
 
 /**
  * Main auto-mode execution loop. Iterates: derive → dispatch → guards →
