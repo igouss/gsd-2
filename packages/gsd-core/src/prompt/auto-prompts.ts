@@ -8,7 +8,7 @@
 
 import { loadFile, parseContinue, parseSummary, loadActiveOverrides, formatOverridesSection, parseTaskPlanFile } from "../persistence/files.js";
 import type { Override, UatType } from "../persistence/files.js";
-import { hasVerdict, getUatType } from "../verdict-parser.js";
+import { hasVerdict, getUatType } from "../analysis/verdict-parser.js";
 import { loadPrompt, inlineTemplate } from "./prompt-loader.js";
 import {
   resolveMilestoneFile, resolveSliceFile, resolveSlicePath,

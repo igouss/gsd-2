@@ -5,8 +5,8 @@
  * (e.g. `passed` → `pass`) are applied consistently across the codebase.
  */
 
-import { extractUatType } from "./persistence/files.js";
-import type { UatType } from "./persistence/files.js";
+import { extractUatType } from "../persistence/files.js";
+import type { UatType } from "../persistence/files.js";
 
 // ── Verdict extraction ──────────────────────────────────────────────────
 

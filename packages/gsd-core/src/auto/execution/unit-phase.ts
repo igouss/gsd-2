@@ -15,7 +15,7 @@ import type {
 } from "../types.js";
 import { MAX_RECOVERY_CHARS } from "../types.js";
 import { debugLog } from "../../debug-logger.js";
-import { PROJECT_FILES } from "../../detection.js";
+import { PROJECT_FILES } from "../../analysis/detection.js";
 import { join, basename, dirname, parse as parsePath } from "node:path";
 import { readdirSync } from "node:fs";
 import { logWarning } from "../../workflow/workflow-logger.js";

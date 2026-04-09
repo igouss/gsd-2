@@ -29,7 +29,7 @@ import { NamespacedResolver } from '../rules/namespaced-resolver.js';
 import {
 	analyzeCollisions,
 	type ClassifiedDiagnostic,
-} from '../collision-diagnostics.js';
+} from '../analysis/collision-diagnostics.js';
 
 // ============================================================================
 // Type Definitions

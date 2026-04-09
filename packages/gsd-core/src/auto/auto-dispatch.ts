@@ -14,7 +14,7 @@ import type { GSDPreferences } from "../preferences/preferences.js";
 import type { UatType } from "../persistence/files.js";
 import { loadFile, extractUatType, loadActiveOverrides } from "../persistence/files.js";
 import { isDbAvailable, getMilestoneSlices, getPendingGates, markAllGatesOmitted, getMilestone } from "../persistence/gsd-db.js";
-import { extractVerdict, isAcceptableUatVerdict } from "../verdict-parser.js";
+import { extractVerdict, isAcceptableUatVerdict } from "../analysis/verdict-parser.js";
 
 import {
   gsdRoot,

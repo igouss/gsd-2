@@ -11,7 +11,7 @@ import {
   resolveTasksDir,
 } from "../persistence/paths.js";
 import { deriveState } from "./state.js";
-import { extractVerdict } from "../verdict-parser.js";
+import { extractVerdict } from "../analysis/verdict-parser.js";
 import { milestoneIdSort, findMilestoneIds } from "../auto/guided-flow.js";
 import type { RiskLevel } from "../domain/types.js";
 import { getSliceBranchName, detectWorktreeName } from "../git/worktree.js";

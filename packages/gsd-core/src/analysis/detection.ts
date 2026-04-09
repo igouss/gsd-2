@@ -9,7 +9,7 @@
 import { existsSync, openSync, readSync, closeSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
-import { gsdRoot } from "./persistence/paths.js";
+import { gsdRoot } from "../persistence/paths.js";
 
 const gsdHome = process.env.GSD_HOME || join(homedir(), ".gsd");
 

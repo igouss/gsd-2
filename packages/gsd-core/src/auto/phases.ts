@@ -23,7 +23,7 @@ import {
 } from "./types.js";
 import { detectStuck } from "./detect-stuck.js";
 import { debugLog } from "../debug-logger.js";
-import { PROJECT_FILES } from "../detection.js";
+import { PROJECT_FILES } from "../analysis/detection.js";
 import { MergeConflictError } from "../git/git-service.js";
 import { join, basename, dirname, parse as parsePath } from "node:path";
 import { existsSync, cpSync, readdirSync } from "node:fs";

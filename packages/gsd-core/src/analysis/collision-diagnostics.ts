@@ -10,8 +10,8 @@
  * namespaced component system.
  */
 
-import type { NamespacedRegistry, RegistryDiagnostic } from './rules/namespaced-registry.js';
-import type { NamespacedResolver, ResolutionResult } from './rules/namespaced-resolver.js';
+import type { NamespacedRegistry, RegistryDiagnostic } from '../rules/namespaced-registry.js';
+import type { NamespacedResolver, ResolutionResult } from '../rules/namespaced-resolver.js';
 
 // ============================================================================
 // Type Definitions

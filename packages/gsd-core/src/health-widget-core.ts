@@ -6,7 +6,7 @@
  */
 
 import { existsSync } from "node:fs";
-import { detectProjectState } from "./detection.js";
+import { detectProjectState } from "./analysis/detection.js";
 import { gsdRoot } from "./persistence/paths.js";
 
 export type HealthWidgetProjectState = "none" | "initialized" | "active";
