@@ -17,11 +17,11 @@ import {
   resolveMilestonePath,
   resolveMilestoneFile,
   buildMilestoneFileName,
-} from "./paths.js";
-import { invalidateAllCaches } from "./cache.js";
-import { loadQueueOrder, saveQueueOrder } from "./queue-order.js";
-import { isDbAvailable, updateMilestoneStatus } from "./gsd-db.js";
-import { logWarning } from "./workflow/workflow-logger.js";
+} from "../paths.js";
+import { invalidateAllCaches } from "../cache.js";
+import { loadQueueOrder, saveQueueOrder } from "../queue-order.js";
+import { isDbAvailable, updateMilestoneStatus } from "../gsd-db.js";
+import { logWarning } from "../workflow/workflow-logger.js";
 
 // ─── Park ──────────────────────────────────────────────────────────────────
 

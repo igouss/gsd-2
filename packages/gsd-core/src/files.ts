@@ -7,7 +7,7 @@ import { promises as fs } from 'node:fs';
 import { resolve } from 'node:path';
 import { atomicWriteAsync } from './atomic-write.js';
 import { resolveMilestoneFile, relMilestoneFile, resolveGsdRootFile } from './paths.js';
-import { milestoneIdSort, findMilestoneIds } from './milestone-ids.js';
+import { milestoneIdSort, findMilestoneIds } from './milestone/milestone-ids.js';
 
 import type {
   TaskPlanFile, TaskPlanFrontmatter,

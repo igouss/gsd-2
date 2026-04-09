@@ -6,7 +6,7 @@ import { deriveState } from '../state.js';
 import { parseSummary, loadFile } from '../files.js';
 import { isDbAvailable, getMilestoneSlices, getSliceTasks } from '../gsd-db.js';
 import { parseRoadmap, parsePlan } from '../parsers-legacy.js';
-import { findMilestoneIds } from '../milestone-ids.js';
+import { findMilestoneIds } from '../milestone/milestone-ids.js';
 import { resolveMilestoneFile, resolveSliceFile, resolveGsdRootFile, gsdRoot } from '../paths.js';
 import {
   getLedger,
@@ -19,7 +19,7 @@ import {
   loadLedgerFromDisk,
   classifyUnitPhase,
 } from './metrics.js';
-import { loadAllCaptures, countPendingCaptures } from '../captures.js';
+import { loadAllCaptures, countPendingCaptures } from '../auto/captures.js';
 import { loadEffectiveGSDPreferences } from '../preferences/preferences.js';
 import { runProviderChecks, type ProviderCheckResult } from '../doctor/doctor-providers.js';
 import { generateSkillHealthReport } from '../skills/skill-health.js';
@@ -28,7 +28,7 @@ import { computeProgressScore } from '../doctor/progress-score.js';
 import { getHealthHistory } from '../doctor/doctor-proactive.js';
 
 import type { Phase } from '../types.js';
-import type { CaptureEntry } from '../captures.js';
+import type { CaptureEntry } from '../auto/captures.js';
 import type {
   ProjectTotals,
   PhaseAggregate,

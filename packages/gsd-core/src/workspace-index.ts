@@ -12,7 +12,7 @@ import {
 } from "./paths.js";
 import { deriveState } from "./state.js";
 import { extractVerdict } from "./verdict-parser.js";
-import { milestoneIdSort, findMilestoneIds } from "./guided-flow.js";
+import { milestoneIdSort, findMilestoneIds } from "./auto/guided-flow.js";
 import type { RiskLevel } from "./types.js";
 import { getSliceBranchName, detectWorktreeName } from "./git/worktree.js";
 

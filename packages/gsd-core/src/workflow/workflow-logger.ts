@@ -19,7 +19,7 @@
 import { appendFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { appendNotification } from "../notification-store.js";
+import { appendNotification } from "../notification/notification-store.js";
 
 // ─── Types ──────────────────────────────────────────────────────────────
 

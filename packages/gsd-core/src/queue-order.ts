@@ -11,7 +11,7 @@
 
 import { join } from "node:path";
 import { gsdRoot } from "./paths.js";
-import { milestoneIdSort } from "./milestone-ids.js";
+import { milestoneIdSort } from "./milestone/milestone-ids.js";
 import { loadJsonFileOrNull, saveJsonFile } from "./json-persistence.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────

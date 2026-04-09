@@ -10,7 +10,7 @@
  */
 
 import type { GitServiceImpl } from "../git/git-service.js";
-import type { CaptureEntry } from "../captures.js";
+import type { CaptureEntry } from "./captures.js";
 import type { BudgetAlertLevel } from "./auto-budget.js";
 
 // ─── Exported Types ──────────────────────────────────────────────────────────

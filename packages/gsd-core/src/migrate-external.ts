@@ -9,7 +9,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, lstatSync, mkdirSync, readdirSync, realpathSync, renameSync, cpSync, rmSync, symlinkSync } from "node:fs";
 import { join } from "node:path";
-import { externalGsdRoot, isInsideWorktree } from "./repo-identity.js";
+import { externalGsdRoot, isInsideWorktree } from "./git/repo-identity.js";
 import { getErrorMessage } from "./error-utils.js";
 import { hasGitTrackedGsdFiles } from "./git/gitignore.js";
 import { GIT_NO_PROMPT_ENV } from "./git/git-constants.js";

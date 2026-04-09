@@ -11,11 +11,11 @@
  */
 
 import { existsSync, mkdirSync, readFileSync, unlinkSync } from "node:fs";
-import { atomicWriteSync } from "./atomic-write.js";
+import { atomicWriteSync } from "../atomic-write.js";
 import { join } from "node:path";
 import { createRequire } from "node:module";
-import { gsdRoot, milestonesDir } from "./paths.js";
-import { MILESTONE_ID_RE } from "./milestone-ids.js";
+import { gsdRoot, milestonesDir } from "../paths.js";
+import { MILESTONE_ID_RE } from "../milestone/milestone-ids.js";
 import type { Classification, CaptureEntry } from "./captures.js";
 import {
   loadPendingCaptures,

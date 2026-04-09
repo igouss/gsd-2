@@ -2,7 +2,7 @@ import { existsSync, lstatSync, readdirSync, readFileSync, realpathSync, rmSync,
 import { basename, dirname, join } from "node:path";
 
 import type { DoctorIssue, DoctorIssueCode } from "./doctor-types.js";
-import { cleanNumberedGsdVariants } from "../repo-identity.js";
+import { cleanNumberedGsdVariants } from "../git/repo-identity.js";
 import { milestonesDir, gsdRoot, resolveGsdRootFile } from "../paths.js";
 import { deriveState } from "../state.js";
 import { saveFile } from "../files.js";

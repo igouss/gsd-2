@@ -1753,7 +1753,7 @@ export async function buildReplanSlicePrompt(
   // Build capture context for replan prompt (captures that triggered this replan)
   let captureContext = "(none)";
   try {
-    const { loadReplanCaptures } = await import("../triage-resolution.js");
+    const { loadReplanCaptures } = await import("../auto/triage-resolution.js");
     const replanCaptures = loadReplanCaptures(base);
     if (replanCaptures.length > 0) {
       captureContext = replanCaptures.map(c =>
@@ -1858,7 +1858,7 @@ export async function buildReassessRoadmapPrompt(
   // Build deferred captures context for reassess prompt
   let deferredCaptures = "(none)";
   try {
-    const { loadDeferredCaptures } = await import("../triage-resolution.js");
+    const { loadDeferredCaptures } = await import("../auto/triage-resolution.js");
     const deferred = loadDeferredCaptures(base);
     if (deferred.length > 0) {
       deferredCaptures = deferred.map(c =>
