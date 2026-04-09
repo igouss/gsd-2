@@ -10,7 +10,7 @@
 
 import type { UnitResult, AgentEndEvent, ErrorContext } from "./types.js";
 import type { AutoSession } from "./session.js";
-import { debugLog } from "../debug-logger.js";
+import { debugLog } from "../reporting/debug-logger.js";
 
 // ─── Per-unit one-shot promise state ────────────────────────────────────────
 //

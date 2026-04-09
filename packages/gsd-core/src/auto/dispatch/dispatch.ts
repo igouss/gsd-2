@@ -16,7 +16,7 @@ import type {
 import { MAX_RECOVERY_CHARS } from "../types.js";
 import { closeoutAndStop } from "../closeout.js";
 import { detectStuck } from "../guards/stuck-detection.js";
-import { debugLog } from "../../debug-logger.js";
+import { debugLog } from "../../reporting/debug-logger.js";
 import { verifyExpectedArtifact, buildLoopRemediationSteps } from "../auto-recovery.js";
 import { diagnoseExpectedArtifact } from "../auto-artifact-paths.js";
 

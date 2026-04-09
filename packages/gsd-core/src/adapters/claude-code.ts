@@ -20,8 +20,8 @@ import type {
   UnitDispatchResult,
   UnitErrorContext,
   OrchestratorEventSink,
-} from "../harness-adapter.js";
-import { nullEventSink } from "../harness-adapter.js";
+} from "./harness-adapter.js";
+import { nullEventSink } from "./harness-adapter.js";
 
 // ---------------------------------------------------------------------------
 // Claude CLI result shape (from --output-format json)

@@ -15,8 +15,8 @@ import {
   scanProjectFiles,
   PROJECT_FILES,
   type ProjectSignals,
-} from "./analysis/detection.js";
-import { loadFile } from "./persistence/files.js";
+} from "../analysis/detection.js";
+import { loadFile } from "../persistence/files.js";
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 

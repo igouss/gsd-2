@@ -24,7 +24,7 @@ import { runDispatch } from "./dispatch/dispatch.js";
 import { runGuards } from "./guards/guards.js";
 import { runUnitPhase } from "./execution/unit-phase.js";
 import { runFinalize } from "./finalize/finalize.js";
-import { debugLog } from "../debug-logger.js";
+import { debugLog } from "../reporting/debug-logger.js";
 import { isInfrastructureError } from "./infra-errors.js";
 import { resolveEngine } from "../routing/engine-resolver.js";
 import type { JournalEventType } from "../persistence/journal.js";

@@ -120,7 +120,7 @@ export async function checkRuntimeHealth(
       for (const key of keys) {
         // Key format: "unitType/unitId" e.g. "execute-task/M001/S01/T01"
         // Hook units have compound types: "hook/<hookName>/unitId"
-        const { splitCompletedKey } = await import("../forensics.js");
+        const { splitCompletedKey } = await import("../session/forensics.js");
         const parsed = splitCompletedKey(key);
         if (!parsed) continue;
         const { unitType, unitId } = parsed;

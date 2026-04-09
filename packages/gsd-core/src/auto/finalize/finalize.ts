@@ -14,7 +14,7 @@ import type {
   IterationData,
 } from "../types.js";
 import { MAX_FINALIZE_TIMEOUTS } from "../types.js";
-import { debugLog } from "../../debug-logger.js";
+import { debugLog } from "../../reporting/debug-logger.js";
 import { withTimeout, FINALIZE_PRE_TIMEOUT_MS, FINALIZE_POST_TIMEOUT_MS } from "../finalize-timeout.js";
 
 /**

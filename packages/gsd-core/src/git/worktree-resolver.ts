@@ -17,7 +17,7 @@ import { existsSync, unlinkSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import type { AutoSession } from "../auto/session.js";
-import { debugLog } from "../debug-logger.js";
+import { debugLog } from "../reporting/debug-logger.js";
 import { MergeConflictError } from "./git-service.js";
 import { emitJournalEvent } from "../persistence/journal.js";
 

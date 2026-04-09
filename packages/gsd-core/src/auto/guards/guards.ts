@@ -11,7 +11,7 @@ import type {
   IterationContext,
 } from "../types.js";
 import { BUDGET_THRESHOLDS } from "../types.js";
-import { debugLog } from "../../debug-logger.js";
+import { debugLog } from "../../reporting/debug-logger.js";
 import { basename } from "node:path";
 
 /**

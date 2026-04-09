@@ -44,7 +44,7 @@ import {
   nudgeGitBranchCache,
 } from "../git/worktree.js";
 import { MergeConflictError, readIntegrationBranch, RUNTIME_EXCLUSION_PATHS } from "../git/git-service.js";
-import { debugLog } from "../debug-logger.js";
+import { debugLog } from "../reporting/debug-logger.js";
 import { logWarning, logError } from "../workflow/workflow-logger.js";
 import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
 import {

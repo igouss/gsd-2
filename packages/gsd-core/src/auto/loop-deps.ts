@@ -6,7 +6,7 @@
  * captures those in closures when constructing CoreLoopDeps.
  */
 
-import type { HarnessAdapter, OrchestratorEventSink } from "../harness-adapter.js";
+import type { HarnessAdapter, OrchestratorEventSink } from "../adapters/harness-adapter.js";
 import type { AutoSession } from "./session.js";
 import type { GSDPreferences } from "../preferences/preferences-types.js";
 import type { GSDState } from "../domain/types.js";

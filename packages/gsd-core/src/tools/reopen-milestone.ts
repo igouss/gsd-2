@@ -24,7 +24,7 @@ import { renderAllProjections } from "../workflow/workflow-projections.js";
 import { writeManifest } from "../workflow/workflow-manifest.js";
 import { appendEvent } from "../workflow/workflow-events.js";
 import { logWarning } from "../workflow/workflow-logger.js";
-import { debugLog } from "../debug-logger.js";
+import { debugLog } from "../reporting/debug-logger.js";
 import { existsSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { resolveMilestonePath, resolveSlicePath, resolveTasksDir, clearPathCache } from "../persistence/paths.js";

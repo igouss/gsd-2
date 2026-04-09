@@ -26,7 +26,7 @@ import {
   runUnitPhase,
   runFinalize,
 } from "./phases.js";
-import { debugLog } from "../debug-logger.js";
+import { debugLog } from "../reporting/debug-logger.js";
 import { isInfrastructureError } from "./infra-errors.js";
 import { resolveEngine } from "../routing/engine-resolver.js";
 

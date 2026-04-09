@@ -15,9 +15,9 @@ export type {
   UnitDispatchResult,
   UnitErrorContext,
   OrchestratorEventSink,
-} from "./harness-adapter.js";
+} from "./adapters/harness-adapter.js";
 
-export { nullEventSink } from "./harness-adapter.js";
+export { nullEventSink } from "./adapters/harness-adapter.js";
 
 // Tool handlers — pure functions for state mutation
 export { handleCompleteTask } from "./tools/complete-task.js";

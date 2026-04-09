@@ -14,7 +14,7 @@ import type {
   IterationData,
 } from "../types.js";
 import { MAX_RECOVERY_CHARS } from "../types.js";
-import { debugLog } from "../../debug-logger.js";
+import { debugLog } from "../../reporting/debug-logger.js";
 import { PROJECT_FILES } from "../../analysis/detection.js";
 import { join, basename, dirname, parse as parsePath } from "node:path";
 import { readdirSync } from "node:fs";

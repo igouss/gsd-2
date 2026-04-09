@@ -19,7 +19,7 @@ import type {
   ManifestStatus,
 } from '../domain/types.js';
 
-import { checkExistingEnvKeys } from '../env-utils.js';
+import { checkExistingEnvKeys } from '../shared/env-utils.js';
 import { nativeExtractSection, nativeParseSummaryFile, NATIVE_UNAVAILABLE } from '../git/native-parser-bridge.js';
 import { CACHE_MAX } from '../domain/constants.js';
 import { splitFrontmatter, parseFrontmatterMap } from "../shared/frontmatter.js";

@@ -9,7 +9,7 @@
 import { extractSection, parseBullets, extractBoldField, extractAllSections, registerCacheClearCallback } from '../persistence/files.js';
 import { splitFrontmatter } from "../shared/frontmatter.js";
 import { nativeParseRoadmap, nativeParsePlanFile } from '../git/native-parser-bridge.js';
-import { debugTime, debugCount } from '../debug-logger.js';
+import { debugTime, debugCount } from '../reporting/debug-logger.js';
 import { CACHE_MAX } from '../domain/constants.js';
 
 import type {
