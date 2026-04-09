@@ -17,11 +17,21 @@ import type {
   UnitDispatchResult,
 } from "@gsd-build/gsd-core";
 
-import { buildSystemPrompt, buildProjectContext } from "./system-prompt.js";
+import {
+  deriveState,
+  invalidateStateCache,
+  clearPathCache,
+  clearParseCache,
+  resolveDispatch,
+  openDatabase,
+  closeDatabase,
+  isDbAvailable,
+  loadEffectiveGSDPreferences,
+  acquireSessionLock,
+  releaseSessionLock,
+} from "@gsd-build/gsd-core";
 
-// All imports below are from gsd-core's internal modules.
-// Since gsd-core only re-exports a subset from index.ts, we import
-// from the built dist/ paths directly.
+import { buildSystemPrompt, buildProjectContext } from "./system-prompt.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -36,49 +46,19 @@ export interface MinimalLoopOptions {
   maxIterations?: number;
 }
 
-// ---------------------------------------------------------------------------
-// Dynamic imports — load gsd-core internals at runtime
-// ---------------------------------------------------------------------------
-
-interface CoreModules {
-  deriveState: (basePath: string) => Promise<any>;
-  invalidateStateCache: () => void;
-  clearPathCache: () => void;
-  clearParseCache: () => void;
-  resolveDispatch: (ctx: any) => Promise<any>;
-  openDatabase: (path: string) => boolean;
-  closeDatabase: () => void;
-  isDbAvailable: () => boolean;
-  loadEffectiveGSDPreferences: () => any;
-  acquireSessionLock: (basePath: string) => any;
-  releaseSessionLock: (basePath: string) => void;
-}
-
-async function loadCoreModules(): Promise<CoreModules> {
-  const [stateMod, dispatchMod, dbMod, prefsMod, lockMod, pathsMod, filesMod] = await Promise.all([
-    import("@gsd-build/gsd-core/dist/state.js"),
-    import("@gsd-build/gsd-core/dist/auto-dispatch.js"),
-    import("@gsd-build/gsd-core/dist/gsd-db.js"),
-    import("@gsd-build/gsd-core/dist/preferences.js"),
-    import("@gsd-build/gsd-core/dist/session-lock.js"),
-    import("@gsd-build/gsd-core/dist/paths.js"),
-    import("@gsd-build/gsd-core/dist/files.js"),
-  ]);
-
-  return {
-    deriveState: stateMod.deriveState,
-    invalidateStateCache: stateMod.invalidateStateCache,
-    clearPathCache: pathsMod.clearPathCache,
-    clearParseCache: filesMod.clearParseCache,
-    resolveDispatch: dispatchMod.resolveDispatch,
-    openDatabase: dbMod.openDatabase,
-    closeDatabase: dbMod.closeDatabase,
-    isDbAvailable: dbMod.isDbAvailable,
-    loadEffectiveGSDPreferences: prefsMod.loadEffectiveGSDPreferences,
-    acquireSessionLock: lockMod.acquireSessionLock,
-    releaseSessionLock: lockMod.releaseSessionLock,
-  };
-}
+const core = {
+  deriveState,
+  invalidateStateCache,
+  clearPathCache,
+  clearParseCache,
+  resolveDispatch,
+  openDatabase,
+  closeDatabase,
+  isDbAvailable,
+  loadEffectiveGSDPreferences,
+  acquireSessionLock,
+  releaseSessionLock,
+};
 
 // ---------------------------------------------------------------------------
 // Minimal loop
@@ -90,7 +70,7 @@ export async function minimalLoop(opts: MinimalLoopOptions): Promise<void> {
   const { adapter, events, projectDir, mcpConfigPath, templatesDir } = opts;
   const maxIter = opts.maxIterations ?? MAX_ITERATIONS;
 
-  const core = await loadCoreModules();
+  // core is now a static module-level object — no lazy loading needed
 
   // Build system prompt once at startup (skills + template)
   const systemPrompt = buildSystemPrompt({ templatesDir, projectDir });
@@ -130,7 +110,7 @@ export async function minimalLoop(opts: MinimalLoopOptions): Promise<void> {
       // 1. Derive state
       const state = await core.deriveState(projectDir);
       const mid = state.activeMilestone?.id;
-      const midTitle = state.activeMilestone?.title ?? mid;
+      const midTitle = state.activeMilestone?.title ?? mid ?? "";
 
       if (!mid) {
         if (state.phase === "complete" || state.registry?.every((m: any) => m.status === "complete")) {

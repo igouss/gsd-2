@@ -39,11 +39,24 @@ export { handleValidateMilestone } from "./tools/validate-milestone.js";
 export { saveDecisionToDb, saveRequirementToDb, updateRequirementInDb, saveArtifactToDb } from "./persistence/db-writer.js";
 export type { SaveArtifactOpts } from "./persistence/db-writer.js";
 
-// DB — direct access for MCP tools
-export { updateSliceStatus, saveGateResult } from "./persistence/gsd-db.js";
+// DB — lifecycle and direct access
+export { openDatabase, closeDatabase, isDbAvailable, updateSliceStatus, saveGateResult } from "./persistence/gsd-db.js";
 
 // State derivation
-export { deriveState } from "./state/state.js";
+export { deriveState, invalidateStateCache } from "./state/state.js";
+
+// Cache invalidation
+export { clearPathCache } from "./persistence/paths.js";
+export { clearParseCache } from "./persistence/files.js";
+
+// Dispatch
+export { resolveDispatch } from "./auto/auto-dispatch.js";
+
+// Preferences
+export { loadEffectiveGSDPreferences } from "./preferences/preferences.js";
+
+// Session locking
+export { acquireSessionLock, releaseSessionLock } from "./session/session-lock.js";
 
 // Milestone IDs
 export { nextMilestoneId, findMilestoneIds } from "./milestone/milestone-ids.js";
