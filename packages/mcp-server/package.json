@@ -21,7 +21,8 @@
     }
   },
   "bin": {
-    "gsd-mcp-server": "./dist/cli.js"
+    "gsd-mcp-server": "./dist/cli.js",
+    "gsd-unit-tools": "./dist/unit-tools-cli.js"
   },
   "scripts": {
     "build": "tsc",
@@ -29,6 +30,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",
+    "@gsd-build/gsd-core": "^0.1.0",
     "@gsd-build/rpc-client": "^2.52.0",
     "zod": "^4.0.0"
   },

@@ -4,6 +4,7 @@
 
 export { SessionManager } from './session-manager.js';
 export { createMcpServer } from './server.js';
+export { createUnitToolsServer } from './unit-tools-server.js';
 export type {
   SessionStatus,
   ManagedSession,

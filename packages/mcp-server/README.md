@@ -2,7 +2,10 @@
 
 MCP server exposing GSD orchestration tools for Claude Code, Cursor, and other MCP-compatible clients.
 
-Start GSD auto-mode sessions, poll progress, resolve blockers, and retrieve results — all through the [Model Context Protocol](https://modelcontextprotocol.io/).
+Two server modes:
+
+1. **Session server** (`gsd-mcp-server`) — manages GSD auto-mode sessions via RPC. Start sessions, poll progress, resolve blockers, retrieve results.
+2. **Unit-tools server** (`gsd-unit-tools` / `createUnitToolsServer`) — exposes GSD state-mutation tools for executing agents. Used by the standalone orchestrator (`gsd-cli`) to give agents access to `gsd_task_complete`, `gsd_plan_slice`, etc.
 
 ## Installation
 
@@ -10,16 +13,106 @@ Start GSD auto-mode sessions, poll progress, resolve blockers, and retrieve resu
 npm install @gsd-build/mcp-server
 ```
 
-Or with the monorepo workspace:
+## Unit-Tools Server (standalone orchestrator)
 
-```bash
-# Already available as a workspace package
-npx gsd-mcp-server
+The unit-tools server provides 18 GSD tools that executing agents call to mutate project state. It's designed to run inside the orchestrator process using SSE transport.
+
+### SSE transport (recommended)
+
+The orchestrator hosts the MCP server in its own process. Claude connects via URL — no separate process spawned. One DB connection, no locking issues.
+
+```typescript
+import { createUnitToolsServer } from "@gsd-build/mcp-server";
+
+// Create server with all 18 tools scoped to a project directory
+const { server } = await createUnitToolsServer("/path/to/project");
+
+// Connect via SSE transport (inside an HTTP server)
+const { SSEServerTransport } = await import("@modelcontextprotocol/sdk/server/sse.js");
+// ... wire to HTTP server, see gsd-cli/src/mcp-host.ts for full example
 ```
 
-## Configuration
+MCP config for claude:
 
-### Claude Code
+```json
+{
+  "mcpServers": {
+    "gsd": {
+      "type": "sse",
+      "url": "http://127.0.0.1:<port>/sse"
+    }
+  }
+}
+```
+
+### Stdio transport (standalone)
+
+For use outside the orchestrator, the unit-tools server can run as a standalone process:
+
+```bash
+npx gsd-unit-tools --project-dir /path/to/project
+```
+
+MCP config:
+
+```json
+{
+  "mcpServers": {
+    "gsd": {
+      "command": "npx",
+      "args": ["gsd-unit-tools", "--project-dir", "/path/to/project"]
+    }
+  }
+}
+```
+
+### Unit-tools: 18 tools
+
+#### Lifecycle
+
+| Tool | Description | Required params |
+|------|-------------|----------------|
+| `gsd_task_complete` | Mark a task as complete | `taskId`, `sliceId`, `milestoneId`, `oneLiner`, `narrative`, `verification` |
+| `gsd_slice_complete` | Mark a slice as complete | `sliceId`, `milestoneId`, `sliceTitle`, `oneLiner`, `narrative`, `verification`, `uatContent` |
+| `gsd_complete_milestone` | Mark a milestone as complete | `milestoneId`, `title`, `oneLiner`, `narrative`, `verificationPassed` |
+| `gsd_validate_milestone` | Write a milestone validation report | `milestoneId`, `verdict`, `remediationRound`, `successCriteriaChecklist`, `sliceDeliveryAudit`, `crossSliceIntegration`, `requirementCoverage`, `verdictRationale` |
+| `gsd_reopen_task` | Reopen a completed task | `taskId`, `sliceId`, `milestoneId`, `reason` |
+| `gsd_reopen_slice` | Reopen a completed slice | `sliceId`, `milestoneId`, `reason` |
+| `gsd_reopen_milestone` | Reopen a completed milestone | `milestoneId`, `reason` |
+
+#### Planning
+
+| Tool | Description | Required params |
+|------|-------------|----------------|
+| `gsd_plan_milestone` | Create milestone roadmap with slice breakdown | `milestoneId`, `title`, `vision`, `slices[]` |
+| `gsd_plan_slice` | Create slice plan with task breakdown | `milestoneId`, `sliceId`, `goal`, `tasks[]` |
+| `gsd_plan_task` | Create detailed task plan | `milestoneId`, `sliceId`, `taskId`, `title`, `description`, `estimate`, `files[]`, `verify` |
+| `gsd_replan_slice` | Rewrite a slice plan | `milestoneId`, `sliceId`, `reason`, `goal`, `tasks[]` |
+| `gsd_reassess_roadmap` | Rewrite milestone roadmap | `milestoneId`, `reason`, `title`, `vision`, `slices[]` |
+
+#### Knowledge
+
+| Tool | Description | Required params |
+|------|-------------|----------------|
+| `gsd_decision_save` | Record a technical decision | `scope`, `decision`, `choice`, `rationale` |
+| `gsd_requirement_save` | Record a requirement | `class`, `description`, `why`, `source` |
+| `gsd_requirement_update` | Update requirement status | `id` |
+
+#### Read-only
+
+| Tool | Description |
+|------|-------------|
+| `gsd_progress` | Project progress metrics |
+| `gsd_roadmap` | Full roadmap structure |
+| `gsd_knowledge` | Decisions, requirements, captures |
+
+---
+
+## Session Server (pi-mono integration)
+
+The session server manages GSD auto-mode sessions via RPC. Used by external MCP clients (Claude Code, Cursor) to start and monitor GSD sessions.
+
+### Configuration
 
 Add to your project's `.mcp.json`:
 
@@ -37,165 +130,54 @@ Add to your project's `.mcp.json`:
 }
 ```
 
-Or if installed globally:
+### Session tools (6)
 
-```json
-{
-  "mcpServers": {
-    "gsd": {
-      "command": "gsd-mcp-server"
-    }
-  }
-}
+| Tool | Description | Required params |
+|------|-------------|----------------|
+| `gsd_execute` | Start a GSD auto-mode session | `projectDir` |
+| `gsd_status` | Poll session status and progress | `sessionId` |
+| `gsd_result` | Get accumulated session result | `sessionId` |
+| `gsd_cancel` | Cancel a running session | `sessionId` |
+| `gsd_query` | Query project state from filesystem (no session) | `projectDir`, `query` |
+| `gsd_resolve_blocker` | Resolve a pending blocker | `sessionId`, `response` |
+
+### Read-only tools (6)
+
+| Tool | Description | Required params |
+|------|-------------|----------------|
+| `gsd_progress` | Structured project progress | `projectDir` |
+| `gsd_roadmap` | Full roadmap structure | `projectDir` |
+| `gsd_history` | Unit execution history | `projectDir` |
+| `gsd_doctor` | Health check results | `projectDir` |
+| `gsd_captures` | User captures and notes | `projectDir` |
+| `gsd_knowledge` | Decisions and requirements | `projectDir` |
+
+## Architecture
+
 ```
-
-### Cursor
-
-Add to `.cursor/mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "gsd": {
-      "command": "npx",
-      "args": ["gsd-mcp-server"],
-      "env": {
-        "GSD_CLI_PATH": "/path/to/gsd"
-      }
-    }
-  }
-}
+┌──────────────────────────────────────────────────────────┐
+│  @gsd-build/mcp-server                                   │
+│                                                          │
+│  ┌─────────────────────┐  ┌───────────────────────────┐  │
+│  │  Session Server      │  │  Unit-Tools Server        │  │
+│  │  (gsd-mcp-server)   │  │  (gsd-unit-tools)         │  │
+│  │                     │  │                           │  │
+│  │  6 session tools    │  │  18 state-mutation tools  │  │
+│  │  6 read-only tools  │  │  Pure handlers from       │  │
+│  │                     │  │  @gsd-build/gsd-core      │  │
+│  │  SessionManager     │  │                           │  │
+│  │  └─ RpcClient       │  │  Transports:              │  │
+│  │     └─ GSD CLI      │  │  - SSE (in-process)       │  │
+│  │        (child proc) │  │  - stdio (standalone)     │  │
+│  └─────────────────────┘  └───────────────────────────┘  │
+└──────────────────────────────────────────────────────────┘
 ```
-
-## Tools
-
-### `gsd_execute`
-
-Start a GSD auto-mode session for a project directory.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `projectDir` | `string` | ✅ | Absolute path to the project directory |
-| `command` | `string` | | Command to send (default: `"/gsd auto"`) |
-| `model` | `string` | | Model ID override |
-| `bare` | `boolean` | | Run in bare mode (skip user config) |
-
-**Returns:** `{ sessionId, status: "started" }`
-
-### `gsd_status`
-
-Poll the current status of a running GSD session.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `sessionId` | `string` | ✅ | Session ID from `gsd_execute` |
-
-**Returns:**
-
-```json
-{
-  "status": "running",
-  "progress": { "eventCount": 42, "toolCalls": 15 },
-  "recentEvents": [ ... ],
-  "pendingBlocker": null,
-  "cost": { "totalCost": 0.12, "tokens": { "input": 5000, "output": 2000, "cacheRead": 1000, "cacheWrite": 500 } },
-  "durationMs": 45000
-}
-```
-
-### `gsd_result`
-
-Get the accumulated result of a session. Works for both running (partial) and completed sessions.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `sessionId` | `string` | ✅ | Session ID from `gsd_execute` |
-
-**Returns:**
-
-```json
-{
-  "sessionId": "abc-123",
-  "projectDir": "/path/to/project",
-  "status": "completed",
-  "durationMs": 120000,
-  "cost": { ... },
-  "recentEvents": [ ... ],
-  "pendingBlocker": null,
-  "error": null
-}
-```
-
-### `gsd_cancel`
-
-Cancel a running session. Aborts the current operation and stops the agent process.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `sessionId` | `string` | ✅ | Session ID from `gsd_execute` |
-
-**Returns:** `{ cancelled: true }`
-
-### `gsd_query`
-
-Query GSD project state from the filesystem without an active session. Returns STATE.md, PROJECT.md, requirements, and milestone listing.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `projectDir` | `string` | ✅ | Absolute path to the project directory |
-| `query` | `string` | ✅ | What to query (e.g. `"status"`, `"milestones"`) |
-
-**Returns:**
-
-```json
-{
-  "projectDir": "/path/to/project",
-  "state": "...",
-  "project": "...",
-  "requirements": "...",
-  "milestones": [
-    { "id": "M001", "hasRoadmap": true, "hasSummary": false }
-  ]
-}
-```
-
-### `gsd_resolve_blocker`
-
-Resolve a pending blocker in a session by sending a response to the blocked UI request.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `sessionId` | `string` | ✅ | Session ID from `gsd_execute` |
-| `response` | `string` | ✅ | Response to send for the pending blocker |
-
-**Returns:** `{ resolved: true }`
 
 ## Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `GSD_CLI_PATH` | Absolute path to the GSD CLI binary. If not set, the server resolves `gsd` via `which`. |
-
-## Architecture
-
-```
-┌─────────────────┐     stdio      ┌──────────────────┐
-│  MCP Client     │ ◄────────────► │  @gsd-build/mcp-server │
-│  (Claude Code,  │    JSON-RPC    │                  │
-│   Cursor, etc.) │                │  SessionManager  │
-└─────────────────┘                │       │          │
-                                   │       ▼          │
-                                   │  @gsd-build/rpc-client │
-                                   │       │          │
-                                   │       ▼          │
-                                   │  GSD CLI (child  │
-                                   │  process via RPC)│
-                                   └──────────────────┘
-```
-
-- **@gsd-build/mcp-server** — MCP protocol adapter. Translates MCP tool calls into SessionManager operations.
-- **SessionManager** — Manages RpcClient lifecycle. One session per project directory. Tracks events in a ring buffer (last 50), detects blockers, accumulates cost.
-- **@gsd-build/rpc-client** — Low-level RPC client that spawns and communicates with the GSD CLI process via JSON-RPC over stdio.
+| `GSD_CLI_PATH` | Absolute path to the GSD CLI binary (session server only). If not set, resolves `gsd` via `which`. |
 
 ## License
 
