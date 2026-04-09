@@ -2,11 +2,11 @@ import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 import type { DoctorIssue } from "./doctor-types.js";
-import { isDbAvailable, _getAdapter } from "./gsd-db.js";
-import { resolveMilestoneFile } from "./paths.js";
-import { deriveState } from "./state.js";
-import { readEvents } from "./workflow-events.js";
-import { renderAllProjections } from "./workflow-projections.js";
+import { isDbAvailable, _getAdapter } from "../gsd-db.js";
+import { resolveMilestoneFile } from "../paths.js";
+import { deriveState } from "../state.js";
+import { readEvents } from "../workflow-events.js";
+import { renderAllProjections } from "../workflow-projections.js";
 
 export async function checkEngineHealth(
   basePath: string,

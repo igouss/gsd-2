@@ -16,14 +16,14 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { gsdRoot, resolveGsdRootFile } from "./paths.js";
-import { readCrashLock, isLockProcessAlive, clearLock } from "./session/crash-recovery.js";
-import { abortAndReset } from "./git-self-heal.js";
+import { gsdRoot, resolveGsdRootFile } from "../paths.js";
+import { readCrashLock, isLockProcessAlive, clearLock } from "../session/crash-recovery.js";
+import { abortAndReset } from "../git-self-heal.js";
 import { rebuildState } from "./doctor.js";
-import { deriveState } from "./state.js";
-import { resolveMilestoneIntegrationBranch } from "./git-service.js";
-import { nativeIsRepo, nativeHasChanges, nativeLastCommitEpoch, nativeGetCurrentBranch, nativeAddTracked, nativeCommit } from "./native-git-bridge.js";
-import { loadEffectiveGSDPreferences } from "./preferences.js";
+import { deriveState } from "../state.js";
+import { resolveMilestoneIntegrationBranch } from "../git-service.js";
+import { nativeIsRepo, nativeHasChanges, nativeLastCommitEpoch, nativeGetCurrentBranch, nativeAddTracked, nativeCommit } from "../native-git-bridge.js";
+import { loadEffectiveGSDPreferences } from "../preferences.js";
 import { runEnvironmentChecks } from "./doctor-environment.js";
 
 // ── Health Score Tracking ──────────────────────────────────────────────────

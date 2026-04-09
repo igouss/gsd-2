@@ -2,15 +2,15 @@ import { existsSync, lstatSync, readdirSync, readFileSync, realpathSync, rmSync,
 import { basename, dirname, join } from "node:path";
 
 import type { DoctorIssue, DoctorIssueCode } from "./doctor-types.js";
-import { cleanNumberedGsdVariants } from "./repo-identity.js";
-import { milestonesDir, gsdRoot, resolveGsdRootFile } from "./paths.js";
-import { deriveState } from "./state.js";
-import { saveFile } from "./files.js";
-import { nativeIsRepo, nativeForEachRef, nativeUpdateRef } from "./native-git-bridge.js";
-import { readCrashLock, isLockProcessAlive, clearLock } from "./session/crash-recovery.js";
-import { ensureGitignore } from "./gitignore.js";
-import { readAllSessionStatuses, isSessionStale, removeSessionStatus } from "./session/session-status-io.js";
-import { recoverFailedMigration } from "./migrate-external.js";
+import { cleanNumberedGsdVariants } from "../repo-identity.js";
+import { milestonesDir, gsdRoot, resolveGsdRootFile } from "../paths.js";
+import { deriveState } from "../state.js";
+import { saveFile } from "../files.js";
+import { nativeIsRepo, nativeForEachRef, nativeUpdateRef } from "../native-git-bridge.js";
+import { readCrashLock, isLockProcessAlive, clearLock } from "../session/crash-recovery.js";
+import { ensureGitignore } from "../gitignore.js";
+import { readAllSessionStatuses, isSessionStale, removeSessionStatus } from "../session/session-status-io.js";
+import { recoverFailedMigration } from "../migrate-external.js";
 
 export async function checkRuntimeHealth(
   basePath: string,
@@ -120,13 +120,13 @@ export async function checkRuntimeHealth(
       for (const key of keys) {
         // Key format: "unitType/unitId" e.g. "execute-task/M001/S01/T01"
         // Hook units have compound types: "hook/<hookName>/unitId"
-        const { splitCompletedKey } = await import("./forensics.js");
+        const { splitCompletedKey } = await import("../forensics.js");
         const parsed = splitCompletedKey(key);
         if (!parsed) continue;
         const { unitType, unitId } = parsed;
 
         // Only validate artifact-producing unit types
-        const { verifyExpectedArtifact } = await import("./auto-recovery.js");
+        const { verifyExpectedArtifact } = await import("../auto-recovery.js");
         if (!verifyExpectedArtifact(unitType, unitId, basePath)) {
           orphaned.push(key);
         }
@@ -181,7 +181,7 @@ export async function checkRuntimeHealth(
           });
 
           if (shouldFix("stale_hook_state")) {
-            const { clearPersistedHookState } = await import("./execution/post-unit-hooks.js");
+            const { clearPersistedHookState } = await import("../execution/post-unit-hooks.js");
             clearPersistedHookState(basePath);
             fixesApplied.push("cleared stale hook-state.json");
           }
@@ -222,7 +222,7 @@ export async function checkRuntimeHealth(
         });
 
         if (shouldFix("activity_log_bloat")) {
-          const { pruneActivityLogs } = await import("./activity-log.js");
+          const { pruneActivityLogs } = await import("../activity-log.js");
           pruneActivityLogs(activityDir, 7); // 7-day retention
           fixesApplied.push("pruned activity logs (7-day retention)");
         }
@@ -474,7 +474,7 @@ export async function checkRuntimeHealth(
             fixable: true,
           });
           if (shouldFix("metrics_ledger_bloat")) {
-            const { pruneMetricsLedger } = await import("./reporting/metrics.js");
+            const { pruneMetricsLedger } = await import("../reporting/metrics.js");
             const removed = pruneMetricsLedger(basePath, 1500);
             fixesApplied.push(`pruned metrics ledger: removed ${removed} oldest entries (${parsed.units.length - removed} remain)`);
           }

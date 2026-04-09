@@ -21,11 +21,11 @@ import {
 } from './metrics.js';
 import { loadAllCaptures, countPendingCaptures } from '../captures.js';
 import { loadEffectiveGSDPreferences } from '../preferences.js';
-import { runProviderChecks, type ProviderCheckResult } from '../doctor-providers.js';
+import { runProviderChecks, type ProviderCheckResult } from '../doctor/doctor-providers.js';
 import { generateSkillHealthReport } from '../skills/skill-health.js';
-import { runEnvironmentChecks, type EnvironmentCheckResult } from '../doctor-environment.js';
-import { computeProgressScore } from '../progress-score.js';
-import { getHealthHistory } from '../doctor-proactive.js';
+import { runEnvironmentChecks, type EnvironmentCheckResult } from '../doctor/doctor-environment.js';
+import { computeProgressScore } from '../doctor/progress-score.js';
+import { getHealthHistory } from '../doctor/doctor-proactive.js';
 
 import type { Phase } from '../types.js';
 import type { CaptureEntry } from '../captures.js';
@@ -199,7 +199,7 @@ export interface HealthInfo {
   userMessages: number;
   providers: ProviderStatusSummary[];
   skillSummary: SkillSummaryInfo;
-  environmentIssues: import("../doctor-environment.js").EnvironmentCheckResult[];
+  environmentIssues: import("../doctor/doctor-environment.js").EnvironmentCheckResult[];
   /** Persisted doctor run history (most recent first, up to 20 entries). */
   doctorHistory?: VisualizerDoctorEntry[];
   /** Current in-memory progress score (null if auto-mode not active). */
