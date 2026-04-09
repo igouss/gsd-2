@@ -10,8 +10,8 @@
 import { join } from "node:path";
 import { mkdirSync } from "node:fs";
 
-import type { CompleteSliceParams } from "../types.js";
-import { isClosedStatus } from "../status-guards.js";
+import type { CompleteSliceParams } from "../domain/types.js";
+import { isClosedStatus } from "../domain/status-guards.js";
 import {
   transaction,
   insertMilestone,

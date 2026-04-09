@@ -9,7 +9,7 @@ import type {
   RoadmapSliceEntry,
   SlicePlan,
   MilestoneRegistryEntry,
-} from './types.js';
+} from './domain/types.js';
 
 import {
   parseRoadmap,
@@ -36,7 +36,7 @@ import {
 
 import { findMilestoneIds } from './milestone/milestone-ids.js';
 import { loadQueueOrder, sortByQueueOrder } from './queue-order.js';
-import { isClosedStatus, isDeferredStatus } from './status-guards.js';
+import { isClosedStatus, isDeferredStatus } from './domain/status-guards.js';
 import { nativeBatchParseGsdFiles, type BatchParsedFile } from './git/native-parser-bridge.js';
 
 import { join, resolve } from 'path';

@@ -16,7 +16,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { getErrorMessage } from "../error-utils.js";
+import { getErrorMessage } from "../domain/error-utils.js";
 
 // ============================================================================
 // Type Definitions

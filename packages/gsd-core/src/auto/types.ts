@@ -7,7 +7,7 @@
 
 import type { AutoSession } from "./session.js";
 import type { GSDPreferences } from "../preferences/preferences-types.js";
-import type { GSDState } from "../types.js";
+import type { GSDState } from "../domain/types.js";
 import type { CmuxLogLevel } from "../cmux/index.js";
 import type { CoreLoopDeps } from "./loop-deps.js";
 

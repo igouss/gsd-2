@@ -9,7 +9,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import type { DynamicRoutingConfig } from "../routing/model-router.js";
 import { defaultRoutingConfig } from "../routing/model-router.js";
-import type { TokenProfile, InlineLevel } from "../types.js";
+import type { TokenProfile, InlineLevel } from "../domain/types.js";
 
 import type {
   GSDPreferences,
@@ -391,7 +391,7 @@ export function resolveInlineLevel(): InlineLevel {
  * budget -> "smart", balanced/quality -> "full".
  * Explicit preference always wins.
  */
-export function resolveContextSelection(): import("../types.js").ContextSelectionMode {
+export function resolveContextSelection(): import("../domain/types.js").ContextSelectionMode {
   const prefs = loadEffectiveGSDPreferences();
   if (prefs?.preferences.context_selection) return prefs.preferences.context_selection;
   const profile = resolveEffectiveProfile();

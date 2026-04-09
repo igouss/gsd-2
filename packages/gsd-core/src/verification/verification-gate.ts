@@ -6,8 +6,8 @@
 import { spawnSync, type SpawnSyncReturns } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join, basename } from "node:path";
-import type { AuditWarning, RuntimeError, VerificationCheck, VerificationResult } from "../types.js";
-import { DEFAULT_COMMAND_TIMEOUT_MS } from "../constants.js";
+import type { AuditWarning, RuntimeError, VerificationCheck, VerificationResult } from "../domain/types.js";
+import { DEFAULT_COMMAND_TIMEOUT_MS } from "../domain/constants.js";
 import { rewriteCommandWithRtk } from "../shared/rtk.js";
 
 /** Maximum bytes of stdout/stderr to retain per command (10 KB). */

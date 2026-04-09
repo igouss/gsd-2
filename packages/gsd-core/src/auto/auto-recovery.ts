@@ -7,7 +7,7 @@
 
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { parseUnitId } from "../unit-id.js";
+import { parseUnitId } from "../domain/unit-id.js";
 import { relSliceFile, relMilestoneFile } from "../paths.js";
 
 /**

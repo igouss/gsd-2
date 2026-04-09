@@ -26,7 +26,7 @@ import { nativeBranchExists } from "../git/native-git-bridge.js";
 import { readIntegrationBranch } from "../git/git-service.js";
 import { resolveParallelConfig } from "../preferences/preferences.js";
 import type { GSDPreferences } from "../preferences/preferences.js";
-import type { ParallelConfig } from "../types.js";
+import type { ParallelConfig } from "../domain/types.js";
 import {
   writeSessionStatus,
   readAllSessionStatuses,
@@ -40,7 +40,7 @@ import {
   analyzeParallelEligibility,
   type ParallelCandidates,
 } from "./parallel-eligibility.js";
-import { getErrorMessage } from "../error-utils.js";
+import { getErrorMessage } from "../domain/error-utils.js";
 import { logWarning } from "../workflow/workflow-logger.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────

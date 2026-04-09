@@ -9,7 +9,7 @@
 import type { HarnessAdapter, OrchestratorEventSink } from "../harness-adapter.js";
 import type { AutoSession } from "./session.js";
 import type { GSDPreferences } from "../preferences/preferences-types.js";
-import type { GSDState } from "../types.js";
+import type { GSDState } from "../domain/types.js";
 import type { SessionLockStatus } from "../session/session-lock.js";
 import type { DispatchAction } from "./auto-dispatch.js";
 import type { WorktreeResolver } from "../git/worktree-resolver.js";

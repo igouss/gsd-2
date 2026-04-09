@@ -20,7 +20,7 @@ import {
 } from "node:fs";
 import { isAbsolute, join, sep as pathSep } from "node:path";
 import { homedir } from "node:os";
-import { GSDError, GSD_IO_ERROR, GSD_GIT_ERROR } from "../errors.js";
+import { GSDError, GSD_IO_ERROR, GSD_GIT_ERROR } from "../domain/errors.js";
 import {
   reconcileWorktreeDb,
   isDbAvailable,

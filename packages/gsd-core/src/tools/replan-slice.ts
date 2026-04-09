@@ -10,7 +10,7 @@ import {
   deleteTask,
 } from "../gsd-db.js";
 import { invalidateStateCache } from "../state.js";
-import { isClosedStatus } from "../status-guards.js";
+import { isClosedStatus } from "../domain/status-guards.js";
 import { isNonEmptyString } from "../verification/validation.js";
 import { renderPlanFromDb, renderReplanFromDb } from "../reporting/markdown-renderer.js";
 import { renderAllProjections } from "../workflow/workflow-projections.js";

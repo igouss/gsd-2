@@ -14,7 +14,7 @@ import type {
   ReconcileResult,
   DisplayMetadata,
 } from "../routing/engine-types.js";
-import type { GSDState } from "../types.js";
+import type { GSDState } from "../domain/types.js";
 import type { DispatchAction, DispatchContext } from "../auto/auto-dispatch.js";
 
 import { deriveState } from "../state.js";

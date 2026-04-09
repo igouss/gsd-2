@@ -8,7 +8,7 @@ import {
   resolveTaskFile,
 } from "./paths.js";
 import { loadFile, parseTaskPlanMustHaves, countMustHavesMentionedInSummary } from "./files.js";
-import { parseUnitId } from "./unit-id.js";
+import { parseUnitId } from "./domain/unit-id.js";
 
 export type UnitRuntimePhase =
   | "dispatched"

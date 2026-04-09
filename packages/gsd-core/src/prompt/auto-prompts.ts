@@ -18,7 +18,7 @@ import {
 } from "../paths.js";
 import { resolveSkillDiscoveryMode, resolveInlineLevel, loadEffectiveGSDPreferences, resolveAllSkillReferences } from "../preferences/preferences.js";
 import { parseRoadmap } from "../parsers-legacy.js";
-import type { GSDState, InlineLevel } from "../types.js";
+import type { GSDState, InlineLevel } from "../domain/types.js";
 import type { GSDPreferences } from "../preferences/preferences.js";
 /** Minimal Skill shape needed by prompt builders — mirrors @gsd/pi-coding-agent's Skill. */
 export interface Skill {

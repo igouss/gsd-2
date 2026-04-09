@@ -10,7 +10,7 @@
 
 import { readFileSync, existsSync, mkdirSync } from "node:fs";
 import { logWarning } from "../workflow/workflow-logger.js";
-import { isClosedStatus } from "../status-guards.js";
+import { isClosedStatus } from "../domain/status-guards.js";
 import { join, relative } from "node:path";
 import { createRequire } from "node:module";
 import {
@@ -25,7 +25,7 @@ import {
   getGateResults,
 } from "../gsd-db.js";
 import type { MilestoneRow, SliceRow, TaskRow, ArtifactRow } from "../gsd-db.js";
-import type { GateRow } from "../types.js";
+import type { GateRow } from "../domain/types.js";
 import {
   resolveMilestoneFile,
   resolveSliceFile,

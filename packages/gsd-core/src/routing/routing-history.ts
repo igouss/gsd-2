@@ -4,7 +4,7 @@
 
 import { join } from "node:path";
 import { gsdRoot } from "../paths.js";
-import type { ComplexityTier } from "../types.js";
+import type { ComplexityTier } from "../domain/types.js";
 import { loadJsonFile, saveJsonFile } from "../json-persistence.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────

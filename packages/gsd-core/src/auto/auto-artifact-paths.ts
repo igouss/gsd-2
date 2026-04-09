@@ -13,7 +13,7 @@ import {
   buildSliceFileName,
   buildTaskFileName,
 } from "../paths.js";
-import { parseUnitId } from "../unit-id.js";
+import { parseUnitId } from "../domain/unit-id.js";
 import { join } from "node:path";
 
 /**

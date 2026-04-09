@@ -12,7 +12,7 @@ import type {
   PreDispatchResult,
   HookExecutionState,
   HookStatusEntry,
-} from "../types.js";
+} from "../domain/types.js";
 
 // ─── Phase & Evaluation Strategy ────────────────────────────────────────────
 

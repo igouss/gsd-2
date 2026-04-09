@@ -17,7 +17,7 @@ import {
   updateMilestoneStatus,
 } from "../gsd-db.js";
 import { resolveMilestonePath, clearPathCache } from "../paths.js";
-import { isClosedStatus } from "../status-guards.js";
+import { isClosedStatus } from "../domain/status-guards.js";
 import { saveFile, clearParseCache } from "../files.js";
 import { invalidateStateCache } from "../state.js";
 import { renderAllProjections, stripIdPrefix } from "../workflow/workflow-projections.js";

@@ -11,7 +11,7 @@ import { loadEffectiveGSDPreferences, type GSDPreferences } from "../preferences
 
 import type { DoctorIssue, DoctorIssueCode, DoctorReport } from "./doctor-types.js";
 import { GLOBAL_STATE_CODES } from "./doctor-types.js";
-import type { RoadmapSliceEntry } from "../types.js";
+import type { RoadmapSliceEntry } from "../domain/types.js";
 import { checkGitHealth, checkRuntimeHealth, checkGlobalHealth, checkEngineHealth } from "./doctor-checks.js";
 import { checkEnvironmentHealth } from "./doctor-environment.js";
 import { runProviderChecks } from "./doctor-providers.js";

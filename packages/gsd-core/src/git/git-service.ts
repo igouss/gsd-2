@@ -35,8 +35,8 @@ import {
   nativeResetSoft,
   nativeCommitSubject,
 } from "./native-git-bridge.js";
-import { GSDError, GSD_MERGE_CONFLICT, GSD_GIT_ERROR } from "../errors.js";
-import { getErrorMessage } from "../error-utils.js";
+import { GSDError, GSD_MERGE_CONFLICT, GSD_GIT_ERROR } from "../domain/errors.js";
+import { getErrorMessage } from "../domain/error-utils.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 

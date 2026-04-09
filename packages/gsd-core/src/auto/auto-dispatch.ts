@@ -9,7 +9,7 @@
  * without modifying orchestration code.
  */
 
-import type { GSDState } from "../types.js";
+import type { GSDState } from "../domain/types.js";
 import type { GSDPreferences } from "../preferences/preferences.js";
 import type { UatType } from "../files.js";
 import { loadFile, extractUatType, loadActiveOverrides } from "../files.js";

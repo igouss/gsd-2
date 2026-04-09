@@ -9,7 +9,7 @@ import { deriveState } from "../state.js";
 import { resolveMilestoneFile, resolveSliceFile } from "../paths.js";
 import { findMilestoneIds } from "../auto/guided-flow.js";
 import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../gsd-db.js";
-import type { MilestoneRegistryEntry } from "../types.js";
+import type { MilestoneRegistryEntry } from "../domain/types.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

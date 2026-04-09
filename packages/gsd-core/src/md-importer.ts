@@ -6,7 +6,7 @@
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import type { Decision, Requirement } from './types.js';
+import type { Decision, Requirement } from './domain/types.js';
 import {
   upsertDecision,
   upsertRequirement,
@@ -78,7 +78,7 @@ export function parseDecisionsTable(content: string): Omit<Decision, 'seq'>[] {
     const revisable = cells[6].trim();
     // Made By column is optional for backward compatibility — defaults to 'agent'
     const rawMadeBy = cells.length >= 8 ? cells[7].trim().toLowerCase() : 'agent';
-    const made_by = (VALID_MADE_BY.has(rawMadeBy) ? rawMadeBy : 'agent') as import('./types.js').DecisionMadeBy;
+    const made_by = (VALID_MADE_BY.has(rawMadeBy) ? rawMadeBy : 'agent') as import('./domain/types.js').DecisionMadeBy;
 
     // Detect (amends DXXX) in the Decision column
     const amendsMatch = decisionText.match(/\(amends\s+(D\d+)\)/i);

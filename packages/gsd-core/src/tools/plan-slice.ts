@@ -1,5 +1,5 @@
 import { clearParseCache } from "../files.js";
-import { isClosedStatus } from "../status-guards.js";
+import { isClosedStatus } from "../domain/status-guards.js";
 import { isNonEmptyString, validateStringArray } from "../verification/validation.js";
 import {
   transaction,
@@ -10,7 +10,7 @@ import {
   upsertTaskPlanning,
   insertGateRow,
 } from "../gsd-db.js";
-import type { GateId } from "../types.js";
+import type { GateId } from "../domain/types.js";
 import { invalidateStateCache } from "../state.js";
 import { renderPlanFromDb } from "../reporting/markdown-renderer.js";
 import { renderAllProjections } from "../workflow/workflow-projections.js";

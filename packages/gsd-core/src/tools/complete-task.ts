@@ -10,8 +10,8 @@
 import { join } from "node:path";
 import { mkdirSync, existsSync } from "node:fs";
 
-import type { CompleteTaskParams } from "../types.js";
-import { isClosedStatus } from "../status-guards.js";
+import type { CompleteTaskParams } from "../domain/types.js";
+import { isClosedStatus } from "../domain/status-guards.js";
 import {
   transaction,
   insertMilestone,

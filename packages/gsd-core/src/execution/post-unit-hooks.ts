@@ -9,7 +9,7 @@ import type {
   HookDispatchResult,
   PreDispatchResult,
   HookStatusEntry,
-} from "../types.js";
+} from "../domain/types.js";
 import { getOrCreateRegistry, resolveHookArtifactPath } from "../rules/rule-registry.js";
 
 // Re-export resolveHookArtifactPath so existing importers still work.

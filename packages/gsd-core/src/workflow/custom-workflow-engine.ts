@@ -33,7 +33,7 @@ import {
 } from "./graph.js";
 import { injectContext } from "../prompt/context-injector.js";
 import type { WorkflowDefinition, StepDefinition } from "./definition-loader.js";
-import { parseUnitId } from "../unit-id.js";
+import { parseUnitId } from "../domain/unit-id.js";
 
 /** Read and parse the frozen DEFINITION.yaml from a run directory. */
 export function readFrozenDefinition(runDir: string): WorkflowDefinition {

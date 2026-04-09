@@ -39,7 +39,7 @@ export { handleValidateMilestone } from "./tools/validate-milestone.js";
 export { saveDecisionToDb, saveRequirementToDb, updateRequirementInDb } from "./db-writer.js";
 
 // Types
-export type { CompleteTaskParams, CompleteSliceParams } from "./types.js";
+export type { CompleteTaskParams, CompleteSliceParams } from "./domain/types.js";
 
 // Adapters
 export { ClaudeCodeAdapter } from "./adapters/claude-code.js";

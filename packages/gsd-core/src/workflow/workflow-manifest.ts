@@ -5,7 +5,7 @@ import {
   type SliceRow,
   type TaskRow,
 } from "../gsd-db.js";
-import type { Decision } from "../types.js";
+import type { Decision } from "../domain/types.js";
 import { atomicWriteSync } from "../atomic-write.js";
 import { readFileSync, existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";

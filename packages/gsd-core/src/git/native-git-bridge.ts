@@ -8,9 +8,9 @@
 import { execSync, execFileSync } from "node:child_process";
 import { existsSync, readFileSync, unlinkSync, rmSync } from "node:fs";
 import { join } from "node:path";
-import { GSDError, GSD_GIT_ERROR } from "../errors.js";
+import { GSDError, GSD_GIT_ERROR } from "../domain/errors.js";
 import { GIT_NO_PROMPT_ENV } from "./git-constants.js";
-import { getErrorMessage } from "../error-utils.js";
+import { getErrorMessage } from "../domain/error-utils.js";
 
 // Issue #453: keep auto-mode bookkeeping on the stable git CLI path unless a
 // caller explicitly opts into the native helper.

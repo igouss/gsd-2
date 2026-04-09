@@ -2,10 +2,10 @@
 
 import { resolveMilestoneFile } from "../paths.js";
 import { findMilestoneIds } from "./guided-flow.js";
-import { parseUnitId } from "../unit-id.js";
+import { parseUnitId } from "../domain/unit-id.js";
 import { isDbAvailable, getMilestoneSlices } from "../gsd-db.js";
 import { parseRoadmap } from "../parsers-legacy.js";
-import { isClosedStatus } from "../status-guards.js";
+import { isClosedStatus } from "../domain/status-guards.js";
 import { readFileSync } from "node:fs";
 
 const SLICE_DISPATCH_TYPES = new Set([

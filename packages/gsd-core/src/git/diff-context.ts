@@ -8,7 +8,7 @@
 
 import { execFileSync, execFile } from "node:child_process";
 import { resolve } from "node:path";
-import { GSDError, GSD_PARSE_ERROR } from "../errors.js";
+import { GSDError, GSD_PARSE_ERROR } from "../domain/errors.js";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

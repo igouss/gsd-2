@@ -10,7 +10,7 @@ import { logWarning } from "../workflow/workflow-logger.js";
 import { readdirSync, existsSync } from "node:fs";
 import { milestonesDir } from "../paths.js";
 import { loadQueueOrder, sortByQueueOrder } from "../queue-order.js";
-import { getErrorMessage } from "../error-utils.js";
+import { getErrorMessage } from "../domain/error-utils.js";
 
 // ─── Regex ──────────────────────────────────────────────────────────────────
 

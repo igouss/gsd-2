@@ -17,11 +17,11 @@ import type {
   TaskIO,
   SecretsManifest, SecretsManifestEntry, SecretsManifestEntryStatus,
   ManifestStatus,
-} from './types.js';
+} from './domain/types.js';
 
 import { checkExistingEnvKeys } from './env-utils.js';
 import { nativeExtractSection, nativeParseSummaryFile, NATIVE_UNAVAILABLE } from './git/native-parser-bridge.js';
-import { CACHE_MAX } from './constants.js';
+import { CACHE_MAX } from './domain/constants.js';
 import { splitFrontmatter, parseFrontmatterMap } from "./shared/frontmatter.js";
 
 // Re-export for downstream consumers

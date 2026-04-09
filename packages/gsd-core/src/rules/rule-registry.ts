@@ -17,11 +17,11 @@ import type {
   HookExecutionState,
   PersistedHookState,
   HookStatusEntry,
-} from "../types.js";
+} from "../domain/types.js";
 import { resolvePostUnitHooks, resolvePreDispatchHooks } from "../preferences/preferences.js";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { parseUnitId } from "../unit-id.js";
+import { parseUnitId } from "../domain/unit-id.js";
 
 // ─── Artifact Path Resolution ──────────────────────────────────────────────
 

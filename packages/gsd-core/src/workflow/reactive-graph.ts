@@ -9,7 +9,7 @@
  * The `loadSliceTaskIO` loader at the bottom is the only async/IO function.
  */
 
-import type { TaskIO, DerivedTaskNode, ReactiveExecutionState } from "../types.js";
+import type { TaskIO, DerivedTaskNode, ReactiveExecutionState } from "../domain/types.js";
 import { loadFile, parseTaskPlanIO } from "../files.js";
 import { isDbAvailable, getSliceTasks } from "../gsd-db.js";
 import { parsePlan } from "../parsers-legacy.js";

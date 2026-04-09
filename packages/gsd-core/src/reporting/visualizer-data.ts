@@ -27,7 +27,7 @@ import { runEnvironmentChecks, type EnvironmentCheckResult } from '../doctor/doc
 import { computeProgressScore } from '../doctor/progress-score.js';
 import { getHealthHistory } from '../doctor/doctor-proactive.js';
 
-import type { Phase } from '../types.js';
+import type { Phase } from '../domain/types.js';
 import type { CaptureEntry } from '../auto/captures.js';
 import type {
   ProjectTotals,

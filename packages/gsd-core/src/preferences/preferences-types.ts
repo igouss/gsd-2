@@ -19,7 +19,7 @@ import type {
   ContextSelectionMode,
   ReactiveExecutionConfig,
   GateEvaluationConfig,
-} from "../types.js";
+} from "../domain/types.js";
 import type { DynamicRoutingConfig } from "../routing/model-router.js";
 
 export interface ContextManagementConfig {

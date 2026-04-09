@@ -18,7 +18,7 @@
  */
 
 import { readFileSync, readdirSync, existsSync } from "node:fs";
-import { GSDError, GSD_PARSE_ERROR } from "../errors.js";
+import { GSDError, GSD_PARSE_ERROR } from "../domain/errors.js";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";

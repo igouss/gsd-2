@@ -2,7 +2,7 @@
 // Cross-platform desktop notifications for auto-mode events.
 
 import { execFileSync } from "node:child_process";
-import type { NotificationPreferences } from "../types.js";
+import type { NotificationPreferences } from "../domain/types.js";
 import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
 import { CmuxClient, emitOsc777Notification, resolveCmuxConfig } from "../cmux/index.js";
 

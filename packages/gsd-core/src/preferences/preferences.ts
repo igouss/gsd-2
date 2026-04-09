@@ -16,7 +16,7 @@ import { join } from "node:path";
 
 import { gsdRoot } from "../paths.js";
 import { parse as parseYaml } from "yaml";
-import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile } from "../types.js";
+import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile } from "../domain/types.js";
 import type { DynamicRoutingConfig } from "../routing/model-router.js";
 import { normalizeStringArray } from "../shared/format-utils.js";
 import { logWarning } from "../workflow/workflow-logger.js";
@@ -373,7 +373,7 @@ function mergePreferences(base: GSDPreferences, override: GSDPreferences): GSDPr
       ? { ...(base.phases ?? {}), ...(override.phases ?? {}) }
       : undefined,
     parallel: (base.parallel || override.parallel)
-      ? { ...(base.parallel ?? {}), ...(override.parallel ?? {}) } as import("../types.js").ParallelConfig
+      ? { ...(base.parallel ?? {}), ...(override.parallel ?? {}) } as import("../domain/types.js").ParallelConfig
       : undefined,
     verification_commands: mergeStringLists(base.verification_commands, override.verification_commands),
     verification_auto_fix: override.verification_auto_fix ?? base.verification_auto_fix,
@@ -563,7 +563,7 @@ export function getIsolationMode(): "none" | "worktree" | "branch" {
   return "none"; // default — no isolation, work on current branch
 }
 
-export function resolveParallelConfig(prefs: GSDPreferences | undefined): import("../types.js").ParallelConfig {
+export function resolveParallelConfig(prefs: GSDPreferences | undefined): import("../domain/types.js").ParallelConfig {
   return {
     enabled: prefs?.parallel?.enabled ?? false,
     max_workers: Math.max(1, Math.min(4, prefs?.parallel?.max_workers ?? 2)),

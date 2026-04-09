@@ -19,7 +19,7 @@ import {
 	type MarketplaceDiscoveryResult,
 	type DiscoveredPlugin,
 } from './marketplace-discovery.js';
-import { GSDError, GSD_STALE_STATE } from '../errors.js';
+import { GSDError, GSD_STALE_STATE } from '../domain/errors.js';
 import {
 	NamespacedRegistry,
 	componentsFromDiscovery,

@@ -17,7 +17,7 @@ import {
   openDatabase,
   setTaskBlockerDiscovered,
 } from "../gsd-db.js";
-import { isClosedStatus } from "../status-guards.js";
+import { isClosedStatus } from "../domain/status-guards.js";
 import { invalidateStateCache } from "../state.js";
 import { clearPathCache } from "../paths.js";
 import { clearParseCache } from "../files.js";

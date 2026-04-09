@@ -10,12 +10,12 @@ import { extractSection, parseBullets, extractBoldField, extractAllSections, reg
 import { splitFrontmatter } from "./shared/frontmatter.js";
 import { nativeParseRoadmap, nativeParsePlanFile } from './git/native-parser-bridge.js';
 import { debugTime, debugCount } from './debug-logger.js';
-import { CACHE_MAX } from './constants.js';
+import { CACHE_MAX } from './domain/constants.js';
 
 import type {
   Roadmap, BoundaryMapEntry,
   SlicePlan, TaskPlanEntry,
-} from './types.js';
+} from './domain/types.js';
 
 // Re-export parseRoadmapSlices so callers can import all legacy parsers from one module
 import { parseRoadmapSlices } from './workflow/roadmap-slices.js';
