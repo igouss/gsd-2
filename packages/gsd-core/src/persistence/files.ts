@@ -7,14 +7,13 @@ import { promises as fs } from 'node:fs';
 import { resolve } from 'node:path';
 import { atomicWriteAsync } from './atomic-write.js';
 import { resolveMilestoneFile, relMilestoneFile, resolveGsdRootFile } from './paths.js';
-import { milestoneIdSort, findMilestoneIds } from '../milestone/milestone-ids.js';
+import { findMilestoneIds } from '../milestone/milestone-ids.js';
 
 import type {
   TaskPlanFile, TaskPlanFrontmatter,
-  Summary, SummaryFrontmatter, SummaryRequires, FileModified,
+  Summary, SummaryFrontmatter, FileModified,
   Continue, ContinueFrontmatter, ContinueStatus,
   RequirementCounts,
-  TaskIO,
   SecretsManifest, SecretsManifestEntry, SecretsManifestEntryStatus,
   ManifestStatus,
 } from '../domain/types.js';
