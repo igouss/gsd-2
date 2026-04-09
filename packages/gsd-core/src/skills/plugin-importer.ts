@@ -19,17 +19,17 @@ import {
 	type MarketplaceDiscoveryResult,
 	type DiscoveredPlugin,
 } from './marketplace-discovery.js';
-import { GSDError, GSD_STALE_STATE } from './errors.js';
+import { GSDError, GSD_STALE_STATE } from '../errors.js';
 import {
 	NamespacedRegistry,
 	componentsFromDiscovery,
 	type NamespacedComponent,
-} from './rules/namespaced-registry.js';
-import { NamespacedResolver } from './rules/namespaced-resolver.js';
+} from '../rules/namespaced-registry.js';
+import { NamespacedResolver } from '../rules/namespaced-resolver.js';
 import {
 	analyzeCollisions,
 	type ClassifiedDiagnostic,
-} from './collision-diagnostics.js';
+} from '../collision-diagnostics.js';
 
 // ============================================================================
 // Type Definitions

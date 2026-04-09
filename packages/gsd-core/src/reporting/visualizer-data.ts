@@ -22,7 +22,7 @@ import {
 import { loadAllCaptures, countPendingCaptures } from '../captures.js';
 import { loadEffectiveGSDPreferences } from '../preferences.js';
 import { runProviderChecks, type ProviderCheckResult } from '../doctor-providers.js';
-import { generateSkillHealthReport } from '../skill-health.js';
+import { generateSkillHealthReport } from '../skills/skill-health.js';
 import { runEnvironmentChecks, type EnvironmentCheckResult } from '../doctor-environment.js';
 import { computeProgressScore } from '../progress-score.js';
 import { getHealthHistory } from '../doctor-proactive.js';
