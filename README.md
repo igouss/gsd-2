@@ -632,7 +632,17 @@ Milestone names will now be generated with a 6 char random string appended e.g. 
 
 ## Architecture
 
-GSD is a TypeScript application that embeds the Pi coding agent SDK.
+GSD is a TypeScript monorepo with four packages:
+
+```
+packages/
+  gsd-cli/       CLI binary — loader, headless mode, onboarding, resource sync
+  gsd-core/      Harness-agnostic orchestration engine (the brain)
+  gsd-tui/       Terminal UI overlay and dashboard
+  mcp-server/    MCP server exposing GSD tools to external integrations
+```
+
+### gsd-cli — The Shell
 
 ```
 gsd (CLI binary)
@@ -650,6 +660,37 @@ gsd (CLI binary)
               ├─ AGENTS.md          Agent routing instructions
               └─ GSD-WORKFLOW.md    Manual bootstrap protocol
 ```
+
+### gsd-core — The Brain
+
+Harness-agnostic orchestration engine. The directory structure screams what the system does:
+
+```
+packages/gsd-core/src/
+  auto/              Autonomous execution engine — loop, dispatch, recovery, worktrees
+  doctor/            Health diagnostics and self-healing
+  execution/         Execution policies, pre/post checks, lifecycle hooks
+  git/               Git operations, worktrees, branches, native bridge
+  milestone/         Milestone lifecycle and validation gates
+  notification/      Notification dispatch and storage
+  parallel/          Parallel slice execution across worktrees
+  preferences/       User configuration, model prefs, skills prefs
+  prompt/            Prompt construction, context injection, budget management
+  reporting/         HTML export, visualization data, metrics, markdown rendering
+  routing/           Model selection, cost tables, complexity classification
+  rules/             Rule registry and namespace resolution
+  session/           Session management, locking, crash recovery
+  skills/            Skill discovery, health monitoring, plugin loading
+  verification/      Safety gates, evidence collection, content validation
+  workflow/          Roadmap/milestone/slice/task lifecycle, graphs, reconciliation
+  adapters/          HarnessAdapter implementations (Claude Code, MCP config)
+  safety/            Checkpoint, file-change, and content validators
+  tools/             12 pure-function tool handlers (plan, complete, reopen, etc.)
+  prompts/           35+ dispatch prompt templates (markdown)
+  templates/         Context injection templates (markdown)
+```
+
+Harness-specific behavior is plugged in via the `HarnessAdapter` interface. All dependencies point inward (hexagonal architecture).
 
 **Key design decisions:**
 
