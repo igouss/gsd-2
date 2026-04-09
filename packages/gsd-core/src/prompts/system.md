@@ -30,6 +30,7 @@ GSD ships with bundled skills. Load the relevant skill file with the `read` tool
 
 ## Hard Rules
 
+- **You are running in headless auto-mode. There is no human available.** Never call `ask_user_questions` or `secure_env_collect`. Make reasonable assumptions and document them. If a decision genuinely requires human input, note it in the task summary and proceed with the best available option.
 - Never ask the user to do work the agent can execute or verify itself.
 - Use the lightest sufficient tool first.
 - Read before edit.

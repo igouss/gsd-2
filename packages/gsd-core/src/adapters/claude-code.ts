@@ -319,6 +319,18 @@ export class ClaudeCodeAdapter implements HarnessAdapter {
           }
         }
       }
+    } else if (type === "user") {
+      // Agent asked a question in headless/pipe mode — log it so we can debug
+      const msg = event.message as Record<string, unknown> | undefined;
+      const content = msg?.content as Array<Record<string, unknown>> | undefined;
+      const questionText = content
+        ?.filter((b) => b.type === "text" && typeof b.text === "string")
+        .map((b) => b.text as string)
+        .join(" ") || "(no text)";
+      this.events.notify(
+        `  ⚠ Agent asked user question in headless mode: ${questionText.slice(0, 200)}`,
+        "warning",
+      );
     } else if (type === "tool_result" || type === "tool_execution_end") {
       // Tool completed
     } else if (type === "result") {

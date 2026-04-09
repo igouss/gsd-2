@@ -317,14 +317,14 @@ cat > "$GSD/milestones/M001/slices/S01/S01-PLAN.md" <<'PLAN'
   - Why: This is the pure business logic — count words, lines, chars from a string
   - Files: `src/counter.ts`, `src/counter.test.ts`
   - Do: Create `countText(input: string): { lines: number; words: number; chars: number }`. Lines = newline count + 1 for non-empty input. Words = split on whitespace, filter empties. Chars = string length.
-  - Verify: `npx tsx --test src/counter.test.ts`
+  - Verify: `node --test src/counter.test.ts`
   - Done when: All counting edge cases pass (empty string, single word, multi-line, trailing newline)
 
 - [ ] **T02: Build CLI entry point** `est:15m`
   - Why: Wire the counting function to a real CLI that reads stdin or file
   - Files: `src/cli.ts`
   - Do: Read filename from process.argv[2]. If present, read file with fs.readFileSync. Otherwise read stdin. Call countText, print result in `<lines> <words> <chars> [filename]` format. Exit 0 on success, 1 on error.
-  - Verify: `echo "hello world" | npx tsx src/cli.ts` outputs `1 2 11`
+  - Verify: `echo "hello world" | node src/cli.ts` outputs `1 2 11`
   - Done when: CLI works with both stdin and file input
 
 - [ ] **T03: Add npm build and verify end-to-end** `est:10m`
