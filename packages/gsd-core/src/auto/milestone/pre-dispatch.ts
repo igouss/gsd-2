@@ -18,7 +18,7 @@ import { debugLog } from "../../debug-logger.js";
 import { MergeConflictError } from "../../git/git-service.js";
 import { join, basename } from "node:path";
 import { existsSync, cpSync } from "node:fs";
-import { logWarning, logError } from "../../workflow-logger.js";
+import { logWarning, logError } from "../../workflow/workflow-logger.js";
 import { gsdRoot } from "../../paths.js";
 import { atomicWriteSync } from "../../atomic-write.js";
 import { getEligibleSlices } from "../../parallel/slice-parallel-eligibility.js";

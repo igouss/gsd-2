@@ -22,7 +22,7 @@ import { saveFile, clearParseCache } from "../files.js";
 import { invalidateStateCache } from "../state.js";
 import { VALIDATION_VERDICTS, isValidMilestoneVerdict } from "../verdict-parser.js";
 import { insertMilestoneValidationGates } from "../milestone-validation-gates.js";
-import { logWarning } from "../workflow-logger.js";
+import { logWarning } from "../workflow/workflow-logger.js";
 
 export interface ValidateMilestoneParams {
   milestoneId: string;

@@ -23,7 +23,7 @@ import { invalidateStateCache } from "../state.js";
 import { renderAllProjections, stripIdPrefix } from "../workflow-projections.js";
 import { writeManifest } from "../workflow-manifest.js";
 import { appendEvent } from "../workflow-events.js";
-import { logWarning, logError } from "../workflow-logger.js";
+import { logWarning, logError } from "../workflow/workflow-logger.js";
 
 export interface CompleteMilestoneParams {
   milestoneId: string;

@@ -41,7 +41,7 @@ import {
   type ParallelCandidates,
 } from "./parallel-eligibility.js";
 import { getErrorMessage } from "../error-utils.js";
-import { logWarning } from "../workflow-logger.js";
+import { logWarning } from "../workflow/workflow-logger.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 

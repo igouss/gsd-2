@@ -15,7 +15,7 @@ import type { MilestoneRow, SliceRow, TaskRow, VerificationEvidenceRow } from ".
 import { atomicWriteSync } from "./atomic-write.js";
 import { join } from "node:path";
 import { mkdirSync, existsSync } from "node:fs";
-import { logWarning } from "./workflow-logger.js";
+import { logWarning } from "./workflow/workflow-logger.js";
 import { isClosedStatus } from "./status-guards.js";
 import { deriveState } from "./state.js";
 import type { GSDState } from "./types.js";

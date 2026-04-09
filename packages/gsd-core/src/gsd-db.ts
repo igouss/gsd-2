@@ -10,7 +10,7 @@ import { existsSync, copyFileSync, mkdirSync, realpathSync } from "node:fs";
 import { dirname } from "node:path";
 import type { Decision, Requirement, GateRow, GateId, GateScope, GateStatus, GateVerdict } from "./types.js";
 import { GSDError, GSD_STALE_STATE } from "./errors.js";
-import { logError, logWarning } from "./workflow-logger.js";
+import { logError, logWarning } from "./workflow/workflow-logger.js";
 
 const _require = createRequire(import.meta.url);
 

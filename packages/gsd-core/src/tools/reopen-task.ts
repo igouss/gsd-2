@@ -22,7 +22,7 @@ import { isClosedStatus } from "../status-guards.js";
 import { renderAllProjections } from "../workflow-projections.js";
 import { writeManifest } from "../workflow-manifest.js";
 import { appendEvent } from "../workflow-events.js";
-import { logWarning } from "../workflow-logger.js";
+import { logWarning } from "../workflow/workflow-logger.js";
 import { existsSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { resolveTasksDir, clearPathCache } from "../paths.js";

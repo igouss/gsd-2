@@ -9,7 +9,7 @@
 // parseRoadmap(), parsePlan(), parseSummary() in files.ts.
 
 import { readFileSync, existsSync, mkdirSync } from "node:fs";
-import { logWarning } from "../workflow-logger.js";
+import { logWarning } from "../workflow/workflow-logger.js";
 import { isClosedStatus } from "../status-guards.js";
 import { join, relative } from "node:path";
 import { createRequire } from "node:module";

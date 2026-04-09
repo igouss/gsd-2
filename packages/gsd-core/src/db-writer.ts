@@ -14,7 +14,7 @@ import type { Decision, Requirement } from './types.js';
 import { resolveGsdRootFile } from './paths.js';
 import { saveFile } from './files.js';
 import { GSDError, GSD_STALE_STATE, GSD_IO_ERROR } from './errors.js';
-import { logWarning, logError } from './workflow-logger.js';
+import { logWarning, logError } from './workflow/workflow-logger.js';
 import { invalidateStateCache } from './state.js';
 import { clearPathCache } from './paths.js';
 import { clearParseCache } from './files.js';

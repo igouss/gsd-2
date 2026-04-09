@@ -31,7 +31,7 @@ import {
 import { findMilestoneIds } from './guided-flow.js';
 import { parseRoadmap, parsePlan } from './parsers-legacy.js';
 import { parseContextDependsOn } from './files.js';
-import { logWarning } from './workflow-logger.js';
+import { logWarning } from './workflow/workflow-logger.js';
 
 // ─── DECISIONS.md Parser ───────────────────────────────────────────────────
 

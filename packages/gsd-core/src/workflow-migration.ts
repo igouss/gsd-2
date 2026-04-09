@@ -7,7 +7,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { _getAdapter, transaction } from "./gsd-db.js";
 import { parseRoadmap, parsePlan } from "./parsers-legacy.js";
-import { logWarning } from "./workflow-logger.js";
+import { logWarning } from "./workflow/workflow-logger.js";
 
 // ─── needsAutoMigration ───────────────────────────────────────────────────
 

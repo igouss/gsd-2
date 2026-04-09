@@ -6,7 +6,7 @@
  */
 
 import { randomInt } from "node:crypto";
-import { logWarning } from "./workflow-logger.js";
+import { logWarning } from "./workflow/workflow-logger.js";
 import { readdirSync, existsSync } from "node:fs";
 import { milestonesDir } from "./paths.js";
 import { loadQueueOrder, sortByQueueOrder } from "./queue-order.js";

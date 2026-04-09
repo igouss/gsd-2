@@ -6,7 +6,7 @@
  */
 
 import { existsSync, readFileSync } from "node:fs";
-import { logWarning } from "../workflow-logger.js";
+import { logWarning } from "../workflow/workflow-logger.js";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

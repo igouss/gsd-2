@@ -29,7 +29,7 @@ import {
 } from "./paths.js";
 import { parseRoadmap } from "./parsers-legacy.js";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { logWarning, logError } from "./workflow-logger.js";
+import { logWarning, logError } from "./workflow/workflow-logger.js";
 import { join } from "node:path";
 import { hasImplementationArtifacts } from "./auto-recovery.js";
 import {

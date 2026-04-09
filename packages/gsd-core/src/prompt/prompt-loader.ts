@@ -22,7 +22,7 @@ import { GSDError, GSD_PARSE_ERROR } from "../errors.js";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
-import { logWarning } from "../workflow-logger.js";
+import { logWarning } from "../workflow/workflow-logger.js";
 
 /**
  * Resolve the GSD extension directory.

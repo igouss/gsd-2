@@ -35,7 +35,7 @@ import { computeBudgets, resolveExecutorContextWindow, truncateAtSectionBoundary
 import { getPendingGates } from "../gsd-db.js";
 import { formatDecisionsCompact, formatRequirementsCompact } from "../reporting/structured-data-formatter.js";
 import { readPhaseAnchor, formatAnchorForPrompt } from "../execution/phase-anchor.js";
-import { logWarning } from "../workflow-logger.js";
+import { logWarning } from "../workflow/workflow-logger.js";
 
 // ─── Preamble Cap ─────────────────────────────────────────────────────────────
 

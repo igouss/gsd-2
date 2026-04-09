@@ -15,7 +15,7 @@ import { MergeConflictError } from "../git/git-service.js";
 import { removeSessionStatus } from "../session/session-status-io.js";
 import type { WorkerInfo } from "./parallel-orchestrator.js";
 import { getErrorMessage } from "../error-utils.js";
-import { logWarning } from "../workflow-logger.js";
+import { logWarning } from "../workflow/workflow-logger.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 

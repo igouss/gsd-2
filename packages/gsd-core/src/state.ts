@@ -42,7 +42,7 @@ import { nativeBatchParseGsdFiles, type BatchParsedFile } from './git/native-par
 import { join, resolve } from 'path';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { debugCount, debugTime } from './debug-logger.js';
-import { logWarning, logError } from './workflow-logger.js';
+import { logWarning, logError } from './workflow/workflow-logger.js';
 import { extractVerdict } from './verdict-parser.js';
 
 import {

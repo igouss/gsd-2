@@ -7,7 +7,7 @@ import { renderTaskPlanFromDb } from "../reporting/markdown-renderer.js";
 import { renderAllProjections } from "../workflow-projections.js";
 import { writeManifest } from "../workflow-manifest.js";
 import { appendEvent } from "../workflow-events.js";
-import { logWarning } from "../workflow-logger.js";
+import { logWarning } from "../workflow/workflow-logger.js";
 
 export interface PlanTaskParams {
   milestoneId: string;

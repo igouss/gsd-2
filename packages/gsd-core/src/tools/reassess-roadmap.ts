@@ -19,7 +19,7 @@ import { renderRoadmapFromDb, renderAssessmentFromDb } from "../reporting/markdo
 import { renderAllProjections } from "../workflow-projections.js";
 import { writeManifest } from "../workflow-manifest.js";
 import { appendEvent } from "../workflow-events.js";
-import { logWarning } from "../workflow-logger.js";
+import { logWarning } from "../workflow/workflow-logger.js";
 
 export interface SliceChangeInput {
   sliceId: string;

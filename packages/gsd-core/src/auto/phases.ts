@@ -27,7 +27,7 @@ import { PROJECT_FILES } from "../detection.js";
 import { MergeConflictError } from "../git/git-service.js";
 import { join, basename, dirname, parse as parsePath } from "node:path";
 import { existsSync, cpSync, readdirSync } from "node:fs";
-import { logWarning, logError } from "../workflow-logger.js";
+import { logWarning, logError } from "../workflow/workflow-logger.js";
 import { gsdRoot } from "../paths.js";
 import { atomicWriteSync } from "../atomic-write.js";
 import { verifyExpectedArtifact, buildLoopRemediationSteps } from "../auto-recovery.js";

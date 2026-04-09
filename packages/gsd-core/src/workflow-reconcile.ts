@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { mkdirSync, existsSync, readFileSync, unlinkSync } from "node:fs";
-import { logWarning, logError } from "./workflow-logger.js";
+import { logWarning, logError } from "./workflow/workflow-logger.js";
 import { readEvents, findForkPoint, appendEvent, getSessionId } from "./workflow-events.js";
 import type { WorkflowEvent } from "./workflow-events.js";
 import {
