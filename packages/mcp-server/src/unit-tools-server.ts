@@ -137,34 +137,48 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   // Static imports — no lazy loading needed
 
   // =====================================================================
+  // Shared schemas (reused by aliases)
+  // =====================================================================
+
+  const taskCompleteSchema = {
+    taskId: z.string().describe('Task ID (e.g. "T1")'),
+    sliceId: z.string().describe('Slice ID (e.g. "S1")'),
+    milestoneId: z.string().describe('Milestone ID (e.g. "M1")'),
+    oneLiner: z.string().describe('One-line summary of what was accomplished'),
+    narrative: z.string().describe('Detailed narrative of the work done'),
+    verification: z.string().describe('Verification result — what was tested and how'),
+    keyFiles: z.array(z.string()).optional().describe('Key files modified'),
+    keyDecisions: z.array(z.string()).optional().describe('Key decisions made during execution'),
+    deviations: z.string().optional().describe('Deviations from the plan (default: "None.")'),
+    knownIssues: z.string().optional().describe('Known issues (default: "None.")'),
+    blockerDiscovered: z.boolean().optional().describe('Whether a blocker was discovered'),
+    verificationEvidence: z.array(z.object({
+      command: z.string(),
+      exitCode: z.number(),
+      verdict: z.string(),
+      durationMs: z.number(),
+    })).optional().describe('Structured verification evidence from test runs'),
+  };
+  const taskCompleteHandler = wrapHandler(projectDir, async (args, basePath) => {
+    return handleCompleteTask(args as any, basePath);
+  });
+
+  // =====================================================================
   // TASK LIFECYCLE
   // =====================================================================
 
   server.tool(
     'gsd_task_complete',
     'Mark a task as complete with summary, narrative, and verification evidence. This is the primary way agents report task completion.',
-    {
-      taskId: z.string().describe('Task ID (e.g. "T1")'),
-      sliceId: z.string().describe('Slice ID (e.g. "S1")'),
-      milestoneId: z.string().describe('Milestone ID (e.g. "M1")'),
-      oneLiner: z.string().describe('One-line summary of what was accomplished'),
-      narrative: z.string().describe('Detailed narrative of the work done'),
-      verification: z.string().describe('Verification result — what was tested and how'),
-      keyFiles: z.array(z.string()).optional().describe('Key files modified'),
-      keyDecisions: z.array(z.string()).optional().describe('Key decisions made during execution'),
-      deviations: z.string().optional().describe('Deviations from the plan (default: "None.")'),
-      knownIssues: z.string().optional().describe('Known issues (default: "None.")'),
-      blockerDiscovered: z.boolean().optional().describe('Whether a blocker was discovered'),
-      verificationEvidence: z.array(z.object({
-        command: z.string(),
-        exitCode: z.number(),
-        verdict: z.string(),
-        durationMs: z.number(),
-      })).optional().describe('Structured verification evidence from test runs'),
-    },
-    wrapHandler(projectDir, async (args, basePath) => {
-      return handleCompleteTask(args as any, basePath);
-    }),
+    taskCompleteSchema,
+    taskCompleteHandler,
+  );
+
+  server.tool(
+    'gsd_complete_task',
+    'Alias for gsd_task_complete.',
+    taskCompleteSchema,
+    taskCompleteHandler,
   );
 
   server.tool(
@@ -228,47 +242,45 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   // MILESTONE LIFECYCLE
   // =====================================================================
 
-  server.tool(
-    'gsd_complete_milestone',
-    'Mark a milestone as complete. All slices should be complete before calling this.',
-    {
-      milestoneId: z.string().describe('Milestone ID'),
-      title: z.string().describe('Milestone title'),
-      oneLiner: z.string().describe('One-line summary of the milestone'),
-      narrative: z.string().describe('Detailed completion narrative'),
-      verificationPassed: z.boolean().describe('Whether all verification checks passed'),
-      successCriteriaResults: z.string().optional().describe('Results of success criteria checks'),
-      definitionOfDoneResults: z.string().optional().describe('Results of definition-of-done checks'),
-      requirementOutcomes: z.string().optional().describe('How requirements were addressed'),
-      keyDecisions: z.array(z.string()).optional().describe('Key decisions made during milestone'),
-      keyFiles: z.array(z.string()).optional().describe('Key files created or modified'),
-      lessonsLearned: z.array(z.string()).optional().describe('Lessons learned'),
-      followUps: z.string().optional().describe('Follow-up items'),
-    },
-    wrapHandler(projectDir, async (args, basePath) => {
-      return handleCompleteMilestone(args as any, basePath);
-    }),
-  );
+  const completeMilestoneSchema = {
+    milestoneId: z.string().describe('Milestone ID'),
+    title: z.string().describe('Milestone title'),
+    oneLiner: z.string().describe('One-line summary of the milestone'),
+    narrative: z.string().describe('Detailed completion narrative'),
+    verificationPassed: z.boolean().describe('Whether all verification checks passed'),
+    successCriteriaResults: z.string().optional().describe('Results of success criteria checks'),
+    definitionOfDoneResults: z.string().optional().describe('Results of definition-of-done checks'),
+    requirementOutcomes: z.string().optional().describe('How requirements were addressed'),
+    keyDecisions: z.array(z.string()).optional().describe('Key decisions made during milestone'),
+    keyFiles: z.array(z.string()).optional().describe('Key files created or modified'),
+    lessonsLearned: z.array(z.string()).optional().describe('Lessons learned'),
+    followUps: z.string().optional().describe('Follow-up items'),
+  };
+  const completeMilestoneHandler = wrapHandler(projectDir, async (args, basePath) => {
+    return handleCompleteMilestone(args as any, basePath);
+  });
 
-  server.tool(
-    'gsd_validate_milestone',
-    'Write a milestone validation report. Checks all slices are complete, success criteria met, and cross-slice integration verified.',
-    {
-      milestoneId: z.string().describe('Milestone ID'),
-      verdict: z.enum(["pass", "needs-attention", "needs-remediation"]).describe('Validation verdict'),
-      remediationRound: z.number().describe('Remediation round number (1 for first validation)'),
-      successCriteriaChecklist: z.string().describe('Checklist of success criteria and their status'),
-      sliceDeliveryAudit: z.string().describe('Audit of each slice delivery status'),
-      crossSliceIntegration: z.string().describe('Assessment of cross-slice integration'),
-      requirementCoverage: z.string().describe('How requirements are covered'),
-      verdictRationale: z.string().describe('Rationale for the verdict'),
-      verificationClasses: z.string().optional().describe('Classification of verification evidence'),
-      remediationPlan: z.string().optional().describe('Plan for fixing issues (if verdict is not pass)'),
-    },
-    wrapHandler(projectDir, async (args, basePath) => {
-      return handleValidateMilestone(args as any, basePath);
-    }),
-  );
+  server.tool('gsd_complete_milestone', 'Mark a milestone as complete. All slices should be complete before calling this.', completeMilestoneSchema, completeMilestoneHandler);
+  server.tool('gsd_milestone_complete', 'Alias for gsd_complete_milestone.', completeMilestoneSchema, completeMilestoneHandler);
+
+  const validateMilestoneSchema = {
+    milestoneId: z.string().describe('Milestone ID'),
+    verdict: z.enum(["pass", "needs-attention", "needs-remediation"]).describe('Validation verdict'),
+    remediationRound: z.number().describe('Remediation round number (1 for first validation)'),
+    successCriteriaChecklist: z.string().describe('Checklist of success criteria and their status'),
+    sliceDeliveryAudit: z.string().describe('Audit of each slice delivery status'),
+    crossSliceIntegration: z.string().describe('Assessment of cross-slice integration'),
+    requirementCoverage: z.string().describe('How requirements are covered'),
+    verdictRationale: z.string().describe('Rationale for the verdict'),
+    verificationClasses: z.string().optional().describe('Classification of verification evidence'),
+    remediationPlan: z.string().optional().describe('Plan for fixing issues (if verdict is not pass)'),
+  };
+  const validateMilestoneHandler = wrapHandler(projectDir, async (args, basePath) => {
+    return handleValidateMilestone(args as any, basePath);
+  });
+
+  server.tool('gsd_validate_milestone', 'Write a milestone validation report.', validateMilestoneSchema, validateMilestoneHandler);
+  server.tool('gsd_milestone_validate', 'Alias for gsd_validate_milestone.', validateMilestoneSchema, validateMilestoneHandler);
 
   server.tool(
     'gsd_reopen_milestone',
@@ -362,53 +374,51 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
     }),
   );
 
-  server.tool(
-    'gsd_replan_slice',
-    'Rewrite a slice plan with a new task breakdown.',
-    {
-      milestoneId: z.string().describe('Milestone ID'),
-      sliceId: z.string().describe('Slice ID'),
-      reason: z.string().describe('Why the slice needs replanning'),
-      goal: z.string().describe('Updated goal'),
-      tasks: z.array(z.object({
-        taskId: z.string().describe('Task ID'),
-        title: z.string().describe('Task title'),
-        description: z.string().describe('What needs to be done'),
-        estimate: z.string().describe('Time estimate'),
-        files: z.array(z.string()).describe('Files to create or modify'),
-        verify: z.string().describe('How to verify'),
-      })).describe('New task breakdown'),
-    },
-    wrapHandler(projectDir, async (args, basePath) => {
-      return handleReplanSlice(args as any, basePath);
-    }),
-  );
+  const replanSliceSchema = {
+    milestoneId: z.string().describe('Milestone ID'),
+    sliceId: z.string().describe('Slice ID'),
+    reason: z.string().describe('Why the slice needs replanning'),
+    goal: z.string().describe('Updated goal'),
+    tasks: z.array(z.object({
+      taskId: z.string().describe('Task ID'),
+      title: z.string().describe('Task title'),
+      description: z.string().describe('What needs to be done'),
+      estimate: z.string().describe('Time estimate'),
+      files: z.array(z.string()).describe('Files to create or modify'),
+      verify: z.string().describe('How to verify'),
+    })).describe('New task breakdown'),
+  };
+  const replanSliceHandler = wrapHandler(projectDir, async (args, basePath) => {
+    return handleReplanSlice(args as any, basePath);
+  });
 
-  server.tool(
-    'gsd_reassess_roadmap',
-    'Reassess and rewrite the milestone roadmap with a new slice breakdown.',
-    {
-      milestoneId: z.string().describe('Milestone ID'),
-      reason: z.string().describe('Why the roadmap needs reassessment'),
-      title: z.string().describe('Updated milestone title'),
-      vision: z.string().describe('Updated vision'),
-      slices: z.array(z.object({
-        sliceId: z.string().describe('Slice ID'),
-        title: z.string().describe('Slice title'),
-        goal: z.string().describe('What this slice achieves'),
-        risk: z.string().describe('Risk level'),
-        depends: z.array(z.string()).describe('Dependencies'),
-        demo: z.string().describe('How to demo'),
-        successCriteria: z.string().describe('Success criteria'),
-        proofLevel: z.string().describe('Proof level'),
-        integrationClosure: z.string().describe('Integration notes'),
-        observabilityImpact: z.string().describe('Observability impact'),
-      })).describe('New slice breakdown'),
-    },
-    wrapHandler(projectDir, async (args, basePath) => {
-      return handleReassessRoadmap(args as any, basePath);
-    }),
-  );
+  server.tool('gsd_replan_slice', 'Rewrite a slice plan with a new task breakdown.', replanSliceSchema, replanSliceHandler);
+  server.tool('gsd_slice_replan', 'Alias for gsd_replan_slice.', replanSliceSchema, replanSliceHandler);
+
+  const reassessRoadmapSchema = {
+    milestoneId: z.string().describe('Milestone ID'),
+    reason: z.string().describe('Why the roadmap needs reassessment'),
+    title: z.string().describe('Updated milestone title'),
+    vision: z.string().describe('Updated vision'),
+    slices: z.array(z.object({
+      sliceId: z.string().describe('Slice ID'),
+      title: z.string().describe('Slice title'),
+      goal: z.string().describe('What this slice achieves'),
+      risk: z.string().describe('Risk level'),
+      depends: z.array(z.string()).describe('Dependencies'),
+      demo: z.string().describe('How to demo'),
+      successCriteria: z.string().describe('Success criteria'),
+      proofLevel: z.string().describe('Proof level'),
+      integrationClosure: z.string().describe('Integration notes'),
+      observabilityImpact: z.string().describe('Observability impact'),
+    })).describe('New slice breakdown'),
+  };
+  const reassessRoadmapHandler = wrapHandler(projectDir, async (args, basePath) => {
+    return handleReassessRoadmap(args as any, basePath);
+  });
+
+  server.tool('gsd_reassess_roadmap', 'Reassess and rewrite the milestone roadmap.', reassessRoadmapSchema, reassessRoadmapHandler);
+  server.tool('gsd_roadmap_reassess', 'Alias for gsd_reassess_roadmap.', reassessRoadmapSchema, reassessRoadmapHandler);
 
   // =====================================================================
   // DECISIONS & REQUIREMENTS
