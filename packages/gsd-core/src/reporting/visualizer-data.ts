@@ -20,7 +20,7 @@ import {
   classifyUnitPhase,
 } from './metrics.js';
 import { loadAllCaptures, countPendingCaptures } from '../captures.js';
-import { loadEffectiveGSDPreferences } from '../preferences.js';
+import { loadEffectiveGSDPreferences } from '../preferences/preferences.js';
 import { runProviderChecks, type ProviderCheckResult } from '../doctor/doctor-providers.js';
 import { generateSkillHealthReport } from '../skills/skill-health.js';
 import { runEnvironmentChecks, type EnvironmentCheckResult } from '../doctor/doctor-environment.js';

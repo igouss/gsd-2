@@ -10,7 +10,7 @@
  */
 
 import type { GSDState } from "./types.js";
-import type { GSDPreferences } from "./preferences.js";
+import type { GSDPreferences } from "./preferences/preferences.js";
 import type { UatType } from "./files.js";
 import { loadFile, extractUatType, loadActiveOverrides } from "./files.js";
 import { isDbAvailable, getMilestoneSlices, getPendingGates, markAllGatesOmitted, getMilestone } from "./gsd-db.js";

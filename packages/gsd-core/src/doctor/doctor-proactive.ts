@@ -23,7 +23,7 @@ import { rebuildState } from "./doctor.js";
 import { deriveState } from "../state.js";
 import { resolveMilestoneIntegrationBranch } from "../git-service.js";
 import { nativeIsRepo, nativeHasChanges, nativeLastCommitEpoch, nativeGetCurrentBranch, nativeAddTracked, nativeCommit } from "../native-git-bridge.js";
-import { loadEffectiveGSDPreferences } from "../preferences.js";
+import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
 import { runEnvironmentChecks } from "./doctor-environment.js";
 
 // ── Health Score Tracking ──────────────────────────────────────────────────

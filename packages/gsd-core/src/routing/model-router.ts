@@ -4,7 +4,7 @@
 
 import type { ComplexityTier, ClassificationResult, TaskMetadata } from "../complexity-classifier.js";
 import { tierOrdinal } from "../complexity-classifier.js";
-import type { ResolvedModelConfig } from "../preferences.js";
+import type { ResolvedModelConfig } from "../preferences/preferences.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

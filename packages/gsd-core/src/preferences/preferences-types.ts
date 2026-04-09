@@ -6,7 +6,7 @@
  * in filesystem or loading logic.
  */
 
-import type { GitPreferences } from "./git-service.js";
+import type { GitPreferences } from "../git-service.js";
 import type {
   PostUnitHookConfig,
   PreDispatchHookConfig,
@@ -19,8 +19,8 @@ import type {
   ContextSelectionMode,
   ReactiveExecutionConfig,
   GateEvaluationConfig,
-} from "./types.js";
-import type { DynamicRoutingConfig } from "./routing/model-router.js";
+} from "../types.js";
+import type { DynamicRoutingConfig } from "../routing/model-router.js";
 
 export interface ContextManagementConfig {
   observation_masking?: boolean;          // default: true
@@ -28,7 +28,7 @@ export interface ContextManagementConfig {
   compaction_threshold_percent?: number;  // default: 0.70, range: 0.5-0.95
   tool_result_max_chars?: number;         // default: 800, range: 200-10000
 }
-import type { GitHubSyncConfig } from "./github-sync/types.js";
+import type { GitHubSyncConfig } from "../github-sync/types.js";
 
 // ─── Workflow Modes ──────────────────────────────────────────────────────────
 

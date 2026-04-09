@@ -46,7 +46,7 @@ import {
 import { MergeConflictError, readIntegrationBranch, RUNTIME_EXCLUSION_PATHS } from "./git-service.js";
 import { debugLog } from "./debug-logger.js";
 import { logWarning, logError } from "./workflow-logger.js";
-import { loadEffectiveGSDPreferences } from "./preferences.js";
+import { loadEffectiveGSDPreferences } from "./preferences/preferences.js";
 import {
   nativeGetCurrentBranch,
   nativeDetectMainBranch,

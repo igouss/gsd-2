@@ -7,7 +7,7 @@ import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../gsd-db.js";
 import { resolveMilestoneFile, resolveMilestonePath, resolveSliceFile, resolveSlicePath, resolveTaskFile, resolveTasksDir, milestonesDir, gsdRoot, relMilestoneFile, relSliceFile, relTaskFile, relSlicePath, relGsdRootFile, resolveGsdRootFile, relMilestonePath } from "../paths.js";
 import { deriveState, isMilestoneComplete } from "../state.js";
 import { invalidateAllCaches } from "../cache.js";
-import { loadEffectiveGSDPreferences, type GSDPreferences } from "../preferences.js";
+import { loadEffectiveGSDPreferences, type GSDPreferences } from "../preferences/preferences.js";
 
 import type { DoctorIssue, DoctorIssueCode, DoctorReport } from "./doctor-types.js";
 import { GLOBAL_STATE_CODES } from "./doctor-types.js";

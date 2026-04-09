@@ -5,7 +5,7 @@
  * This stub exports the types and no-op functions that gsd-core needs.
  */
 
-import type { GSDPreferences } from "../preferences.js";
+import type { GSDPreferences } from "../preferences/preferences.js";
 
 export type CmuxLogLevel = "info" | "progress" | "success" | "warning" | "error";
 

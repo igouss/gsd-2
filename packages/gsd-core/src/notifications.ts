@@ -3,7 +3,7 @@
 
 import { execFileSync } from "node:child_process";
 import type { NotificationPreferences } from "./types.js";
-import { loadEffectiveGSDPreferences } from "./preferences.js";
+import { loadEffectiveGSDPreferences } from "./preferences/preferences.js";
 import { CmuxClient, emitOsc777Notification, resolveCmuxConfig } from "./cmux/index.js";
 
 export type NotifyLevel = "info" | "success" | "warning" | "error";

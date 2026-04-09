@@ -17,7 +17,7 @@ import { join, resolve, sep } from "node:path";
 import { homedir } from "node:os";
 
 import { GitServiceImpl, writeIntegrationBranch, type TaskCommitContext } from "./git-service.js";
-import { loadEffectiveGSDPreferences } from "./preferences.js";
+import { loadEffectiveGSDPreferences } from "./preferences/preferences.js";
 
 export { MergeConflictError } from "./git-service.js";
 export type { TaskCommitContext } from "./git-service.js";

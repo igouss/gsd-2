@@ -18,7 +18,7 @@ import type {
   PersistedHookState,
   HookStatusEntry,
 } from "../types.js";
-import { resolvePostUnitHooks, resolvePreDispatchHooks } from "../preferences.js";
+import { resolvePostUnitHooks, resolvePreDispatchHooks } from "../preferences/preferences.js";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { parseUnitId } from "../unit-id.js";

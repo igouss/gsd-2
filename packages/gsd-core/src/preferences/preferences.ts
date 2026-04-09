@@ -14,12 +14,12 @@ import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-import { gsdRoot } from "./paths.js";
+import { gsdRoot } from "../paths.js";
 import { parse as parseYaml } from "yaml";
-import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile } from "./types.js";
-import type { DynamicRoutingConfig } from "./routing/model-router.js";
-import { normalizeStringArray } from "./shared/format-utils.js";
-import { logWarning } from "./workflow-logger.js";
+import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile } from "../types.js";
+import type { DynamicRoutingConfig } from "../routing/model-router.js";
+import { normalizeStringArray } from "../shared/format-utils.js";
+import { logWarning } from "../workflow-logger.js";
 import { resolveProfileDefaults as _resolveProfileDefaults } from "./preferences-models.js";
 
 import {
@@ -373,7 +373,7 @@ function mergePreferences(base: GSDPreferences, override: GSDPreferences): GSDPr
       ? { ...(base.phases ?? {}), ...(override.phases ?? {}) }
       : undefined,
     parallel: (base.parallel || override.parallel)
-      ? { ...(base.parallel ?? {}), ...(override.parallel ?? {}) } as import("./types.js").ParallelConfig
+      ? { ...(base.parallel ?? {}), ...(override.parallel ?? {}) } as import("../types.js").ParallelConfig
       : undefined,
     verification_commands: mergeStringLists(base.verification_commands, override.verification_commands),
     verification_auto_fix: override.verification_auto_fix ?? base.verification_auto_fix,
@@ -387,7 +387,7 @@ function mergePreferences(base: GSDPreferences, override: GSDPreferences): GSDPr
     auto_visualize: override.auto_visualize ?? base.auto_visualize,
     auto_report: override.auto_report ?? base.auto_report,
     github: (base.github || override.github)
-      ? { ...(base.github ?? {}), ...(override.github ?? {}) } as import("./github-sync/types.js").GitHubSyncConfig
+      ? { ...(base.github ?? {}), ...(override.github ?? {}) } as import("../github-sync/types.js").GitHubSyncConfig
       : undefined,
     service_tier: override.service_tier ?? base.service_tier,
     forensics_dedup: override.forensics_dedup ?? base.forensics_dedup,
@@ -563,7 +563,7 @@ export function getIsolationMode(): "none" | "worktree" | "branch" {
   return "none"; // default — no isolation, work on current branch
 }
 
-export function resolveParallelConfig(prefs: GSDPreferences | undefined): import("./types.js").ParallelConfig {
+export function resolveParallelConfig(prefs: GSDPreferences | undefined): import("../types.js").ParallelConfig {
   return {
     enabled: prefs?.parallel?.enabled ?? false,
     max_workers: Math.max(1, Math.min(4, prefs?.parallel?.max_workers ?? 2)),

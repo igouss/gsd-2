@@ -6,11 +6,11 @@
  * together with any errors and warnings.
  */
 
-import type { GitPreferences } from "./git-service.js";
-import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile, PhaseSkipPreferences } from "./types.js";
-import type { DynamicRoutingConfig } from "./routing/model-router.js";
-import { VALID_BRANCH_NAME } from "./git-service.js";
-import { normalizeStringArray } from "./shared/format-utils.js";
+import type { GitPreferences } from "../git-service.js";
+import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile, PhaseSkipPreferences } from "../types.js";
+import type { DynamicRoutingConfig } from "../routing/model-router.js";
+import { VALID_BRANCH_NAME } from "../git-service.js";
+import { normalizeStringArray } from "../shared/format-utils.js";
 
 import {
   KNOWN_PREFERENCE_KEYS,
@@ -539,7 +539,7 @@ export function validatePreferences(preferences: GSDPreferences): {
     }
 
     if (Object.keys(parallel).length > 0) {
-      validated.parallel = parallel as unknown as import("./types.js").ParallelConfig;
+      validated.parallel = parallel as unknown as import("../types.js").ParallelConfig;
     }
   }
 
@@ -585,7 +585,7 @@ export function validatePreferences(preferences: GSDPreferences): {
       }
 
       if (Object.keys(validRe).length > 0) {
-        validated.reactive_execution = validRe as unknown as import("./types.js").ReactiveExecutionConfig;
+        validated.reactive_execution = validRe as unknown as import("../types.js").ReactiveExecutionConfig;
       }
     } else {
       errors.push("reactive_execution must be an object");
@@ -622,7 +622,7 @@ export function validatePreferences(preferences: GSDPreferences): {
       }
 
       if (Object.keys(validGe).length > 0) {
-        validated.gate_evaluation = validGe as unknown as import("./types.js").GateEvaluationConfig;
+        validated.gate_evaluation = validGe as unknown as import("../types.js").GateEvaluationConfig;
       }
     } else {
       errors.push("gate_evaluation must be an object");
@@ -831,7 +831,7 @@ export function validatePreferences(preferences: GSDPreferences): {
       }
 
       if (Object.keys(validGh).length > 0) {
-        validated.github = validGh as unknown as import("./github-sync/types.js").GitHubSyncConfig;
+        validated.github = validGh as unknown as import("../github-sync/types.js").GitHubSyncConfig;
       }
     } else {
       errors.push("github must be an object");

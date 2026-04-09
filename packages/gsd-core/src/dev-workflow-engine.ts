@@ -19,7 +19,7 @@ import type { DispatchAction, DispatchContext } from "./auto-dispatch.js";
 
 import { deriveState } from "./state.js";
 import { resolveDispatch } from "./auto-dispatch.js";
-import { loadEffectiveGSDPreferences } from "./preferences.js";
+import { loadEffectiveGSDPreferences } from "./preferences/preferences.js";
 
 // ─── Bridge: DispatchAction → EngineDispatchAction ────────────────────────
 

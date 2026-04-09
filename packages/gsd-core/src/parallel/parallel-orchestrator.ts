@@ -24,8 +24,8 @@ import { createWorktree, worktreePath } from "../worktree-manager.js";
 import { autoWorktreeBranch, runWorktreePostCreateHook, syncGsdStateToWorktree } from "../auto-worktree.js";
 import { nativeBranchExists } from "../native-git-bridge.js";
 import { readIntegrationBranch } from "../git-service.js";
-import { resolveParallelConfig } from "../preferences.js";
-import type { GSDPreferences } from "../preferences.js";
+import { resolveParallelConfig } from "../preferences/preferences.js";
+import type { GSDPreferences } from "../preferences/preferences.js";
 import type { ParallelConfig } from "../types.js";
 import {
   writeSessionStatus,

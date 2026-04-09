@@ -12,7 +12,7 @@ import { abortAndReset } from "../git-self-heal.js";
 import { RUNTIME_EXCLUSION_PATHS, resolveMilestoneIntegrationBranch, writeIntegrationBranch } from "../git-service.js";
 import { nativeIsRepo, nativeWorktreeList, nativeWorktreeRemove, nativeBranchList, nativeBranchDelete, nativeLsFiles, nativeRmCached, nativeHasChanges, nativeLastCommitEpoch, nativeGetCurrentBranch, nativeAddTracked, nativeCommit } from "../native-git-bridge.js";
 import { getAllWorktreeHealth } from "../worktree-health.js";
-import { loadEffectiveGSDPreferences } from "../preferences.js";
+import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
 
 /**
  * Returns true if the directory contains only doctor artifacts
