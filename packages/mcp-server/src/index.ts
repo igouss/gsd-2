@@ -1,15 +1,16 @@
 /**
- * @gsd-build/mcp-server — MCP server for GSD orchestration and project state.
+ * @gsd-build/mcp-server — MCP server exposing GSD state-mutation tools.
+ *
+ * The interactive session server (SessionManager, createMcpServer) depends on
+ * @gsd-build/rpc-client which is not available in this repo. Those modules
+ * have been removed. This package now exports only the unit-tools server
+ * and read-only state readers.
  */
 
-export { SessionManager } from './session-manager.js';
-export { createMcpServer } from './server.js';
 export { createUnitToolsServer } from './unit-tools-server.js';
 export type {
   SessionStatus,
-  ManagedSession,
   ExecuteOptions,
-  PendingBlocker,
   CostAccumulator,
 } from './types.js';
 export { MAX_EVENTS, INIT_TIMEOUT_MS } from './types.js';
