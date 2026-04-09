@@ -6,9 +6,9 @@
 //
 // A module-level singleton accessor allows existing code to migrate incrementally.
 
-import { logWarning } from "./workflow-logger.js";
+import { logWarning } from "../workflow-logger.js";
 import type { UnifiedRule, RulePhase } from "./rule-types.js";
-import type { DispatchAction, DispatchContext, DispatchRule } from "./auto-dispatch.js";
+import type { DispatchAction, DispatchContext, DispatchRule } from "../auto-dispatch.js";
 import type {
   PostUnitHookConfig,
   PreDispatchHookConfig,
@@ -17,11 +17,11 @@ import type {
   HookExecutionState,
   PersistedHookState,
   HookStatusEntry,
-} from "./types.js";
-import { resolvePostUnitHooks, resolvePreDispatchHooks } from "./preferences.js";
+} from "../types.js";
+import { resolvePostUnitHooks, resolvePreDispatchHooks } from "../preferences.js";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { parseUnitId } from "./unit-id.js";
+import { parseUnitId } from "../unit-id.js";
 
 // ─── Artifact Path Resolution ──────────────────────────────────────────────
 

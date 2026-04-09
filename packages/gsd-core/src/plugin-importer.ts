@@ -24,8 +24,8 @@ import {
 	NamespacedRegistry,
 	componentsFromDiscovery,
 	type NamespacedComponent,
-} from './namespaced-registry.js';
-import { NamespacedResolver } from './namespaced-resolver.js';
+} from './rules/namespaced-registry.js';
+import { NamespacedResolver } from './rules/namespaced-resolver.js';
 import {
 	analyzeCollisions,
 	type ClassifiedDiagnostic,

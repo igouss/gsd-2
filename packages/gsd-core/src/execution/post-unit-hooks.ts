@@ -10,10 +10,10 @@ import type {
   PreDispatchResult,
   HookStatusEntry,
 } from "../types.js";
-import { getOrCreateRegistry, resolveHookArtifactPath } from "../rule-registry.js";
+import { getOrCreateRegistry, resolveHookArtifactPath } from "../rules/rule-registry.js";
 
 // Re-export resolveHookArtifactPath so existing importers still work.
-export { resolveHookArtifactPath } from "../rule-registry.js";
+export { resolveHookArtifactPath } from "../rules/rule-registry.js";
 
 // ─── Post-Unit Hooks ───────────────────────────────────────────────────────
 

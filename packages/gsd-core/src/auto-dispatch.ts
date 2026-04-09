@@ -838,7 +838,7 @@ export const DISPATCH_RULES: DispatchRule[] = [
   },
 ];
 
-import { getRegistry } from "./rule-registry.js";
+import { getRegistry } from "./rules/rule-registry.js";
 
 // ─── Resolver ─────────────────────────────────────────────────────────────
 
