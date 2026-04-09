@@ -25,7 +25,7 @@ import type {
   VisualizerMilestone,
   VisualizerSlice,
 } from './visualizer-data.js';
-import { formatDateShort, formatDuration } from "./shared/format-utils.js";
+import { formatDateShort, formatDuration } from '../shared/format-utils.js';
 import { formatCost, formatTokenCount } from './metrics.js';
 import type { UnitMetrics } from './metrics.js';
 

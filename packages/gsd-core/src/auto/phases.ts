@@ -72,9 +72,9 @@ async function generateMilestoneReport(
   deps: CoreLoopDeps,
   milestoneId: string,
 ): Promise<void> {
-  const { loadVisualizerData } = await import("../visualizer-data.js");
-  const { generateHtmlReport } = await import("../export-html.js");
-  const { writeReportSnapshot } = await import("../reports.js");
+  const { loadVisualizerData } = await import("../reporting/visualizer-data.js");
+  const { generateHtmlReport } = await import("../reporting/export-html.js");
+  const { writeReportSnapshot } = await import("../reporting/reports.js");
 
   const reportBasePath = _resolveReportBasePath(s);
 

@@ -29,7 +29,7 @@ import { resolveSliceFile, resolveTasksDir, clearPathCache } from "../paths.js";
 import { checkOwnership, taskUnitKey } from "../unit-ownership.js";
 import { saveFile, clearParseCache } from "../files.js";
 import { invalidateStateCache } from "../state.js";
-import { renderPlanCheckboxes } from "../markdown-renderer.js";
+import { renderPlanCheckboxes } from "../reporting/markdown-renderer.js";
 import { renderAllProjections, renderSummaryContent } from "../workflow-projections.js";
 import { writeManifest } from "../workflow-manifest.js";
 import { appendEvent } from "../workflow-events.js";

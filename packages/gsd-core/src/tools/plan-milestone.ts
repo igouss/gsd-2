@@ -12,7 +12,7 @@ import {
   upsertSlicePlanning,
 } from "../gsd-db.js";
 import { invalidateStateCache } from "../state.js";
-import { renderRoadmapFromDb } from "../markdown-renderer.js";
+import { renderRoadmapFromDb } from "../reporting/markdown-renderer.js";
 import { renderAllProjections } from "../workflow-projections.js";
 import { writeManifest } from "../workflow-manifest.js";
 import { appendEvent } from "../workflow-events.js";

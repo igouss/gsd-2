@@ -15,7 +15,7 @@ import {
   deleteSlice,
 } from "../gsd-db.js";
 import { invalidateStateCache } from "../state.js";
-import { renderRoadmapFromDb, renderAssessmentFromDb } from "../markdown-renderer.js";
+import { renderRoadmapFromDb, renderAssessmentFromDb } from "../reporting/markdown-renderer.js";
 import { renderAllProjections } from "../workflow-projections.js";
 import { writeManifest } from "../workflow-manifest.js";
 import { appendEvent } from "../workflow-events.js";

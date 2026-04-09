@@ -474,7 +474,7 @@ export async function checkRuntimeHealth(
             fixable: true,
           });
           if (shouldFix("metrics_ledger_bloat")) {
-            const { pruneMetricsLedger } = await import("./metrics.js");
+            const { pruneMetricsLedger } = await import("./reporting/metrics.js");
             const removed = pruneMetricsLedger(basePath, 1500);
             fixesApplied.push(`pruned metrics ledger: removed ${removed} oldest entries (${parsed.units.length - removed} remain)`);
           }

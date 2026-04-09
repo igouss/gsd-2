@@ -7,12 +7,12 @@
  */
 
 import { join } from "node:path";
-import { gsdRoot } from "./paths.js";
-import { loadJsonFileOrNull } from "./json-persistence.js";
-import { parseUnitId } from "./unit-id.js";
+import { gsdRoot } from "../paths.js";
+import { loadJsonFileOrNull } from "../json-persistence.js";
+import { parseUnitId } from "../unit-id.js";
 
 // Re-export from shared
-export { formatTokenCount } from "./shared/format-utils.js";
+export { formatTokenCount } from '../shared/format-utils.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

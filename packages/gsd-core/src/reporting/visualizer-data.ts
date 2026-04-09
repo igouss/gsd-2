@@ -2,12 +2,12 @@
 
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { deriveState } from './state.js';
-import { parseSummary, loadFile } from './files.js';
-import { isDbAvailable, getMilestoneSlices, getSliceTasks } from './gsd-db.js';
-import { parseRoadmap, parsePlan } from './parsers-legacy.js';
-import { findMilestoneIds } from './milestone-ids.js';
-import { resolveMilestoneFile, resolveSliceFile, resolveGsdRootFile, gsdRoot } from './paths.js';
+import { deriveState } from '../state.js';
+import { parseSummary, loadFile } from '../files.js';
+import { isDbAvailable, getMilestoneSlices, getSliceTasks } from '../gsd-db.js';
+import { parseRoadmap, parsePlan } from '../parsers-legacy.js';
+import { findMilestoneIds } from '../milestone-ids.js';
+import { resolveMilestoneFile, resolveSliceFile, resolveGsdRootFile, gsdRoot } from '../paths.js';
 import {
   getLedger,
   getProjectTotals,
@@ -19,16 +19,16 @@ import {
   loadLedgerFromDisk,
   classifyUnitPhase,
 } from './metrics.js';
-import { loadAllCaptures, countPendingCaptures } from './captures.js';
-import { loadEffectiveGSDPreferences } from './preferences.js';
-import { runProviderChecks, type ProviderCheckResult } from './doctor-providers.js';
-import { generateSkillHealthReport } from './skill-health.js';
-import { runEnvironmentChecks, type EnvironmentCheckResult } from './doctor-environment.js';
-import { computeProgressScore } from './progress-score.js';
-import { getHealthHistory } from './doctor-proactive.js';
+import { loadAllCaptures, countPendingCaptures } from '../captures.js';
+import { loadEffectiveGSDPreferences } from '../preferences.js';
+import { runProviderChecks, type ProviderCheckResult } from '../doctor-providers.js';
+import { generateSkillHealthReport } from '../skill-health.js';
+import { runEnvironmentChecks, type EnvironmentCheckResult } from '../doctor-environment.js';
+import { computeProgressScore } from '../progress-score.js';
+import { getHealthHistory } from '../doctor-proactive.js';
 
-import type { Phase } from './types.js';
-import type { CaptureEntry } from './captures.js';
+import type { Phase } from '../types.js';
+import type { CaptureEntry } from '../captures.js';
 import type {
   ProjectTotals,
   PhaseAggregate,
@@ -199,7 +199,7 @@ export interface HealthInfo {
   userMessages: number;
   providers: ProviderStatusSummary[];
   skillSummary: SkillSummaryInfo;
-  environmentIssues: import("./doctor-environment.js").EnvironmentCheckResult[];
+  environmentIssues: import("../doctor-environment.js").EnvironmentCheckResult[];
   /** Persisted doctor run history (most recent first, up to 20 entries). */
   doctorHistory?: VisualizerDoctorEntry[];
   /** Current in-memory progress score (null if auto-mode not active). */

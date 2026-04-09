@@ -9,8 +9,8 @@
 // parseRoadmap(), parsePlan(), parseSummary() in files.ts.
 
 import { readFileSync, existsSync, mkdirSync } from "node:fs";
-import { logWarning } from "./workflow-logger.js";
-import { isClosedStatus } from "./status-guards.js";
+import { logWarning } from "../workflow-logger.js";
+import { isClosedStatus } from "../status-guards.js";
 import { join, relative } from "node:path";
 import { createRequire } from "node:module";
 import {
@@ -23,9 +23,9 @@ import {
   getArtifact,
   insertArtifact,
   getGateResults,
-} from "./gsd-db.js";
-import type { MilestoneRow, SliceRow, TaskRow, ArtifactRow } from "./gsd-db.js";
-import type { GateRow } from "./types.js";
+} from "../gsd-db.js";
+import type { MilestoneRow, SliceRow, TaskRow, ArtifactRow } from "../gsd-db.js";
+import type { GateRow } from "../types.js";
 import {
   resolveMilestoneFile,
   resolveSliceFile,
@@ -34,10 +34,10 @@ import {
   gsdRoot,
   buildTaskFileName,
   buildSliceFileName,
-} from "./paths.js";
-import { saveFile, clearParseCache } from "./files.js";
-import { invalidateStateCache } from "./state.js";
-import { clearPathCache } from "./paths.js";
+} from "../paths.js";
+import { saveFile, clearParseCache } from "../files.js";
+import { invalidateStateCache } from "../state.js";
+import { clearPathCache } from "../paths.js";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 

@@ -26,7 +26,7 @@ import { resolveSliceFile, resolveSlicePath, clearPathCache } from "../paths.js"
 import { checkOwnership, sliceUnitKey } from "../unit-ownership.js";
 import { saveFile, clearParseCache } from "../files.js";
 import { invalidateStateCache } from "../state.js";
-import { renderRoadmapCheckboxes } from "../markdown-renderer.js";
+import { renderRoadmapCheckboxes } from "../reporting/markdown-renderer.js";
 import { renderAllProjections } from "../workflow-projections.js";
 import { writeManifest } from "../workflow-manifest.js";
 import { appendEvent } from "../workflow-events.js";
