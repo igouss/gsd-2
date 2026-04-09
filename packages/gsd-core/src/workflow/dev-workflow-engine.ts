@@ -15,10 +15,10 @@ import type {
   DisplayMetadata,
 } from "../routing/engine-types.js";
 import type { GSDState } from "../types.js";
-import type { DispatchAction, DispatchContext } from "../auto-dispatch.js";
+import type { DispatchAction, DispatchContext } from "../auto/auto-dispatch.js";
 
 import { deriveState } from "../state.js";
-import { resolveDispatch } from "../auto-dispatch.js";
+import { resolveDispatch } from "../auto/auto-dispatch.js";
 import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
 
 // ─── Bridge: DispatchAction → EngineDispatchAction ────────────────────────

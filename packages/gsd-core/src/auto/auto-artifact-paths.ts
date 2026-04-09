@@ -12,8 +12,8 @@ import {
   buildMilestoneFileName,
   buildSliceFileName,
   buildTaskFileName,
-} from "./paths.js";
-import { parseUnitId } from "./unit-id.js";
+} from "../paths.js";
+import { parseUnitId } from "../unit-id.js";
 import { join } from "node:path";
 
 /**

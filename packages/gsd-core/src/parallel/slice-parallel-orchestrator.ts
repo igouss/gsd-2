@@ -25,7 +25,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { gsdRoot } from "../paths.js";
 import { createWorktree, worktreePath, removeWorktree } from "../git/worktree-manager.js";
-import { autoWorktreeBranch, runWorktreePostCreateHook } from "../auto-worktree.js";
+import { autoWorktreeBranch, runWorktreePostCreateHook } from "../auto/auto-worktree.js";
 import {
   writeSessionStatus,
   removeSessionStatus,

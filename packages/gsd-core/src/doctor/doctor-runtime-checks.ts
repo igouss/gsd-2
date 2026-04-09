@@ -126,7 +126,7 @@ export async function checkRuntimeHealth(
         const { unitType, unitId } = parsed;
 
         // Only validate artifact-producing unit types
-        const { verifyExpectedArtifact } = await import("../auto-recovery.js");
+        const { verifyExpectedArtifact } = await import("../auto/auto-recovery.js");
         if (!verifyExpectedArtifact(unitType, unitId, basePath)) {
           orphaned.push(key);
         }
@@ -222,7 +222,7 @@ export async function checkRuntimeHealth(
         });
 
         if (shouldFix("activity_log_bloat")) {
-          const { pruneActivityLogs } = await import("../activity-log.js");
+          const { pruneActivityLogs } = await import("../auto/activity-log.js");
           pruneActivityLogs(activityDir, 7); // 7-day retention
           fixesApplied.push("pruned activity logs (7-day retention)");
         }

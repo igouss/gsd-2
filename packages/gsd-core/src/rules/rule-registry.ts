@@ -8,7 +8,7 @@
 
 import { logWarning } from "../workflow/workflow-logger.js";
 import type { UnifiedRule, RulePhase } from "./rule-types.js";
-import type { DispatchAction, DispatchContext, DispatchRule } from "../auto-dispatch.js";
+import type { DispatchAction, DispatchContext, DispatchRule } from "../auto/auto-dispatch.js";
 import type {
   PostUnitHookConfig,
   PreDispatchHookConfig,

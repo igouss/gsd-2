@@ -10,7 +10,7 @@ import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { loadFile } from "../files.js";
 import { resolveMilestoneFile } from "../paths.js";
-import { mergeMilestoneToMain } from "../auto-worktree.js";
+import { mergeMilestoneToMain } from "../auto/auto-worktree.js";
 import { MergeConflictError } from "../git/git-service.js";
 import { removeSessionStatus } from "../session/session-status-io.js";
 import type { WorkerInfo } from "./parallel-orchestrator.js";

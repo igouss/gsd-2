@@ -4,9 +4,9 @@
  * Pure functions — no module-level globals or AutoContext dependency.
  */
 
-import { clearLock } from "./session/crash-recovery.js";
-import { releaseSessionLock } from "./session/session-lock.js";
-import { nativeHasChanges } from "./git/native-git-bridge.js";
+import { clearLock } from "../session/crash-recovery.js";
+import { releaseSessionLock } from "../session/session-lock.js";
+import { nativeHasChanges } from "../git/native-git-bridge.js";
 
 // ─── Signal Handling ─────────────────────────────────────────────────────────
 

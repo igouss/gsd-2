@@ -9,12 +9,12 @@
  * without modifying orchestration code.
  */
 
-import type { GSDState } from "./types.js";
-import type { GSDPreferences } from "./preferences/preferences.js";
-import type { UatType } from "./files.js";
-import { loadFile, extractUatType, loadActiveOverrides } from "./files.js";
-import { isDbAvailable, getMilestoneSlices, getPendingGates, markAllGatesOmitted, getMilestone } from "./gsd-db.js";
-import { extractVerdict, isAcceptableUatVerdict } from "./verdict-parser.js";
+import type { GSDState } from "../types.js";
+import type { GSDPreferences } from "../preferences/preferences.js";
+import type { UatType } from "../files.js";
+import { loadFile, extractUatType, loadActiveOverrides } from "../files.js";
+import { isDbAvailable, getMilestoneSlices, getPendingGates, markAllGatesOmitted, getMilestone } from "../gsd-db.js";
+import { extractVerdict, isAcceptableUatVerdict } from "../verdict-parser.js";
 
 import {
   gsdRoot,
@@ -26,10 +26,10 @@ import {
   relSliceFile,
   buildMilestoneFileName,
   buildSliceFileName,
-} from "./paths.js";
-import { parseRoadmap } from "./parsers-legacy.js";
+} from "../paths.js";
+import { parseRoadmap } from "../parsers-legacy.js";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { logWarning, logError } from "./workflow/workflow-logger.js";
+import { logWarning, logError } from "../workflow/workflow-logger.js";
 import { join } from "node:path";
 import { hasImplementationArtifacts } from "./auto-recovery.js";
 import {
@@ -51,7 +51,7 @@ import {
   buildParallelResearchSlicesPrompt,
   checkNeedsReassessment,
   checkNeedsRunUat,
-} from "./prompt/auto-prompts.js";
+} from "../prompt/auto-prompts.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -74,7 +74,7 @@ export interface DispatchContext {
   midTitle: string;
   state: GSDState;
   prefs: GSDPreferences | undefined;
-  session?: import("./auto/session.js").AutoSession;
+  session?: import("../auto/session.js").AutoSession;
 }
 
 export interface DispatchRule {
@@ -191,7 +191,7 @@ export const DISPATCH_RULES: DispatchRule[] = [
       if (pendingOverrides.length === 0) return null;
       const count = getRewriteCount(basePath);
       if (count >= MAX_REWRITE_ATTEMPTS) {
-        const { resolveAllOverrides } = await import("./files.js");
+        const { resolveAllOverrides } = await import("../files.js");
         await resolveAllOverrides(basePath);
         setRewriteCount(basePath, 0);
         return null;
@@ -559,7 +559,7 @@ export const DISPATCH_RULES: DispatchRule[] = [
           getReadyTasks,
           chooseNonConflictingSubset,
           graphMetrics,
-        } = await import("./workflow/reactive-graph.js");
+        } = await import("../workflow/reactive-graph.js");
 
         const taskIO = await loadSliceTaskIO(basePath, mid, sid);
         if (taskIO.length < 2) return null; // single task, no point
@@ -592,7 +592,7 @@ export const DISPATCH_RULES: DispatchRule[] = [
 
         // Persist dispatched batch so verification and recovery can check
         // exactly which tasks were sent.
-        const { saveReactiveState } = await import("./workflow/reactive-graph.js");
+        const { saveReactiveState } = await import("../workflow/reactive-graph.js");
         saveReactiveState(basePath, mid, sid, {
           sliceId: sid,
           completed: [...completed],
@@ -838,7 +838,7 @@ export const DISPATCH_RULES: DispatchRule[] = [
   },
 ];
 
-import { getRegistry } from "./rules/rule-registry.js";
+import { getRegistry } from "../rules/rule-registry.js";
 
 // ─── Resolver ─────────────────────────────────────────────────────────────
 

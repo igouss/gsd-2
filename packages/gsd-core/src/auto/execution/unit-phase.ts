@@ -19,7 +19,7 @@ import { PROJECT_FILES } from "../../detection.js";
 import { join, basename, dirname, parse as parsePath } from "node:path";
 import { readdirSync } from "node:fs";
 import { logWarning } from "../../workflow/workflow-logger.js";
-import { verifyExpectedArtifact } from "../../auto-recovery.js";
+import { verifyExpectedArtifact } from "../auto-recovery.js";
 import { writeUnitRuntimeRecord } from "../../unit-runtime.js";
 import { createCheckpoint, cleanupCheckpoint, rollbackToCheckpoint, resolveSafetyHarnessConfig } from "../../safety/safety-harness.js";
 

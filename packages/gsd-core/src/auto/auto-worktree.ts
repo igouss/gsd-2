@@ -20,33 +20,33 @@ import {
 } from "node:fs";
 import { isAbsolute, join, sep as pathSep } from "node:path";
 import { homedir } from "node:os";
-import { GSDError, GSD_IO_ERROR, GSD_GIT_ERROR } from "./errors.js";
+import { GSDError, GSD_IO_ERROR, GSD_GIT_ERROR } from "../errors.js";
 import {
   reconcileWorktreeDb,
   isDbAvailable,
   getMilestone,
   getMilestoneSlices,
-} from "./gsd-db.js";
-import { atomicWriteSync } from "./atomic-write.js";
+} from "../gsd-db.js";
+import { atomicWriteSync } from "../atomic-write.js";
 import { execFileSync } from "node:child_process";
-import { safeCopy, safeCopyRecursive } from "./safe-fs.js";
-import { gsdRoot } from "./paths.js";
+import { safeCopy, safeCopyRecursive } from "../safe-fs.js";
+import { gsdRoot } from "../paths.js";
 import {
   createWorktree,
   removeWorktree,
   resolveGitDir,
   worktreePath,
   isInsideWorktreesDir,
-} from "./git/worktree-manager.js";
+} from "../git/worktree-manager.js";
 import {
   detectWorktreeName,
   resolveGitHeadPath,
   nudgeGitBranchCache,
-} from "./git/worktree.js";
-import { MergeConflictError, readIntegrationBranch, RUNTIME_EXCLUSION_PATHS } from "./git/git-service.js";
-import { debugLog } from "./debug-logger.js";
-import { logWarning, logError } from "./workflow/workflow-logger.js";
-import { loadEffectiveGSDPreferences } from "./preferences/preferences.js";
+} from "../git/worktree.js";
+import { MergeConflictError, readIntegrationBranch, RUNTIME_EXCLUSION_PATHS } from "../git/git-service.js";
+import { debugLog } from "../debug-logger.js";
+import { logWarning, logError } from "../workflow/workflow-logger.js";
+import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
 import {
   nativeGetCurrentBranch,
   nativeDetectMainBranch,
@@ -65,7 +65,7 @@ import {
   nativeUpdateRef,
   nativeIsAncestor,
   nativeMergeAbort,
-} from "./git/native-git-bridge.js";
+} from "../git/native-git-bridge.js";
 
 const gsdHome = process.env.GSD_HOME || join(homedir(), ".gsd");
 const PROJECT_PREFERENCES_FILE = "PREFERENCES.md";
