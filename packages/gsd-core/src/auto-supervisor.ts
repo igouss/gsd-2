@@ -6,7 +6,7 @@
 
 import { clearLock } from "./session/crash-recovery.js";
 import { releaseSessionLock } from "./session/session-lock.js";
-import { nativeHasChanges } from "./native-git-bridge.js";
+import { nativeHasChanges } from "./git/native-git-bridge.js";
 
 // ─── Signal Handling ─────────────────────────────────────────────────────────
 

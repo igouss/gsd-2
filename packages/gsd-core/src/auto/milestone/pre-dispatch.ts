@@ -15,7 +15,7 @@ import type {
 import { generateMilestoneReport, _resolveReportBasePath } from "./report.js";
 import { closeoutAndStop } from "../closeout.js";
 import { debugLog } from "../../debug-logger.js";
-import { MergeConflictError } from "../../git-service.js";
+import { MergeConflictError } from "../../git/git-service.js";
 import { join, basename } from "node:path";
 import { existsSync, cpSync } from "node:fs";
 import { logWarning, logError } from "../../workflow-logger.js";

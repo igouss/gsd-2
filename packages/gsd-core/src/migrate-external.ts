@@ -11,8 +11,8 @@ import { existsSync, lstatSync, mkdirSync, readdirSync, realpathSync, renameSync
 import { join } from "node:path";
 import { externalGsdRoot, isInsideWorktree } from "./repo-identity.js";
 import { getErrorMessage } from "./error-utils.js";
-import { hasGitTrackedGsdFiles } from "./gitignore.js";
-import { GIT_NO_PROMPT_ENV } from "./git-constants.js";
+import { hasGitTrackedGsdFiles } from "./git/gitignore.js";
+import { GIT_NO_PROMPT_ENV } from "./git/git-constants.js";
 
 export interface MigrationResult {
   migrated: boolean;

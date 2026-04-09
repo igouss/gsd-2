@@ -6,9 +6,9 @@ import { cleanNumberedGsdVariants } from "../repo-identity.js";
 import { milestonesDir, gsdRoot, resolveGsdRootFile } from "../paths.js";
 import { deriveState } from "../state.js";
 import { saveFile } from "../files.js";
-import { nativeIsRepo, nativeForEachRef, nativeUpdateRef } from "../native-git-bridge.js";
+import { nativeIsRepo, nativeForEachRef, nativeUpdateRef } from "../git/native-git-bridge.js";
 import { readCrashLock, isLockProcessAlive, clearLock } from "../session/crash-recovery.js";
-import { ensureGitignore } from "../gitignore.js";
+import { ensureGitignore } from "../git/gitignore.js";
 import { readAllSessionStatuses, isSessionStale, removeSessionStatus } from "../session/session-status-io.js";
 import { recoverFailedMigration } from "../migrate-external.js";
 

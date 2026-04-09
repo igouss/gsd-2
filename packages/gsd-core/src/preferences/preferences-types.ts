@@ -6,7 +6,7 @@
  * in filesystem or loading logic.
  */
 
-import type { GitPreferences } from "../git-service.js";
+import type { GitPreferences } from "../git/git-service.js";
 import type {
   PostUnitHookConfig,
   PreDispatchHookConfig,

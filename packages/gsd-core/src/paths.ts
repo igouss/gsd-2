@@ -12,7 +12,7 @@
 import { readdirSync, existsSync, realpathSync, Dirent } from "node:fs";
 import { join, dirname, normalize } from "node:path";
 import { spawnSync } from "node:child_process";
-import { nativeScanGsdTree, type GsdTreeEntry } from "./native-parser-bridge.js";
+import { nativeScanGsdTree, type GsdTreeEntry } from "./git/native-parser-bridge.js";
 import { DIR_CACHE_MAX } from "./constants.js";
 
 // ─── Directory Listing Cache ──────────────────────────────────────────────────

@@ -12,7 +12,7 @@ import type { GSDPreferences } from "../preferences/preferences-types.js";
 import type { GSDState } from "../types.js";
 import type { SessionLockStatus } from "../session/session-lock.js";
 import type { DispatchAction } from "../auto-dispatch.js";
-import type { WorktreeResolver } from "../worktree-resolver.js";
+import type { WorktreeResolver } from "../git/worktree-resolver.js";
 import type { CmuxLogLevel } from "../cmux/index.js";
 import type { JournalEntry } from "../journal.js";
 

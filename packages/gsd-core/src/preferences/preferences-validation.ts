@@ -6,10 +6,10 @@
  * together with any errors and warnings.
  */
 
-import type { GitPreferences } from "../git-service.js";
+import type { GitPreferences } from "../git/git-service.js";
 import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile, PhaseSkipPreferences } from "../types.js";
 import type { DynamicRoutingConfig } from "../routing/model-router.js";
-import { VALID_BRANCH_NAME } from "../git-service.js";
+import { VALID_BRANCH_NAME } from "../git/git-service.js";
 import { normalizeStringArray } from "../shared/format-utils.js";
 
 import {

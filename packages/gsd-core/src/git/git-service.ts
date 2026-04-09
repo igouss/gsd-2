@@ -11,9 +11,9 @@
 import { execFileSync, execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { gsdRoot } from "./paths.js";
+import { gsdRoot } from "../paths.js";
 import { GIT_NO_PROMPT_ENV } from "./git-constants.js";
-import { loadEffectiveGSDPreferences } from "./preferences/preferences.js";
+import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
 
 
 import {
@@ -35,8 +35,8 @@ import {
   nativeResetSoft,
   nativeCommitSubject,
 } from "./native-git-bridge.js";
-import { GSDError, GSD_MERGE_CONFLICT, GSD_GIT_ERROR } from "./errors.js";
-import { getErrorMessage } from "./error-utils.js";
+import { GSDError, GSD_MERGE_CONFLICT, GSD_GIT_ERROR } from "../errors.js";
+import { getErrorMessage } from "../error-utils.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 

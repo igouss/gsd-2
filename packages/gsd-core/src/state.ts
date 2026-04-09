@@ -37,7 +37,7 @@ import {
 import { findMilestoneIds } from './milestone-ids.js';
 import { loadQueueOrder, sortByQueueOrder } from './queue-order.js';
 import { isClosedStatus, isDeferredStatus } from './status-guards.js';
-import { nativeBatchParseGsdFiles, type BatchParsedFile } from './native-parser-bridge.js';
+import { nativeBatchParseGsdFiles, type BatchParsedFile } from './git/native-parser-bridge.js';
 
 import { join, resolve } from 'path';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';

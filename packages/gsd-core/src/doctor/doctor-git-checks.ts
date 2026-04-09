@@ -7,11 +7,11 @@ import { parseRoadmap as parseLegacyRoadmap } from "../parsers-legacy.js";
 import { isDbAvailable, getMilestoneSlices } from "../gsd-db.js";
 import { resolveMilestoneFile } from "../paths.js";
 import { deriveState, isMilestoneComplete } from "../state.js";
-import { listWorktrees, resolveGitDir, worktreesDir } from "../worktree-manager.js";
-import { abortAndReset } from "../git-self-heal.js";
-import { RUNTIME_EXCLUSION_PATHS, resolveMilestoneIntegrationBranch, writeIntegrationBranch } from "../git-service.js";
-import { nativeIsRepo, nativeWorktreeList, nativeWorktreeRemove, nativeBranchList, nativeBranchDelete, nativeLsFiles, nativeRmCached, nativeHasChanges, nativeLastCommitEpoch, nativeGetCurrentBranch, nativeAddTracked, nativeCommit } from "../native-git-bridge.js";
-import { getAllWorktreeHealth } from "../worktree-health.js";
+import { listWorktrees, resolveGitDir, worktreesDir } from "../git/worktree-manager.js";
+import { abortAndReset } from "../git/git-self-heal.js";
+import { RUNTIME_EXCLUSION_PATHS, resolveMilestoneIntegrationBranch, writeIntegrationBranch } from "../git/git-service.js";
+import { nativeIsRepo, nativeWorktreeList, nativeWorktreeRemove, nativeBranchList, nativeBranchDelete, nativeLsFiles, nativeRmCached, nativeHasChanges, nativeLastCommitEpoch, nativeGetCurrentBranch, nativeAddTracked, nativeCommit } from "../git/native-git-bridge.js";
+import { getAllWorktreeHealth } from "../git/worktree-health.js";
 import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
 
 /**
@@ -435,7 +435,7 @@ export async function checkGitHealth(
 
         if (health.safeToRemove && shouldFix("worktree_branch_merged") && !isCwd) {
           try {
-            const { removeWorktree } = await import("../worktree-manager.js");
+            const { removeWorktree } = await import("../git/worktree-manager.js");
             removeWorktree(basePath, wt.name, { deleteBranch: true, branch: wt.branch });
             fixesApplied.push(`removed merged worktree "${wt.name}" and deleted branch ${wt.branch}`);
           } catch {

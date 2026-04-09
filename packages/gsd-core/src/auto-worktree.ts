@@ -37,13 +37,13 @@ import {
   resolveGitDir,
   worktreePath,
   isInsideWorktreesDir,
-} from "./worktree-manager.js";
+} from "./git/worktree-manager.js";
 import {
   detectWorktreeName,
   resolveGitHeadPath,
   nudgeGitBranchCache,
-} from "./worktree.js";
-import { MergeConflictError, readIntegrationBranch, RUNTIME_EXCLUSION_PATHS } from "./git-service.js";
+} from "./git/worktree.js";
+import { MergeConflictError, readIntegrationBranch, RUNTIME_EXCLUSION_PATHS } from "./git/git-service.js";
 import { debugLog } from "./debug-logger.js";
 import { logWarning, logError } from "./workflow-logger.js";
 import { loadEffectiveGSDPreferences } from "./preferences/preferences.js";
@@ -65,7 +65,7 @@ import {
   nativeUpdateRef,
   nativeIsAncestor,
   nativeMergeAbort,
-} from "./native-git-bridge.js";
+} from "./git/native-git-bridge.js";
 
 const gsdHome = process.env.GSD_HOME || join(homedir(), ".gsd");
 const PROJECT_PREFERENCES_FILE = "PREFERENCES.md";
