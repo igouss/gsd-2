@@ -27,7 +27,7 @@ import { nullEventSink } from "./harness-adapter.js";
 // Claude CLI result shape (from --output-format json)
 // ---------------------------------------------------------------------------
 
-interface ClaudeJsonResult {
+interface ClaudeResultOutput {
   type: "result";
   subtype: "success" | "error";
   is_error: boolean;
@@ -42,6 +42,17 @@ interface ClaudeJsonResult {
     cache_creation_input_tokens?: number;
   };
 }
+
+interface ClaudeUserOutput {
+  type: "user";
+  message?: {
+    content?: Array<{ type: string; text?: string }> | string;
+  };
+  result?: string;
+}
+
+/** Discriminated union of all possible Claude CLI JSON outputs. */
+type ClaudeCliOutput = ClaudeResultOutput | ClaudeUserOutput | { type: string };
 
 // ---------------------------------------------------------------------------
 // Options
@@ -320,16 +331,16 @@ export class ClaudeCodeAdapter implements HarnessAdapter {
         }
       }
     } else if (type === "user") {
-      // Agent asked a question in headless/pipe mode — log it so we can debug
-      const msg = event.message as Record<string, unknown> | undefined;
-      const content = msg?.content as Array<Record<string, unknown>> | undefined;
-      const questionText = content
-        ?.filter((b) => b.type === "text" && typeof b.text === "string")
-        .map((b) => b.text as string)
-        .join(" ") || "(no text)";
+      // Agent asked a question in headless mode — fatal error, means
+      // requirements are underspecified. Log the full question.
+      const questionText = extractQuestionText(event);
       this.events.notify(
-        `  ⚠ Agent asked user question in headless mode: ${questionText.slice(0, 200)}`,
-        "warning",
+        `FATAL: Agent asked user question in headless mode — requirements are underspecified`,
+        "error",
+      );
+      this.events.notify(
+        `Question: ${questionText}`,
+        "error",
       );
     } else if (type === "tool_result" || type === "tool_execution_end") {
       // Tool completed
@@ -383,6 +394,28 @@ function cleanupFile(path: string): void {
   }
 }
 
+/**
+ * Extract the question text from a `type: "user"` CLI output event.
+ * Handles both stream-json events (with message.content array) and
+ * json-mode output (with result string).
+ */
+function extractQuestionText(parsed: ClaudeUserOutput | Record<string, unknown>): string {
+  const msg = (parsed as ClaudeUserOutput).message;
+  if (msg) {
+    const { content } = msg;
+    if (Array.isArray(content)) {
+      const texts = content
+        .filter((b): b is { type: string; text: string } => b.type === "text" && typeof b.text === "string")
+        .map((b) => b.text);
+      if (texts.length > 0) return texts.join(" ").slice(0, 500);
+    }
+    if (typeof content === "string") return content.slice(0, 500);
+  }
+  const result = (parsed as ClaudeUserOutput).result;
+  if (typeof result === "string") return result.slice(0, 500);
+  return "(could not extract question text)";
+}
+
 function parseClaudeResult(stdout: string): UnitDispatchResult {
   const trimmed = stdout.trim();
   if (!trimmed) {
@@ -396,7 +429,7 @@ function parseClaudeResult(stdout: string): UnitDispatchResult {
     };
   }
 
-  let parsed: ClaudeJsonResult;
+  let parsed: ClaudeCliOutput;
   try {
     parsed = JSON.parse(trimmed);
   } catch (err) {
@@ -410,42 +443,55 @@ function parseClaudeResult(stdout: string): UnitDispatchResult {
     };
   }
 
-  if (parsed.type !== "result") {
-    // "user" means the agent tried to ask a question in headless mode —
-    // treat as transient so the orchestrator can retry.
-    const isUserPrompt = parsed.type === "user";
+  if (parsed.type === "user") {
+    // Agent asked a question in headless mode — this is a fatal error.
+    // It means the task requirements are underspecified and need human
+    // clarification before the agent can proceed.
+    const questionText = extractQuestionText(parsed);
     return {
       status: "error",
       errorContext: {
-        message: isUserPrompt
-          ? "Agent asked a user question in headless mode (no interactive input available)"
-          : `Unexpected output type: ${parsed.type}`,
-        category: isUserPrompt ? "idle" : "unknown",
-        isTransient: isUserPrompt,
+        message: `Agent asked a user question in headless mode — requirements are underspecified. Question: ${questionText}`,
+        category: "session-failed",
+        isTransient: false,
       },
     };
   }
 
-  const cost = parsed.total_cost_usd
+  if (parsed.type !== "result") {
+    return {
+      status: "error",
+      errorContext: {
+        message: `Unexpected output type: ${parsed.type}`,
+        category: "unknown",
+        isTransient: false,
+      },
+    };
+  }
+
+  // After the guards above, parsed is guaranteed to be ClaudeResultOutput
+  const result = parsed as ClaudeResultOutput;
+
+  const cost = result.total_cost_usd
     ? {
-        totalCost: parsed.total_cost_usd,
+        totalCost: result.total_cost_usd,
         tokens: {
-          input: parsed.usage?.input_tokens ?? 0,
-          output: parsed.usage?.output_tokens ?? 0,
-          cacheRead: parsed.usage?.cache_read_input_tokens ?? 0,
-          cacheWrite: parsed.usage?.cache_creation_input_tokens ?? 0,
+          input: result.usage?.input_tokens ?? 0,
+          output: result.usage?.output_tokens ?? 0,
+          cacheRead: result.usage?.cache_read_input_tokens ?? 0,
+          cacheWrite: result.usage?.cache_creation_input_tokens ?? 0,
         },
       }
     : undefined;
 
-  if (parsed.is_error || parsed.subtype === "error") {
+  if (result.is_error || result.subtype === "error") {
     return {
       status: "error",
       errorContext: {
-        message: parsed.result || "Claude CLI reported an error",
+        message: result.result || "Claude CLI reported an error",
         category: "provider",
         isTransient: true,
-        stopReason: parsed.stop_reason,
+        stopReason: result.stop_reason,
       },
       cost,
     };
