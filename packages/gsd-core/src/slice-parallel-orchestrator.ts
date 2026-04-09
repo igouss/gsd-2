@@ -29,7 +29,7 @@ import { autoWorktreeBranch, runWorktreePostCreateHook } from "./auto-worktree.j
 import {
   writeSessionStatus,
   removeSessionStatus,
-} from "./session-status-io.js";
+} from "./session/session-status-io.js";
 import { hasFileConflict } from "./slice-parallel-conflict.js";
 import { getErrorMessage } from "./error-utils.js";
 

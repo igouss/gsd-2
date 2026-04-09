@@ -23,7 +23,7 @@ import { clearPathCache } from "./paths.js";
 import { clearParseCache } from "./files.js";
 import { writeManifest } from "./workflow-manifest.js";
 import { atomicWriteSync } from "./atomic-write.js";
-import { acquireSyncLock, releaseSyncLock } from "./sync-lock.js";
+import { acquireSyncLock, releaseSyncLock } from "./session/sync-lock.js";
 
 // ─── Replay Helpers ──────────────────────────────────────────────────────────
 

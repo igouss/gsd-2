@@ -5,7 +5,7 @@
 
 import { existsSync, statSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
-import { atomicWriteSync } from "./atomic-write.js";
+import { atomicWriteSync } from "../atomic-write.js";
 
 const STALE_THRESHOLD_MS = 60_000; // 60 seconds
 const DEFAULT_TIMEOUT_MS = 5_000;  // 5 seconds

@@ -35,7 +35,7 @@ import {
   sendSignal,
   cleanupStaleSessions,
   type SessionStatus,
-} from "./session-status-io.js";
+} from "./session/session-status-io.js";
 import {
   analyzeParallelEligibility,
   type ParallelCandidates,

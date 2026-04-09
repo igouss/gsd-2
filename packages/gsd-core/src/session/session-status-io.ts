@@ -17,8 +17,8 @@ import {
   existsSync,
 } from "node:fs";
 import { join } from "node:path";
-import { gsdRoot } from "./paths.js";
-import { loadJsonFileOrNull, writeJsonFileAtomic } from "./json-persistence.js";
+import { gsdRoot } from "../paths.js";
+import { loadJsonFileOrNull, writeJsonFileAtomic } from "../json-persistence.js";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 

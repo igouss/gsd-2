@@ -12,8 +12,8 @@
 
 import { readFileSync, unlinkSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { gsdRoot } from "./paths.js";
-import { atomicWriteSync } from "./atomic-write.js";
+import { gsdRoot } from "../paths.js";
+import { atomicWriteSync } from "../atomic-write.js";
 import { effectiveLockFile } from "./session-lock.js";
 
 export interface LockData {
