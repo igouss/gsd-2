@@ -222,9 +222,10 @@ export class ClaudeCodeAdapter implements HarnessAdapter {
           for (const line of chunk.split("\n").filter(Boolean)) {
             try {
               const event = JSON.parse(line);
-              // Only keep "result" lines — other types (e.g. "user" when
-              // the agent asks a question) must not overwrite the result.
-              if (event.type === "result" || !lastResultLine) {
+              // Only keep "result" or "user" lines for final parse.
+              // "result" = normal completion, "user" = agent asked a question (fatal).
+              // All other types (system, rate_limit_event, etc.) are ignored.
+              if (event.type === "result" || event.type === "user") {
                 lastResultLine = line;
               }
               this.handleStreamEvent(event, request);
@@ -290,9 +291,21 @@ export class ClaudeCodeAdapter implements HarnessAdapter {
           return;
         }
 
-        // Parse result — in stream-json mode, find the last "result" line;
+        // Parse result — in stream-json mode, use the last "result"/"user" line;
         // in json mode, the entire stdout is the result.
         const jsonToParse = this.verbose ? lastResultLine : stdout;
+        if (this.verbose && !lastResultLine) {
+          // Stream mode but no result/user line — process exited without completing
+          resolve({
+            status: "error",
+            errorContext: {
+              message: `Claude CLI exited (code ${code}) without producing a result — likely killed by timeout or signal`,
+              category: "timeout",
+              isTransient: true,
+            },
+          });
+          return;
+        }
         const result = parseClaudeResult(jsonToParse);
         resolve(result);
       });
