@@ -17,13 +17,13 @@
  * - The frozen DEFINITION.yaml on disk is the single source of truth for step policies.
  */
 
-import { logWarning } from "./workflow-logger.js";
+import { logWarning } from "../workflow-logger.js";
 import { readFileSync, existsSync, statSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
 import { spawnSync } from "node:child_process";
-import type { StepDefinition, VerifyPolicy } from "./definition-loader.js";
-import { readFrozenDefinition } from "./custom-workflow-engine.js";
-import { rewriteCommandWithRtk } from "./shared/rtk.js";
+import type { StepDefinition, VerifyPolicy } from "../definition-loader.js";
+import { readFrozenDefinition } from "../custom-workflow-engine.js";
+import { rewriteCommandWithRtk } from "../shared/rtk.js";
 
 /** Verification outcome type — matches ExecutionPolicy.verify() return type. */
 export type VerificationOutcome = "continue" | "retry" | "pause";

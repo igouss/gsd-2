@@ -1,5 +1,5 @@
-import { loadFile } from "./files.js";
-import { resolveSliceFile, resolveTaskFile, resolveTasksDir, resolveTaskFiles } from "./paths.js";
+import { loadFile } from "../files.js";
+import { resolveSliceFile, resolveTaskFile, resolveTasksDir, resolveTaskFiles } from "../paths.js";
 
 export interface ValidationIssue {
   severity: "info" | "warning" | "error";

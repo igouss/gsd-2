@@ -1,6 +1,6 @@
 import { clearParseCache } from "../files.js";
 import { isClosedStatus } from "../status-guards.js";
-import { isNonEmptyString, validateStringArray } from "../validation.js";
+import { isNonEmptyString, validateStringArray } from "../verification/validation.js";
 import { transaction, getSlice, getTask, insertTask, upsertTaskPlanning } from "../gsd-db.js";
 import { invalidateStateCache } from "../state.js";
 import { renderTaskPlanFromDb } from "../reporting/markdown-renderer.js";

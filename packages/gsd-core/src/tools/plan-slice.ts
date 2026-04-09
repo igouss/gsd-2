@@ -1,6 +1,6 @@
 import { clearParseCache } from "../files.js";
 import { isClosedStatus } from "../status-guards.js";
-import { isNonEmptyString, validateStringArray } from "../validation.js";
+import { isNonEmptyString, validateStringArray } from "../verification/validation.js";
 import {
   transaction,
   getMilestone,

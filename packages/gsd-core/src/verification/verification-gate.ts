@@ -6,9 +6,9 @@
 import { spawnSync, type SpawnSyncReturns } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join, basename } from "node:path";
-import type { AuditWarning, RuntimeError, VerificationCheck, VerificationResult } from "./types.js";
-import { DEFAULT_COMMAND_TIMEOUT_MS } from "./constants.js";
-import { rewriteCommandWithRtk } from "./shared/rtk.js";
+import type { AuditWarning, RuntimeError, VerificationCheck, VerificationResult } from "../types.js";
+import { DEFAULT_COMMAND_TIMEOUT_MS } from "../constants.js";
+import { rewriteCommandWithRtk } from "../shared/rtk.js";
 
 /** Maximum bytes of stdout/stderr to retain per command (10 KB). */
 const MAX_OUTPUT_BYTES = 10 * 1024;
@@ -348,7 +348,7 @@ export async function captureRuntimeErrors(
     if (options?.getProcesses) {
       processes = options.getProcesses();
     } else {
-      const mod = await import("./bg-shell/process-manager.js");
+      const mod = await import("../bg-shell/process-manager.js");
       processes = mod.processes;
     }
 
@@ -424,7 +424,7 @@ export async function captureRuntimeErrors(
     if (options?.getConsoleLogs) {
       logs = options.getConsoleLogs();
     } else {
-      const mod = await import("./browser-tools/state.js");
+      const mod = await import("../browser-tools/state.js");
       logs = mod.getConsoleLogs();
     }
 
