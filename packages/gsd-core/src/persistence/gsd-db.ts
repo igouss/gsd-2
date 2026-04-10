@@ -6,8 +6,7 @@
 // Schema is initialized on first open with WAL mode for file-backed DBs.
 
 import { createRequire } from "node:module";
-import { existsSync, copyFileSync, mkdirSync, realpathSync } from "node:fs";
-import { dirname } from "node:path";
+import { existsSync, copyFileSync, realpathSync } from "node:fs";
 import type { Decision, Requirement, GateRow, GateId, GateScope, GateStatus, GateVerdict } from "../domain/types.js";
 import { GSDError, GSD_STALE_STATE } from "../domain/errors.js";
 import { logError, logWarning } from "../workflow/workflow-logger.js";
@@ -776,13 +775,7 @@ function migrateSchema(db: DbAdapter): void {
 
 let currentDb: DbAdapter | null = null;
 let currentPath: string | null = null;
-let currentPid: number = 0;
 let _exitHandlerRegistered = false;
-
-export function getDbProvider(): ProviderName | null {
-  loadProvider();
-  return providerName;
-}
 
 export function isDbAvailable(): boolean {
   return currentDb !== null;
@@ -819,7 +812,6 @@ export function openDatabase(path: string): boolean {
 
   currentDb = adapter;
   currentPath = path;
-  currentPid = process.pid;
 
   if (!_exitHandlerRegistered) {
     _exitHandlerRegistered = true;
@@ -843,16 +835,7 @@ export function closeDatabase(): void {
     } catch (e) { logWarning("db", `database close failed: ${(e as Error).message}`); }
     currentDb = null;
     currentPath = null;
-    currentPid = 0;
   }
-}
-
-/** Run a full VACUUM — call sparingly (e.g. after milestone completion). */
-export function vacuumDatabase(): void {
-  if (!currentDb) return;
-  try {
-    currentDb.exec('VACUUM');
-  } catch (e) { logWarning("db", `VACUUM failed: ${(e as Error).message}`); }
 }
 
 let _txDepth = 0;
@@ -885,80 +868,6 @@ export function transaction<T>(fn: () => T): T {
   }
 }
 
-export function insertDecision(d: Omit<Decision, "seq">): void {
-  if (!currentDb) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
-  currentDb.prepare(
-    `INSERT INTO decisions (id, when_context, scope, decision, choice, rationale, revisable, made_by, superseded_by)
-     VALUES (:id, :when_context, :scope, :decision, :choice, :rationale, :revisable, :made_by, :superseded_by)`,
-  ).run({
-    ":id": d.id,
-    ":when_context": d.when_context,
-    ":scope": d.scope,
-    ":decision": d.decision,
-    ":choice": d.choice,
-    ":rationale": d.rationale,
-    ":revisable": d.revisable,
-    ":made_by": d.made_by ?? "agent",
-    ":superseded_by": d.superseded_by,
-  });
-}
-
-export function getDecisionById(id: string): Decision | null {
-  if (!currentDb) return null;
-  const row = currentDb.prepare("SELECT * FROM decisions WHERE id = ?").get(id);
-  if (!row) return null;
-  return {
-    seq: row["seq"] as number,
-    id: row["id"] as string,
-    when_context: row["when_context"] as string,
-    scope: row["scope"] as string,
-    decision: row["decision"] as string,
-    choice: row["choice"] as string,
-    rationale: row["rationale"] as string,
-    revisable: row["revisable"] as string,
-    made_by: (row["made_by"] as string as import("../domain/types.js").DecisionMadeBy) ?? "agent",
-    superseded_by: (row["superseded_by"] as string) ?? null,
-  };
-}
-
-export function getActiveDecisions(): Decision[] {
-  if (!currentDb) return [];
-  const rows = currentDb.prepare("SELECT * FROM active_decisions").all();
-  return rows.map((row) => ({
-    seq: row["seq"] as number,
-    id: row["id"] as string,
-    when_context: row["when_context"] as string,
-    scope: row["scope"] as string,
-    decision: row["decision"] as string,
-    choice: row["choice"] as string,
-    rationale: row["rationale"] as string,
-    revisable: row["revisable"] as string,
-    made_by: (row["made_by"] as string as import("../domain/types.js").DecisionMadeBy) ?? "agent",
-    superseded_by: null,
-  }));
-}
-
-export function insertRequirement(r: Requirement): void {
-  if (!currentDb) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
-  currentDb.prepare(
-    `INSERT INTO requirements (id, class, status, description, why, source, primary_owner, supporting_slices, validation, notes, full_content, superseded_by)
-     VALUES (:id, :class, :status, :description, :why, :source, :primary_owner, :supporting_slices, :validation, :notes, :full_content, :superseded_by)`,
-  ).run({
-    ":id": r.id,
-    ":class": r.class,
-    ":status": r.status,
-    ":description": r.description,
-    ":why": r.why,
-    ":source": r.source,
-    ":primary_owner": r.primary_owner,
-    ":supporting_slices": r.supporting_slices,
-    ":validation": r.validation,
-    ":notes": r.notes,
-    ":full_content": r.full_content,
-    ":superseded_by": r.superseded_by,
-  });
-}
-
 export function getRequirementById(id: string): Requirement | null {
   if (!currentDb) return null;
   const row = currentDb.prepare("SELECT * FROM requirements WHERE id = ?").get(id);
@@ -979,41 +888,8 @@ export function getRequirementById(id: string): Requirement | null {
   };
 }
 
-export function getActiveRequirements(): Requirement[] {
-  if (!currentDb) return [];
-  const rows = currentDb.prepare("SELECT * FROM active_requirements").all();
-  return rows.map((row) => ({
-    id: row["id"] as string,
-    class: row["class"] as string,
-    status: row["status"] as string,
-    description: row["description"] as string,
-    why: row["why"] as string,
-    source: row["source"] as string,
-    primary_owner: row["primary_owner"] as string,
-    supporting_slices: row["supporting_slices"] as string,
-    validation: row["validation"] as string,
-    notes: row["notes"] as string,
-    full_content: row["full_content"] as string,
-    superseded_by: null,
-  }));
-}
-
-export function getDbOwnerPid(): number {
-  return currentPid;
-}
-
-export function getDbPath(): string | null {
-  return currentPath;
-}
-
 export function _getAdapter(): DbAdapter | null {
   return currentDb;
-}
-
-export function _resetProvider(): void {
-  loadAttempted = false;
-  providerModule = null;
-  providerName = null;
 }
 
 export function upsertDecision(d: Omit<Decision, "seq">): void {
@@ -1708,46 +1584,6 @@ export function updateMilestoneStatus(milestoneId: string, status: string, compl
   ).run({ ":status": status, ":completed_at": completedAt ?? null, ":id": milestoneId });
 }
 
-export function getActiveMilestoneFromDb(): MilestoneRow | null {
-  if (!currentDb) return null;
-  const row = currentDb.prepare(
-    "SELECT * FROM milestones WHERE status NOT IN ('complete', 'parked') ORDER BY id LIMIT 1",
-  ).get();
-  if (!row) return null;
-  return rowToMilestone(row);
-}
-
-export function getActiveSliceFromDb(milestoneId: string): SliceRow | null {
-  if (!currentDb) return null;
-
-  // Single query: find the first non-complete slice whose dependencies are all satisfied.
-  // Uses json_each() to expand the JSON depends array and checks each dep is complete.
-  const row = currentDb.prepare(
-    `SELECT s.* FROM slices s
-     WHERE s.milestone_id = :mid
-       AND s.status NOT IN ('complete', 'done', 'skipped')
-       AND NOT EXISTS (
-         SELECT 1 FROM json_each(s.depends) AS dep
-         WHERE dep.value NOT IN (
-           SELECT id FROM slices WHERE milestone_id = :mid AND status IN ('complete', 'done', 'skipped')
-         )
-       )
-     ORDER BY s.sequence, s.id
-     LIMIT 1`,
-  ).get({ ":mid": milestoneId });
-  if (!row) return null;
-  return rowToSlice(row);
-}
-
-export function getActiveTaskFromDb(milestoneId: string, sliceId: string): TaskRow | null {
-  if (!currentDb) return null;
-  const row = currentDb.prepare(
-    "SELECT * FROM tasks WHERE milestone_id = :mid AND slice_id = :sid AND status NOT IN ('complete', 'done') ORDER BY sequence, id LIMIT 1",
-  ).get({ ":mid": milestoneId, ":sid": sliceId });
-  if (!row) return null;
-  return rowToTask(row);
-}
-
 export function getMilestoneSlices(milestoneId: string): SliceRow[] {
   if (!currentDb) return [];
   const rows = currentDb.prepare("SELECT * FROM slices WHERE milestone_id = :mid ORDER BY sequence, id").all({ ":mid": milestoneId });
@@ -1761,87 +1597,7 @@ export function getArtifact(path: string): ArtifactRow | null {
   return rowToArtifact(row);
 }
 
-// ─── Lightweight Query Variants (hot-path optimized) ─────────────────────
-
-/** Fast milestone status check — avoids deserializing JSON planning fields. */
-export function getActiveMilestoneIdFromDb(): { id: string; status: string } | null {
-  if (!currentDb) return null;
-  const row = currentDb.prepare(
-    "SELECT id, status FROM milestones WHERE status NOT IN ('complete', 'parked') ORDER BY id LIMIT 1",
-  ).get();
-  if (!row) return null;
-  return { id: row["id"] as string, status: row["status"] as string };
-}
-
-/** Fast slice status check — avoids deserializing JSON depends/planning fields. */
-export function getSliceStatusSummary(milestoneId: string): Array<{ id: string; status: string }> {
-  if (!currentDb) return [];
-  return currentDb.prepare(
-    "SELECT id, status FROM slices WHERE milestone_id = :mid ORDER BY sequence, id",
-  ).all({ ":mid": milestoneId }).map((r) => ({ id: r["id"] as string, status: r["status"] as string }));
-}
-
-/** Fast task status check — avoids deserializing JSON arrays and large text fields. */
-export function getActiveTaskIdFromDb(milestoneId: string, sliceId: string): { id: string; status: string; title: string } | null {
-  if (!currentDb) return null;
-  const row = currentDb.prepare(
-    "SELECT id, status, title FROM tasks WHERE milestone_id = :mid AND slice_id = :sid AND status NOT IN ('complete', 'done') ORDER BY sequence, id LIMIT 1",
-  ).get({ ":mid": milestoneId, ":sid": sliceId });
-  if (!row) return null;
-  return { id: row["id"] as string, status: row["status"] as string, title: row["title"] as string };
-}
-
-/** Count tasks by status for a slice — useful for progress reporting without full row load. */
-export function getSliceTaskCounts(milestoneId: string, sliceId: string): { total: number; done: number; pending: number } {
-  if (!currentDb) return { total: 0, done: 0, pending: 0 };
-  const row = currentDb.prepare(
-    `SELECT
-       COUNT(*) as total,
-       SUM(CASE WHEN status IN ('complete', 'done') THEN 1 ELSE 0 END) as done,
-       SUM(CASE WHEN status NOT IN ('complete', 'done') THEN 1 ELSE 0 END) as pending
-     FROM tasks WHERE milestone_id = :mid AND slice_id = :sid`,
-  ).get({ ":mid": milestoneId, ":sid": sliceId });
-  if (!row) return { total: 0, done: 0, pending: 0 };
-  return { total: (row["total"] as number) ?? 0, done: (row["done"] as number) ?? 0, pending: (row["pending"] as number) ?? 0 };
-}
-
-// ─── Slice Dependencies (junction table) ─────────────────────────────────
-
-/** Sync the slice_dependencies junction table from a slice's JSON depends array. */
-export function syncSliceDependencies(milestoneId: string, sliceId: string, depends: string[]): void {
-  if (!currentDb) return;
-  currentDb.prepare(
-    "DELETE FROM slice_dependencies WHERE milestone_id = :mid AND slice_id = :sid",
-  ).run({ ":mid": milestoneId, ":sid": sliceId });
-  for (const dep of depends) {
-    currentDb.prepare(
-      "INSERT OR IGNORE INTO slice_dependencies (milestone_id, slice_id, depends_on_slice_id) VALUES (:mid, :sid, :dep)",
-    ).run({ ":mid": milestoneId, ":sid": sliceId, ":dep": dep });
-  }
-}
-
-/** Get all slices that depend on a given slice. */
-export function getDependentSlices(milestoneId: string, sliceId: string): string[] {
-  if (!currentDb) return [];
-  return currentDb.prepare(
-    "SELECT slice_id FROM slice_dependencies WHERE milestone_id = :mid AND depends_on_slice_id = :sid",
-  ).all({ ":mid": milestoneId, ":sid": sliceId }).map((r) => r["slice_id"] as string);
-}
-
 // ─── Worktree DB Helpers ──────────────────────────────────────────────────
-
-export function copyWorktreeDb(srcDbPath: string, destDbPath: string): boolean {
-  try {
-    if (!existsSync(srcDbPath)) return false;
-    const destDir = dirname(destDbPath);
-    mkdirSync(destDir, { recursive: true });
-    copyFileSync(srcDbPath, destDbPath);
-    return true;
-  } catch (err) {
-    logError("db", "failed to copy DB to worktree", { error: (err as Error).message });
-    return false;
-  }
-}
 
 export interface ReconcileResult {
   decisions: number;
@@ -2173,14 +1929,6 @@ export function getReplanHistory(milestoneId: string, sliceId?: string): Array<R
   return currentDb.prepare(
     `SELECT * FROM replan_history WHERE milestone_id = :mid ORDER BY created_at DESC`,
   ).all({ ":mid": milestoneId });
-}
-
-export function getAssessment(path: string): Record<string, unknown> | null {
-  if (!currentDb) return null;
-  const row = currentDb.prepare(
-    `SELECT * FROM assessments WHERE path = :path`,
-  ).get({ ":path": path });
-  return row ?? null;
 }
 
 // ─── Quality Gates ───────────────────────────────────────────────────────
