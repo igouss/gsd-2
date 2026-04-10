@@ -288,7 +288,7 @@ function parseMustHavesFromLines(fmLines: string[]): PlanningPlanMustHaves | nul
     // New top-level key — stop
     if (/^\w/.test(line)) break;
     // Sub-key at 2-space indent
-    const subKey = line.match(/^  (\w[\w_]*):/);
+    const subKey = line.match(/^ {2}(\w[\w_]*):/);
     if (subKey) {
       const key = subKey[1];
       if (key === 'truths') currentList = truths;
@@ -300,7 +300,7 @@ function parseMustHavesFromLines(fmLines: string[]): PlanningPlanMustHaves | nul
       continue;
     }
     // Array item at 4-space indent
-    const item = line.match(/^    - (.+)$/);
+    const item = line.match(/^ {4}- (.+)$/);
     if (item && currentList) {
       currentList.push(item[1].trim());
     }

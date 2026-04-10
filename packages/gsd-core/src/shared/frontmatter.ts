@@ -43,14 +43,14 @@ export function parseFrontmatterMap(lines: string[]): Record<string, unknown> {
 
   for (const line of lines) {
     // Nested object property (4-space indent with key: value)
-    const nestedMatch = line.match(/^    ([\w][\w_-]*)\s*:\s*(.*)$/);
+    const nestedMatch = line.match(/^ {4}([\w][\w_-]*)\s*:\s*(.*)$/);
     if (nestedMatch && currentArray && currentObj) {
       currentObj[nestedMatch[1]] = nestedMatch[2].trim();
       continue;
     }
 
     // Array item (2-space indent)
-    const arrayMatch = line.match(/^  - ?(.*)$/);
+    const arrayMatch = line.match(/^ {2}- ?(.*)$/);
     if (arrayMatch && currentKey) {
       // If there's a pending nested object, push it
       if (currentObj && Object.keys(currentObj).length > 0) {
