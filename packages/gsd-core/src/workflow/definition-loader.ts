@@ -342,7 +342,7 @@ export function loadDefinition(defsDir: string, name: string): WorkflowDefinitio
     parsed = parse(raw);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    throw new Error(`Failed to parse YAML in ${filePath}: ${msg}`);
+    throw new Error(`Failed to parse YAML in ${filePath}: ${msg}`, { cause: e });
   }
 
   const { valid, errors } = validateDefinition(parsed);
