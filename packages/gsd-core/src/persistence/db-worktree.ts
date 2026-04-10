@@ -30,6 +30,7 @@ export function reconcileWorktreeDb(
   // Sanitize path: reject any characters that could break ATTACH syntax.
   // ATTACH DATABASE doesn't support parameterized paths in all providers,
   // so we use strict allowlist validation instead.
+  // eslint-disable-next-line no-control-regex
   if (/['";\x00]/.test(worktreeDbPath)) {
     logError("db", "worktree DB reconciliation failed: path contains unsafe characters");
     return zero;

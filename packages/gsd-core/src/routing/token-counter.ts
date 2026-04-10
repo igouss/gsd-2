@@ -20,7 +20,7 @@ async function getEncoder(): Promise<TokenEncoder | null> {
 	if (encoder) return encoder;
 	if (encoderFailed) return null;
 	try {
-		// @ts-ignore — tiktoken may not have type declarations in extensions tsconfig
+		// @ts-expect-error — tiktoken may not have type declarations in extensions tsconfig
 		const tiktoken = await import("tiktoken");
 		encoder = tiktoken.encoding_for_model("gpt-4o") as TokenEncoder;
 		return encoder;
