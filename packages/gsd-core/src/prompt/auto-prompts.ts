@@ -880,7 +880,7 @@ export async function checkNeedsReassessment(
         const completedSliceIds = slices.filter(s => s.status === "complete").map(s => s.id);
         const hasIncomplete = slices.some(s => s.status !== "complete");
         if (completedSliceIds.length === 0 || !hasIncomplete) return null;
-        const lastCompleted = completedSliceIds[completedSliceIds.length - 1];
+        const lastCompleted = completedSliceIds[completedSliceIds.length - 1]!;
         const assessmentFile = resolveSliceFile(base, mid, lastCompleted, "ASSESSMENT");
         const hasAssessment = !!(assessmentFile && await loadFile(assessmentFile));
         if (hasAssessment) return null;
@@ -903,7 +903,7 @@ export async function checkNeedsReassessment(
   const fileCompletedIds = parsed.slices.filter(s => s.done).map(s => s.id);
   const fileHasIncomplete = parsed.slices.some(s => !s.done);
   if (fileCompletedIds.length === 0 || !fileHasIncomplete) return null;
-  const lastDone = fileCompletedIds[fileCompletedIds.length - 1];
+  const lastDone = fileCompletedIds[fileCompletedIds.length - 1]!;
   const assessFile = resolveSliceFile(base, mid, lastDone, "ASSESSMENT");
   const hasAssess = !!(assessFile && await loadFile(assessFile));
   if (hasAssess) return null;
@@ -938,7 +938,7 @@ export async function checkNeedsRunUat(
         if (completedSlices.length === 0) return null;
         if (incompleteSlices.length === 0) return null;
         if (!prefs?.uat_dispatch) return null;
-        const lastCompleted = completedSlices[completedSlices.length - 1];
+        const lastCompleted = completedSlices[completedSlices.length - 1]!;
         const sid = lastCompleted.id;
         const uatFile = resolveSliceFile(base, mid, sid, "UAT");
         if (!uatFile) return null;
@@ -972,7 +972,7 @@ export async function checkNeedsRunUat(
   const completedFileSlices = parsed.slices.filter(s => s.done);
   const incompleteFileSlices = parsed.slices.filter(s => !s.done);
   if (completedFileSlices.length === 0 || incompleteFileSlices.length === 0) return null;
-  const lastCompletedFile = completedFileSlices[completedFileSlices.length - 1];
+  const lastCompletedFile = completedFileSlices[completedFileSlices.length - 1]!;
   const uatSid = lastCompletedFile.id;
   const uatFileFb = resolveSliceFile(base, mid, uatSid, "UAT");
   if (!uatFileFb) return null;
@@ -1676,7 +1676,7 @@ export async function buildValidateMilestonePrompt(
   let remediationRound = 0;
   if (validationContent) {
     const roundMatch = validationContent.match(/remediation_round:\s*(\d+)/);
-    remediationRound = roundMatch ? parseInt(roundMatch[1], 10) + 1 : 1;
+    remediationRound = roundMatch ? parseInt(roundMatch[1]!, 10) + 1 : 1;
     inlined.push(`### Previous Validation (re-validation round ${remediationRound})\nSource: \`${validationRel}\`\n\n${validationContent.trim()}`);
   }
 

@@ -63,26 +63,26 @@ export function parseDecisionsTable(content: string): Omit<Decision, 'seq'>[] {
 
     if (cells.length < 7) continue;
 
-    const id = cells[0].trim();
+    const id = cells[0]!.trim();
     // Skip header row
     if (id === '#' || id.toLowerCase() === 'id') continue;
     // Must look like a decision ID (D followed by digits)
     if (!/^D\d+/.test(id)) continue;
 
-    const when_context = cells[1].trim();
-    const scope = cells[2].trim();
-    const decisionText = cells[3].trim();
-    const choice = cells[4].trim();
-    const rationale = cells[5].trim();
-    const revisable = cells[6].trim();
+    const when_context = cells[1]!.trim();
+    const scope = cells[2]!.trim();
+    const decisionText = cells[3]!.trim();
+    const choice = cells[4]!.trim();
+    const rationale = cells[5]!.trim();
+    const revisable = cells[6]!.trim();
     // Made By column is optional for backward compatibility — defaults to 'agent'
-    const rawMadeBy = cells.length >= 8 ? cells[7].trim().toLowerCase() : 'agent';
+    const rawMadeBy = cells.length >= 8 ? cells[7]!.trim().toLowerCase() : 'agent';
     const made_by = (VALID_MADE_BY.has(rawMadeBy) ? rawMadeBy : 'agent') as import('../domain/types.ts').DecisionMadeBy;
 
     // Detect (amends DXXX) in the Decision column
     const amendsMatch = decisionText.match(/\(amends\s+(D\d+)\)/i);
     if (amendsMatch) {
-      amendsMap.set(amendsMatch[1], id);
+      amendsMap.set(amendsMatch[1]!, id);
     }
 
     results.push({
@@ -155,7 +155,7 @@ export function parseRequirementsSections(content: string): Requirement[] {
   }
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+    const line = lines[i]!;
     const lineLower = line.trim().toLowerCase();
 
     // Check for section heading (## Active, ## Validated, etc.)
@@ -179,7 +179,7 @@ export function parseRequirementsSections(content: string): Requirement[] {
       flushReq();
       if (currentSectionStatus !== null) {
         currentReq = {
-          id: reqMatch[1],
+          id: reqMatch[1]!,
           status: currentSectionStatus,
         };
         currentFullContentLines = [line];
@@ -194,8 +194,8 @@ export function parseRequirementsSections(content: string): Requirement[] {
       // Extract field bullets: "- Field: value" or "- Field name: value"
       const bulletMatch = line.match(/^-\s+(.+?):\s+(.*)/);
       if (bulletMatch) {
-        const fieldName = bulletMatch[1].trim().toLowerCase();
-        const value = bulletMatch[2].trim();
+        const fieldName = bulletMatch[1]!.trim().toLowerCase();
+        const value = bulletMatch[2]!.trim();
 
         switch (fieldName) {
           case 'class':
@@ -551,7 +551,7 @@ export function migrateHierarchyToDb(basePath: string): {
     if (!milestoneTitle && hasContext) {
       const contextContent = readFileSync(contextPath!, 'utf-8');
       const h1Match = contextContent.match(/^#\s+(.+)/m);
-      if (h1Match) milestoneTitle = h1Match[1].trim();
+      if (h1Match) milestoneTitle = h1Match[1]!.trim();
     }
 
     // Determine depends_on from CONTEXT frontmatter

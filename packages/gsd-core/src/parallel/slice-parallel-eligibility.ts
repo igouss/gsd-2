@@ -44,7 +44,7 @@ export function getEligibleSlices(
   const eligible: EligibleSlice[] = [];
 
   for (let i = 0; i < slices.length; i++) {
-    const slice = slices[i];
+    const slice = slices[i]!;
 
     // Rule 1: skip done slices
     if (slice.done) continue;

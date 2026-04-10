@@ -68,12 +68,12 @@ function detectFileOverlaps(
   const ids = [...fileSets.keys()];
 
   for (let i = 0; i < ids.length; i++) {
-    const files1 = new Set(fileSets.get(ids[i])!);
+    const files1 = new Set(fileSets.get(ids[i]!)!);
     for (let j = i + 1; j < ids.length; j++) {
-      const files2 = fileSets.get(ids[j])!;
+      const files2 = fileSets.get(ids[j]!)!;
       const shared = files2.filter(f => files1.has(f));
       if (shared.length > 0) {
-        overlaps.push({ mid1: ids[i], mid2: ids[j], files: shared.sort() });
+        overlaps.push({ mid1: ids[i]!, mid2: ids[j]!, files: shared.sort() });
       }
     }
   }

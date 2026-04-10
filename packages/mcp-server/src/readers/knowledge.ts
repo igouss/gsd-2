@@ -36,18 +36,18 @@ function parseTableRows(section: string, type: KnowledgeType): KnowledgeEntry[] 
     const cells = line.split('|').map((c) => c.trim()).filter(Boolean);
     if (cells.length < 3) continue;
     // Skip header/separator
-    if (cells[0].startsWith('#') || cells[0].startsWith('-')) continue;
+    if (cells[0]!.startsWith('#') || cells[0]!.startsWith('-')) continue;
 
-    const id = cells[0];
+    const id = cells[0]!;
     if (!/^[KPL]\d+$/i.test(id)) continue;
 
     if (type === 'rule' && cells.length >= 5) {
       entries.push({
-        id, type, scope: cells[1], content: cells[2], addedAt: cells[4] ?? '',
+        id, type, scope: cells[1]!, content: cells[2]!, addedAt: cells[4] ?? '',
       });
     } else if (type === 'pattern' && cells.length >= 4) {
       entries.push({
-        id, type, scope: cells[2] ?? '', content: cells[1], addedAt: cells[3] ?? '',
+        id, type, scope: cells[2] ?? '', content: cells[1]!, addedAt: cells[3] ?? '',
       });
     } else if (type === 'lesson' && cells.length >= 5) {
       entries.push({
@@ -67,19 +67,19 @@ function parseKnowledgeMarkdown(content: string): KnowledgeEntry[] {
   // Find ## Rules section
   const rulesMatch = content.match(/## Rules\s*\n([\s\S]*?)(?=\n## |$)/i);
   if (rulesMatch) {
-    entries.push(...parseTableRows(rulesMatch[1], 'rule'));
+    entries.push(...parseTableRows(rulesMatch[1]!, 'rule'));
   }
 
   // Find ## Patterns section
   const patternsMatch = content.match(/## Patterns\s*\n([\s\S]*?)(?=\n## |$)/i);
   if (patternsMatch) {
-    entries.push(...parseTableRows(patternsMatch[1], 'pattern'));
+    entries.push(...parseTableRows(patternsMatch[1]!, 'pattern'));
   }
 
   // Find ## Lessons Learned section
   const lessonsMatch = content.match(/## Lessons Learned\s*\n([\s\S]*?)(?=\n## |$)/i);
   if (lessonsMatch) {
-    entries.push(...parseTableRows(lessonsMatch[1], 'lesson'));
+    entries.push(...parseTableRows(lessonsMatch[1]!, 'lesson'));
   }
 
   return entries;

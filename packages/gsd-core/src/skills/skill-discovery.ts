@@ -129,10 +129,10 @@ function parseSkillFrontmatter(path: string): { name?: string; description?: str
     const result: { name?: string; description?: string } = {};
 
     const nameMatch = fm.match(/^name:\s*(.+)$/m);
-    if (nameMatch) result.name = nameMatch[1].trim();
+    if (nameMatch) result.name = nameMatch[1]!.trim();
 
     const descMatch = fm.match(/^description:\s*(.+)$/m);
-    if (descMatch) result.description = descMatch[1].trim();
+    if (descMatch) result.description = descMatch[1]!.trim();
 
     return result;
   } catch {

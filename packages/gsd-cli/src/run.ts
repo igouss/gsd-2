@@ -53,16 +53,16 @@ function parseArgs(): CliArgs {
 
   let i = 0;
   while (i < args.length) {
-    const arg = args[i];
+    const arg = args[i]!;
     switch (arg) {
       case "--model":
-        result.model = args[++i];
+        result.model = args[++i]!;
         break;
       case "--claude-bin":
-        result.claudeBin = args[++i];
+        result.claudeBin = args[++i]!;
         break;
       case "--max-budget":
-        result.maxBudget = parseFloat(args[++i]);
+        result.maxBudget = parseFloat(args[++i]!);
         break;
       case "--verbose":
         result.verbose = true;

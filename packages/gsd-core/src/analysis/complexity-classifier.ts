@@ -256,7 +256,7 @@ export function extractTaskMetadata(unitId: string, basePath: string): TaskMetad
     // Try to extract estimated lines from content
     const estimateMatch = content.match(/~?\s*(\d+)\s*lines?\b/i);
     if (estimateMatch) {
-      meta.estimatedLines = parseInt(estimateMatch[1], 10);
+      meta.estimatedLines = parseInt(estimateMatch[1]!, 10);
     }
 
     // Phase 4: Deeper introspection signals

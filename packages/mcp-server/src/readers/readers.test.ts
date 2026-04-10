@@ -111,7 +111,7 @@ Execute T02 in S01 — implement token refresh.
   it('parses blockers', () => {
     const result = readProgress(projectDir);
     assert.equal(result.blockers.length, 1);
-    assert.ok(result.blockers[0].includes('OAuth'));
+    assert.ok(result.blockers[0]!.includes('OAuth'));
   });
 
   it('parses requirements', () => {
@@ -188,36 +188,36 @@ Build the foundation for the project.
   it('returns milestone structure', () => {
     const result = readRoadmap(projectDir);
     assert.equal(result.milestones.length, 1);
-    assert.equal(result.milestones[0].id, 'M001');
-    assert.equal(result.milestones[0].title, 'Core Setup');
+    assert.equal(result.milestones[0]!.id, 'M001');
+    assert.equal(result.milestones[0]!.title, 'Core Setup');
   });
 
   it('reads vision from roadmap', () => {
     const result = readRoadmap(projectDir);
-    assert.ok(result.milestones[0].vision.includes('foundation'));
+    assert.ok(result.milestones[0]!.vision.includes('foundation'));
   });
 
   it('parses slices from roadmap table', () => {
     const result = readRoadmap(projectDir);
-    const slices = result.milestones[0].slices;
+    const slices = result.milestones[0]!.slices;
     assert.equal(slices.length, 2);
-    assert.equal(slices[0].id, 'S01');
-    assert.equal(slices[0].title, 'Database schema');
-    assert.equal(slices[1].id, 'S02');
+    assert.equal(slices[0]!.id, 'S01');
+    assert.equal(slices[0]!.title, 'Database schema');
+    assert.equal(slices[1]!.id, 'S02');
   });
 
   it('derives slice status from task summaries', () => {
     const result = readRoadmap(projectDir);
-    const slices = result.milestones[0].slices;
-    assert.equal(slices[0].status, 'done');
-    assert.equal(slices[1].status, 'pending');
+    const slices = result.milestones[0]!.slices;
+    assert.equal(slices[0]!.status, 'done');
+    assert.equal(slices[1]!.status, 'pending');
   });
 
   it('includes tasks in slices', () => {
     const result = readRoadmap(projectDir);
-    const s01Tasks = result.milestones[0].slices[0].tasks;
+    const s01Tasks = result.milestones[0]!.slices[0]!.tasks;
     assert.equal(s01Tasks.length, 2);
-    assert.equal(s01Tasks[0].status, 'done');
+    assert.equal(s01Tasks[0]!.status, 'done');
   });
 
   it('filters by milestoneId', () => {
@@ -270,7 +270,7 @@ describe('readHistory', () => {
   it('returns all entries sorted by most recent', () => {
     const result = readHistory(projectDir);
     assert.equal(result.entries.length, 2);
-    assert.equal(result.entries[0].id, 'M001/S01/T02'); // most recent first
+    assert.equal(result.entries[0]!.id, 'M001/S01/T02'); // most recent first
   });
 
   it('computes totals', () => {
@@ -347,13 +347,13 @@ describe('readCaptures', () => {
   it('filters pending captures', () => {
     const result = readCaptures(projectDir, 'pending');
     assert.equal(result.captures.length, 1);
-    assert.equal(result.captures[0].id, 'CAP-aaa11111');
+    assert.equal(result.captures[0]!.id, 'CAP-aaa11111');
   });
 
   it('filters actionable captures (inject, replan, quick-task)', () => {
     const result = readCaptures(projectDir, 'actionable');
     assert.equal(result.captures.length, 1);
-    assert.equal(result.captures[0].id, 'CAP-bbb22222');
+    assert.equal(result.captures[0]!.id, 'CAP-bbb22222');
   });
 
   it('counts correctly regardless of filter', () => {
@@ -503,7 +503,7 @@ describe('runDoctorLite', () => {
     const empty = tmpProject();
     const result = runDoctorLite(empty);
     assert.equal(result.ok, true);
-    assert.equal(result.issues[0].code, 'no_gsd_directory');
+    assert.equal(result.issues[0]!.code, 'no_gsd_directory');
     rmSync(empty, { recursive: true, force: true });
   });
 });

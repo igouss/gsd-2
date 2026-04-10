@@ -655,7 +655,7 @@ function buildCostOverTimeChart(units: UnitMetrics[]): string {
   });
 
   const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-  const areaPath = `${linePath} L${points[points.length - 1].x.toFixed(1)},${(padT + plotH).toFixed(1)} L${points[0].x.toFixed(1)},${(padT + plotH).toFixed(1)} Z`;
+  const areaPath = `${linePath} L${points[points.length - 1]!.x.toFixed(1)},${(padT + plotH).toFixed(1)} L${points[0]!.x.toFixed(1)},${(padT + plotH).toFixed(1)} Z`;
 
   const gridLines: string[] = [];
   for (let i = 0; i <= 4; i++) {

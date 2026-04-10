@@ -124,7 +124,7 @@ export async function handleValidateMilestone(
     // Previously only the assessment was written, leaving M002+ milestones
     // with zero quality_gate records despite passing validation.
     const slices = getMilestoneSlices(params.milestoneId);
-    const sliceId = slices.length > 0 ? slices[0].id : "_milestone";
+    const sliceId = slices.length > 0 ? slices[0]!.id : "_milestone";
     insertMilestoneValidationGates(
       params.milestoneId,
       sliceId,

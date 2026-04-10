@@ -48,7 +48,7 @@ export function executeInject(
     const taskMatches = [...content.matchAll(/- \[[ x]\] \*\*T(\d+):/g)];
     if (taskMatches.length === 0) return null;
 
-    const maxId = Math.max(...taskMatches.map(m => parseInt(m[1], 10)));
+    const maxId = Math.max(...taskMatches.map(m => parseInt(m[1]!, 10)));
     const newId = `T${String(maxId + 1).padStart(2, "0")}`;
 
     // Build the new task entry
@@ -157,7 +157,7 @@ export function executeBacktrack(
     // Reject ambiguous multi-target strings — if more than one distinct target remains,
     // don't guess; let the user clarify.
     const uniqueTargets = [...new Set(allMatches)];
-    const targetMilestoneId = uniqueTargets.length === 1 ? uniqueTargets[0] : null;
+    const targetMilestoneId = uniqueTargets.length === 1 ? uniqueTargets[0]! : null;
 
     const ts = new Date().toISOString();
     const triggerPath = join(gsdRoot(basePath), "BACKTRACK-TRIGGER.md");
@@ -288,7 +288,7 @@ export function detectFileOverlap(
   const tasks = [...planContent.matchAll(taskPattern)];
 
   for (const taskMatch of tasks) {
-    const taskId = taskMatch[1];
+    const taskId = taskMatch[1]!;
     const taskStart = taskMatch.index!;
 
     // Find the end of this task (next task or end of section)
@@ -303,7 +303,7 @@ export function detectFileOverlap(
 
     // Extract file references — look for backtick-quoted paths
     const fileRefs = [...taskContent.matchAll(/`([^`]+\.[a-z]+)`/g)]
-      .map(m => m[1].replace(/^\.\//, "").toLowerCase());
+      .map(m => m[1]!.replace(/^\.\//, "").toLowerCase());
 
     // Check for overlap
     const hasOverlap = fileRefs.some(f => normalizedAffected.has(f));

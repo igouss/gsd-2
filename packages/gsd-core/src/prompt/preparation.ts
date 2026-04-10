@@ -918,13 +918,13 @@ function parseDecisions(content: string | null): PriorContextBrief["decisions"] 
 
     if (cells.length < 6) continue;
 
-    const id = cells[0]; // D001
+    const id = cells[0]!; // D001
     if (!id.match(/^D\d+$/)) continue; // Must be a decision ID
 
-    const scope = cells[2]; // pattern, architecture, etc.
-    const decision = cells[3];
-    const choice = cells[4];
-    const rationale = cells[5];
+    const scope = cells[2]!; // pattern, architecture, etc.
+    const decision = cells[3]!;
+    const choice = cells[4]!;
+    const rationale = cells[5]!;
 
     const entry: DecisionEntry = { id, scope, decision, choice, rationale };
 
@@ -963,12 +963,12 @@ function parseRequirements(content: string | null): PriorContextBrief["requireme
     const idMatch = block.match(/^### (R\d+)\s*—\s*(.+)/m);
     if (!idMatch) continue;
 
-    const id = idMatch[1];
-    const description = idMatch[2].trim();
+    const id = idMatch[1]!;
+    const description = idMatch[2]!.trim();
 
     // Extract status from "- Status: active" line
     const statusMatch = block.match(/^-\s*Status:\s*(\w+)/m);
-    const statusRaw = statusMatch ? statusMatch[1].toLowerCase() : "active";
+    const statusRaw = statusMatch ? statusMatch[1]!.toLowerCase() : "active";
 
     let status: RequirementEntry["status"] = "active";
     if (statusRaw === "validated") status = "validated";

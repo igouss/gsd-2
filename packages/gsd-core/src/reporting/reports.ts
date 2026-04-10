@@ -217,7 +217,7 @@ function buildIndexHtml(index: ReportsIndex): string {
     // Delta vs previous
     let deltaHtml = '';
     if (i > 0) {
-      const prev = sorted[i - 1];
+      const prev = sorted[i - 1]!;
       const dCost = e.totalCost - prev.totalCost;
       const dSlices = e.doneSlices - prev.doneSlices;
       const dMillestones = e.doneMilestones - prev.doneMilestones;
@@ -355,13 +355,13 @@ function buildCostSparkline(entries: ReportEntry[]): string {
     const x = PAD + i * xStep;
     const y = PAD + (1 - c / maxCost) * (H - PAD * 2);
     return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" class="spark-dot">
-      <title>${esc(entries[i].label)} — ${formatCost(c)}</title>
+      <title>${esc(entries[i]!.label)} — ${formatCost(c)}</title>
     </circle>`;
   }).join('');
 
   // Labels at start and end
-  const startLabel = formatCost(costs[0]);
-  const endLabel   = formatCost(costs[costs.length - 1]);
+  const startLabel = formatCost(costs[0]!);
+  const endLabel   = formatCost(costs[costs.length - 1]!);
 
   return `
     <div class="sparkline">

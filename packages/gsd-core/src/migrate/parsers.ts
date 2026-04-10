@@ -33,7 +33,7 @@ import type {
 function extractXmlTag(content: string, tagName: string): string {
   const regex = new RegExp(`<${tagName}>([\\s\\S]*?)<\\/${tagName}>`, 'i');
   const match = regex.exec(content);
-  return match ? match[1].trim() : '';
+  return match ? match[1]!.trim() : '';
 }
 
 /**
@@ -47,7 +47,7 @@ function extractTasks(content: string): string[] {
   const regex = /<task>([\s\S]*?)<\/task>/gi;
   let match: RegExpExecArray | null;
   while ((match = regex.exec(tasksBlock)) !== null) {
-    const trimmed = match[1].trim();
+    const trimmed = match[1]!.trim();
     if (trimmed) tasks.push(trimmed);
   }
   return tasks;
@@ -64,7 +64,7 @@ function parsePhaseEntry(line: string): PlanningRoadmapEntry | null {
   // Also handles: - [x] Phase 25: Title - Description (completed ...)
   const fmtPhaseColon = stripped.match(/^-\s+\[([ xX])\]\s+(?:Phase\s+)?(\d+(?:\.\d+)?)\s*:\s*(.+)$/);
   if (fmtPhaseColon) {
-    let title = fmtPhaseColon[3].trim();
+    let title = fmtPhaseColon[3]!.trim();
     // Strip trailing parentheticals, plan counts, and completion notes
     title = title.replace(/\s*\(\d+\/\d+\s+plans?\)/, '')
                  .replace(/\s*--\s+.*$/, '')
@@ -73,9 +73,9 @@ function parsePhaseEntry(line: string): PlanningRoadmapEntry | null {
                  .replace(/\s*\(shipped.*\)$/i, '')
                  .trim();
     return {
-      number: parseFloat(fmtPhaseColon[2]),
+      number: parseFloat(fmtPhaseColon[2]!),
       title,
-      done: fmtPhaseColon[1].toLowerCase() === 'x',
+      done: fmtPhaseColon[1]!.toLowerCase() === 'x',
       raw: line,
     };
   }
@@ -83,14 +83,14 @@ function parsePhaseEntry(line: string): PlanningRoadmapEntry | null {
   // Format 2: - [x] 25 — Title (em-dash/en-dash only — NOT plain hyphen to avoid plan file refs)
   const fmtDash = stripped.match(/^-\s+\[([ xX])\]\s+(?:Phase\s+)?(\d+(?:\.\d+)?)\s*[—–]\s*(.+)$/);
   if (fmtDash) {
-    let title = fmtDash[3].trim();
+    let title = fmtDash[3]!.trim();
     title = title.replace(/\s*\(\d+\/\d+\s+plans?\)/, '')
                  .replace(/\s*--\s+.*$/, '')
                  .trim();
     return {
-      number: parseFloat(fmtDash[2]),
+      number: parseFloat(fmtDash[2]!),
       title,
-      done: fmtDash[1].toLowerCase() === 'x',
+      done: fmtDash[1]!.toLowerCase() === 'x',
       raw: line,
     };
   }
@@ -123,22 +123,22 @@ export function parseOldRoadmap(content: string): PlanningRoadmap {
     // Also check for non-collapsed milestone sections (### v3.0 Title)
     // that follow the <details> blocks
     for (let i = 0; i < lines.length; i++) {
-      const heading = lines[i].match(/^###\s+(v[\d.]+)\s+(.+?)(?:\s*\(.*\))?\s*$/);
+      const heading = lines[i]!.match(/^###\s+(v[\d.]+)\s+(.+?)(?:\s*\(.*\))?\s*$/);
       if (heading) {
         // Already captured as a details block?
-        const id = heading[1];
+        const id = heading[1]!;
         if (result.milestones.some(m => m.id === id)) continue;
 
         // Collect phase entries until next ## or ### heading
         const phases: PlanningRoadmapEntry[] = [];
         for (let j = i + 1; j < lines.length; j++) {
-          if (/^##?\s/.test(lines[j]) || /^###\s/.test(lines[j])) break;
-          const entry = parsePhaseEntry(lines[j].trim());
+          if (/^##?\s/.test(lines[j]!) || /^###\s/.test(lines[j]!)) break;
+          const entry = parsePhaseEntry(lines[j]!.trim());
           if (entry) phases.push(entry);
         }
         result.milestones.push({
           id,
-          title: heading[2].trim(),
+          title: heading[2]!.trim(),
           collapsed: false,
           phases,
         });
@@ -152,15 +152,15 @@ export function parseOldRoadmap(content: string): PlanningRoadmap {
   const milestoneHeadings: { index: number; id: string; title: string }[] = [];
 
   for (let i = 0; i < lines.length; i++) {
-    const match = lines[i].match(milestoneHeadingRegex);
+    const match = lines[i]!.match(milestoneHeadingRegex);
     if (match) {
-      const heading = match[1].trim();
+      const heading = match[1]!.trim();
       // Skip generic headings like "## Phases", "## Milestones", "## Phase Details", "## Progress"
       if (/^(phases?|milestones?|phase\s+details?|progress)$/i.test(heading)) continue;
       // Extract milestone ID (e.g. "v2.0" from "v2.0 — Foundation")
       const idMatch = heading.match(/^(v[\d.]+|[\w.-]+)\s*[—–-]\s*(.+)$/);
       if (idMatch) {
-        milestoneHeadings.push({ index: i, id: idMatch[1], title: idMatch[2].trim() });
+        milestoneHeadings.push({ index: i, id: idMatch[1]!, title: idMatch[2]!.trim() });
       }
     }
   }
@@ -168,13 +168,13 @@ export function parseOldRoadmap(content: string): PlanningRoadmap {
   if (milestoneHeadings.length > 0) {
     // Milestone-sectioned format
     for (let m = 0; m < milestoneHeadings.length; m++) {
-      const startIdx = milestoneHeadings[m].index + 1;
-      const endIdx = m + 1 < milestoneHeadings.length ? milestoneHeadings[m + 1].index : lines.length;
+      const startIdx = milestoneHeadings[m]!.index + 1;
+      const endIdx = m + 1 < milestoneHeadings.length ? milestoneHeadings[m + 1]!.index : lines.length;
       const sectionLines = lines.slice(startIdx, endIdx);
 
       const milestone: PlanningRoadmapMilestone = {
-        id: milestoneHeadings[m].id,
-        title: milestoneHeadings[m].title,
+        id: milestoneHeadings[m]!.id,
+        title: milestoneHeadings[m]!.title,
         collapsed: false,
         phases: [],
       };
@@ -230,8 +230,8 @@ function parseDetailsBlockMilestones(lines: string[]): PlanningRoadmapMilestone[
       const summaryMatch = trimmed.match(/<summary>\s*(v[\d.]+)\s+(.+?)\s*(?:\(.*\))?\s*(?:--\s*.*)?\s*<\/summary>/);
       if (summaryMatch) {
         currentMilestone = {
-          id: summaryMatch[1],
-          title: summaryMatch[2].trim(),
+          id: summaryMatch[1]!,
+          title: summaryMatch[2]!.trim(),
           collapsed: true,
           phases: [],
         };
@@ -284,13 +284,13 @@ function parseMustHavesFromLines(fmLines: string[]): PlanningPlanMustHaves | nul
   let currentList: string[] | null = null;
 
   for (let i = start + 1; i < fmLines.length; i++) {
-    const line = fmLines[i];
+    const line = fmLines[i]!;
     // New top-level key — stop
     if (/^\w/.test(line)) break;
     // Sub-key at 2-space indent
     const subKey = line.match(/^ {2}(\w[\w_]*):/);
     if (subKey) {
-      const key = subKey[1];
+      const key = subKey[1]!;
       if (key === 'truths') currentList = truths;
       else if (key === 'artifacts') currentList = artifacts;
       else if (key === 'key_links') currentList = keyLinks;
@@ -302,7 +302,7 @@ function parseMustHavesFromLines(fmLines: string[]): PlanningPlanMustHaves | nul
     // Array item at 4-space indent
     const item = line.match(/^ {4}- (.+)$/);
     if (item && currentList) {
-      currentList.push(item[1].trim());
+      currentList.push(item[1]!.trim());
     }
   }
 
@@ -436,7 +436,7 @@ export function parseOldRequirements(content: string): PlanningRequirement[] {
     const statusMatch = line.match(/^##\s+(\w[\w\s&]*\w)\s*$/);
     if (statusMatch) {
       flushReq();
-      currentStatus = statusMatch[1].toLowerCase();
+      currentStatus = statusMatch[1]!.toLowerCase();
       continue;
     }
 
@@ -444,10 +444,10 @@ export function parseOldRequirements(content: string): PlanningRequirement[] {
     const sectionMatch = line.match(/^###\s+(.+)$/);
     if (sectionMatch) {
       // Check if this is a requirement heading (### R001 — Title)
-      const reqHeading = sectionMatch[1].match(/^(R\d+)\s*[—–-]\s*(.+)$/);
+      const reqHeading = sectionMatch[1]!.match(/^(R\d+)\s*[—–-]\s*(.+)$/);
       if (reqHeading) {
         flushReq();
-        currentReq = { id: reqHeading[1], title: reqHeading[2].trim(), status: currentStatus, description: '' };
+        currentReq = { id: reqHeading[1]!, title: reqHeading[2]!.trim(), status: currentStatus, description: '' };
         currentRaw.push(line);
         continue;
       }
@@ -460,9 +460,9 @@ export function parseOldRequirements(content: string): PlanningRequirement[] {
     const bulletReqMatch = line.match(/^-\s+\[([ xX])\]\s+\*\*([^*]+)\*\*\s*:\s*(.+)$/);
     if (bulletReqMatch) {
       flushReq();
-      const done = bulletReqMatch[1].toLowerCase() === 'x';
-      const id = bulletReqMatch[2].trim();
-      const desc = bulletReqMatch[3].trim();
+      const done = bulletReqMatch[1]!.toLowerCase() === 'x';
+      const id = bulletReqMatch[2]!.trim();
+      const desc = bulletReqMatch[3]!.trim();
       requirements.push({
         id,
         title: desc,
@@ -478,12 +478,12 @@ export function parseOldRequirements(content: string): PlanningRequirement[] {
       currentRaw.push(line);
       const descMatch = line.match(/^-\s+Description:\s*(.+)$/);
       if (descMatch) {
-        currentReq.description = descMatch[1].trim();
+        currentReq.description = descMatch[1]!.trim();
         continue;
       }
       const statMatch = line.match(/^-\s+Status:\s*(.+)$/);
       if (statMatch) {
-        currentReq.status = statMatch[1].trim();
+        currentReq.status = statMatch[1]!.trim();
       }
     }
   }

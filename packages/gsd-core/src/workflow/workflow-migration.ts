@@ -157,7 +157,7 @@ export function migrateFromMarkdown(basePath: string): void {
     const knownSliceIds = new Set(roadmapSlices.map(s => s.id));
 
     for (let sIdx = 0; sIdx < roadmapSlices.length; sIdx++) {
-      const slice = roadmapSlices[sIdx];
+      const slice = roadmapSlices[sIdx]!;
       // Per Pitfall #5: if milestone is done, force all child slices to done
       const sliceStatus = milestoneDone ? "done" : (slice.done ? "done" : "pending");
 
@@ -179,7 +179,7 @@ export function migrateFromMarkdown(basePath: string): void {
           const plan = parsePlan(planContent);
 
           for (let tIdx = 0; tIdx < plan.tasks.length; tIdx++) {
-            const task = plan.tasks[tIdx];
+            const task = plan.tasks[tIdx]!;
             // Per Pitfall #5: if milestone is done, force all tasks to done
             const taskStatus = milestoneDone ? "done" : (task.done ? "done" : "pending");
             taskInserts.push({

@@ -973,7 +973,7 @@ export async function repairStaleRenders(basePath: string): Promise<number> {
         // Roadmap checkbox mismatch — extract milestone ID from path
         const milestoneMatch = normPath.match(/milestones\/([^/]+)\//);
         if (milestoneMatch) {
-          const ok = await renderRoadmapCheckboxes(basePath, milestoneMatch[1]);
+          const ok = await renderRoadmapCheckboxes(basePath, milestoneMatch[1]!);
           if (ok) {
             repairedPaths.add(entry.path);
             repairCount++;
@@ -983,7 +983,7 @@ export async function repairStaleRenders(basePath: string): Promise<number> {
         // Plan checkbox mismatch — extract milestone + slice IDs from path
         const pathMatch = normPath.match(/milestones\/([^/]+)\/slices\/([^/]+)\//);
         if (pathMatch) {
-          const ok = await renderPlanCheckboxes(basePath, pathMatch[1], pathMatch[2]);
+          const ok = await renderPlanCheckboxes(basePath, pathMatch[1]!, pathMatch[2]!);
           if (ok) {
             repairedPaths.add(entry.path);
             repairCount++;
@@ -994,7 +994,7 @@ export async function repairStaleRenders(basePath: string): Promise<number> {
         const pathMatch = normPath.match(/milestones\/([^/]+)\/slices\/([^/]+)\/tasks\//);
         const taskMatch = entry.reason.match(/^(T\d+)/);
         if (pathMatch && taskMatch) {
-          const ok = await renderTaskSummary(basePath, pathMatch[1], pathMatch[2], taskMatch[1]);
+          const ok = await renderTaskSummary(basePath, pathMatch[1]!, pathMatch[2]!, taskMatch[1]!);
           if (ok) {
             repairedPaths.add(entry.path);
             repairCount++;
@@ -1004,7 +1004,7 @@ export async function repairStaleRenders(basePath: string): Promise<number> {
         // Missing slice summary — extract IDs from path
         const pathMatch = normPath.match(/milestones\/([^/]+)\/slices\/([^/]+)\//);
         if (pathMatch) {
-          const ok = await renderSliceSummary(basePath, pathMatch[1], pathMatch[2]);
+          const ok = await renderSliceSummary(basePath, pathMatch[1]!, pathMatch[2]!);
           if (ok) {
             repairedPaths.add(entry.path);
             repairCount++;
@@ -1014,7 +1014,7 @@ export async function repairStaleRenders(basePath: string): Promise<number> {
         // Missing slice UAT — renderSliceSummary handles both SUMMARY + UAT
         const pathMatch = normPath.match(/milestones\/([^/]+)\/slices\/([^/]+)\//);
         if (pathMatch) {
-          const ok = await renderSliceSummary(basePath, pathMatch[1], pathMatch[2]);
+          const ok = await renderSliceSummary(basePath, pathMatch[1]!, pathMatch[2]!);
           if (ok) {
             repairedPaths.add(entry.path);
             repairCount++;

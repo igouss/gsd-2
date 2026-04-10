@@ -34,14 +34,14 @@ export interface ProgressResult {
 function parseBoldField(content: string, label: string): string | null {
   const re = new RegExp(`\\*\\*${label}:\\*\\*\\s*(.+)`, 'i');
   const m = content.match(re);
-  return m ? m[1].trim() : null;
+  return m ? m[1]!.trim() : null;
 }
 
 function parseActiveRef(value: string | null): { id: string; title: string } | null {
   if (!value || value.toLowerCase() === 'none' || value === '—') return null;
   // "M001: Flight Simulator" or "M001"
   const m = value.match(/^(M\d+|S\d+|T\d+):?\s*(.*)/);
-  if (m) return { id: m[1], title: m[2] || m[1] };
+  if (m) return { id: m[1]!, title: m[2] || m[1]! };
   return { id: value, title: value };
 }
 
@@ -63,17 +63,17 @@ function parseRequirementsLine(value: string | null): ProgressResult['requiremen
   const outOfScope = value.match(/(\d+)\s*out.of.scope/i);
   if (!active && !validated && !deferred && !outOfScope) return null;
   return {
-    active: active ? parseInt(active[1], 10) : 0,
-    validated: validated ? parseInt(validated[1], 10) : 0,
-    deferred: deferred ? parseInt(deferred[1], 10) : 0,
-    outOfScope: outOfScope ? parseInt(outOfScope[1], 10) : 0,
+    active: active ? parseInt(active[1]!, 10) : 0,
+    validated: validated ? parseInt(validated[1]!, 10) : 0,
+    deferred: deferred ? parseInt(deferred[1]!, 10) : 0,
+    outOfScope: outOfScope ? parseInt(outOfScope[1]!, 10) : 0,
   };
 }
 
 function parseBlockers(content: string): string[] {
   const section = content.match(/## Blockers\s*\n([\s\S]*?)(?=\n##|\n$|$)/i);
   if (!section) return [];
-  return section[1]
+  return section[1]!
     .split('\n')
     .map((l) => l.replace(/^[-*]\s*/, '').trim())
     .filter(Boolean);
@@ -82,7 +82,7 @@ function parseBlockers(content: string): string[] {
 function parseNextAction(content: string): string {
   const section = content.match(/## Next Action\s*\n([\s\S]*?)(?=\n##|\n$|$)/i);
   if (!section) return '';
-  return section[1].trim().split('\n')[0] || '';
+  return section[1]!.trim().split('\n')[0] ?? '';
 }
 
 // ---------------------------------------------------------------------------
@@ -95,10 +95,10 @@ function parseMilestoneRegistry(content: string): RegistryEntry[] {
   const section = content.match(/## Milestone Registry\s*\n([\s\S]*?)(?=\n##|\n$|$)/i);
   if (!section) return [];
   const entries: RegistryEntry[] = [];
-  for (const line of section[1].split('\n')) {
+  for (const line of section[1]!.split('\n')) {
     const m = line.match(/[-*]\s*(☑|✅|🔄|⬜|⏸)\s*\*\*(M\d+):\*\*/);
     if (!m) continue;
-    const [, icon, id] = m;
+    const icon = m[1]!, id = m[2]!;
     let status: RegistryEntry['status'] = 'pending';
     if (icon === '☑' || icon === '✅') status = 'done';
     else if (icon === '🔄') status = 'active';

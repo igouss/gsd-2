@@ -102,7 +102,7 @@ function parseFrontmatter(content: string): { name: string; description: string 
   const match = content.match(/^---\s*\n([\s\S]*?)\n---/);
   if (!match) return { name: "", description: "" };
 
-  const block = match[1];
+  const block = match[1]!;
   let name = "";
   let description = "";
 
@@ -126,7 +126,7 @@ function parseFrontmatter(content: string): { name: string; description: string 
 
     const kvMatch = line.match(/^(\w+):\s*(.*)/);
     if (kvMatch) {
-      const [, key, value] = kvMatch;
+      const key = kvMatch[1]!, value = kvMatch[2]!;
       if (key === "name") {
         name = value.trim().replace(/^["']|["']$/g, "");
       } else if (key === "description") {

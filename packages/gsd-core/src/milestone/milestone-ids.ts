@@ -22,7 +22,7 @@ export const MILESTONE_ID_RE = /^M\d{3}(?:-[a-z0-9]{6})?$/;
 /** Extract the trailing sequential number from a milestone ID. Returns 0 for non-matches. */
 export function extractMilestoneSeq(id: string): number {
   const m = id.match(/^M(\d{3})(?:-[a-z0-9]{6})?$/);
-  return m ? parseInt(m[1], 10) : 0;
+  return m ? parseInt(m[1]!, 10) : 0;
 }
 
 /** Structured parse of a milestone ID into optional suffix and sequence number. */
@@ -31,7 +31,7 @@ export function parseMilestoneId(id: string): { suffix?: string; num: number } {
   if (!m) return { num: 0 };
   return {
     ...(m[2] ? { suffix: m[2] } : {}),
-    num: parseInt(m[1], 10),
+    num: parseInt(m[1]!, 10),
   };
 }
 

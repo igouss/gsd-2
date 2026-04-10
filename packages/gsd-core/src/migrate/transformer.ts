@@ -137,7 +137,7 @@ function deriveDemo(phase: PlanningPhase, slug: string): string {
   // First plan's objective, first sentence
   const planNumbers = Object.keys(phase.plans).sort((a, b) => Number(a) - Number(b));
   if (planNumbers.length > 0) {
-    const firstPlan = phase.plans[planNumbers[0]];
+    const firstPlan = phase.plans[planNumbers[0]!];
     if (firstPlan?.objective) {
       return firstSentence(firstPlan.objective);
     }
@@ -158,7 +158,7 @@ function mapSlice(
   let tasks: GSDTask[] = [];
   if (phase) {
     const planNumbers = Object.keys(phase.plans).sort((a, b) => Number(a) - Number(b));
-    tasks = planNumbers.map((pn, i) => mapTask(phase.plans[pn], i, phase.summaries));
+    tasks = planNumbers.map((pn, i) => mapTask(phase.plans[pn]!, i, phase.summaries));
   }
 
   const done = entry.done;
@@ -207,9 +207,9 @@ function buildMilestoneFromEntries(
 
   const slices: GSDSlice[] = [];
   for (let i = 0; i < sorted.length; i++) {
-    const entry = sorted[i];
+    const entry = sorted[i]!;
     const phase = findPhase(phases, entry.number, entry.title);
-    const prevId = i > 0 ? slices[i - 1].id : null;
+    const prevId = i > 0 ? slices[i - 1]!.id : null;
     slices.push(mapSlice(phase, entry, i, prevId));
   }
 
@@ -268,7 +268,7 @@ function deriveVision(parsed: PlanningProject): string {
   // Fallback: roadmap title
   if (parsed.roadmap) {
     if (parsed.roadmap.milestones.length > 0) {
-      return parsed.roadmap.milestones[0].title;
+      return parsed.roadmap.milestones[0]!.title;
     }
   }
   return 'Project migration from .planning format';
@@ -299,7 +299,7 @@ export function transformToGSD(parsed: PlanningProject): GSDProject {
   if (isMultiMilestone) {
     // Multi-milestone mode: each roadmap milestone section → one GSDMilestone
     for (let mi = 0; mi < roadmap!.milestones.length; mi++) {
-      const rm = roadmap!.milestones[mi];
+      const rm = roadmap!.milestones[mi]!;
       milestones.push(
         buildMilestoneFromEntries(
           milestoneId(mi + 1),

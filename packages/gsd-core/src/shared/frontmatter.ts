@@ -45,7 +45,7 @@ export function parseFrontmatterMap(lines: string[]): Record<string, unknown> {
     // Nested object property (4-space indent with key: value)
     const nestedMatch = line.match(/^ {4}([\w][\w_-]*)\s*:\s*(.*)$/);
     if (nestedMatch && currentArray && currentObj) {
-      currentObj[nestedMatch[1]] = nestedMatch[2].trim();
+      currentObj[nestedMatch[1]!] = nestedMatch[2]!.trim();
       continue;
     }
 
@@ -58,13 +58,13 @@ export function parseFrontmatterMap(lines: string[]): Record<string, unknown> {
       }
       currentObj = null;
 
-      const val = arrayMatch[1].trim();
+      const val = arrayMatch[1]!.trim();
       if (!currentArray) currentArray = [];
 
       // Check if this array item starts a nested object (e.g. "- slice: S00")
       const nestedStart = val.match(/^([\w][\w_-]*)\s*:\s*(.*)$/);
       if (nestedStart) {
-        currentObj = { [nestedStart[1]]: nestedStart[2].trim() };
+        currentObj = { [nestedStart[1]!]: nestedStart[2]!.trim() };
       } else {
         currentArray.push(stripQuotes(val));
       }
@@ -86,17 +86,17 @@ export function parseFrontmatterMap(lines: string[]): Record<string, unknown> {
     // Top-level key: value (supports hyphens in key names)
     const kvMatch = line.match(/^([\w][\w_-]*)\s*:\s*(.*)$/);
     if (kvMatch) {
-      currentKey = kvMatch[1];
-      const val = kvMatch[2].trim();
+      currentKey = kvMatch[1]!;
+      const val = kvMatch[2]!.trim();
 
       if (val === '' || val === '[]') {
         currentArray = [];
       } else if (val.startsWith('[') && val.endsWith(']')) {
         const inner = val.slice(1, -1).trim();
-        result[currentKey] = inner ? inner.split(',').map(s => s.trim()) : [];
+        result[currentKey!] = inner ? inner.split(',').map(s => s.trim()) : [];
         currentKey = null;
       } else {
-        result[currentKey] = stripQuotes(val);
+        result[currentKey!] = stripQuotes(val);
         currentKey = null;
       }
     }

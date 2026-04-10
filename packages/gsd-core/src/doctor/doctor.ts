@@ -165,7 +165,7 @@ function auditRequirements(content: string | null): DoctorIssue[] {
   for (const block of blocks) {
     const idMatch = block.match(/^(R\d+)/);
     if (!idMatch) continue;
-    const requirementId = idMatch[1];
+    const requirementId = idMatch[1]!;
     const status = block.match(/^-\s+Status:\s+(.+)$/m)?.[1]?.trim().toLowerCase() ?? "";
     const owner = block.match(/^-\s+Primary owning slice:\s+(.+)$/m)?.[1]?.trim().toLowerCase() ?? "";
     const notes = block.match(/^-\s+Notes:\s+(.+)$/m)?.[1]?.trim().toLowerCase() ?? "";
@@ -716,10 +716,10 @@ export async function runGSDDoctor(basePath: string, options?: { fix?: boolean; 
             const rawSummary = await loadFile(summaryPath);
             const m = rawSummary?.match(/^completed_at:\s*(.+)$/m);
             if (m) {
-              const ts = new Date(m[1].trim());
+              const ts = new Date(m[1]!.trim());
               if (!isNaN(ts.getTime()) && ts.getTime() > Date.now() + 24 * 60 * 60 * 1000) {
                 issues.push({ severity: "warning", code: "future_timestamp", scope: "task", unitId: taskUnitId,
-                  message: `Task ${task.id} has completed_at "${m[1].trim()}" which is more than 24h in the future`,
+                  message: `Task ${task.id} has completed_at "${m[1]!.trim()}" which is more than 24h in the future`,
                   file: relTaskFile(basePath, milestoneId, slice.id, task.id, "SUMMARY"), fixable: false });
               }
             }

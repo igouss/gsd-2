@@ -367,7 +367,7 @@ export function getGsdArgumentCompletions(prefix: string) {
     return [];
   }
 
-  const nested = NESTED_COMPLETIONS[command];
+  const nested = NESTED_COMPLETIONS[command!];
   if (nested && parts.length <= 2) {
     return filterOptions(subcommand, nested, command);
   }

@@ -117,7 +117,7 @@ export async function appendKnowledge(
     let maxId = 0;
     let match;
     while ((match = idPattern.exec(existing)) !== null) {
-      const num = parseInt(match[1], 10);
+      const num = parseInt(match[1]!, 10);
       if (num > maxId) maxId = num;
     }
     const nextId = `${prefix}${String(maxId + 1).padStart(3, "0")}`;
@@ -243,11 +243,11 @@ export function parseOverrides(content: string): Override[] {
 
     for (const line of lines) {
       const changeMatch = line.match(/^\*\*Change:\*\*\s*(.+)$/);
-      if (changeMatch) change = changeMatch[1].trim();
+      if (changeMatch) change = changeMatch[1]!.trim();
       const scopeMatch = line.match(/^\*\*Scope:\*\*\s*(.+)$/);
-      if (scopeMatch) scope = scopeMatch[1].trim() as "active" | "resolved";
+      if (scopeMatch) scope = scopeMatch[1]!.trim() as "active" | "resolved";
       const appliedMatch = line.match(/^\*\*Applied-at:\*\*\s*(.+)$/);
-      if (appliedMatch) appliedAt = appliedMatch[1].trim();
+      if (appliedMatch) appliedAt = appliedMatch[1]!.trim();
     }
 
     if (change) {

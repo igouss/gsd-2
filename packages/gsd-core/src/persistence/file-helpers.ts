@@ -105,9 +105,9 @@ export function extractAllSections(body: string, level: number = 2): Map<string,
   const matches = [...body.matchAll(regex)];
 
   for (let i = 0; i < matches.length; i++) {
-    const heading = matches[i][1].trim();
-    const start = matches[i].index! + matches[i][0].length;
-    const end = i + 1 < matches.length ? matches[i + 1].index! : body.length;
+    const heading = matches[i]![1]!.trim();
+    const start = matches[i]!.index! + matches[i]![0].length;
+    const end = i + 1 < matches.length ? matches[i + 1]!.index! : body.length;
     sections.set(heading, body.slice(start, end).trim());
   }
 
@@ -125,5 +125,5 @@ export function parseBullets(text: string): string[] {
 export function extractBoldField(text: string, key: string): string | null {
   const regex = new RegExp(`^\\*\\*${escapeRegex(key)}:\\*\\*\\s*(.+)$`, 'm');
   const match = regex.exec(text);
-  return match ? match[1].trim() : null;
+  return match ? match[1]!.trim() : null;
 }

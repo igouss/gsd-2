@@ -446,7 +446,7 @@ export function substituteParams(
     let m: RegExpExecArray | null;
     const re = new RegExp(PARAM_PATTERN.source, "g");
     while ((m = re.exec(step.prompt)) !== null) {
-      unresolved.add(m[1]);
+      unresolved.add(m[1]!);
     }
   }
 

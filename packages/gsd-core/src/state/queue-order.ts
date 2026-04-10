@@ -142,7 +142,7 @@ export function validateQueueOrder(
 
   const positionMap = new Map<string, number>();
   for (let i = 0; i < order.length; i++) {
-    positionMap.set(order[i], i);
+    positionMap.set(order[i]!, i);
   }
 
   const allKnownIds = new Set([...order, ...completedIds]);
@@ -212,8 +212,8 @@ export function validateQueueOrder(
       if (cycle) {
         const cycleStr = cycle.join(' → ');
         violations.push({
-          milestone: cycle[0],
-          dependsOn: cycle[cycle.length - 2],
+          milestone: cycle[0]!,
+          dependsOn: cycle[cycle.length - 2]!,
           type: 'circular',
           message: `Circular dependency: ${cycleStr}`,
         });

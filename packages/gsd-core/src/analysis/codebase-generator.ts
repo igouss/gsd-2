@@ -81,7 +81,7 @@ export function parseCodebaseMap(content: string): Map<string, string> {
     // Match: - `path/to/file.ts` — Description here
     const match = line.match(/^- `(.+?)` — (.+)$/);
     if (match) {
-      descriptions.set(match[1], match[2]);
+      descriptions.set(match[1]!, match[2]!);
       continue;
     }
 
@@ -89,7 +89,7 @@ export function parseCodebaseMap(content: string): Map<string, string> {
     if (!inCollapsedBlock) {
       const bareMatch = line.match(/^- `(.+?)`\s*$/);
       if (bareMatch) {
-        descriptions.set(bareMatch[1], "");
+        descriptions.set(bareMatch[1]!, "");
       }
     }
   }
@@ -338,7 +338,7 @@ export function getCodebaseMapStats(basePath: string): {
 
   // Parse total file count from the header line (accurate even for collapsed dirs)
   const fileCountMatch = content.match(/Files:\s*(\d+)/);
-  const totalFiles = fileCountMatch ? parseInt(fileCountMatch[1], 10) : 0;
+  const totalFiles = fileCountMatch ? parseInt(fileCountMatch[1]!, 10) : 0;
 
   // Use parseCodebaseMap to count described files (includes collapsed-description blocks)
   const descriptions = parseCodebaseMap(content);

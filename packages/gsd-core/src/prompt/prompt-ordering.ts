@@ -140,7 +140,7 @@ export function reorderForCaching(prompt: string): string {
 
   // Stable sort: sections with the same role keep their original relative order
   const sorted = [...sections].sort((a, b) => {
-    return ROLE_ORDER[a.role] - ROLE_ORDER[b.role];
+    return ROLE_ORDER[a.role]! - ROLE_ORDER[b.role]!;
   });
 
   const parts: string[] = [];

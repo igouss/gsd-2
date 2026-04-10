@@ -107,8 +107,8 @@ function checkNodeVersion(basePath: string): EnvironmentCheckResult | null {
     const curMatch = currentVersion.match(/v?(\d+)\.(\d+)/);
     if (!curMatch) return null;
 
-    const curMajor = parseInt(curMatch[1], 10);
-    const curMinor = parseInt(curMatch[2], 10);
+    const curMajor = parseInt(curMatch[1]!, 10);
+    const curMinor = parseInt(curMatch[2]!, 10);
 
     if (curMajor < reqMajor || (curMajor === reqMajor && curMinor < reqMinor)) {
       return {
@@ -249,7 +249,7 @@ function checkPortConflicts(basePath: string): EnvironmentCheckResult[] {
     // Look for --port NNNN, -p NNNN, PORT=NNNN, :NNNN patterns
     const portMatches = scriptText.matchAll(/(?:--port\s+|(?:^|[^a-z])PORT[=:]\s*|-p\s+|:)(\d{4,5})\b/gi);
     for (const m of portMatches) {
-      const port = parseInt(m[1], 10);
+      const port = parseInt(m[1]!, 10);
       if (port >= 1024 && port <= 65535) portsToCheck.add(port);
     }
   } catch {
@@ -298,7 +298,7 @@ function checkDiskSpace(basePath: string): EnvironmentCheckResult | null {
   try {
     // df output: filesystem blocks used avail capacity mount
     const parts = dfOutput.split(/\s+/);
-    const availKB = parseInt(parts[3], 10);
+    const availKB = parseInt(parts[3]!, 10);
     if (isNaN(availKB)) return null;
 
     const availBytes = availKB * 1024;

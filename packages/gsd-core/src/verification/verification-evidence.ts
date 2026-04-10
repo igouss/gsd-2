@@ -222,7 +222,7 @@ export function formatEvidenceTable(result: VerificationResult): string {
   ];
 
   for (let i = 0; i < result.checks.length; i++) {
-    const check = result.checks[i];
+    const check = result.checks[i]!;
     const num = i + 1;
     const verdict =
       check.exitCode === 0 ? "✅ pass" : "❌ fail";
@@ -240,7 +240,7 @@ export function formatEvidenceTable(result: VerificationResult): string {
     lines.push("| # | Source | Severity | Blocking | Message |");
     lines.push("|---|--------|----------|----------|---------|");
     for (let i = 0; i < result.runtimeErrors.length; i++) {
-      const err = result.runtimeErrors[i];
+      const err = result.runtimeErrors[i]!;
       const blockIcon = err.blocking ? "🚫 yes" : "ℹ️ no";
       lines.push(`| ${i + 1} | ${err.source} | ${err.severity} | ${blockIcon} | ${err.message.slice(0, 100)} |`);
     }
@@ -259,7 +259,7 @@ export function formatEvidenceTable(result: VerificationResult): string {
     lines.push("| # | Package | Severity | Title | Fix Available |");
     lines.push("|---|---------|----------|-------|---------------|");
     for (let i = 0; i < result.auditWarnings.length; i++) {
-      const w = result.auditWarnings[i];
+      const w = result.auditWarnings[i]!;
       const emoji = severityEmoji[w.severity] ?? "⚪";
       const fix = w.fixAvailable ? "✅ yes" : "❌ no";
       lines.push(`| ${i + 1} | ${w.name} | ${emoji} ${w.severity} | ${w.title} | ${fix} |`);

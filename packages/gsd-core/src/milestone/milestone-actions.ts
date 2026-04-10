@@ -136,8 +136,8 @@ export function getParkedReason(basePath: string, milestoneId: string): string |
     const content = readFileSync(parkedFile, "utf-8");
     const match = content.match(/^---\n([\s\S]*?)\n---/);
     if (!match) return null;
-    const reasonMatch = match[1].match(/reason:\s*"([^"]*?)"/);
-    return reasonMatch ? reasonMatch[1] : null;
+    const reasonMatch = match[1]!.match(/reason:\s*"([^"]*?)"/);
+    return reasonMatch ? reasonMatch[1]! : null;
   } catch {
     return null;
   }

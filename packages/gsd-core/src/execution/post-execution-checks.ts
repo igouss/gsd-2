@@ -65,7 +65,7 @@ export function extractRelativeImports(
   let inBlockComment = false;
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+    const line = lines[i]!;
 
     // Handle block comment boundaries
     if (inBlockComment) {
@@ -107,7 +107,7 @@ export function extractRelativeImports(
       }
 
       imports.push({
-        importPath: match[2],
+        importPath: match[2]!,
         lineNum: i + 1,
       });
     }
@@ -256,15 +256,15 @@ function extractFunctionSignatures(
     /(?:export\s+)?(?:async\s+)?(?:function\s+|const\s+)(\w+)(?:\s*=\s*)?\s*\(([^)]*)\)(?:\s*:\s*([^{=>\n]+))?/g;
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+    const line = lines[i]!;
     funcPattern.lastIndex = 0;
 
     let match: RegExpExecArray | null;
     while ((match = funcPattern.exec(line)) !== null) {
       const [, name, params, returnType] = match;
       signatures.push({
-        name,
-        params: normalizeParams(params),
+        name: name!,
+        params: normalizeParams(params!),
         returnType: normalizeType(returnType || "void"),
         file: fileName,
         lineNum: i + 1,
@@ -350,7 +350,7 @@ export function checkCrossTaskSignatures(
 
         // If this function was defined in a prior task, check for signature drift
         if (priorDefs && priorDefs.length > 0) {
-          const priorDef = priorDefs[0]; // Use first definition
+          const priorDef = priorDefs[0]!; // Use first definition
 
           // Check parameter mismatch
           if (currentSig.params !== priorDef.params) {
@@ -469,7 +469,7 @@ function checkNamingConsistency(
   let match: RegExpExecArray | null;
 
   while ((match = funcPattern.exec(source)) !== null) {
-    functionNames.push(match[1]);
+    functionNames.push(match[1]!);
   }
 
   // Check for mixed naming conventions in functions

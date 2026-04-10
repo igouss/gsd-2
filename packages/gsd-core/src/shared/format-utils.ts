@@ -52,7 +52,7 @@ export function sparkline(values: number[]): string {
   for (const v of values) {
     if (v > max) max = v;
   }
-  if (max === 0) return chars[0].repeat(values.length);
+  if (max === 0) return chars[0]!.repeat(values.length);
   return values.map(v => chars[Math.min(7, Math.floor((v / max) * 7))]).join("");
 }
 

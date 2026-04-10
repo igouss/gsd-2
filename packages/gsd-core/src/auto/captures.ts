@@ -193,7 +193,7 @@ export function markCaptureResolved(
   const match = sectionRegex.exec(content);
   if (!match) return;
 
-  let section = match[1];
+  let section = match[1]!;
 
   // Update Status field
   section = section.replace(
@@ -245,7 +245,7 @@ export function markCaptureExecuted(basePath: string, captureId: string): void {
   const match = sectionRegex.exec(content);
   if (!match) return;
 
-  let section = match[1];
+  let section = match[1]!;
 
   // Remove any existing Executed field (in case of re-execution)
   section = section.replace(/\*\*Executed:\*\*\s*.+\n?/g, "");
@@ -336,7 +336,7 @@ export function revertExecutorResolvedCaptures(basePath: string): number {
       );
       const match = sectionRegex.exec(content);
       if (match) {
-        let section = match[1];
+        let section = match[1]!;
         section = section.replace(
           /\*\*Status:\*\*\s*resolved/i,
           "**Status:** pending",
@@ -375,7 +375,7 @@ export function stampCaptureMilestone(basePath: string, captureId: string, miles
   const match = sectionRegex.exec(content);
   if (!match) return;
 
-  let section = match[1];
+  let section = match[1]!;
 
   // Only stamp if not already present
   if (/\*\*Milestone:\*\*/.test(section)) return;
@@ -451,7 +451,7 @@ function parseCapturesContent(content: string): CaptureEntry[] {
 function extractBoldField(text: string, key: string): string | null {
   const regex = new RegExp(`^\\*\\*${escapeRegex(key)}:\\*\\*\\s*(.+)$`, "m");
   const match = regex.exec(text);
-  return match ? match[1].trim() : null;
+  return match ? match[1]!.trim() : null;
 }
 
 function escapeRegex(s: string): string {

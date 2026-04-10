@@ -217,7 +217,7 @@ function detectXcodePlatforms(basePath: string): XcodePlatform[] {
           let m: RegExpExecArray | null;
           let foundExplicit = false;
           while ((m = sdkRe.exec(content)) !== null) {
-            const val = m[1].toLowerCase();
+            const val = m[1]!.toLowerCase();
             if (val === "auto") continue;
             const canonical = SDKROOT_MAP[val];
             if (canonical) {
@@ -228,7 +228,7 @@ function detectXcodePlatforms(basePath: string): XcodePlatform[] {
           if (!foundExplicit) {
             let sp: RegExpExecArray | null;
             while ((sp = SUPPORTED_PLATFORMS_RE.exec(content)) !== null) {
-              for (const tok of sp[1].split(/\s+/)) {
+              for (const tok of sp[1]!.split(/\s+/)) {
                 const canonical = SDKROOT_MAP[tok.toLowerCase()];
                 if (canonical) platforms.add(canonical);
               }
@@ -348,7 +348,7 @@ function readMakefileTargets(basePath: string): string[] {
     const targets: string[] = [];
     for (const line of raw.split("\n")) {
       const match = line.match(/^([a-zA-Z_][a-zA-Z0-9_-]*):/);
-      if (match) targets.push(match[1]);
+      if (match) targets.push(match[1]!);
     }
     return targets;
   } catch {

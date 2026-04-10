@@ -34,7 +34,7 @@ function defaultTempPath(filePath: string): string {
 
 function computeRetryDelayMs(attempt: number): number {
   const base = 8 * attempt;
-  const jitter = randomBytes(1)[0] % 5;
+  const jitter = randomBytes(1)[0]! % 5;
   return base + jitter;
 }
 

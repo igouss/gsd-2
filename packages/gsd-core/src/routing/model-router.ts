@@ -418,7 +418,7 @@ export function resolveModelForComplexity(
   }
 
   // STEP 3: Fallback — use first eligible model (cheapest in tier, or single eligible)
-  const targetModelId = eligible[0];
+  const targetModelId = eligible[0]!;
 
   // Build fallback chain: [downgraded_model, ...configured_fallbacks, configured_primary]
   const fallbacks = buildFallbackChain(targetModelId, phaseConfig);

@@ -45,7 +45,7 @@ export function parseSecretsManifest(content: string): SecretsManifest {
     for (const line of sectionContent.split('\n')) {
       const numMatch = line.match(/^\s*\d+\.\s+(.+)/);
       if (numMatch) {
-        guidance.push(numMatch[1].trim());
+        guidance.push(numMatch[1]!.trim());
       }
     }
 
@@ -195,10 +195,10 @@ function _parseSummaryImpl(content: string): Summary {
   const h1 = bodyLines.find(l => l.startsWith('# '));
   const title = h1 ? h1.slice(2).trim() : '';
 
-  const h1Idx = bodyLines.indexOf(h1 || '');
+  const h1Idx = bodyLines.indexOf(h1 ?? '');
   let oneLiner = '';
   for (let i = h1Idx + 1; i < bodyLines.length; i++) {
-    const line = bodyLines[i].trim();
+    const line = bodyLines[i]!.trim();
     if (!line) continue;
     if (line.startsWith('**') && line.endsWith('**')) {
       oneLiner = line.slice(2, -2);
@@ -218,7 +218,7 @@ function _parseSummaryImpl(content: string): Summary {
 
       const fileMatch = trimmed.match(/^`([^`]+)`\s*[—–-]\s*(.+)/);
       if (fileMatch) {
-        filesModified.push({ path: fileMatch[1], description: fileMatch[2].trim() });
+        filesModified.push({ path: fileMatch[1]!, description: fileMatch[2]!.trim() });
       }
     }
   }
@@ -275,9 +275,9 @@ function formatFrontmatter(data: Record<string, unknown>): string {
         for (const obj of value) {
           const entries = Object.entries(obj as Record<string, unknown>);
           if (entries.length > 0) {
-            lines.push(`  - ${entries[0][0]}: ${entries[0][1]}`);
+            lines.push(`  - ${entries[0]![0]}: ${entries[0]![1]}`);
             for (let i = 1; i < entries.length; i++) {
-              lines.push(`    ${entries[i][0]}: ${entries[i][1]}`);
+              lines.push(`    ${entries[i]![0]}: ${entries[i]![1]}`);
             }
           }
         }
@@ -349,8 +349,8 @@ export function parseTaskPlanMustHaves(content: string): Array<{ text: string; c
     const cbMatch = line.match(/^\[([xX ])\]\s+(.+)/);
     if (cbMatch) {
       return {
-        text: cbMatch[2].trim(),
-        checked: cbMatch[1].toLowerCase() === 'x',
+        text: cbMatch[2]!.trim(),
+        checked: cbMatch[1]!.toLowerCase() === 'x',
       };
     }
     // No checkbox - treat as unchecked with full line as text
@@ -388,7 +388,7 @@ export function countMustHavesMentionedInSummary(
     const codeRegex = /`([^`]+)`/g;
     let match: RegExpExecArray | null;
     while ((match = codeRegex.exec(mh.text)) !== null) {
-      codeTokens.push(match[1]);
+      codeTokens.push(match[1]!);
     }
 
     if (codeTokens.length > 0) {

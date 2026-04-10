@@ -94,8 +94,8 @@ function _parseRoadmapImpl(content: string): Roadmap {
       const arrowMatch = heading.match(/^(\S+)\s*→\s*(\S+)/);
       if (!arrowMatch) continue;
 
-      const fromSlice = arrowMatch[1];
-      const toSlice = arrowMatch[2];
+      const fromSlice = arrowMatch[1]!;
+      const toSlice = arrowMatch[2]!;
 
       let produces = '';
       let consumes = '';
@@ -114,7 +114,7 @@ function _parseRoadmapImpl(content: string): Roadmap {
 
       const consLineMatch = sectionContent.match(/^Consumes[^:]*:\s*(.+)$/m);
       if (consLineMatch) {
-        consumes = consLineMatch[1].trim();
+        consumes = consLineMatch[1]!.trim();
       }
       if (!consumes) {
         const consIdx = sectionContent.search(/^Consumes[^:]*:\s*$/m);
@@ -176,8 +176,8 @@ function _parsePlanImpl(content: string): SlicePlan {
   if (h1) {
     const match = h1.match(/^#\s+(\w+):\s+(.+)/);
     if (match) {
-      id = match[1];
-      title = match[2].trim();
+      id = match[1]!;
+      title = match[2]!.trim();
     } else {
       title = h1.slice(2).trim();
     }
@@ -205,7 +205,7 @@ function _parsePlanImpl(content: string): SlicePlan {
       // Heading-style: ### T01 -- Title, ### T01: Title, ### T01 — Title
       const hdMatch = !cbMatch ? line.match(/^#{2,4}\s+([\w.]+)\s*(?:--|—|:)\s*(.+)/) : null;
       if (cbMatch || hdMatch) {
-        const taskId = cbMatch ? cbMatch[2] : hdMatch![1];
+        const taskId = cbMatch ? cbMatch[2]! : hdMatch![1]!;
         // Skip tasks already found in the Tasks section
         if (knownIds.has(taskId)) {
           currentTask = null;
@@ -216,23 +216,23 @@ function _parsePlanImpl(content: string): SlicePlan {
         if (cbMatch) {
           const rest = cbMatch[4] || '';
           const estMatch = rest.match(/`est:([^`]+)`/);
-          const estimate = estMatch ? estMatch[1] : '';
+          const estimate = estMatch ? estMatch[1]! : '';
 
           currentTask = {
-            id: cbMatch[2],
-            title: cbMatch[3],
+            id: cbMatch[2]!,
+            title: cbMatch[3]!,
             description: '',
-            done: cbMatch[1].toLowerCase() === 'x',
+            done: cbMatch[1]!.toLowerCase() === 'x',
             estimate,
           };
         } else {
           const rest = hdMatch![2] || '';
           const titleEstMatch = rest.match(/^(.+?)\s*`est:([^`]+)`\s*$/);
-          const title = titleEstMatch ? titleEstMatch[1].trim() : rest.trim();
-          const estimate = titleEstMatch ? titleEstMatch[2] : '';
+          const title = titleEstMatch ? titleEstMatch[1]!.trim() : rest.trim();
+          const estimate = titleEstMatch ? titleEstMatch[2]! : '';
 
           currentTask = {
-            id: hdMatch![1],
+            id: hdMatch![1]!,
             title,
             description: '',
             done: false,
@@ -242,7 +242,7 @@ function _parsePlanImpl(content: string): SlicePlan {
       } else if (currentTask && line.match(/^\s*-\s+Files:\s*(.*)/)) {
         const filesMatch = line.match(/^\s*-\s+Files:\s*(.*)/);
         if (filesMatch) {
-          currentTask.files = filesMatch[1]
+          currentTask.files = filesMatch[1]!
             .split(',')
             .map(f => f.replace(/`/g, '').trim())
             .filter(f => f.length > 0);
@@ -250,7 +250,7 @@ function _parsePlanImpl(content: string): SlicePlan {
       } else if (currentTask && line.match(/^\s*-\s+Verify:\s*(.*)/)) {
         const verifyMatch = line.match(/^\s*-\s+Verify:\s*(.*)/);
         if (verifyMatch) {
-          currentTask.verify = verifyMatch[1].trim();
+          currentTask.verify = verifyMatch[1]!.trim();
         }
       } else if (currentTask && line.trim() && !line.startsWith('#')) {
         const desc = line.trim();

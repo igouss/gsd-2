@@ -57,14 +57,14 @@ function parseRoadmapTable(content: string): Array<{
   // Try table format first: | S01 | Title | risk | depends | done-icon | demo |
   const tableSection = content.match(/## (?:Slice[s]?|Slice Overview|Slice Table)\s*\n([\s\S]*?)(?=\n##|\n$|$)/i);
   if (tableSection) {
-    const lines = tableSection[1].split('\n');
+    const lines = tableSection[1]!.split('\n');
     for (const line of lines) {
       if (!line.includes('|')) continue;
       const cells = line.split('|').map((c) => c.trim()).filter(Boolean);
       if (cells.length < 4) continue;
-      if (cells[0] === 'ID' || cells[0].startsWith('--')) continue;
+      if (cells[0]! === 'ID' || cells[0]!.startsWith('--')) continue;
 
-      const id = cells[0].match(/S\d+/)?.[0];
+      const id = cells[0]!.match(/S\d+/)?.[0];
       if (!id) continue;
 
       const done = cells.some((c) => c === '\u2611' || c === '\u2705' || c.toLowerCase() === 'done');
@@ -88,11 +88,11 @@ function parseRoadmapTable(content: string): Array<{
   while ((match = checkboxRe.exec(content)) !== null) {
     const [, checked, id, title, risk, deps] = match;
     results.push({
-      id,
-      title: title.trim(),
+      id: id!,
+      title: title!.trim(),
       risk: risk ?? 'medium',
       depends: deps ? deps.split(',').map((d) => d.trim()).filter(Boolean) : [],
-      done: checked !== ' ',
+      done: checked! !== ' ',
       demo: '',
     });
   }
@@ -102,8 +102,8 @@ function parseRoadmapTable(content: string): Array<{
   const headerRe = /^##\s+(S\d+):\s*(.+)/gm;
   while ((match = headerRe.exec(content)) !== null) {
     results.push({
-      id: match[1],
-      title: match[2].trim(),
+      id: match[1]!,
+      title: match[2]!.trim(),
       risk: 'medium',
       depends: [],
       done: false,
@@ -126,9 +126,9 @@ function parseSlicePlanTasks(content: string): Array<{ id: string; title: string
   let match: RegExpExecArray | null;
   while ((match = taskRe.exec(content)) !== null) {
     results.push({
-      id: match[2],
-      title: match[3].trim(),
-      done: match[1] !== ' ',
+      id: match[2]!,
+      title: match[3]!.trim(),
+      done: match[1]! !== ' ',
     });
   }
   if (results.length > 0) return results;
@@ -137,8 +137,8 @@ function parseSlicePlanTasks(content: string): Array<{ id: string; title: string
   const h3Re = /^###\s+(T\d+):\s*(.+)/gm;
   while ((match = h3Re.exec(content)) !== null) {
     results.push({
-      id: match[1],
-      title: match[2].trim(),
+      id: match[1]!,
+      title: match[2]!.trim(),
       done: false,
     });
   }
@@ -155,14 +155,14 @@ function readMilestoneTitle(gsdRoot: string, mid: string): string {
   if (ctxPath && existsSync(ctxPath)) {
     const content = readFileSync(ctxPath, 'utf-8');
     const h1 = content.match(/^#\s+(?:M\d+:?\s*)?(.+)/m);
-    if (h1) return h1[1].trim();
+    if (h1) return h1[1]!.trim();
   }
 
   const roadmapPath = resolveMilestoneFile(gsdRoot, mid, 'ROADMAP');
   if (roadmapPath && existsSync(roadmapPath)) {
     const content = readFileSync(roadmapPath, 'utf-8');
     const h1 = content.match(/^#\s+(?:M\d+:?\s*)?(.+)/m);
-    if (h1) return h1[1].trim();
+    if (h1) return h1[1]!.trim();
   }
 
   return mid;
@@ -174,7 +174,7 @@ function readVision(gsdRoot: string, mid: string): string {
 
   const content = readFileSync(roadmapPath, 'utf-8');
   const section = content.match(/## Vision\s*\n([\s\S]*?)(?=\n##|\n$|$)/i);
-  return section ? section[1].trim() : '';
+  return section ? section[1]!.trim() : '';
 }
 
 // ---------------------------------------------------------------------------

@@ -759,7 +759,7 @@ export async function runGuards(
     const { loadStopCaptures, markCaptureExecuted } = await import("./captures.ts");
     const stopCaptures = loadStopCaptures(s.basePath);
     if (stopCaptures.length > 0) {
-      const first = stopCaptures[0];
+      const first = stopCaptures[0]!;
       const isBacktrack = first.classification === "backtrack";
       const label = isBacktrack
         ? `Backtrack directive: ${first.text}`

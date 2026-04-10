@@ -105,12 +105,12 @@ export function validateSlicePlanContent(file: string, content: string): Validat
     const taskLinePattern = /^- \[[ x]\] \*\*T\d+:/;
     const taskLineIndices: number[] = [];
     for (let i = 0; i < lines.length; i++) {
-      if (taskLinePattern.test(lines[i])) taskLineIndices.push(i);
+      if (taskLinePattern.test(lines[i]!)) taskLineIndices.push(i);
     }
 
     for (let t = 0; t < taskLineIndices.length; t++) {
-      const start = taskLineIndices[t];
-      const end = t + 1 < taskLineIndices.length ? taskLineIndices[t + 1] : lines.length;
+      const start = taskLineIndices[t]!;
+      const end = t + 1 < taskLineIndices.length ? taskLineIndices[t + 1]! : lines.length;
       // Check lines between this task header and the next (or section end)
       const bodyLines = lines.slice(start + 1, end);
       const meaningful = bodyLines.filter(l => l.trim().length > 0);
@@ -207,7 +207,7 @@ export function validateTaskPlanContent(file: string, content: string): Validati
     const filesMatch = fm.match(/^estimated_files:\s*(\d+)/m);
 
     if (stepsMatch) {
-      const estimatedSteps = parseInt(stepsMatch[1], 10);
+      const estimatedSteps = parseInt(stepsMatch[1]!, 10);
       if (estimatedSteps >= 10) {
         issues.push({
           severity: "warning",
@@ -221,7 +221,7 @@ export function validateTaskPlanContent(file: string, content: string): Validati
     }
 
     if (filesMatch) {
-      const estimatedFiles = parseInt(filesMatch[1], 10);
+      const estimatedFiles = parseInt(filesMatch[1]!, 10);
       if (estimatedFiles >= 12) {
         issues.push({
           severity: "warning",
@@ -397,7 +397,7 @@ export async function validatePlanBoundary(basePath: string, milestoneId: string
   const tasksDir = resolveTasksDir(basePath, milestoneId, sliceId);
   const taskPlans = tasksDir ? resolveTaskFiles(tasksDir, "PLAN") : [];
   for (const file of taskPlans) {
-    const taskId = file.split("-")[0];
+    const taskId = file.split("-")[0]!;
     const taskPlan = resolveTaskFile(basePath, milestoneId, sliceId, taskId, "PLAN");
     if (!taskPlan) continue;
     const content = await loadFile(taskPlan);
@@ -429,7 +429,7 @@ export async function validateCompleteBoundary(basePath: string, milestoneId: st
   const tasksDir = resolveTasksDir(basePath, milestoneId, sliceId);
   const taskSummaries = tasksDir ? resolveTaskFiles(tasksDir, "SUMMARY") : [];
   for (const file of taskSummaries) {
-    const taskId = file.split("-")[0];
+    const taskId = file.split("-")[0]!;
     const taskSummary = resolveTaskFile(basePath, milestoneId, sliceId, taskId, "SUMMARY");
     if (!taskSummary) continue;
     const content = await loadFile(taskSummary);

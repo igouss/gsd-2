@@ -22,7 +22,7 @@ function parseArgs(): { projectDir: string } {
     );
     process.exit(1);
   }
-  return { projectDir: args[idx + 1] };
+  return { projectDir: args[idx + 1]! };
 }
 
 async function main(): Promise<void> {

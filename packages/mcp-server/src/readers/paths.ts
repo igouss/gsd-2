@@ -76,7 +76,7 @@ export function findMilestoneIds(gsdRoot: string): string[] {
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
     const match = entry.name.match(/^(M\d+)/);
-    if (match) ids.push(match[1]);
+    if (match) ids.push(match[1]!);
   }
 
   return ids.sort();
@@ -142,7 +142,7 @@ export function findSliceIds(gsdRoot: string, milestoneId: string): string[] {
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
     const match = entry.name.match(/^(S\d+)/);
-    if (match) ids.push(match[1]);
+    if (match) ids.push(match[1]!);
   }
 
   return ids.sort();
@@ -204,7 +204,7 @@ export function findTaskFiles(
   for (const f of files) {
     const match = f.match(/^(T\d+).*-(PLAN|SUMMARY)\.md$/i);
     if (!match) continue;
-    const [, id, type] = match;
+    const id = match[1]!, type = match[2]!;
     const existing = taskMap.get(id) ?? { hasPlan: false, hasSummary: false };
     if (type.toUpperCase() === 'PLAN') existing.hasPlan = true;
     if (type.toUpperCase() === 'SUMMARY') existing.hasSummary = true;

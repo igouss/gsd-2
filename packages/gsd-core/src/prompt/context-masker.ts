@@ -24,7 +24,7 @@ const MASK_CONTENT_BLOCK = [{ type: "text" as const, text: MASK_PLACEHOLDER }];
 function findTurnBoundary(messages: MaskableMessage[], keepRecentTurns: number): number {
   let turnsSeen = 0;
   for (let i = messages.length - 1; i >= 0; i--) {
-    const m = messages[i];
+    const m = messages[i]!;
     // In the LLM payload, genuine user turns have role "user".
     // Tool results have role "toolResult" and are excluded by this check.
     if (m.role === "user") {

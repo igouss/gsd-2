@@ -95,8 +95,8 @@ export function parseTaskPlanIO(content: string): { inputFiles: string[]; output
         // Filter out things that look like code tokens rather than file paths
         // (e.g. `true`, `false`, `npm run test`). A file path has at least one
         // dot or slash.
-        if (candidate.includes("/") || candidate.includes(".")) {
-          paths.push(candidate);
+        if (candidate!.includes("/") || candidate!.includes(".")) {
+          paths.push(candidate!);
         }
       }
     }
@@ -169,8 +169,8 @@ export async function inlinePriorMilestoneSummary(mid: string, base: string): Pr
   const idx = sorted.indexOf(mid);
   if (idx <= 0) return null;
   const prevMid = sorted[idx - 1];
-  const absPath = resolveMilestoneFile(base, prevMid, "SUMMARY");
-  const relPath = relMilestoneFile(base, prevMid, "SUMMARY");
+  const absPath = resolveMilestoneFile(base, prevMid!, "SUMMARY");
+  const relPath = relMilestoneFile(base, prevMid!, "SUMMARY");
   const content = absPath ? await loadFile(absPath) : null;
   if (!content) return null;
   return `### Prior Milestone Summary\nSource: \`${relPath}\`\n\n${content.trim()}`;

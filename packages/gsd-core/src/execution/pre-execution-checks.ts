@@ -74,7 +74,7 @@ export function extractPackageReferences(description: string): string[] {
       // Try to match a package name
       const pkgMatch = remaining.match(tokenPattern);
       if (pkgMatch) {
-        const token = pkgMatch[1];
+        const token = pkgMatch[1]!;
         // Skip stopwords - they indicate end of package list
         if (stopwords.has(token.toLowerCase())) {
           break;
@@ -93,7 +93,7 @@ export function extractPackageReferences(description: string): string[] {
   let importMatch: RegExpExecArray | null;
   while ((importMatch = importPattern.exec(description)) !== null) {
     // Skip relative imports and node builtins
-    const pkg = importMatch[1];
+    const pkg = importMatch[1]!;
     if (!pkg.startsWith(".") && !pkg.startsWith("node:")) {
       packages.add(normalizePackageName(pkg));
     }
@@ -110,10 +110,10 @@ function normalizePackageName(raw: string): string {
   // Scoped package: @org/pkg or @org/pkg/subpath
   if (raw.startsWith("@")) {
     const parts = raw.split("/");
-    return parts.length >= 2 ? `${parts[0]}/${parts[1]}` : raw;
+    return parts.length >= 2 ? `${parts[0]!}/${parts[1]!}` : raw;
   }
   // Regular package: pkg or pkg/subpath
-  return raw.split("/")[0];
+  return raw.split("/")[0]!;
 }
 
 /**
@@ -265,12 +265,12 @@ function extractPathFromAnnotation(raw: string): string {
 
   const backtickMatch = trimmed.match(/^`([^`]+)`(?:\s+[—–-]\s+.*)?$/);
   if (backtickMatch) {
-    return backtickMatch[1].trim();
+    return backtickMatch[1]!.trim();
   }
 
   const annotatedMatch = trimmed.match(/^(.+?)\s+[—–-]\s+.+$/);
   if (annotatedMatch) {
-    return annotatedMatch[1].trim();
+    return annotatedMatch[1]!.trim();
   }
 
   // Fall back to the original behavior for already-plain paths.
@@ -284,7 +284,7 @@ function extractPathFromAnnotation(raw: string): string {
 function getExpectedOutputsUpTo(tasks: TaskRow[], taskIndex: number): Set<string> {
   const outputs = new Set<string>();
   for (let i = 0; i < taskIndex; i++) {
-    for (const file of tasks[i].expected_output) {
+    for (const file of tasks[i]!.expected_output) {
       outputs.add(normalizeFilePath(file));
     }
   }
@@ -308,7 +308,7 @@ export function checkFilePathConsistency(
   const results: PreExecutionCheckJSON[] = [];
 
   for (let i = 0; i < tasks.length; i++) {
-    const task = tasks[i];
+    const task = tasks[i]!;
     const priorOutputs = getExpectedOutputsUpTo(tasks, i);
     const filesToCheck = [...task.inputs];
 
@@ -358,7 +358,7 @@ export function checkTaskOrdering(
   // Build map: normalized file → task index that creates it
   const fileCreators = new Map<string, { taskId: string; index: number; originalPath: string }>();
   for (let i = 0; i < tasks.length; i++) {
-    const task = tasks[i];
+    const task = tasks[i]!;
     for (const file of task.expected_output) {
       const normalizedFile = normalizeFilePath(file);
       if (!fileCreators.has(normalizedFile)) {
@@ -371,7 +371,7 @@ export function checkTaskOrdering(
   // Only check task.inputs — task.files ("files likely touched") intentionally
   // includes files the task will create, so they don't indicate read-before-create (#3677).
   for (let i = 0; i < tasks.length; i++) {
-    const task = tasks[i];
+    const task = tasks[i]!;
     const filesToCheck = [...task.inputs];
 
     for (const file of filesToCheck) {
@@ -415,7 +415,7 @@ function extractFunctionSignatures(description: string, taskId: string): Functio
   let blockMatch: RegExpExecArray | null;
 
   while ((blockMatch = codeBlockPattern.exec(description)) !== null) {
-    const codeBlock = blockMatch[1];
+    const codeBlock = blockMatch[1]!;
 
     // Match function declarations and exports
     // Patterns:
@@ -430,8 +430,8 @@ function extractFunctionSignatures(description: string, taskId: string): Functio
     while ((funcMatch = funcPattern.exec(codeBlock)) !== null) {
       const [raw, name, params, returnType] = funcMatch;
       signatures.push({
-        name,
-        params: normalizeParams(params),
+        name: name!,
+        params: normalizeParams(params!),
         returnType: normalizeType(returnType || "void"),
         taskId,
         raw: raw.trim(),
@@ -446,9 +446,9 @@ function extractFunctionSignatures(description: string, taskId: string): Functio
     while ((methodMatch = methodPattern.exec(codeBlock)) !== null) {
       const [raw, name, params, returnType] = methodMatch;
       signatures.push({
-        name,
-        params: normalizeParams(params),
-        returnType: normalizeType(returnType),
+        name: name!,
+        params: normalizeParams(params!),
+        returnType: normalizeType(returnType!),
         taskId,
         raw: raw.trim(),
       });
@@ -510,9 +510,9 @@ export function checkInterfaceContracts(
     if (sigs.length < 2) continue;
 
     // Compare signatures
-    const first = sigs[0];
+    const first = sigs[0]!;
     for (let i = 1; i < sigs.length; i++) {
-      const current = sigs[i];
+      const current = sigs[i]!;
 
       // Check parameter mismatch
       if (first.params !== current.params) {

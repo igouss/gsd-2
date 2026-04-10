@@ -317,7 +317,7 @@ export function computeCriticalPath(milestones: VisualizerMilestone[]): Critical
 
   // Trace back
   const milestonePath: string[] = [];
-  let cur: string | null = endNode;
+  let cur: string | null = endNode ?? null;
   while (cur !== null) {
     milestonePath.unshift(cur);
     cur = prev.get(cur) ?? null;
@@ -397,7 +397,7 @@ export function computeCriticalPath(milestones: VisualizerMilestone[]): Critical
     }
 
     let slMax = 0;
-    let slEnd = activeMs.slices[0].id;
+    let slEnd = activeMs.slices[0]!.id;
     for (const s of activeMs.slices) {
       const totalDist = slDist.get(s.id)! + (s.done ? 0 : 1);
       if (totalDist > slMax) {
@@ -575,11 +575,11 @@ function loadKnowledge(basePath: string): KnowledgeInfo {
     if (cols.length < 2) continue;
 
     if (currentSection === 'rules' && cols.length >= 3) {
-      rules.push({ id: cols[0], scope: cols[1], content: cols[2] });
+      rules.push({ id: cols[0]!, scope: cols[1]!, content: cols[2]! });
     } else if (currentSection === 'patterns' && cols.length >= 2) {
-      patterns.push({ id: cols[0], content: cols[1] });
+      patterns.push({ id: cols[0]!, content: cols[1]! });
     } else if (currentSection === 'lessons' && cols.length >= 2) {
-      lessons.push({ id: cols[0], content: cols[1] });
+      lessons.push({ id: cols[0]!, content: cols[1]! });
     }
   }
 

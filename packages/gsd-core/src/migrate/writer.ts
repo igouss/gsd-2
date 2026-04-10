@@ -83,9 +83,9 @@ function serializeFrontmatter(data: Record<string, unknown>): string {
         for (const obj of value) {
           const entries = Object.entries(obj as Record<string, string>);
           if (entries.length > 0) {
-            lines.push(`  - ${entries[0][0]}: ${entries[0][1]}`);
+            lines.push(`  - ${entries[0]![0]}: ${entries[0]![1]}`);
             for (let i = 1; i < entries.length; i++) {
-              lines.push(`    ${entries[i][0]}: ${entries[i][1]}`);
+              lines.push(`    ${entries[i]![0]}: ${entries[i]![1]}`);
             }
           }
         }
@@ -321,9 +321,9 @@ export function formatRequirements(requirements: GSDRequirement[]): string {
   for (const req of requirements) {
     const status = req.status.toLowerCase();
     if (status in groups) {
-      groups[status].push(req);
+      groups[status]!.push(req);
     } else {
-      groups.active.push(req);
+      groups['active']!.push(req);
     }
   }
 
@@ -337,7 +337,7 @@ export function formatRequirements(requirements: GSDRequirement[]): string {
   for (const [key, heading] of sectionMap) {
     lines.push(`## ${heading}`);
     lines.push('');
-    for (const req of groups[key]) {
+    for (const req of groups[key]!) {
       lines.push(`### ${req.id} — ${req.title}`);
       lines.push('');
       lines.push(`- Status: ${req.status}`);

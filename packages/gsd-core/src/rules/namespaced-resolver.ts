@@ -248,7 +248,7 @@ export class NamespacedResolver {
 			return {
 				requestedName: name,
 				resolution: 'shorthand',
-				component: candidates[0],
+				component: candidates[0]!,
 			};
 		}
 

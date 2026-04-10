@@ -49,11 +49,11 @@ function parseCapturesMarkdown(content: string): CaptureEntry[] {
     const idMatch = section.match(/^### (CAP-[\da-f]+)/);
     if (!idMatch) continue;
 
-    const id = idMatch[1];
+    const id = idMatch[1]!;
     const field = (label: string): string | null => {
       const re = new RegExp(`\\*\\*${label}:\\*\\*\\s*(.+)`, 'i');
       const m = section.match(re);
-      return m ? m[1].trim() : null;
+      return m ? m[1]!.trim() : null;
     };
 
     const status = (field('Status') ?? 'pending').toLowerCase() as CaptureStatus;

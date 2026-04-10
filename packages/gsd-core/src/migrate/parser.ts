@@ -59,14 +59,14 @@ function isDir(path: string): boolean {
 function parsePhaseDir(dirName: string): { number: number; slug: string } | null {
   const match = dirName.match(/^(\d+(?:\.\d+)?)-(.+)$/);
   if (!match) return null;
-  return { number: parseFloat(match[1]), slug: match[2] };
+  return { number: parseFloat(match[1]!), slug: match[2]! };
 }
 
 /** Extract quick task number and slug from a directory name like "001-fix-login". */
 function parseQuickDir(dirName: string): { number: number; slug: string } | null {
   const match = dirName.match(/^(\d+)-(.+)$/);
   if (!match) return null;
-  return { number: parseInt(match[1], 10), slug: match[2] };
+  return { number: parseInt(match[1]!, 10), slug: match[2]! };
 }
 
 // ─── Phase Scanner ─────────────────────────────────────────────────────────
@@ -105,7 +105,7 @@ function scanPhaseDirectory(phaseDir: string, dirName: string, parsed: ReturnTyp
 
     const planMatch = entry.match(PLAN_RE);
     if (planMatch) {
-      const planNumber = planMatch[2];
+      const planNumber = planMatch[2]!;
       const content = readFileSync(entryPath, 'utf-8');
       phase.plans[planNumber] = parseOldPlan(content, entry, planNumber);
       continue;
@@ -113,7 +113,7 @@ function scanPhaseDirectory(phaseDir: string, dirName: string, parsed: ReturnTyp
 
     const summaryMatch = entry.match(SUMMARY_RE);
     if (summaryMatch) {
-      const planNumber = summaryMatch[2];
+      const planNumber = summaryMatch[2]!;
       const content = readFileSync(entryPath, 'utf-8');
       phase.summaries[planNumber] = parseOldSummary(content, entry, planNumber);
       continue;
@@ -193,8 +193,8 @@ function scanMilestonesDirectory(msDir: string): PlanningMilestone[] {
     // Extract milestone ID: everything before the first dash-followed-by-uppercase or common suffix
     const idMatch = entry.match(/^(.+?)-(ROADMAP|REQUIREMENTS|SUMMARY)\.md$/i);
     if (idMatch) {
-      const id = idMatch[1];
-      const type = idMatch[2].toUpperCase();
+      const id = idMatch[1]!;
+      const type = idMatch[2]!.toUpperCase();
       if (!grouped.has(id)) grouped.set(id, { requirements: null, roadmap: null, extraFiles: [] });
       const ms = grouped.get(id)!;
       const content = readFileSync(entryPath, 'utf-8');
@@ -205,7 +205,7 @@ function scanMilestonesDirectory(msDir: string): PlanningMilestone[] {
     } else {
       // Non-standard file — try to extract ID from filename
       const simpleMatch = entry.match(/^(.+?)\./);
-      const id = simpleMatch ? simpleMatch[1] : entry;
+      const id = simpleMatch ? simpleMatch[1]! : entry;
       if (!grouped.has(id)) grouped.set(id, { requirements: null, roadmap: null, extraFiles: [] });
       const content = readFileSync(entryPath, 'utf-8');
       grouped.get(id)!.extraFiles.push({ fileName: entry, content });

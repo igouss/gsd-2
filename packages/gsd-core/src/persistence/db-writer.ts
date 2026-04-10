@@ -530,11 +530,11 @@ export function extractDeferredSliceRef(
   const slicePattern = /\b(M\d{3,4})\/(S\d{2,3})\b/;
   const choiceMatch = fields.choice.match(slicePattern);
   if (choiceMatch) {
-    return { milestoneId: choiceMatch[1], sliceId: choiceMatch[2] };
+    return { milestoneId: choiceMatch[1]!, sliceId: choiceMatch[2]! };
   }
   const decisionMatch = fields.decision.match(slicePattern);
   if (decisionMatch) {
-    return { milestoneId: decisionMatch[1], sliceId: decisionMatch[2] };
+    return { milestoneId: decisionMatch[1]!, sliceId: decisionMatch[2]! };
   }
 
   return null;

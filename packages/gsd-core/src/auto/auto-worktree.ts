@@ -509,7 +509,7 @@ export function cleanStaleRuntimeUnits(
       if (!file.endsWith(".json")) continue;
       const midMatch = file.match(/(M\d+(?:-[a-z0-9]{6})?)/);
       if (!midMatch) continue;
-      if (hasMilestoneSummary(midMatch[1])) {
+      if (hasMilestoneSummary(midMatch[1]!)) {
         try {
           unlinkSync(join(runtimeUnitsDir, file));
           cleaned++;
@@ -1003,7 +1003,7 @@ function reconcilePlanCheckboxes(
     // Pattern: - [x] **T<id>: or - [x] **S<id>: (case-insensitive x)
     const checkedRe = /^- \[[xX]\] \*\*([TS]\d+):/gm;
     const srcChecked = new Set<string>();
-    for (const m of srcContent.matchAll(checkedRe)) srcChecked.add(m[1]);
+    for (const m of srcContent.matchAll(checkedRe)) srcChecked.add(m[1]!);
 
     if (srcChecked.size === 0) continue;
 
@@ -1451,7 +1451,7 @@ export function mergeMilestoneToMain(
     const sliceRe = /- \[x\] \*\*(\w+):\s*(.+?)\*\*/gi;
     let m: RegExpExecArray | null;
     while ((m = sliceRe.exec(roadmapContent)) !== null) {
-      completedSlices.push({ id: m[1], title: m[2] });
+      completedSlices.push({ id: m[1]!, title: m[2]! });
     }
   }
 
@@ -1494,7 +1494,7 @@ export function mergeMilestoneToMain(
   // Fallback: parse title from roadmap content header (e.g. "# M020: Backend foundation")
   if (!milestoneTitle && roadmapContent) {
     const titleMatch = roadmapContent.match(new RegExp(`^#\\s+${milestoneId}:\\s*(.+)`, "m"));
-    if (titleMatch) milestoneTitle = titleMatch[1].trim();
+    if (titleMatch) milestoneTitle = titleMatch[1]!.trim();
   }
   milestoneTitle = milestoneTitle || milestoneId;
   const subject = `feat: ${milestoneTitle}`;

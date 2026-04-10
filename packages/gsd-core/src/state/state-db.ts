@@ -537,7 +537,7 @@ export async function deriveStateFromDb(basePath: string): Promise<GSDState> {
         const diskPlan = parsePlan(planContent);
         if (diskPlan.tasks.length > 0) {
           for (let i = 0; i < diskPlan.tasks.length; i++) {
-            const t = diskPlan.tasks[i];
+            const t = diskPlan.tasks[i]!;
             try {
               insertTask({
                 id: t.id,

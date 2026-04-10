@@ -273,12 +273,12 @@ function parseHeadingListFormat(content: string): GSDPreferences {
     const line = rawLine.replace(/\r$/, '');
     const headingMatch = line.match(/^##\s+(.+)$/);
     if (headingMatch) {
-      currentSection = headingMatch[1].trim().toLowerCase().replace(/\s+/g, '_');
+      currentSection = headingMatch[1]!.trim().toLowerCase().replace(/\s+/g, '_');
       if (!result[currentSection]) result[currentSection] = [];
       continue;
     }
     if (currentSection && line.trim() && !line.trimStart().startsWith('#')) {
-      result[currentSection].push(line);
+      result[currentSection]!.push(line);
     }
   }
 
@@ -302,9 +302,9 @@ function parseHeadingListFormat(content: string): GSDPreferences {
         const keys = Object.keys(parsed);
         if (keys.length === 1) {
           const [onlyKey] = keys;
-          if (onlyKey === section || (!KNOWN_PREFERENCE_KEYS.has(section) && KNOWN_PREFERENCE_KEYS.has(onlyKey))) {
-            targetSection = onlyKey;
-            value = (parsed as Record<string, unknown>)[onlyKey];
+          if (onlyKey === section || (!KNOWN_PREFERENCE_KEYS.has(section) && KNOWN_PREFERENCE_KEYS.has(onlyKey!))) {
+            targetSection = onlyKey!;
+            value = (parsed as Record<string, unknown>)[onlyKey!];
           }
         }
       }

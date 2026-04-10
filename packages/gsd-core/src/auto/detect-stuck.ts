@@ -28,8 +28,8 @@ export function detectStuck(
 ): { stuck: true; reason: string } | null {
   if (window.length < 2) return null;
 
-  const last = window[window.length - 1];
-  const prev = window[window.length - 2];
+  const last = window[window.length - 1]!;
+  const prev = window[window.length - 2]!;
 
   // Rule 1: Same error repeated consecutively
   if (last.error && prev.error && last.error === prev.error) {
@@ -54,13 +54,13 @@ export function detectStuck(
   if (window.length >= 4) {
     const w = window.slice(-4);
     if (
-      w[0].key === w[2].key &&
-      w[1].key === w[3].key &&
-      w[0].key !== w[1].key
+      w[0]!.key === w[2]!.key &&
+      w[1]!.key === w[3]!.key &&
+      w[0]!.key !== w[1]!.key
     ) {
       return {
         stuck: true,
-        reason: `Oscillation detected: ${w[0].key} ↔ ${w[1].key}`,
+        reason: `Oscillation detected: ${w[0]!.key} ↔ ${w[1]!.key}`,
       };
     }
   }
@@ -72,7 +72,7 @@ export function detectStuck(
     if (!entry.error) continue;
     const match = ENOENT_PATH_RE.exec(entry.error);
     if (!match) continue;
-    const filePath = match[1];
+    const filePath = match[1]!;
     const count = (enoentPaths.get(filePath) ?? 0) + 1;
     if (count >= 2) {
       return {

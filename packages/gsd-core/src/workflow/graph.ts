@@ -230,7 +230,7 @@ export function expandIteration(
   if (parentIndex === -1) {
     throw new Error(`expandIteration: step not found: ${stepId}`);
   }
-  const parentStep = graph.steps[parentIndex];
+  const parentStep = graph.steps[parentIndex]!;
   if (parentStep.status !== "pending") {
     throw new Error(
       `expandIteration: step "${stepId}" has status "${parentStep.status}", expected "pending"`,
@@ -262,7 +262,7 @@ export function expandIteration(
       // Insert instances immediately after parent
       newSteps.push(...instances);
     } else {
-      const step = graph.steps[i];
+      const step = graph.steps[i]!;
       // Rewrite dependsOn: replace parent ID with all instance IDs
       const hasDep = step.dependsOn.includes(stepId);
       if (hasDep) {

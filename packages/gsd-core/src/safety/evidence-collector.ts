@@ -128,8 +128,8 @@ export function recordToolResult(
 
 function findLastUnresolved(kind: string): EvidenceEntry | undefined {
   for (let i = unitEvidence.length - 1; i >= 0; i--) {
-    if (unitEvidence[i].kind === kind && unitEvidence[i].toolCallId === "") {
-      return unitEvidence[i];
+    if (unitEvidence[i]!.kind === kind && unitEvidence[i]!.toolCallId === "") {
+      return unitEvidence[i]!;
     }
   }
   return undefined;

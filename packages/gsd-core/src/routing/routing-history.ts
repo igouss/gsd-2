@@ -87,7 +87,7 @@ export function recordOutcome(
   // Record for the base unit type
   const basePattern = unitType;
   ensurePattern(basePattern);
-  const outcome = history.patterns[basePattern][tier];
+  const outcome = history.patterns[basePattern]![tier];
   if (success) outcome.success++;
   else outcome.fail++;
 
@@ -96,7 +96,7 @@ export function recordOutcome(
     for (const tag of tags) {
       const tagPattern = `${unitType}:${tag}`;
       ensurePattern(tagPattern);
-      const tagOutcome = history.patterns[tagPattern][tier];
+      const tagOutcome = history.patterns[tagPattern]![tier];
       if (success) tagOutcome.success++;
       else tagOutcome.fail++;
     }
@@ -104,7 +104,7 @@ export function recordOutcome(
 
   // Apply rolling window — cap total entries per tier per pattern
   for (const pattern of Object.keys(history.patterns)) {
-    const p = history.patterns[pattern];
+    const p = history.patterns[pattern]!;
     for (const t of ["light", "standard", "heavy"] as const) {
       const total = p[t].success + p[t].fail;
       if (total > ROLLING_WINDOW) {
@@ -152,12 +152,12 @@ export function recordFeedback(
     // and also as success at one tier lower (encourages more downgrading)
     const lower = tierBelow(tier);
     if (lower) {
-      const outcomes = history.patterns[pattern][lower];
+      const outcomes = history.patterns[pattern]![lower];
       outcomes.success += FEEDBACK_WEIGHT;
     }
   } else if (rating === "under") {
     // User says this needed a better model → record as failure at current tier
-    const outcomes = history.patterns[pattern][tier];
+    const outcomes = history.patterns[pattern]![tier];
     outcomes.fail += FEEDBACK_WEIGHT;
   }
   // "ok" = no adjustment needed

@@ -34,7 +34,7 @@ function containsFastapiInPyproject(content: string): boolean {
   for (const line of content.split("\n")) {
     const keyMatch = line.match(/^\s*([A-Za-z0-9_.-]+)\s*=/);
     if (keyMatch) {
-      const key = normalizePackageName(keyMatch[1]);
+      const key = normalizePackageName(keyMatch[1]!);
       if (key === "fastapi") {
         return true;
       }
@@ -46,7 +46,7 @@ function containsFastapiInPyproject(content: string): boolean {
     const quotedSpecRe = /["']([^"']+)["']/g;
     let match: RegExpExecArray | null;
     while ((match = quotedSpecRe.exec(line)) !== null) {
-      if (extractRequirementName(match[1]) === "fastapi") {
+      if (extractRequirementName(match[1]!) === "fastapi") {
         return true;
       }
     }
@@ -80,12 +80,12 @@ export function containsSpringBootMarker(
       for (const accessor of catalogAccessors) {
         const aliasRe = new RegExp(`alias\\(\\s*${accessor}\\.plugins\\.([a-z0-9_.-]+)\\s*\\)`, "gi");
         while ((match = aliasRe.exec(normalized)) !== null) {
-          usedPluginAliases.add(normalizePluginAlias(match[1]));
+          usedPluginAliases.add(normalizePluginAlias(match[1]!));
         }
 
         const libraryAliasRe = new RegExp(`\\b${accessor}\\.((?!plugins\\b)[a-z0-9_.-]+)`, "gi");
         while ((match = libraryAliasRe.exec(normalized)) !== null) {
-          usedLibraryAliases.add(normalizePluginAlias(match[1]));
+          usedLibraryAliases.add(normalizePluginAlias(match[1]!));
         }
       }
     } catch {
@@ -110,19 +110,19 @@ export function containsSpringBootMarker(
       const aliasRe = /^\s*([A-Za-z0-9_.-]+)\s*=\s*\{[^\n}]*\bid\s*=\s*["']org\.springframework\.boot["'][^\n}]*\}/gm;
       let match: RegExpExecArray | null;
       while ((match = aliasRe.exec(content)) !== null) {
-        springBootAliases.add(normalizePluginAlias(match[1]));
+        springBootAliases.add(normalizePluginAlias(match[1]!));
       }
 
       const libraryRe = /^\s*([A-Za-z0-9_.-]+)\s*=\s*\{[^\n}]*\b(module\s*=\s*["']org\.springframework\.boot:[^"']+["']|group\s*=\s*["']org\.springframework\.boot["'][^\n}]*\bname\s*=\s*["']spring-boot[^"']*["'])[^\n}]*\}/gm;
       while ((match = libraryRe.exec(content)) !== null) {
-        springBootLibraries.add(normalizePluginAlias(match[1]));
+        springBootLibraries.add(normalizePluginAlias(match[1]!));
       }
 
       const bundleRe = /^\s*([A-Za-z0-9_.-]+)\s*=\s*\[([\s\S]*?)\]/gm;
       while ((match = bundleRe.exec(content)) !== null) {
         pendingSpringBootBundles.push({
-          bundleAlias: normalizePluginAlias(`bundles.${match[1]}`),
-          referencedAliases: match[2]
+          bundleAlias: normalizePluginAlias(`bundles.${match[1]!}`),
+          referencedAliases: match[2]!
             .split(",")
             .map((part) => normalizePluginAlias(part.replace(/["'\s]/g, "")))
             .filter(Boolean),
@@ -179,8 +179,8 @@ function resolveVersionCatalogAccessors(
       const createRe = /create\(\s*["']([A-Za-z0-9_]+)["']\s*\)\s*\{[\s\S]*?([A-Za-z0-9_.-]+\.versions\.toml)["']?\s*\)\s*\)/g;
       let match: RegExpExecArray | null;
       while ((match = createRe.exec(content)) !== null) {
-        const accessor = match[1].toLowerCase();
-        const catalogBasename = match[2].replaceAll("\\", "/").split("/").pop()!;
+        const accessor = match[1]!.toLowerCase();
+        const catalogBasename = match[2]!.replaceAll("\\", "/").split("/").pop()!;
         if (versionCatalogFiles.some((file) => {
           const normalized = file.replaceAll("\\", "/");
           return normalized === catalogBasename || normalized.endsWith(`/${catalogBasename}`);
@@ -238,7 +238,7 @@ function extractRequirementName(spec: string): string | null {
 
   const match = trimmed.match(/^([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?(?=\s*(?:@|[<>=!~;]|$))/);
   if (!match) return null;
-  return normalizePackageName(match[1]);
+  return normalizePackageName(match[1]!);
 }
 
 function extractPyprojectDependencySections(content: string): string {
@@ -272,7 +272,7 @@ function extractPyprojectDependencySections(content: string): string {
 
     const sectionMatch = trimmed.match(/^\[([^\]]+)\]$/);
     if (sectionMatch) {
-      section = sectionMatch[1].trim();
+      section = sectionMatch[1]!.trim();
       continue;
     }
 

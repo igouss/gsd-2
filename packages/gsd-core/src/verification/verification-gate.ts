@@ -187,7 +187,7 @@ export function isLikelyCommand(cmd: string): boolean {
   if (!trimmed) return false;
 
   const tokens = trimmed.split(/\s+/);
-  const firstToken = tokens[0];
+  const firstToken = tokens[0]!;
 
   // Known command prefix → definitely a command
   if (KNOWN_COMMAND_PREFIXES.has(firstToken)) return true;

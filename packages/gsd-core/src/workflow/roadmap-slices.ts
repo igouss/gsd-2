@@ -178,7 +178,7 @@ export function parseRoadmapSlices(content: string): RoadmapSliceEntry[] {
     if (cbMatch) {
       if (currentSlice) slices.push(currentSlice);
 
-      const done = cbMatch[1].toLowerCase() === "x";
+      const done = cbMatch[1]!.toLowerCase() === "x";
       const id = cbMatch[2]!;
       const title = cbMatch[3]!;
       const rest = cbMatch[4] ?? "";

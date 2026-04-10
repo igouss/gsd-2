@@ -74,7 +74,7 @@ function loadProvider(): void {
     // unavailable
   }
 
-  const nodeMajor = parseInt(process.versions.node.split(".")[0], 10);
+  const nodeMajor = parseInt(process.versions.node.split(".")[0]!, 10);
   const versionHint = nodeMajor < 22
     ? ` GSD requires Node >= 22.0.0 (current: v${process.versions.node}). Upgrade Node to fix this.`
     : "";
