@@ -338,7 +338,7 @@ export function computeCriticalPath(milestones: VisualizerMilestone[]): Critical
 
   // Slice-level critical path within active milestone
   const activeMs = milestones.find(m => m.status === 'active');
-  let slicePath: string[] = [];
+  const slicePath: string[] = [];
   const sliceSlack = new Map<string, number>();
 
   if (activeMs && activeMs.slices.length > 0) {

@@ -612,7 +612,7 @@ export async function runDispatch(
   deps.emitJournalEvent({ ts: new Date().toISOString(), flowId: ic.flowId, seq: ic.nextSeq(), eventType: "dispatch-match", rule: dispatchResult.matchedRule, data: { unitType: dispatchResult.unitType, unitId: dispatchResult.unitId } });
 
   let unitType = dispatchResult.unitType;
-  let unitId = dispatchResult.unitId;
+  const unitId = dispatchResult.unitId;
   let prompt = dispatchResult.prompt;
   const pauseAfterUatDispatch = dispatchResult.pauseAfterDispatch ?? false;
 

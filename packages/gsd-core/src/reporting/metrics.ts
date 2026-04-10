@@ -119,7 +119,7 @@ export function pruneMetricsLedger(_base: string, _keepCount: number): number {
 
 // ─── In-memory state (stub — real impl has module-level ledger) ──────────────
 
-let ledger: MetricsLedger | null = null;
+const ledger: MetricsLedger | null = null;
 
 export function getLedger(): MetricsLedger | null {
   return ledger;
