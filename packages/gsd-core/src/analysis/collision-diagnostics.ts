@@ -326,7 +326,11 @@ function formatDiagnosticEntry(diagnostic: ClassifiedDiagnostic): string {
 // Exports
 // ============================================================================
 
-export default {
-	analyzeCollisions,
-	doctorReport,
+const collisionDiagnostics: {
+	analyzeCollisions: typeof analyzeCollisions;
+	doctorReport: typeof doctorReport;
+} = {
+	analyzeCollisions: analyzeCollisions,
+	doctorReport: doctorReport,
 };
+export default collisionDiagnostics;

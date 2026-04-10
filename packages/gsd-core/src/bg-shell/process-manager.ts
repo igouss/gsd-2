@@ -6,4 +6,4 @@
  * needed by verification-gate.ts.
  */
 
-export const processes = new Map<string, unknown>();
+export const processes: Map<string, unknown> = new Map<string, unknown>();

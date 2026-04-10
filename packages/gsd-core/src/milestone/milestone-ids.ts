@@ -15,7 +15,7 @@ import { getErrorMessage } from "../domain/error-utils.ts";
 // ─── Regex ──────────────────────────────────────────────────────────────────
 
 /** Matches both classic `M001` and unique `M001-abc123` formats (anchored). */
-export const MILESTONE_ID_RE = /^M\d{3}(?:-[a-z0-9]{6})?$/;
+export const MILESTONE_ID_RE: RegExp = /^M\d{3}(?:-[a-z0-9]{6})?$/;
 
 // ─── Parsing & Extraction ───────────────────────────────────────────────────
 

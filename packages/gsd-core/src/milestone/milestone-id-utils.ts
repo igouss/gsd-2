@@ -3,7 +3,7 @@ import { readdirSync } from "node:fs";
 import { milestonesDir } from "../persistence/paths.ts";
 
 /** Matches both classic `M001` and unique `M001-abc123` formats (anchored). */
-export const MILESTONE_ID_RE = /^M\d{3}(?:-[a-z0-9]{6})?$/;
+export const MILESTONE_ID_RE: RegExp = /^M\d{3}(?:-[a-z0-9]{6})?$/;
 
 /** Extract the trailing sequential number from a milestone ID. Returns 0 for non-matches. */
 export function extractMilestoneSeq(id: string): number {

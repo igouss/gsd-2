@@ -288,7 +288,7 @@ function getExtensionCompletions(prefix: string, action: string) {
   }
 }
 
-export function getGsdArgumentCompletions(prefix: string) {
+export function getGsdArgumentCompletions(prefix: string): Array<{ value: string; label: string; description: string }> {
   const hasTrailingSpace = prefix.endsWith(" ");
   const parts = prefix.trim().split(/\s+/);
   if (hasTrailingSpace && parts.length >= 1) {

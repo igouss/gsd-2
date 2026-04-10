@@ -2,9 +2,11 @@
  * Shared git constants used across git-service and native-git-bridge.
  */
 
+const baseEnv: Record<string, string | undefined> = { ...process.env };
+
 /** Env overlay that suppresses interactive git credential prompts and git-svn noise. */
-export const GIT_NO_PROMPT_ENV = {
-  ...process.env,
+export const GIT_NO_PROMPT_ENV: Record<string, string | undefined> = {
+  ...baseEnv,
   GIT_TERMINAL_PROMPT: "0",
   GIT_ASKPASS: "",
   GIT_SVN_ID: "",

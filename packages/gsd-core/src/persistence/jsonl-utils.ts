@@ -7,7 +7,7 @@
  */
 
 /** Max bytes to parse from a JSONL source. Prevents V8 OOM on bloated activity logs. */
-export const MAX_JSONL_BYTES = 10 * 1024 * 1024; // 10 MB
+export const MAX_JSONL_BYTES: number = 10 * 1024 * 1024; // 10 MB
 
 /**
  * Parse a raw JSONL string into an array of parsed objects.

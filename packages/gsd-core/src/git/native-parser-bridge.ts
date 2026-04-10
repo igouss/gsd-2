@@ -65,7 +65,7 @@ export function nativeSplitFrontmatter(content: string): { metadata: Record<stri
 }
 
 /** Sentinel value indicating the native module is not available. */
-const NATIVE_UNAVAILABLE = Symbol('native-unavailable');
+const NATIVE_UNAVAILABLE: symbol = Symbol('native-unavailable');
 
 /**
  * Native-backed section extraction.

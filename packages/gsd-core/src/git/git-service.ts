@@ -84,7 +84,7 @@ export interface GitPreferences {
   absorb_snapshot_commits?: boolean;
 }
 
-export const VALID_BRANCH_NAME = /^[a-zA-Z0-9_\-./]+$/;
+export const VALID_BRANCH_NAME: RegExp = /^[a-zA-Z0-9_\-./]+$/;
 
 export interface CommitOptions {
   message: string;

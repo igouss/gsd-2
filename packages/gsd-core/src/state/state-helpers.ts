@@ -116,4 +116,4 @@ export function extractContextTitle(content: string | null, fallback: string): s
 
 // isStatusDone replaced by isClosedStatus from status-guards.ts (single source of truth).
 // Alias kept for backward compatibility within state derivation files.
-export const isStatusDone = isClosedStatus;
+export const isStatusDone: (status: string) => boolean = isClosedStatus;

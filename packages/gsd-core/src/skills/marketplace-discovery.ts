@@ -500,9 +500,15 @@ export function discoverMarketplace(repoRoot: string): MarketplaceDiscoveryResul
 // Export all types and functions
 // ============================================================================
 
-export default {
-  parseMarketplaceJson,
-  inspectPlugin,
-  discoverMarketplace,
-  resolvePluginRoot
+const marketplaceDiscovery: {
+  parseMarketplaceJson: typeof parseMarketplaceJson;
+  inspectPlugin: typeof inspectPlugin;
+  discoverMarketplace: typeof discoverMarketplace;
+  resolvePluginRoot: typeof resolvePluginRoot;
+} = {
+  parseMarketplaceJson: parseMarketplaceJson,
+  inspectPlugin: inspectPlugin,
+  discoverMarketplace: discoverMarketplace,
+  resolvePluginRoot: resolvePluginRoot
 };
+export default marketplaceDiscovery;

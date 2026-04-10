@@ -58,7 +58,7 @@ export const MODE_DEFAULTS: Record<WorkflowMode, Partial<GSDPreferences>> = {
 };
 
 /** All recognized top-level keys in GSDPreferences. Used to detect typos / stale config. */
-export const KNOWN_PREFERENCE_KEYS = new Set<string>([
+export const KNOWN_PREFERENCE_KEYS: Set<string> = new Set<string>([
   "version",
   "mode",
   "always_use_skills",
@@ -124,7 +124,7 @@ export const KNOWN_UNIT_TYPES = [
 export type UnitType = (typeof KNOWN_UNIT_TYPES)[number];
 
 
-export const SKILL_ACTIONS = new Set(["use", "prefer", "avoid"]);
+export const SKILL_ACTIONS: Set<string> = new Set(["use", "prefer", "avoid"]);
 
 export interface GSDSkillRule {
   when: string;

@@ -12,6 +12,7 @@
     "noImplicitReturns": true,
     "verbatimModuleSyntax": true,
     "noUncheckedIndexedAccess": true,
+    "isolatedDeclarations": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,

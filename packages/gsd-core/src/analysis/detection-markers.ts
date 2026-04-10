@@ -114,7 +114,7 @@ export const RECURSIVE_SCAN_IGNORED_DIRS = new Set([
 ]) as ReadonlySet<string>;
 
 /** Project file markers safe to detect recursively via suffix matching. */
-export const ROOT_ONLY_PROJECT_FILES = new Set<string>([
+export const ROOT_ONLY_PROJECT_FILES: Set<string> = new Set<string>([
   ".github/workflows",
   "package.json",
   "Gemfile",

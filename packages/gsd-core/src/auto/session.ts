@@ -76,9 +76,9 @@ export class AutoSession {
   gitService: GitServiceImpl | null = null;
 
   // ── Dispatch counters ────────────────────────────────────────────────────
-  readonly unitDispatchCount = new Map<string, number>();
-  readonly unitLifetimeDispatches = new Map<string, number>();
-  readonly unitRecoveryCount = new Map<string, number>();
+  readonly unitDispatchCount: Map<string, number> = new Map<string, number>();
+  readonly unitLifetimeDispatches: Map<string, number> = new Map<string, number>();
+  readonly unitRecoveryCount: Map<string, number> = new Map<string, number>();
 
   // ── Timers ───────────────────────────────────────────────────────────────
   unitTimeoutHandle: ReturnType<typeof setTimeout> | null = null;
@@ -104,7 +104,7 @@ export class AutoSession {
   // ── Recovery ─────────────────────────────────────────────────────────────
   pendingCrashRecovery: string | null = null;
   pendingVerificationRetry: PendingVerificationRetry | null = null;
-  readonly verificationRetryCount = new Map<string, number>();
+  readonly verificationRetryCount: Map<string, number> = new Map<string, number>();
   pausedSessionFile: string | null = null;
   resourceVersionOnStart: string | null = null;
   lastStateRebuildAt = 0;

@@ -92,7 +92,7 @@ function cleanupTempFileSync(tmpPath: string, ops: AtomicWriteSyncOps): void {
 export async function atomicWriteAsyncWithOps(
   filePath: string,
   content: string,
-  encoding: RetryableEncoding = "utf-8",
+  encoding: RetryableEncoding | undefined = "utf-8",
   ops: AtomicWriteAsyncOps,
 ): Promise<void> {
   await ops.mkdir(dirname(filePath), { recursive: true });
@@ -123,7 +123,7 @@ export async function atomicWriteAsyncWithOps(
 export function atomicWriteSyncWithOps(
   filePath: string,
   content: string,
-  encoding: RetryableEncoding = "utf-8",
+  encoding: RetryableEncoding | undefined = "utf-8",
   ops: AtomicWriteSyncOps,
 ): void {
   ops.mkdir(dirname(filePath), { recursive: true });

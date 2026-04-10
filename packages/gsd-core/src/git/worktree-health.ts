@@ -58,7 +58,7 @@ const DEFAULT_STALE_DAYS = 14;
 export function getWorktreeHealth(
   basePath: string,
   wt: WorktreeInfo,
-  staleDays = DEFAULT_STALE_DAYS,
+  staleDays: number = DEFAULT_STALE_DAYS,
 ): WorktreeHealthStatus {
   const mainBranch = nativeDetectMainBranch(basePath);
 
@@ -128,7 +128,7 @@ export function getWorktreeHealth(
  */
 export function getAllWorktreeHealth(
   basePath: string,
-  staleDays = DEFAULT_STALE_DAYS,
+  staleDays: number = DEFAULT_STALE_DAYS,
 ): WorktreeHealthStatus[] {
   const worktrees = listWorktrees(basePath);
   return worktrees.map(wt => getWorktreeHealth(basePath, wt, staleDays));

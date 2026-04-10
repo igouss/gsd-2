@@ -91,7 +91,7 @@ export type DoctorIssueCode =
  * effectively discarding all work past that point (#1809). This must only be
  * fixed by an explicit manual doctor run (fixLevel="all").
  */
-export const GLOBAL_STATE_CODES = new Set<DoctorIssueCode>([
+export const GLOBAL_STATE_CODES: Set<DoctorIssueCode> = new Set<DoctorIssueCode>([
   "orphaned_project_state",
   "orphaned_completed_units",
 ]);
