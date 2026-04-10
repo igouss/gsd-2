@@ -10,7 +10,7 @@
  */
 
 import { execFileSync } from "node:child_process";
-import { logWarning } from "../workflow/workflow-logger.js";
+import { logWarning } from "../workflow/workflow-logger.ts";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

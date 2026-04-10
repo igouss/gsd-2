@@ -6,17 +6,17 @@ import type {
   Summary, SummaryFrontmatter, FileModified,
   Continue, ContinueFrontmatter, ContinueStatus,
   SecretsManifest, SecretsManifestEntry, SecretsManifestEntryStatus,
-} from '../domain/types.js';
+} from '../domain/types.ts';
 
-import { nativeParseSummaryFile } from '../git/native-parser-bridge.js';
-import { splitFrontmatter, parseFrontmatterMap } from "../shared/frontmatter.js";
+import { nativeParseSummaryFile } from '../git/native-parser-bridge.ts';
+import { splitFrontmatter, parseFrontmatterMap } from "../shared/frontmatter.ts";
 import {
   cachedParse,
   extractSection,
   extractAllSections,
   extractBoldField,
   parseBullets,
-} from './file-helpers.js';
+} from './file-helpers.ts';
 
 // ─── Secrets Manifest Parser ───────────────────────────────────────────────
 

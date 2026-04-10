@@ -11,7 +11,7 @@
  * See: https://github.com/gsd-build/gsd-2/issues/3013
  */
 
-import type { CompleteMilestoneParams } from "../tools/complete-milestone.js";
+import type { CompleteMilestoneParams } from "../tools/complete-milestone.ts";
 
 /**
  * Coerce an unknown value to a trimmed string.

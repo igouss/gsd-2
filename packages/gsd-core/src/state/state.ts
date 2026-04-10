@@ -1,44 +1,42 @@
 // GSD Extension — State Derivation
 // Barrel module: orchestrator + re-exports from split files.
 
-import type { GSDState } from '../domain/types.js';
+import type { GSDState } from '../domain/types.ts';
 
 import {
   loadFile,
   parseRequirementCounts,
-} from '../persistence/files.js';
+} from '../persistence/files.ts';
 
 import {
   resolveMilestoneFile,
   resolveGsdRootFile,
-} from '../persistence/paths.js';
+} from '../persistence/paths.ts';
 
-import { findMilestoneIds } from '../milestone/milestone-ids.js';
-import { loadQueueOrder, sortByQueueOrder } from './queue-order.js';
-import { isClosedStatus } from '../domain/status-guards.js';
+import { findMilestoneIds } from '../milestone/milestone-ids.ts';
+import { loadQueueOrder, sortByQueueOrder } from './queue-order.ts';
+import { isClosedStatus } from '../domain/status-guards.ts';
 
-import { parseRoadmap } from './parsers-legacy.js';
+import { parseRoadmap } from '../persistence/md-parsers.ts';
 
-import { debugCount, debugTime } from '../reporting/debug-logger.js';
-import { logWarning } from '../workflow/workflow-logger.js';
+import { debugCount, debugTime } from '../reporting/debug-logger.ts';
+import { logWarning } from '../workflow/workflow-logger.ts';
 
 import {
   isDbAvailable,
   getAllMilestones,
   insertMilestone,
-} from '../persistence/gsd-db.js';
+} from '../persistence/gsd-db.ts';
 
-import { isGhostMilestone, isMilestoneComplete } from './state-helpers.js';
-import { CACHE_TTL_MS, getStateCache, setStateCache } from './state-cache.js';
-import { deriveStateFromDb } from './state-db.js';
-import { _deriveStateImpl } from './state-legacy.js';
+import { isGhostMilestone, isMilestoneComplete } from './state-helpers.ts';
+import { CACHE_TTL_MS, getStateCache, setStateCache } from './state-cache.ts';
+import { deriveStateFromDb } from './state-db.ts';
 
 // ─── Re-exports (barrel) ─────────────────────────────────────────────────
 
-export { isGhostMilestone, isSliceComplete, isMilestoneComplete, isValidationTerminal } from './state-helpers.js';
-export { invalidateStateCache } from './state-cache.js';
-export { deriveStateFromDb } from './state-db.js';
-export { _deriveStateImpl } from './state-legacy.js';
+export { isGhostMilestone, isSliceComplete, isMilestoneComplete, isValidationTerminal } from './state-helpers.ts';
+export { invalidateStateCache } from './state-cache.ts';
+export { deriveStateFromDb } from './state-db.ts';
 
 // ─── getActiveMilestoneId ─────────────────────────────────────────────────
 
@@ -101,12 +99,12 @@ export async function getActiveMilestoneId(basePath: string): Promise<string | n
 // ─── deriveState orchestrator ─────────────────────────────────────────────
 
 /**
- * Reconstruct GSD state from DB (primary) or filesystem (fallback).
+ * Reconstruct GSD state from the DB.
  * STATE.md is a rendered cache of this output.
  *
- * When DB is available, queries milestone/slice/task tables directly.
- * Falls back to filesystem parsing for unmigrated projects or when DB
- * has zero milestones (e.g. first run before migration).
+ * Disk→DB reconciliation ensures milestones created outside the DB write
+ * path are picked up automatically. When the DB is unavailable or empty
+ * (no milestones on disk either), returns a minimal pre-planning state.
  */
 export async function deriveState(basePath: string): Promise<GSDState> {
   // Return cached result if within the TTL window for the same basePath
@@ -122,8 +120,24 @@ export async function deriveState(basePath: string): Promise<GSDState> {
   const stopTimer = debugTime("derive-state-impl");
   let result: GSDState;
 
-  // Dual-path: try DB-backed derivation first when hierarchy tables are populated
-  if (isDbAvailable()) {
+  const requirements = parseRequirementCounts(await loadFile(resolveGsdRootFile(basePath, "REQUIREMENTS")));
+  const emptyState: GSDState = {
+    activeMilestone: null,
+    activeSlice: null,
+    activeTask: null,
+    phase: 'pre-planning',
+    recentDecisions: [],
+    blockers: [],
+    nextAction: 'No milestones found. Run /gsd to create one.',
+    registry: [],
+    requirements,
+    progress: { milestones: { done: 0, total: 0 } },
+  };
+
+  if (!isDbAvailable()) {
+    logWarning("state", "DB unavailable — returning empty state (degraded mode)");
+    result = emptyState;
+  } else {
     let dbMilestones = getAllMilestones();
 
     // Disk→DB reconciliation when DB is empty but disk has milestones (#2631).
@@ -147,12 +161,8 @@ export async function deriveState(basePath: string): Promise<GSDState> {
       result = await deriveStateFromDb(basePath);
       stopDbTimer({ phase: result.phase, milestone: result.activeMilestone?.id });
     } else {
-      // DB open but no milestones on disk either — use filesystem path
-      result = await _deriveStateImpl(basePath);
+      result = emptyState;
     }
-  } else {
-    logWarning("state", "DB unavailable — using filesystem state derivation (degraded mode)");
-    result = await _deriveStateImpl(basePath);
   }
 
   stopTimer({ phase: result.phase, milestone: result.activeMilestone?.id });

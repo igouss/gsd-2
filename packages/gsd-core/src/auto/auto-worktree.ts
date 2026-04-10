@@ -20,33 +20,32 @@ import {
 } from "node:fs";
 import { isAbsolute, join, sep as pathSep } from "node:path";
 import { homedir } from "node:os";
-import { GSDError, GSD_IO_ERROR, GSD_GIT_ERROR } from "../domain/errors.js";
+import { GSDError, GSD_IO_ERROR, GSD_GIT_ERROR } from "../domain/errors.ts";
 import {
   reconcileWorktreeDb,
   isDbAvailable,
   getMilestone,
   getMilestoneSlices,
-} from "../persistence/gsd-db.js";
-import { atomicWriteSync } from "../persistence/atomic-write.js";
+} from "../persistence/gsd-db.ts";
+import { atomicWriteSync } from "../persistence/atomic-write.ts";
 import { execFileSync } from "node:child_process";
-import { safeCopy, safeCopyRecursive } from "../persistence/safe-fs.js";
-import { gsdRoot } from "../persistence/paths.js";
+import { safeCopy, safeCopyRecursive } from "../persistence/safe-fs.ts";
+import { gsdRoot } from "../persistence/paths.ts";
 import {
   createWorktree,
   removeWorktree,
   resolveGitDir,
   worktreePath,
   isInsideWorktreesDir,
-} from "../git/worktree-manager.js";
+} from "../git/worktree-manager.ts";
 import {
   detectWorktreeName,
-  resolveGitHeadPath,
   nudgeGitBranchCache,
-} from "../git/worktree.js";
-import { MergeConflictError, readIntegrationBranch, RUNTIME_EXCLUSION_PATHS } from "../git/git-service.js";
-import { debugLog } from "../reporting/debug-logger.js";
-import { logWarning, logError } from "../workflow/workflow-logger.js";
-import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
+} from "../git/worktree.ts";
+import { MergeConflictError, readIntegrationBranch, RUNTIME_EXCLUSION_PATHS } from "../git/git-service.ts";
+import { debugLog } from "../reporting/debug-logger.ts";
+import { logWarning, logError } from "../workflow/workflow-logger.ts";
+import { loadEffectiveGSDPreferences } from "../preferences/preferences.ts";
 import {
   nativeGetCurrentBranch,
   nativeDetectMainBranch,
@@ -65,7 +64,7 @@ import {
   nativeUpdateRef,
   nativeIsAncestor,
   nativeMergeAbort,
-} from "../git/native-git-bridge.js";
+} from "../git/native-git-bridge.ts";
 
 const gsdHome = process.env.GSD_HOME || join(homedir(), ".gsd");
 const PROJECT_PREFERENCES_FILE = "PREFERENCES.md";

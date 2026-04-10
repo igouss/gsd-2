@@ -15,8 +15,8 @@ import {
   nativeLastCommitEpoch,
   nativeUnpushedCount,
   nativeWorkingTreeStatus,
-} from "./native-git-bridge.js";
-import { listWorktrees, type WorktreeInfo } from "./worktree-manager.js";
+} from "./native-git-bridge.ts";
+import { listWorktrees, type WorktreeInfo } from "./worktree-manager.ts";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 

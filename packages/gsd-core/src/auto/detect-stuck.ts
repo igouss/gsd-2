@@ -4,7 +4,7 @@
  * Leaf node in the import DAG.
  */
 
-import type { WindowEntry } from "./types.js";
+import type { WindowEntry } from "./types.ts";
 
 /**
  * Pattern matching ENOENT errors with a file path.

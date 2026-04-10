@@ -12,8 +12,8 @@ import {
   buildMilestoneFileName,
   buildSliceFileName,
   buildTaskFileName,
-} from "../persistence/paths.js";
-import { parseUnitId } from "../domain/unit-id.js";
+} from "../persistence/paths.ts";
+import { parseUnitId } from "../domain/unit-id.ts";
 import { join } from "node:path";
 
 /**

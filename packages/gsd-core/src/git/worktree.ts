@@ -13,14 +13,14 @@
  */
 
 import { existsSync, readFileSync, realpathSync, utimesSync } from "node:fs";
-import { join, resolve, sep } from "node:path";
+import { join, resolve } from "node:path";
 import { homedir } from "node:os";
 
-import { GitServiceImpl, writeIntegrationBranch, type TaskCommitContext } from "./git-service.js";
-import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
+import { GitServiceImpl, writeIntegrationBranch, type TaskCommitContext } from "./git-service.ts";
+import { loadEffectiveGSDPreferences } from "../preferences/preferences.ts";
 
-export { MergeConflictError } from "./git-service.js";
-export type { TaskCommitContext } from "./git-service.js";
+export { MergeConflictError } from "./git-service.ts";
+export type { TaskCommitContext } from "./git-service.ts";
 
 // ─── Lazy GitServiceImpl Cache ─────────────────────────────────────────────
 
@@ -246,8 +246,8 @@ export function getSliceBranchName(milestoneId: string, sliceId: string, worktre
 }
 
 /** Re-export for backward compatibility — canonical definition in branch-patterns.ts */
-export { SLICE_BRANCH_RE } from "./branch-patterns.js";
-import { SLICE_BRANCH_RE } from "./branch-patterns.js";
+export { SLICE_BRANCH_RE } from "./branch-patterns.ts";
+import { SLICE_BRANCH_RE } from "./branch-patterns.ts";
 
 /**
  * Parse a slice branch name into its components.

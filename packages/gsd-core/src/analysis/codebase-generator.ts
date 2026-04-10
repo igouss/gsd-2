@@ -12,7 +12,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join, dirname, extname } from "node:path";
 
 import { execSync } from "node:child_process";
-import { gsdRoot } from "../persistence/paths.js";
+import { gsdRoot } from "../persistence/paths.ts";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

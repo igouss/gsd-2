@@ -12,8 +12,8 @@
 
 import { existsSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
-import { MergeConflictError } from "./git-service.js";
-import { nativeMergeAbort, nativeRebaseAbort, nativeResetHard } from "./native-git-bridge.js";
+import { MergeConflictError } from "./git-service.ts";
+import { nativeMergeAbort, nativeRebaseAbort, nativeResetHard } from "./native-git-bridge.ts";
 
 // Re-export for consumers
 export { MergeConflictError };

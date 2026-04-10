@@ -18,10 +18,9 @@ import type {
   HarnessAdapter,
   UnitDispatchRequest,
   UnitDispatchResult,
-  UnitErrorContext,
   OrchestratorEventSink,
-} from "./harness-adapter.js";
-import { nullEventSink } from "./harness-adapter.js";
+} from "./harness-adapter.ts";
+import { nullEventSink } from "./harness-adapter.ts";
 
 // ---------------------------------------------------------------------------
 // Claude CLI result shape (from --output-format json)
@@ -318,7 +317,7 @@ export class ClaudeCodeAdapter implements HarnessAdapter {
    */
   private handleStreamEvent(
     event: Record<string, unknown>,
-    request: UnitDispatchRequest,
+    _request: UnitDispatchRequest,
   ): void {
     const type = event.type as string;
 

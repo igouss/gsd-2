@@ -5,11 +5,10 @@
  * dependency satisfaction and file overlap across slice plans.
  */
 
-import { deriveState } from "../state/state.js";
-import { resolveMilestoneFile, resolveSliceFile } from "../persistence/paths.js";
-import { findMilestoneIds } from "../auto/guided-flow.js";
-import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../persistence/gsd-db.js";
-import type { MilestoneRegistryEntry } from "../domain/types.js";
+import { deriveState } from "../state/state.ts";
+import { findMilestoneIds } from "../auto/guided-flow.ts";
+import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../persistence/gsd-db.ts";
+import type { MilestoneRegistryEntry } from "../domain/types.ts";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -33,7 +32,7 @@ export interface ParallelCandidates {
  * Returns a deduplicated list of file paths.
  */
 async function collectTouchedFiles(
-  basePath: string,
+  _basePath: string,
   milestoneId: string,
 ): Promise<string[]> {
   const files = new Set<string>();

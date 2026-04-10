@@ -4,8 +4,8 @@
  * Generates HTML milestone report snapshots when milestones complete.
  */
 
-import type { AutoSession } from "../session.js";
-import type { CoreLoopDeps } from "../loop-deps.js";
+import type { AutoSession } from "../session.ts";
+import type { CoreLoopDeps } from "../loop-deps.ts";
 import { basename } from "node:path";
 
 /**
@@ -26,9 +26,9 @@ export async function generateMilestoneReport(
   deps: CoreLoopDeps,
   milestoneId: string,
 ): Promise<void> {
-  const { loadVisualizerData } = await import("../../reporting/visualizer-data.js");
-  const { generateHtmlReport } = await import("../../reporting/export-html.js");
-  const { writeReportSnapshot } = await import("../../reporting/reports.js");
+  const { loadVisualizerData } = await import("../../reporting/visualizer-data.ts");
+  const { generateHtmlReport } = await import("../../reporting/export-html.ts");
+  const { writeReportSnapshot } = await import("../../reporting/reports.ts");
 
   const reportBasePath = _resolveReportBasePath(s);
 

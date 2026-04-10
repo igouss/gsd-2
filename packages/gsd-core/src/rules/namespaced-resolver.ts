@@ -9,7 +9,7 @@
  * This is the core logic for D003 (same-plugin local-first) and R007/R008 (safe shorthand).
  */
 
-import type { NamespacedRegistry, NamespacedComponent, ComponentType } from './namespaced-registry.js';
+import type { NamespacedRegistry, NamespacedComponent, ComponentType } from './namespaced-registry.ts';
 
 // ============================================================================
 // Type Definitions

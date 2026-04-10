@@ -14,9 +14,9 @@
  */
 
 import { readFileSync, existsSync } from "node:fs";
-import { join, resolve, sep } from "node:path";
-import type { StepDefinition } from "../workflow/definition-loader.js";
-import { readFrozenDefinition } from "../workflow/custom-workflow-engine.js";
+import { resolve, sep } from "node:path";
+import type { StepDefinition } from "../workflow/definition-loader.ts";
+import { readFrozenDefinition } from "../workflow/custom-workflow-engine.ts";
 
 /** Maximum characters per artifact to prevent context window blowout. */
 const MAX_CONTEXT_CHARS = 10_000;

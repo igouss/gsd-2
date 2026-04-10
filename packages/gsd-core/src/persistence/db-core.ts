@@ -4,8 +4,8 @@
 
 import { createRequire } from "node:module";
 import { existsSync, copyFileSync } from "node:fs";
-import { GSDError, GSD_STALE_STATE } from "../domain/errors.js";
-import { logWarning } from "../workflow/workflow-logger.js";
+import { GSDError, GSD_STALE_STATE } from "../domain/errors.ts";
+import { logWarning } from "../workflow/workflow-logger.ts";
 
 const _require = createRequire(import.meta.url);
 

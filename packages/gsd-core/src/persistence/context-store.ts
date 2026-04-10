@@ -4,8 +4,8 @@
 // with optional filtering. Format functions produce prompt-injectable markdown.
 // All functions degrade gracefully: return empty results when DB unavailable, never throw.
 
-import { isDbAvailable, _getAdapter } from './gsd-db.js';
-import type { Decision, Requirement } from '../domain/types.js';
+import { isDbAvailable, _getAdapter } from './gsd-db.ts';
+import type { Decision, Requirement } from '../domain/types.ts';
 
 // ─── Query Functions ───────────────────────────────────────────────────────
 
@@ -58,7 +58,7 @@ export function queryDecisions(opts?: DecisionQueryOpts): Decision[] {
       choice: row['choice'] as string,
       rationale: row['rationale'] as string,
       revisable: row['revisable'] as string,
-      made_by: (row['made_by'] as string as import('../domain/types.js').DecisionMadeBy) ?? 'agent',
+      made_by: (row['made_by'] as string as import('../domain/types.ts').DecisionMadeBy) ?? 'agent',
       superseded_by: null,
     }));
   } catch {
@@ -226,7 +226,7 @@ export async function queryKnowledge(content: string, keywords: string[]): Promi
   if (!content || keywords.length === 0) return '';
 
   // Lazy import to avoid circular dependency
-  const { extractAllSections } = await import('./files.js');
+  const { extractAllSections } = await import('./files.ts');
 
   const sections = extractAllSections(content, 2);
   if (sections.size === 0) return '';

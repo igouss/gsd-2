@@ -7,8 +7,8 @@
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { ProjectSignals, XcodePlatform } from "./detection-types.js";
-import { PROJECT_FILES } from "./detection-types.js";
+import type { ProjectSignals, XcodePlatform } from "./detection-types.ts";
+import { PROJECT_FILES } from "./detection-types.ts";
 import {
   LANGUAGE_MAP,
   MONOREPO_MARKERS,
@@ -23,8 +23,8 @@ import {
   matchesProjectFileMarker,
   isPythonRequirementsFile,
   scanProjectFiles,
-} from "./detection-markers.js";
-import { containsFastapiDependency, containsSpringBootMarker } from "./detection-frameworks.js";
+} from "./detection-markers.ts";
+import { containsFastapiDependency, containsSpringBootMarker } from "./detection-frameworks.ts";
 
 // ─── Project Signals Detection ──────────────────────────────────────────────────
 

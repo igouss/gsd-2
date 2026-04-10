@@ -4,9 +4,9 @@ import {
   type MilestoneRow,
   type SliceRow,
   type TaskRow,
-} from "../persistence/gsd-db.js";
-import type { Decision } from "../domain/types.js";
-import { atomicWriteSync } from "../persistence/atomic-write.js";
+} from "../persistence/gsd-db.ts";
+import type { Decision } from "../domain/types.ts";
+import { atomicWriteSync } from "../persistence/atomic-write.ts";
 import { readFileSync, existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 

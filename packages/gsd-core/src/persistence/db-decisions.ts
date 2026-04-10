@@ -1,8 +1,8 @@
 // GSD Database — Decision + Requirement CRUD
 
-import type { Decision, Requirement } from "../domain/types.js";
-import { GSDError, GSD_STALE_STATE } from "../domain/errors.js";
-import { _getCurrentDb } from "./db-core.js";
+import type { Decision, Requirement } from "../domain/types.ts";
+import { GSDError, GSD_STALE_STATE } from "../domain/errors.ts";
+import { _getCurrentDb } from "./db-core.ts";
 
 export function getRequirementById(id: string): Requirement | null {
   const db = _getCurrentDb();

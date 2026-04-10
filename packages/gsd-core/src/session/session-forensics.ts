@@ -20,11 +20,11 @@
 
 import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { basename, join } from "node:path";
-import { gsdRoot } from "../persistence/paths.js";
-import { truncateWithEllipsis } from "../shared/format-utils.js";
-import { nativeParseJsonlTail } from "../git/native-parser-bridge.js";
-import { MAX_JSONL_BYTES, parseJSONL } from "../persistence/jsonl-utils.js";
-import { nativeWorkingTreeStatus, nativeDiffStat } from "../git/native-git-bridge.js";
+import { gsdRoot } from "../persistence/paths.ts";
+import { truncateWithEllipsis } from "../shared/format-utils.ts";
+import { nativeParseJsonlTail } from "../git/native-parser-bridge.ts";
+import { MAX_JSONL_BYTES, parseJSONL } from "../persistence/jsonl-utils.ts";
+import { nativeWorkingTreeStatus, nativeDiffStat } from "../git/native-git-bridge.ts";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -524,7 +524,7 @@ function extractResultText(msg: Record<string, unknown>): string {
  * Redact sensitive fields from tool inputs.
  * Keep paths and commands, drop large content bodies.
  */
-function redactInput(name: string, input: Record<string, unknown>): Record<string, unknown> {
+function redactInput(_name: string, input: Record<string, unknown>): Record<string, unknown> {
   const safe: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(input)) {
     if (key === "content" || key === "oldText" || key === "newText") {

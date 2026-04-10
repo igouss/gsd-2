@@ -1,4 +1,4 @@
-import { clearParseCache } from "../persistence/files.js";
+import { clearParseCache } from "../persistence/files.ts";
 import {
   transaction,
   getSlice,
@@ -8,15 +8,15 @@ import {
   upsertTaskPlanning,
   insertReplanHistory,
   deleteTask,
-} from "../persistence/gsd-db.js";
-import { invalidateStateCache } from "../state/state.js";
-import { isClosedStatus } from "../domain/status-guards.js";
-import { isNonEmptyString } from "../verification/validation.js";
-import { renderPlanFromDb, renderReplanFromDb } from "../reporting/markdown-renderer.js";
-import { renderAllProjections } from "../workflow/workflow-projections.js";
-import { writeManifest } from "../workflow/workflow-manifest.js";
-import { appendEvent } from "../workflow/workflow-events.js";
-import { logWarning } from "../workflow/workflow-logger.js";
+} from "../persistence/gsd-db.ts";
+import { invalidateStateCache } from "../state/state.ts";
+import { isClosedStatus } from "../domain/status-guards.ts";
+import { isNonEmptyString } from "../verification/validation.ts";
+import { renderPlanFromDb, renderReplanFromDb } from "../reporting/markdown-renderer.ts";
+import { renderAllProjections } from "../workflow/workflow-projections.ts";
+import { writeManifest } from "../workflow/workflow-manifest.ts";
+import { appendEvent } from "../workflow/workflow-events.ts";
+import { logWarning } from "../workflow/workflow-logger.ts";
 
 export interface ReplanSliceTaskInput {
   taskId: string;

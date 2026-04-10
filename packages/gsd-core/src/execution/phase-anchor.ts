@@ -6,7 +6,7 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { gsdRoot } from "../persistence/paths.js";
+import { gsdRoot } from "../persistence/paths.ts";
 
 export interface PhaseAnchor {
   phase: string;

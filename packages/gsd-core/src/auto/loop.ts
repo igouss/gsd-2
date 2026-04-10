@@ -10,25 +10,25 @@
  */
 
 import { randomUUID } from "node:crypto";
-import type { AutoSession, SidecarItem } from "./session.js";
-import type { CoreLoopDeps } from "./loop-deps.js";
+import type { AutoSession, SidecarItem } from "./session.ts";
+import type { CoreLoopDeps } from "./loop-deps.ts";
 import {
   MAX_LOOP_ITERATIONS,
   type LoopState,
   type IterationContext,
   type IterationData,
-} from "./types.js";
-import { _clearCurrentResolve } from "./resolve.js";
+} from "./types.ts";
+import { _clearCurrentResolve } from "./resolve.ts";
 import {
   runPreDispatch,
   runDispatch,
   runGuards,
   runUnitPhase,
   runFinalize,
-} from "./phases.js";
-import { debugLog } from "../reporting/debug-logger.js";
-import { isInfrastructureError } from "./infra-errors.js";
-import { resolveEngine } from "../routing/engine-resolver.js";
+} from "./phases.ts";
+import { debugLog } from "../reporting/debug-logger.ts";
+import { isInfrastructureError } from "./infra-errors.ts";
+import { resolveEngine } from "../routing/engine-resolver.ts";
 
 /**
  * Main auto-mode execution loop. Iterates: derive → dispatch → guards →

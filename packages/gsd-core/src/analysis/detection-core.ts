@@ -5,9 +5,9 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
-import { gsdRoot } from "../persistence/paths.js";
-import type { ProjectDetection, V1Detection, V2Detection } from "./detection-types.js";
-import { detectProjectSignals } from "./detection-signals.js";
+import { gsdRoot } from "../persistence/paths.ts";
+import type { ProjectDetection, V1Detection, V2Detection } from "./detection-types.ts";
+import { detectProjectSignals } from "./detection-signals.ts";
 
 const gsdHome = process.env.GSD_HOME || join(homedir(), ".gsd");
 

@@ -86,20 +86,20 @@ export {
   getFilePaths,
   recordToolCall,
   recordToolResult,
-} from "./evidence-collector.js";
+} from "./evidence-collector.ts";
 
-export type { EvidenceEntry, BashEvidence, FileWriteEvidence, FileEditEvidence } from "./evidence-collector.js";
+export type { EvidenceEntry, BashEvidence, FileWriteEvidence, FileEditEvidence } from "./evidence-collector.ts";
 
-export { classifyCommand } from "./destructive-guard.js";
-export type { CommandClassification } from "./destructive-guard.js";
+export { classifyCommand } from "./destructive-guard.ts";
+export type { CommandClassification } from "./destructive-guard.ts";
 
-export { validateFileChanges } from "./file-change-validator.js";
-export type { FileChangeAudit, FileViolation } from "./file-change-validator.js";
+export { validateFileChanges } from "./file-change-validator.ts";
+export type { FileChangeAudit, FileViolation } from "./file-change-validator.ts";
 
-export { crossReferenceEvidence } from "./evidence-cross-ref.js";
-export type { ClaimedEvidence, EvidenceMismatch } from "./evidence-cross-ref.js";
+export { crossReferenceEvidence } from "./evidence-cross-ref.ts";
+export type { ClaimedEvidence, EvidenceMismatch } from "./evidence-cross-ref.ts";
 
-export { createCheckpoint, rollbackToCheckpoint, cleanupCheckpoint } from "./git-checkpoint.js";
+export { createCheckpoint, rollbackToCheckpoint, cleanupCheckpoint } from "./git-checkpoint.ts";
 
-export { validateContent } from "./content-validator.js";
-export type { ContentViolation } from "./content-validator.js";
+export { validateContent } from "./content-validator.ts";
+export type { ContentViolation } from "./content-validator.ts";

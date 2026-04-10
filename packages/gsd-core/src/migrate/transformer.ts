@@ -7,7 +7,6 @@ import type {
   PlanningPlan,
   PlanningSummary,
   PlanningRoadmapEntry,
-  PlanningRoadmapMilestone,
   PlanningResearch,
   PlanningRequirement,
   GSDProject,
@@ -17,8 +16,7 @@ import type {
   GSDRequirement,
   GSDSliceSummaryData,
   GSDTaskSummaryData,
-  GSDBoundaryEntry,
-} from './types.js';
+} from './types.ts';
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 

@@ -9,8 +9,8 @@
  * deps.adapter.dispatchUnit().
  */
 
-import type { AutoSession, SidecarItem } from "./session.js";
-import type { CoreLoopDeps, PreVerificationOpts } from "./loop-deps.js";
+import type { AutoSession, SidecarItem } from "./session.ts";
+import type { CoreLoopDeps, PreVerificationOpts } from "./loop-deps.ts";
 import {
   MAX_RECOVERY_CHARS,
   BUDGET_THRESHOLDS,
@@ -20,26 +20,26 @@ import {
   type LoopState,
   type PreDispatchData,
   type IterationData,
-} from "./types.js";
-import { detectStuck } from "./detect-stuck.js";
-import { debugLog } from "../reporting/debug-logger.js";
-import { PROJECT_FILES } from "../analysis/detection.js";
-import { MergeConflictError } from "../git/git-service.js";
+} from "./types.ts";
+import { detectStuck } from "./detect-stuck.ts";
+import { debugLog } from "../reporting/debug-logger.ts";
+import { PROJECT_FILES } from "../analysis/detection.ts";
+import { MergeConflictError } from "../git/git-service.ts";
 import { join, basename, dirname, parse as parsePath } from "node:path";
 import { existsSync, cpSync, readdirSync } from "node:fs";
-import { logWarning, logError } from "../workflow/workflow-logger.js";
-import { gsdRoot } from "../persistence/paths.js";
-import { atomicWriteSync } from "../persistence/atomic-write.js";
-import { verifyExpectedArtifact, buildLoopRemediationSteps } from "./auto-recovery.js";
-import { diagnoseExpectedArtifact } from "./auto-artifact-paths.js";
-import { writeUnitRuntimeRecord } from "../state/unit-runtime.js";
-import { withTimeout, FINALIZE_PRE_TIMEOUT_MS, FINALIZE_POST_TIMEOUT_MS } from "./finalize-timeout.js";
-import { getEligibleSlices } from "../parallel/slice-parallel-eligibility.js";
-import { startSliceParallel } from "../parallel/slice-parallel-orchestrator.js";
-import { isDbAvailable, getMilestoneSlices } from "../persistence/gsd-db.js";
-import { resetEvidence } from "../safety/evidence-collector.js";
-import { createCheckpoint, cleanupCheckpoint, rollbackToCheckpoint } from "../safety/git-checkpoint.js";
-import { resolveSafetyHarnessConfig } from "../safety/safety-harness.js";
+import { logWarning, logError } from "../workflow/workflow-logger.ts";
+import { gsdRoot } from "../persistence/paths.ts";
+import { atomicWriteSync } from "../persistence/atomic-write.ts";
+import { verifyExpectedArtifact, buildLoopRemediationSteps } from "./auto-recovery.ts";
+import { diagnoseExpectedArtifact } from "./auto-artifact-paths.ts";
+import { writeUnitRuntimeRecord } from "../state/unit-runtime.ts";
+import { withTimeout, FINALIZE_PRE_TIMEOUT_MS, FINALIZE_POST_TIMEOUT_MS } from "./finalize-timeout.ts";
+import { getEligibleSlices } from "../parallel/slice-parallel-eligibility.ts";
+import { startSliceParallel } from "../parallel/slice-parallel-orchestrator.ts";
+import { isDbAvailable, getMilestoneSlices } from "../persistence/gsd-db.ts";
+import { resetEvidence } from "../safety/evidence-collector.ts";
+import { createCheckpoint, cleanupCheckpoint, rollbackToCheckpoint } from "../safety/git-checkpoint.ts";
+import { resolveSafetyHarnessConfig } from "../safety/safety-harness.ts";
 
 // ─── generateMilestoneReport ──────────────────────────────────────────────────
 
@@ -72,9 +72,9 @@ async function generateMilestoneReport(
   deps: CoreLoopDeps,
   milestoneId: string,
 ): Promise<void> {
-  const { loadVisualizerData } = await import("../reporting/visualizer-data.js");
-  const { generateHtmlReport } = await import("../reporting/export-html.js");
-  const { writeReportSnapshot } = await import("../reporting/reports.js");
+  const { loadVisualizerData } = await import("../reporting/visualizer-data.ts");
+  const { generateHtmlReport } = await import("../reporting/export-html.ts");
+  const { writeReportSnapshot } = await import("../reporting/reports.ts");
 
   const reportBasePath = _resolveReportBasePath(s);
 
@@ -756,7 +756,7 @@ export async function runGuards(
 
   // ── Stop/Backtrack directive guard (#3487) ──
   try {
-    const { loadStopCaptures, markCaptureExecuted } = await import("./captures.js");
+    const { loadStopCaptures, markCaptureExecuted } = await import("./captures.ts");
     const stopCaptures = loadStopCaptures(s.basePath);
     if (stopCaptures.length > 0) {
       const first = stopCaptures[0];
@@ -777,7 +777,7 @@ export async function runGuards(
       // For backtrack captures, write the backtrack trigger after pausing
       if (isBacktrack) {
         try {
-          const { executeBacktrack } = await import("./triage-resolution.js");
+          const { executeBacktrack } = await import("./triage-resolution.ts");
           executeBacktrack(s.basePath, mid, first);
         } catch (e) {
           debugLog("guards", { phase: "backtrack-execution-error", error: String(e) });
@@ -1052,7 +1052,7 @@ export async function runUnitPhase(
   s.lastBaselineCharCount = undefined;
   if (deps.isDbAvailable()) {
     try {
-      const { inlineGsdRootFile } = await import("../prompt/auto-prompts.js");
+      const { inlineGsdRootFile } = await import("../prompt/auto-prompts.ts");
       const [decisionsContent, requirementsContent, projectContent] =
         await Promise.all([
           inlineGsdRootFile(s.basePath, "decisions.md", "Decisions"),
@@ -1286,7 +1286,7 @@ export async function runUnitPhase(
   const anchorPhases = new Set(["research-milestone", "research-slice", "plan-milestone", "plan-slice"]);
   if (artifactVerified && mid && anchorPhases.has(unitType)) {
     try {
-      const { writePhaseAnchor } = await import("../execution/phase-anchor.js");
+      const { writePhaseAnchor } = await import("../execution/phase-anchor.ts");
       writePhaseAnchor(s.basePath, mid, {
         phase: unitType,
         milestoneId: mid,

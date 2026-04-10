@@ -9,10 +9,10 @@
 // invalidated together to prevent stale reads. This module provides a
 // single function that clears all three atomically.
 
-import { invalidateStateCache } from './state.js';
-import { clearPathCache } from '../persistence/paths.js';
-import { clearParseCache } from '../persistence/files.js';
-import { clearArtifacts } from '../persistence/gsd-db.js';
+import { invalidateStateCache } from './state.ts';
+import { clearPathCache } from '../persistence/paths.ts';
+import { clearParseCache } from '../persistence/files.ts';
+import { clearArtifacts } from '../persistence/gsd-db.ts';
 
 /**
  * Invalidate all GSD runtime caches in one call.

@@ -6,9 +6,9 @@
  */
 
 import { readFileSync } from "node:fs";
-import { atomicWriteSync } from "../persistence/atomic-write.js";
-import { resolveMilestoneFile } from "../persistence/paths.js";
-import { clearParseCache } from "../persistence/files.js";
+import { atomicWriteSync } from "../persistence/atomic-write.ts";
+import { resolveMilestoneFile } from "../persistence/paths.ts";
+import { clearParseCache } from "../persistence/files.ts";
 
 /**
  * Mark a slice as done ([x]) in the milestone roadmap.
@@ -87,7 +87,7 @@ export function markSliceUndoneInRoadmap(basePath: string, mid: string, sid: str
  *
  * @returns true if the plan was modified, false if no change was needed
  */
-export function markTaskDoneInPlan(basePath: string, planPath: string, tid: string): boolean {
+export function markTaskDoneInPlan(_basePath: string, planPath: string, tid: string): boolean {
   let content: string;
   try {
     content = readFileSync(planPath, "utf-8");
@@ -113,7 +113,7 @@ export function markTaskDoneInPlan(basePath: string, planPath: string, tid: stri
  *
  * @returns true if the plan was modified, false if no change was needed
  */
-export function markTaskUndoneInPlan(basePath: string, planPath: string, tid: string): boolean {
+export function markTaskUndoneInPlan(_basePath: string, planPath: string, tid: string): boolean {
   let content: string;
   try {
     content = readFileSync(planPath, "utf-8");

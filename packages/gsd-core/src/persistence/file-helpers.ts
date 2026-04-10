@@ -2,9 +2,9 @@
 // Parse cache, markdown section extraction, and utility functions.
 // Pure functions, zero Pi dependencies.
 
-import { nativeExtractSection, NATIVE_UNAVAILABLE } from '../git/native-parser-bridge.js';
-import { CACHE_MAX } from '../domain/constants.js';
-import { splitFrontmatter, parseFrontmatterMap } from "../shared/frontmatter.js";
+import { nativeExtractSection, NATIVE_UNAVAILABLE } from '../git/native-parser-bridge.ts';
+import { CACHE_MAX } from '../domain/constants.ts';
+import { splitFrontmatter, parseFrontmatterMap } from "../shared/frontmatter.ts";
 
 // Re-export for downstream consumers
 export { splitFrontmatter, parseFrontmatterMap };
@@ -35,18 +35,18 @@ export function cachedParse<T>(content: string, tag: string, parseFn: (c: string
 }
 
 // ─── Cross-module cache clear registry ────────────────────────────────────
-// parsers-legacy.ts registers its cache-clear callback here at module init
+// md-parsers.ts registers its cache-clear callback here at module init
 // to avoid circular imports. clearParseCache() calls all registered callbacks.
 const _cacheClearCallbacks: (() => void)[] = [];
 
 /** Register a callback to be invoked when clearParseCache() is called.
- *  Used by parsers-legacy.ts to synchronously clear its own cache. */
+ *  Used by md-parsers.ts to synchronously clear its own cache. */
 export function registerCacheClearCallback(cb: () => void): void {
   _cacheClearCallbacks.push(cb);
 }
 
 /** Clear the module-scoped parse cache. Call when files change on disk.
- *  Also clears any registered external caches (e.g. parsers-legacy.ts). */
+ *  Also clears any registered external caches (e.g. md-parsers.ts). */
 export function clearParseCache(): void {
   _parseCache.clear();
   for (const cb of _cacheClearCallbacks) cb();

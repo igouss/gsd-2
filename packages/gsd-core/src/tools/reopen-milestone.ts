@@ -17,17 +17,17 @@ import {
   updateSliceStatus,
   updateTaskStatus,
   transaction,
-} from "../persistence/gsd-db.js";
-import { invalidateStateCache } from "../state/state.js";
-import { isClosedStatus } from "../domain/status-guards.js";
-import { renderAllProjections } from "../workflow/workflow-projections.js";
-import { writeManifest } from "../workflow/workflow-manifest.js";
-import { appendEvent } from "../workflow/workflow-events.js";
-import { logWarning } from "../workflow/workflow-logger.js";
-import { debugLog } from "../reporting/debug-logger.js";
+} from "../persistence/gsd-db.ts";
+import { invalidateStateCache } from "../state/state.ts";
+import { isClosedStatus } from "../domain/status-guards.ts";
+import { renderAllProjections } from "../workflow/workflow-projections.ts";
+import { writeManifest } from "../workflow/workflow-manifest.ts";
+import { appendEvent } from "../workflow/workflow-events.ts";
+import { logWarning } from "../workflow/workflow-logger.ts";
+import { debugLog } from "../reporting/debug-logger.ts";
 import { existsSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
-import { resolveMilestonePath, resolveSlicePath, resolveTasksDir, clearPathCache } from "../persistence/paths.js";
+import { resolveMilestonePath, resolveSlicePath, resolveTasksDir, clearPathCache } from "../persistence/paths.ts";
 
 export interface ReopenMilestoneParams {
   milestoneId: string;

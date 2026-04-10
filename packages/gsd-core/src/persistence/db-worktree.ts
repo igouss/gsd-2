@@ -1,8 +1,8 @@
 // GSD Database — Worktree DB reconciliation
 
 import { existsSync, realpathSync } from "node:fs";
-import { logError, logWarning } from "../workflow/workflow-logger.js";
-import { _getCurrentDb, openDatabase } from "./db-core.js";
+import { logError, logWarning } from "../workflow/workflow-logger.ts";
+import { _getCurrentDb, openDatabase } from "./db-core.ts";
 
 export interface ReconcileResult {
   decisions: number;

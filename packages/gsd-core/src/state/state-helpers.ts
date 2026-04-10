@@ -3,20 +3,20 @@
 import type {
   Roadmap,
   SlicePlan,
-} from '../domain/types.js';
+} from '../domain/types.ts';
 
 import {
   resolveMilestoneFile,
   gsdRoot,
-} from '../persistence/paths.js';
+} from '../persistence/paths.ts';
 
-import { isClosedStatus } from '../domain/status-guards.js';
-import { extractVerdict } from '../analysis/verdict-parser.js';
+import { isClosedStatus } from '../domain/status-guards.ts';
+import { extractVerdict } from '../analysis/verdict-parser.ts';
 
 import {
   isDbAvailable,
   getMilestone,
-} from '../persistence/gsd-db.js';
+} from '../persistence/gsd-db.ts';
 
 import { join } from 'path';
 import { existsSync } from 'node:fs';

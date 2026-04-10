@@ -6,8 +6,8 @@
  * Wiring this policy into the loop is S04's responsibility.
  */
 
-import type { ExecutionPolicy } from "./execution-policy.js";
-import type { RecoveryAction, CloseoutResult } from "../routing/engine-types.js";
+import type { ExecutionPolicy } from "./execution-policy.ts";
+import type { RecoveryAction, CloseoutResult } from "../routing/engine-types.ts";
 
 export class DevExecutionPolicy implements ExecutionPolicy {
   async prepareWorkspace(

@@ -7,24 +7,24 @@
  * and read-only state readers.
  */
 
-export { createUnitToolsServer } from './unit-tools-server.js';
+export { createUnitToolsServer } from './unit-tools-server.ts';
 export type {
   SessionStatus,
   ExecuteOptions,
   CostAccumulator,
-} from './types.js';
-export { MAX_EVENTS, INIT_TIMEOUT_MS } from './types.js';
+} from './types.ts';
+export { MAX_EVENTS, INIT_TIMEOUT_MS } from './types.ts';
 
 // Read-only state readers (usable without a running session)
-export { readProgress } from './readers/state.js';
-export type { ProgressResult } from './readers/state.js';
-export { readRoadmap } from './readers/roadmap.js';
-export type { RoadmapResult, MilestoneInfo, SliceInfo, TaskInfo } from './readers/roadmap.js';
-export { readHistory } from './readers/metrics.js';
-export type { HistoryResult, MetricsUnit } from './readers/metrics.js';
-export { readCaptures } from './readers/captures.js';
-export type { CapturesResult, CaptureEntry } from './readers/captures.js';
-export { readKnowledge } from './readers/knowledge.js';
-export type { KnowledgeResult, KnowledgeEntry } from './readers/knowledge.js';
-export { runDoctorLite } from './readers/doctor-lite.js';
-export type { DoctorResult, DoctorIssue } from './readers/doctor-lite.js';
+export { readProgress } from './readers/state.ts';
+export type { ProgressResult } from './readers/state.ts';
+export { readRoadmap } from './readers/roadmap.ts';
+export type { RoadmapResult, MilestoneInfo, SliceInfo, TaskInfo } from './readers/roadmap.ts';
+export { readHistory } from './readers/metrics.ts';
+export type { HistoryResult, MetricsUnit } from './readers/metrics.ts';
+export { readCaptures } from './readers/captures.ts';
+export type { CapturesResult, CaptureEntry } from './readers/captures.ts';
+export { readKnowledge } from './readers/knowledge.ts';
+export type { KnowledgeResult, KnowledgeEntry } from './readers/knowledge.ts';
+export { runDoctorLite } from './readers/doctor-lite.ts';
+export type { DoctorResult, DoctorIssue } from './readers/doctor-lite.ts';

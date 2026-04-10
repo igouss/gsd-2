@@ -4,8 +4,8 @@
 // writeGSDDirectory: orchestrator that writes a complete .gsd directory tree from a GSDProject.
 
 import { join } from 'node:path';
-import { saveFile } from '../persistence/files.js';
-import { gsdRoot } from '../persistence/paths.js';
+import { saveFile } from '../persistence/files.ts';
+import { gsdRoot } from '../persistence/paths.ts';
 
 import type {
   GSDMilestone,
@@ -13,7 +13,7 @@ import type {
   GSDTask,
   GSDRequirement,
   GSDProject,
-} from './types.js';
+} from './types.ts';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 

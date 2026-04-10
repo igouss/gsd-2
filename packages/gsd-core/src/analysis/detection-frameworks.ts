@@ -3,7 +3,7 @@
  */
 
 import { join } from "node:path";
-import { readBounded, isPythonRequirementsFile } from "./detection-markers.js";
+import { readBounded, isPythonRequirementsFile } from "./detection-markers.ts";
 
 // ─── FastAPI Detection ──────────────────────────────────────────────────────────
 

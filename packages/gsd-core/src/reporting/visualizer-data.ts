@@ -2,12 +2,12 @@
 
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { deriveState } from '../state/state.js';
-import { parseSummary, loadFile } from '../persistence/files.js';
-import { isDbAvailable, getMilestoneSlices, getSliceTasks } from '../persistence/gsd-db.js';
-import { parseRoadmap, parsePlan } from '../state/parsers-legacy.js';
-import { findMilestoneIds } from '../milestone/milestone-ids.js';
-import { resolveMilestoneFile, resolveSliceFile, resolveGsdRootFile, gsdRoot } from '../persistence/paths.js';
+import { deriveState } from '../state/state.ts';
+import { parseSummary, loadFile } from '../persistence/files.ts';
+import { isDbAvailable, getMilestoneSlices, getSliceTasks } from '../persistence/gsd-db.ts';
+import { parseRoadmap, parsePlan } from '../persistence/md-parsers.ts';
+import { findMilestoneIds } from '../milestone/milestone-ids.ts';
+import { resolveMilestoneFile, resolveSliceFile, resolveGsdRootFile, gsdRoot } from '../persistence/paths.ts';
 import {
   getLedger,
   getProjectTotals,
@@ -17,18 +17,17 @@ import {
   aggregateByTier,
   formatTierSavings,
   loadLedgerFromDisk,
-  classifyUnitPhase,
-} from './metrics.js';
-import { loadAllCaptures, countPendingCaptures } from '../auto/captures.js';
-import { loadEffectiveGSDPreferences } from '../preferences/preferences.js';
-import { runProviderChecks, type ProviderCheckResult } from '../doctor/doctor-providers.js';
-import { generateSkillHealthReport } from '../skills/skill-health.js';
-import { runEnvironmentChecks, type EnvironmentCheckResult } from '../doctor/doctor-environment.js';
-import { computeProgressScore } from '../doctor/progress-score.js';
-import { getHealthHistory } from '../doctor/doctor-proactive.js';
+} from './metrics.ts';
+import { loadAllCaptures, countPendingCaptures } from '../auto/captures.ts';
+import { loadEffectiveGSDPreferences } from '../preferences/preferences.ts';
+import { runProviderChecks, type ProviderCheckResult } from '../doctor/doctor-providers.ts';
+import { generateSkillHealthReport } from '../skills/skill-health.ts';
+import { runEnvironmentChecks, type EnvironmentCheckResult } from '../doctor/doctor-environment.ts';
+import { computeProgressScore } from '../doctor/progress-score.ts';
+import { getHealthHistory } from '../doctor/doctor-proactive.ts';
 
-import type { Phase } from '../domain/types.js';
-import type { CaptureEntry } from '../auto/captures.js';
+import type { Phase } from '../domain/types.ts';
+import type { CaptureEntry } from '../auto/captures.ts';
 import type {
   ProjectTotals,
   PhaseAggregate,
@@ -36,7 +35,7 @@ import type {
   ModelAggregate,
   TierAggregate,
   UnitMetrics,
-} from './metrics.js';
+} from './metrics.ts';
 
 // ─── Visualizer Types ─────────────────────────────────────────────────────────
 
@@ -199,7 +198,7 @@ export interface HealthInfo {
   userMessages: number;
   providers: ProviderStatusSummary[];
   skillSummary: SkillSummaryInfo;
-  environmentIssues: import("../doctor/doctor-environment.js").EnvironmentCheckResult[];
+  environmentIssues: import("../doctor/doctor-environment.ts").EnvironmentCheckResult[];
   /** Persisted doctor run history (most recent first, up to 20 entries). */
   doctorHistory?: VisualizerDoctorEntry[];
   /** Current in-memory progress score (null if auto-mode not active). */
@@ -382,7 +381,6 @@ export function computeCriticalPath(milestones: VisualizerMilestone[]): Critical
     const slDist = new Map<string, number>();
     const slPrev = new Map<string, string | null>();
     for (const s of activeMs.slices) {
-      const w = s.done ? 0 : 1;
       slDist.set(s.id, 0);
       slPrev.set(s.id, null);
     }

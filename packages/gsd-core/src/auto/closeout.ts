@@ -5,8 +5,8 @@
  * condition is reached.
  */
 
-import type { AutoSession } from "./session.js";
-import type { CoreLoopDeps } from "./loop-deps.js";
+import type { AutoSession } from "./session.ts";
+import type { CoreLoopDeps } from "./loop-deps.ts";
 
 /**
  * If a unit is in-flight, close it out, then stop auto-mode.

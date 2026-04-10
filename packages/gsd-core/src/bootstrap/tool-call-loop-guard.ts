@@ -22,7 +22,6 @@ const MAX_CONSECUTIVE_STRICT = 1;
 
 let consecutiveCount = 0;
 let lastSignature = "";
-let lastToolName = "";
 let enabled = true;
 
 /** Hash tool name + args into a compact signature for comparison. */
@@ -60,7 +59,6 @@ export function checkToolCallLoop(
   } else {
     consecutiveCount = 1;
     lastSignature = sig;
-    lastToolName = toolName;
   }
 
   const threshold = STRICT_LOOP_TOOLS.has(toolName)
@@ -85,7 +83,6 @@ export function checkToolCallLoop(
 export function resetToolCallLoopGuard(): void {
   consecutiveCount = 0;
   lastSignature = "";
-  lastToolName = "";
   enabled = true;
 }
 
@@ -94,7 +91,6 @@ export function disableToolCallLoopGuard(): void {
   enabled = false;
   consecutiveCount = 0;
   lastSignature = "";
-  lastToolName = "";
 }
 
 /** Get current consecutive count for diagnostics. */

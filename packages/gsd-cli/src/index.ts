@@ -5,4 +5,4 @@
  * and dispatches work via harness adapters.
  */
 
-export { run } from "./run.js";
+export { run } from "./run.ts";

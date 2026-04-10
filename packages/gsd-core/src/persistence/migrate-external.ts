@@ -9,10 +9,10 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, lstatSync, mkdirSync, readdirSync, realpathSync, renameSync, cpSync, rmSync, symlinkSync } from "node:fs";
 import { join } from "node:path";
-import { externalGsdRoot, isInsideWorktree } from "../git/repo-identity.js";
-import { getErrorMessage } from "../domain/error-utils.js";
-import { hasGitTrackedGsdFiles } from "../git/gitignore.js";
-import { GIT_NO_PROMPT_ENV } from "../git/git-constants.js";
+import { externalGsdRoot, isInsideWorktree } from "../git/repo-identity.ts";
+import { getErrorMessage } from "../domain/error-utils.ts";
+import { hasGitTrackedGsdFiles } from "../git/gitignore.ts";
+import { GIT_NO_PROMPT_ENV } from "../git/git-constants.ts";
 
 export interface MigrationResult {
   migrated: boolean;

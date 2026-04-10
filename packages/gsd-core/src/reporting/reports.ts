@@ -15,10 +15,10 @@
  */
 
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'node:fs';
-import { join, basename } from 'node:path';
-import { gsdRoot } from '../persistence/paths.js';
-import { formatCost, formatTokenCount } from './metrics.js';
-import { formatDateShort, formatDuration } from '../shared/format-utils.js';
+import { join } from 'node:path';
+import { gsdRoot } from '../persistence/paths.ts';
+import { formatCost, formatTokenCount } from './metrics.ts';
+import { formatDateShort, formatDuration } from '../shared/format-utils.ts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

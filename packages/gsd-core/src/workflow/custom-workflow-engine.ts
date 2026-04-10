@@ -12,14 +12,14 @@
  * - Phase transitions are derivable from GRAPH.yaml step statuses.
  */
 
-import type { WorkflowEngine } from "./workflow-engine.js";
+import type { WorkflowEngine } from "./workflow-engine.ts";
 import type {
   EngineState,
   EngineDispatchAction,
   CompletedStep,
   ReconcileResult,
   DisplayMetadata,
-} from "../routing/engine-types.js";
+} from "../routing/engine-types.ts";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse } from "yaml";
@@ -30,10 +30,10 @@ import {
   markStepComplete,
   expandIteration,
   type WorkflowGraph,
-} from "./graph.js";
-import { injectContext } from "../prompt/context-injector.js";
-import type { WorkflowDefinition, StepDefinition } from "./definition-loader.js";
-import { parseUnitId } from "../domain/unit-id.js";
+} from "./graph.ts";
+import { injectContext } from "../prompt/context-injector.ts";
+import type { WorkflowDefinition, StepDefinition } from "./definition-loader.ts";
+import { parseUnitId } from "../domain/unit-id.ts";
 
 /** Read and parse the frozen DEFINITION.yaml from a run directory. */
 export function readFrozenDefinition(runDir: string): WorkflowDefinition {

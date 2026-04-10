@@ -1,11 +1,11 @@
 // GSD Dispatch Guard — prevents out-of-order slice dispatch
 
-import { resolveMilestoneFile } from "../persistence/paths.js";
-import { findMilestoneIds } from "./guided-flow.js";
-import { parseUnitId } from "../domain/unit-id.js";
-import { isDbAvailable, getMilestoneSlices } from "../persistence/gsd-db.js";
-import { parseRoadmap } from "../state/parsers-legacy.js";
-import { isClosedStatus } from "../domain/status-guards.js";
+import { resolveMilestoneFile } from "../persistence/paths.ts";
+import { findMilestoneIds } from "./guided-flow.ts";
+import { parseUnitId } from "../domain/unit-id.ts";
+import { isDbAvailable, getMilestoneSlices } from "../persistence/gsd-db.ts";
+import { parseRoadmap } from "../persistence/md-parsers.ts";
+import { isClosedStatus } from "../domain/status-guards.ts";
 import { readFileSync } from "node:fs";
 
 const SLICE_DISPATCH_TYPES = new Set([

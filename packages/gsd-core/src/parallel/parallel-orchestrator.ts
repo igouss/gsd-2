@@ -19,14 +19,14 @@ import {
 } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { gsdRoot } from "../persistence/paths.js";
-import { createWorktree, worktreePath } from "../git/worktree-manager.js";
-import { autoWorktreeBranch, runWorktreePostCreateHook, syncGsdStateToWorktree } from "../auto/auto-worktree.js";
-import { nativeBranchExists } from "../git/native-git-bridge.js";
-import { readIntegrationBranch } from "../git/git-service.js";
-import { resolveParallelConfig } from "../preferences/preferences.js";
-import type { GSDPreferences } from "../preferences/preferences.js";
-import type { ParallelConfig } from "../domain/types.js";
+import { gsdRoot } from "../persistence/paths.ts";
+import { createWorktree, worktreePath } from "../git/worktree-manager.ts";
+import { autoWorktreeBranch, runWorktreePostCreateHook, syncGsdStateToWorktree } from "../auto/auto-worktree.ts";
+import { nativeBranchExists } from "../git/native-git-bridge.ts";
+import { readIntegrationBranch } from "../git/git-service.ts";
+import { resolveParallelConfig } from "../preferences/preferences.ts";
+import type { GSDPreferences } from "../preferences/preferences.ts";
+import type { ParallelConfig } from "../domain/types.ts";
 import {
   writeSessionStatus,
   readAllSessionStatuses,
@@ -35,13 +35,13 @@ import {
   sendSignal,
   cleanupStaleSessions,
   type SessionStatus,
-} from "../session/session-status-io.js";
+} from "../session/session-status-io.ts";
 import {
   analyzeParallelEligibility,
   type ParallelCandidates,
-} from "./parallel-eligibility.js";
-import { getErrorMessage } from "../domain/error-utils.js";
-import { logWarning } from "../workflow/workflow-logger.js";
+} from "./parallel-eligibility.ts";
+import { getErrorMessage } from "../domain/error-utils.ts";
+import { logWarning } from "../workflow/workflow-logger.ts";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 

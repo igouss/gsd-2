@@ -15,60 +15,60 @@ export type {
   UnitDispatchResult,
   UnitErrorContext,
   OrchestratorEventSink,
-} from "./adapters/harness-adapter.js";
+} from "./adapters/harness-adapter.ts";
 
-export { nullEventSink } from "./adapters/harness-adapter.js";
+export { nullEventSink } from "./adapters/harness-adapter.ts";
 
 // Tool handlers — pure functions for state mutation
-export { handleCompleteTask } from "./tools/complete-task.js";
-export type { CompleteTaskResult } from "./tools/complete-task.js";
-export { handleCompleteSlice } from "./tools/complete-slice.js";
-export type { CompleteSliceResult } from "./tools/complete-slice.js";
-export { handleCompleteMilestone } from "./tools/complete-milestone.js";
-export { handlePlanMilestone } from "./tools/plan-milestone.js";
-export { handlePlanSlice } from "./tools/plan-slice.js";
-export { handlePlanTask } from "./tools/plan-task.js";
-export { handleReplanSlice } from "./tools/replan-slice.js";
-export { handleReassessRoadmap } from "./tools/reassess-roadmap.js";
-export { handleReopenTask } from "./tools/reopen-task.js";
-export { handleReopenSlice } from "./tools/reopen-slice.js";
-export { handleReopenMilestone } from "./tools/reopen-milestone.js";
-export { handleValidateMilestone } from "./tools/validate-milestone.js";
+export { handleCompleteTask } from "./tools/complete-task.ts";
+export type { CompleteTaskResult } from "./tools/complete-task.ts";
+export { handleCompleteSlice } from "./tools/complete-slice.ts";
+export type { CompleteSliceResult } from "./tools/complete-slice.ts";
+export { handleCompleteMilestone } from "./tools/complete-milestone.ts";
+export { handlePlanMilestone } from "./tools/plan-milestone.ts";
+export { handlePlanSlice } from "./tools/plan-slice.ts";
+export { handlePlanTask } from "./tools/plan-task.ts";
+export { handleReplanSlice } from "./tools/replan-slice.ts";
+export { handleReassessRoadmap } from "./tools/reassess-roadmap.ts";
+export { handleReopenTask } from "./tools/reopen-task.ts";
+export { handleReopenSlice } from "./tools/reopen-slice.ts";
+export { handleReopenMilestone } from "./tools/reopen-milestone.ts";
+export { handleValidateMilestone } from "./tools/validate-milestone.ts";
 
 // DB operations
-export { saveDecisionToDb, saveRequirementToDb, updateRequirementInDb, saveArtifactToDb } from "./persistence/db-writer.js";
-export type { SaveArtifactOpts } from "./persistence/db-writer.js";
+export { saveDecisionToDb, saveRequirementToDb, updateRequirementInDb, saveArtifactToDb } from "./persistence/db-writer.ts";
+export type { SaveArtifactOpts } from "./persistence/db-writer.ts";
 
 // DB — lifecycle and direct access
-export { openDatabase, closeDatabase, isDbAvailable, updateSliceStatus, saveGateResult } from "./persistence/gsd-db.js";
+export { openDatabase, closeDatabase, isDbAvailable, updateSliceStatus, saveGateResult } from "./persistence/gsd-db.ts";
 
 // State derivation
-export { deriveState, invalidateStateCache } from "./state/state.js";
+export { deriveState, invalidateStateCache } from "./state/state.ts";
 
 // Cache invalidation
-export { clearPathCache } from "./persistence/paths.js";
-export { clearParseCache } from "./persistence/files.js";
+export { clearPathCache } from "./persistence/paths.ts";
+export { clearParseCache } from "./persistence/files.ts";
 
 // Dispatch
-export { resolveDispatch } from "./auto/auto-dispatch.js";
+export { resolveDispatch } from "./auto/auto-dispatch.ts";
 
 // Preferences
-export { loadEffectiveGSDPreferences } from "./preferences/preferences.js";
+export { loadEffectiveGSDPreferences } from "./preferences/preferences.ts";
 
 // Session locking
-export { acquireSessionLock, releaseSessionLock } from "./session/session-lock.js";
+export { acquireSessionLock, releaseSessionLock } from "./session/session-lock.ts";
 
 // Milestone IDs
-export { nextMilestoneId, findMilestoneIds } from "./milestone/milestone-ids.js";
+export { nextMilestoneId, findMilestoneIds } from "./milestone/milestone-ids.ts";
 
 // Journal
-export { queryJournal } from "./persistence/journal.js";
+export { queryJournal } from "./persistence/journal.ts";
 
 // Types
-export type { CompleteTaskParams, CompleteSliceParams } from "./domain/types.js";
+export type { CompleteTaskParams, CompleteSliceParams } from "./domain/types.ts";
 
 // Adapters
-export { ClaudeCodeAdapter } from "./adapters/claude-code.js";
-export type { ClaudeCodeAdapterOptions } from "./adapters/claude-code.js";
-export { writeMcpConfig } from "./adapters/mcp-config.js";
-export type { McpConfigOptions } from "./adapters/mcp-config.js";
+export { ClaudeCodeAdapter } from "./adapters/claude-code.ts";
+export type { ClaudeCodeAdapterOptions } from "./adapters/claude-code.ts";
+export { writeMcpConfig } from "./adapters/mcp-config.ts";
+export type { McpConfigOptions } from "./adapters/mcp-config.ts";

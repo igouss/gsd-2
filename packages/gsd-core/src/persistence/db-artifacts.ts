@@ -1,8 +1,8 @@
 // GSD Database — Artifact CRUD
 
-import { GSDError, GSD_STALE_STATE } from "../domain/errors.js";
-import { logWarning } from "../workflow/workflow-logger.js";
-import { _getCurrentDb } from "./db-core.js";
+import { GSDError, GSD_STALE_STATE } from "../domain/errors.ts";
+import { logWarning } from "../workflow/workflow-logger.ts";
+import { _getCurrentDb } from "./db-core.ts";
 
 export function clearArtifacts(): void {
   const db = _getCurrentDb();

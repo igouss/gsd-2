@@ -1,8 +1,8 @@
 import { join } from "node:path";
 import { mkdirSync, existsSync, readFileSync, unlinkSync } from "node:fs";
-import { logWarning, logError } from "../workflow/workflow-logger.js";
-import { readEvents, findForkPoint, appendEvent, getSessionId } from "./workflow-events.js";
-import type { WorkflowEvent } from "./workflow-events.js";
+import { logWarning, logError } from "../workflow/workflow-logger.ts";
+import { readEvents, findForkPoint, appendEvent, getSessionId } from "./workflow-events.ts";
+import type { WorkflowEvent } from "./workflow-events.ts";
 import {
   transaction,
   updateTaskStatus,
@@ -16,14 +16,14 @@ import {
   upsertDecision,
   openDatabase,
   setTaskBlockerDiscovered,
-} from "../persistence/gsd-db.js";
-import { isClosedStatus } from "../domain/status-guards.js";
-import { invalidateStateCache } from "../state/state.js";
-import { clearPathCache } from "../persistence/paths.js";
-import { clearParseCache } from "../persistence/files.js";
-import { writeManifest } from "./workflow-manifest.js";
-import { atomicWriteSync } from "../persistence/atomic-write.js";
-import { acquireSyncLock, releaseSyncLock } from "../session/sync-lock.js";
+} from "../persistence/gsd-db.ts";
+import { isClosedStatus } from "../domain/status-guards.ts";
+import { invalidateStateCache } from "../state/state.ts";
+import { clearPathCache } from "../persistence/paths.ts";
+import { clearParseCache } from "../persistence/files.ts";
+import { writeManifest } from "./workflow-manifest.ts";
+import { atomicWriteSync } from "../persistence/atomic-write.ts";
+import { acquireSyncLock, releaseSyncLock } from "../session/sync-lock.ts";
 
 // ─── Replay Helpers ──────────────────────────────────────────────────────────
 

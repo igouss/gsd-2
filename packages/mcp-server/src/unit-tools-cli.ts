@@ -9,7 +9,7 @@
  * agent (Claude Code, etc.) connects to this server via MCP config.
  */
 
-import { createUnitToolsServer } from './unit-tools-server.js';
+import { createUnitToolsServer } from './unit-tools-server.ts';
 
 const MCP_PKG = '@modelcontextprotocol/sdk';
 

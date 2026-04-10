@@ -5,25 +5,24 @@
  * This is the "what milestone are we in and should we keep going?" phase.
  */
 
-import type { CoreLoopDeps } from "../loop-deps.js";
 import type {
   PhaseResult,
   IterationContext,
   LoopState,
   PreDispatchData,
-} from "../types.js";
-import { generateMilestoneReport, _resolveReportBasePath } from "./report.js";
-import { closeoutAndStop } from "../closeout.js";
-import { debugLog } from "../../reporting/debug-logger.js";
-import { MergeConflictError } from "../../git/git-service.js";
+} from "../types.ts";
+import { generateMilestoneReport, _resolveReportBasePath } from "./report.ts";
+import { closeoutAndStop } from "../closeout.ts";
+import { debugLog } from "../../reporting/debug-logger.ts";
+import { MergeConflictError } from "../../git/git-service.ts";
 import { join, basename } from "node:path";
 import { existsSync, cpSync } from "node:fs";
-import { logWarning, logError } from "../../workflow/workflow-logger.js";
-import { gsdRoot } from "../../persistence/paths.js";
-import { atomicWriteSync } from "../../persistence/atomic-write.js";
-import { getEligibleSlices } from "../../parallel/slice-parallel-eligibility.js";
-import { startSliceParallel } from "../../parallel/slice-parallel-orchestrator.js";
-import { isDbAvailable, getMilestoneSlices } from "../../persistence/gsd-db.js";
+import { logWarning, logError } from "../../workflow/workflow-logger.ts";
+import { gsdRoot } from "../../persistence/paths.ts";
+import { atomicWriteSync } from "../../persistence/atomic-write.ts";
+import { getEligibleSlices } from "../../parallel/slice-parallel-eligibility.ts";
+import { startSliceParallel } from "../../parallel/slice-parallel-orchestrator.ts";
+import { isDbAvailable, getMilestoneSlices } from "../../persistence/gsd-db.ts";
 
 /**
  * Phase 1: Pre-dispatch — resource guard, health gate, state derivation,

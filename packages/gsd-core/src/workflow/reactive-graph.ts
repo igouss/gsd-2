@@ -9,13 +9,13 @@
  * The `loadSliceTaskIO` loader at the bottom is the only async/IO function.
  */
 
-import type { TaskIO, DerivedTaskNode, ReactiveExecutionState } from "../domain/types.js";
-import { loadFile, parseTaskPlanIO } from "../persistence/files.js";
-import { isDbAvailable, getSliceTasks } from "../persistence/gsd-db.js";
-import { parsePlan } from "../state/parsers-legacy.js";
-import { resolveTasksDir, resolveTaskFiles } from "../persistence/paths.js";
+import type { TaskIO, DerivedTaskNode, ReactiveExecutionState } from "../domain/types.ts";
+import { loadFile, parseTaskPlanIO } from "../persistence/files.ts";
+import { isDbAvailable, getSliceTasks } from "../persistence/gsd-db.ts";
+import { parsePlan } from "../persistence/md-parsers.ts";
+import { resolveTasksDir, resolveTaskFiles } from "../persistence/paths.ts";
 import { join } from "node:path";
-import { loadJsonFileOrNull, saveJsonFile } from "../persistence/json-persistence.js";
+import { loadJsonFileOrNull, saveJsonFile } from "../persistence/json-persistence.ts";
 import { existsSync, unlinkSync } from "node:fs";
 
 // ─── Graph Construction ───────────────────────────────────────────────────
@@ -203,7 +203,7 @@ export async function loadSliceTaskIO(
   mid: string,
   sid: string,
 ): Promise<TaskIO[]> {
-  const { resolveSliceFile } = await import("../persistence/paths.js");
+  const { resolveSliceFile } = await import("../persistence/paths.ts");
   const slicePlanPath = resolveSliceFile(basePath, mid, sid, "PLAN");
   const planContent = slicePlanPath ? await loadFile(slicePlanPath) : null;
   if (!planContent) return [];

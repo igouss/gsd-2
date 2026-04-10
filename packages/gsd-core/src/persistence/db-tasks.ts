@@ -1,8 +1,8 @@
 // GSD Database — Task CRUD
 
-import { GSDError, GSD_STALE_STATE } from "../domain/errors.js";
-import { _getCurrentDb } from "./db-core.js";
-import { transaction } from "./db-core.js";
+import { GSDError, GSD_STALE_STATE } from "../domain/errors.ts";
+import { _getCurrentDb } from "./db-core.ts";
+import { transaction } from "./db-core.ts";
 
 export interface TaskPlanningRecord {
   title?: string;

@@ -1,8 +1,8 @@
 import { existsSync, readdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
-import type { DoctorIssue, DoctorIssueCode } from "./doctor-types.js";
-import { readRepoMeta, externalProjectsRoot } from "../git/repo-identity.js";
+import type { DoctorIssue, DoctorIssueCode } from "./doctor-types.ts";
+import { readRepoMeta, externalProjectsRoot } from "../git/repo-identity.ts";
 
 /**
  * Check for orphaned project state directories in ~/.gsd/projects/.

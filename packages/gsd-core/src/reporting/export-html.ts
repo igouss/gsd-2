@@ -24,10 +24,10 @@ import type {
   VisualizerData,
   VisualizerMilestone,
   VisualizerSlice,
-} from './visualizer-data.js';
-import { formatDateShort, formatDuration } from '../shared/format-utils.js';
-import { formatCost, formatTokenCount } from './metrics.js';
-import type { UnitMetrics } from './metrics.js';
+} from './visualizer-data.ts';
+import { formatDateShort, formatDuration } from '../shared/format-utils.ts';
+import { formatCost, formatTokenCount } from './metrics.ts';
+import type { UnitMetrics } from './metrics.ts';
 
 // ─── Public API ────────────────────────────────────────────────────────────────
 
@@ -682,7 +682,6 @@ function buildBudgetBurndown(data: VisualizerData): string {
   if (!data.health.budgetCeiling) return '';
   const ceiling = data.health.budgetCeiling;
   const spent = data.totals?.cost ?? 0;
-  const totalSlices = data.milestones.reduce((s, m) => s + m.slices.length, 0);
   const doneSlices = data.milestones.reduce((s, m) => s + m.slices.filter(sl => sl.done).length, 0);
   const avgCostPerSlice = doneSlices > 0 ? spent / doneSlices : 0;
   const projected = avgCostPerSlice > 0 ? avgCostPerSlice * data.remainingSliceCount + spent : spent;

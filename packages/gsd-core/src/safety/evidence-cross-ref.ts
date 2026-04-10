@@ -6,7 +6,7 @@
  * Copyright (c) 2026 Jeremy McSpadden <jeremy@fluxlabs.net>
  */
 
-import type { BashEvidence, EvidenceEntry } from "./evidence-collector.js";
+import type { BashEvidence, EvidenceEntry } from "./evidence-collector.ts";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, cpSync, type CopySyncOptions } from "node:fs"
 import { dirname } from "node:path"
-import { logWarning } from "../workflow/workflow-logger.js"
+import { logWarning } from "../workflow/workflow-logger.ts"
 
 /**
  * Safely creates a directory. Returns true if successful, false on error.

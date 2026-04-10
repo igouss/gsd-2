@@ -5,23 +5,22 @@
  * This is the "actually run the work" phase.
  */
 
-import type { AutoSession, SidecarItem } from "../session.js";
-import type { CoreLoopDeps } from "../loop-deps.js";
+import type { AutoSession, SidecarItem } from "../session.ts";
 import type {
   PhaseResult,
   IterationContext,
   LoopState,
   IterationData,
-} from "../types.js";
-import { MAX_RECOVERY_CHARS } from "../types.js";
-import { debugLog } from "../../reporting/debug-logger.js";
-import { PROJECT_FILES } from "../../analysis/detection.js";
-import { join, basename, dirname, parse as parsePath } from "node:path";
+} from "../types.ts";
+import { MAX_RECOVERY_CHARS } from "../types.ts";
+import { debugLog } from "../../reporting/debug-logger.ts";
+import { PROJECT_FILES } from "../../analysis/detection.ts";
+import { join, dirname, parse as parsePath } from "node:path";
 import { readdirSync } from "node:fs";
-import { logWarning } from "../../workflow/workflow-logger.js";
-import { verifyExpectedArtifact } from "../auto-recovery.js";
-import { writeUnitRuntimeRecord } from "../../state/unit-runtime.js";
-import { createCheckpoint, cleanupCheckpoint, rollbackToCheckpoint, resolveSafetyHarnessConfig } from "../../safety/safety-harness.js";
+import { logWarning } from "../../workflow/workflow-logger.ts";
+import { verifyExpectedArtifact } from "../auto-recovery.ts";
+import { writeUnitRuntimeRecord } from "../../state/unit-runtime.ts";
+import { createCheckpoint, cleanupCheckpoint, rollbackToCheckpoint, resolveSafetyHarnessConfig } from "../../safety/safety-harness.ts";
 
 /**
  * Phase 4: Unit execution — dispatch prompt, await result, closeout, artifact verify.
@@ -165,7 +164,7 @@ export async function runUnitPhase(
   s.lastBaselineCharCount = undefined;
   if (deps.isDbAvailable()) {
     try {
-      const { inlineGsdRootFile } = await import("../../prompt/auto-prompts.js");
+      const { inlineGsdRootFile } = await import("../../prompt/auto-prompts.ts");
       const [decisionsContent, requirementsContent, projectContent] =
         await Promise.all([
           inlineGsdRootFile(s.basePath, "decisions.md", "Decisions"),
@@ -399,7 +398,7 @@ export async function runUnitPhase(
   const anchorPhases = new Set(["research-milestone", "research-slice", "plan-milestone", "plan-slice"]);
   if (artifactVerified && mid && anchorPhases.has(unitType)) {
     try {
-      const { writePhaseAnchor } = await import("../../execution/phase-anchor.js");
+      const { writePhaseAnchor } = await import("../../execution/phase-anchor.ts");
       writePhaseAnchor(s.basePath, mid, {
         phase: unitType,
         milestoneId: mid,

@@ -8,9 +8,9 @@
  * Imports from: auto/types
  */
 
-import type { UnitResult, AgentEndEvent, ErrorContext } from "./types.js";
-import type { AutoSession } from "./session.js";
-import { debugLog } from "../reporting/debug-logger.js";
+import type { UnitResult, AgentEndEvent, ErrorContext } from "./types.ts";
+import type { AutoSession } from "./session.ts";
+import { debugLog } from "../reporting/debug-logger.ts";
 
 // ─── Per-unit one-shot promise state ────────────────────────────────────────
 //

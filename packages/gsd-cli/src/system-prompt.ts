@@ -8,7 +8,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
-import { scanSkills, defaultSkillDirs, buildSkillsTable } from "./skills-loader.js";
+import { scanSkills, defaultSkillDirs, buildSkillsTable } from "./skills-loader.ts";
 
 export interface SystemPromptOptions {
   /** Path to gsd-core templates directory */

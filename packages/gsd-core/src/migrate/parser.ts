@@ -3,8 +3,8 @@
 // and assembles the complete typed PlanningProject.
 // Zero Pi dependencies — uses only Node built-ins + local parsers.
 
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, basename } from 'node:path';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 
 import {
   parseOldRoadmap,
@@ -14,8 +14,8 @@ import {
   parseOldProject,
   parseOldState,
   parseOldConfig,
-} from './parsers.js';
-import { validatePlanningDirectory } from './validator.js';
+} from './parsers.ts';
+import { validatePlanningDirectory } from './validator.ts';
 
 import type {
   PlanningProject,
@@ -24,7 +24,7 @@ import type {
   PlanningMilestone,
   PlanningResearch,
   PlanningPhaseFile,
-} from './types.js';
+} from './types.ts';
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 

@@ -6,11 +6,11 @@
  * together with any errors and warnings.
  */
 
-import type { GitPreferences } from "../git/git-service.js";
-import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile, PhaseSkipPreferences } from "../domain/types.js";
-import type { DynamicRoutingConfig } from "../routing/model-router.js";
-import { VALID_BRANCH_NAME } from "../git/git-service.js";
-import { normalizeStringArray } from "../shared/format-utils.js";
+import type { GitPreferences } from "../git/git-service.ts";
+import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile, PhaseSkipPreferences } from "../domain/types.ts";
+import type { DynamicRoutingConfig } from "../routing/model-router.ts";
+import { VALID_BRANCH_NAME } from "../git/git-service.ts";
+import { normalizeStringArray } from "../shared/format-utils.ts";
 
 import {
   KNOWN_PREFERENCE_KEYS,
@@ -20,7 +20,7 @@ import {
   type WorkflowMode,
   type GSDPreferences,
   type GSDSkillRule,
-} from "./preferences-types.js";
+} from "./preferences-types.ts";
 
 const VALID_TOKEN_PROFILES = new Set<TokenProfile>(["budget", "balanced", "quality"]);
 
@@ -539,7 +539,7 @@ export function validatePreferences(preferences: GSDPreferences): {
     }
 
     if (Object.keys(parallel).length > 0) {
-      validated.parallel = parallel as unknown as import("../domain/types.js").ParallelConfig;
+      validated.parallel = parallel as unknown as import("../domain/types.ts").ParallelConfig;
     }
   }
 
@@ -585,7 +585,7 @@ export function validatePreferences(preferences: GSDPreferences): {
       }
 
       if (Object.keys(validRe).length > 0) {
-        validated.reactive_execution = validRe as unknown as import("../domain/types.js").ReactiveExecutionConfig;
+        validated.reactive_execution = validRe as unknown as import("../domain/types.ts").ReactiveExecutionConfig;
       }
     } else {
       errors.push("reactive_execution must be an object");
@@ -622,7 +622,7 @@ export function validatePreferences(preferences: GSDPreferences): {
       }
 
       if (Object.keys(validGe).length > 0) {
-        validated.gate_evaluation = validGe as unknown as import("../domain/types.js").GateEvaluationConfig;
+        validated.gate_evaluation = validGe as unknown as import("../domain/types.ts").GateEvaluationConfig;
       }
     } else {
       errors.push("gate_evaluation must be an object");
@@ -831,7 +831,7 @@ export function validatePreferences(preferences: GSDPreferences): {
       }
 
       if (Object.keys(validGh).length > 0) {
-        validated.github = validGh as unknown as import("../github-sync/types.js").GitHubSyncConfig;
+        validated.github = validGh as unknown as import("../github-sync/types.ts").GitHubSyncConfig;
       }
     } else {
       errors.push("github must be an object");
@@ -851,7 +851,7 @@ export function validatePreferences(preferences: GSDPreferences): {
   if (preferences.experimental !== undefined) {
     if (typeof preferences.experimental === "object" && preferences.experimental !== null) {
       const exp = preferences.experimental as unknown as Record<string, unknown>;
-      const validExp: import("./preferences-types.js").ExperimentalPreferences = {};
+      const validExp: import("./preferences-types.ts").ExperimentalPreferences = {};
 
       if (exp.rtk !== undefined) {
         if (typeof exp.rtk === "boolean") validExp.rtk = exp.rtk;
@@ -877,7 +877,7 @@ export function validatePreferences(preferences: GSDPreferences): {
   if (preferences.codebase !== undefined) {
     if (typeof preferences.codebase === "object" && preferences.codebase !== null) {
       const cb = preferences.codebase as Record<string, unknown>;
-      const validCb: import("./preferences-types.js").CodebaseMapPreferences = {};
+      const validCb: import("./preferences-types.ts").CodebaseMapPreferences = {};
 
       if (cb.exclude_patterns !== undefined) {
         if (Array.isArray(cb.exclude_patterns) && cb.exclude_patterns.every((p: unknown) => typeof p === "string")) {

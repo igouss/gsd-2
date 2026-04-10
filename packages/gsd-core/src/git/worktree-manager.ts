@@ -18,8 +18,8 @@
 import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, realpathSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join, resolve, sep } from "node:path";
-import { GSDError, GSD_PARSE_ERROR, GSD_STALE_STATE, GSD_LOCK_HELD, GSD_GIT_ERROR, GSD_MERGE_CONFLICT } from "../domain/errors.js";
-import { logWarning } from "../workflow/workflow-logger.js";
+import { GSDError, GSD_PARSE_ERROR, GSD_STALE_STATE, GSD_LOCK_HELD, GSD_GIT_ERROR, GSD_MERGE_CONFLICT } from "../domain/errors.ts";
+import { logWarning } from "../workflow/workflow-logger.ts";
 import {
   nativeBranchDelete,
   nativeBranchExists,
@@ -36,7 +36,7 @@ import {
   nativeWorktreeList,
   nativeWorktreePrune,
   nativeWorktreeRemove,
-} from "./native-git-bridge.js";
+} from "./native-git-bridge.ts";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 

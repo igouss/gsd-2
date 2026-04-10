@@ -16,13 +16,13 @@ import {
   insertAssessment,
   deleteAssessmentByScope,
   getMilestoneSlices,
-} from "../persistence/gsd-db.js";
-import { resolveMilestonePath, clearPathCache } from "../persistence/paths.js";
-import { saveFile, clearParseCache } from "../persistence/files.js";
-import { invalidateStateCache } from "../state/state.js";
-import { VALIDATION_VERDICTS, isValidMilestoneVerdict } from "../analysis/verdict-parser.js";
-import { insertMilestoneValidationGates } from "../milestone/milestone-validation-gates.js";
-import { logWarning } from "../workflow/workflow-logger.js";
+} from "../persistence/gsd-db.ts";
+import { resolveMilestonePath, clearPathCache } from "../persistence/paths.ts";
+import { saveFile, clearParseCache } from "../persistence/files.ts";
+import { invalidateStateCache } from "../state/state.ts";
+import { VALIDATION_VERDICTS, isValidMilestoneVerdict } from "../analysis/verdict-parser.ts";
+import { insertMilestoneValidationGates } from "../milestone/milestone-validation-gates.ts";
+import { logWarning } from "../workflow/workflow-logger.ts";
 
 export interface ValidateMilestoneParams {
   milestoneId: string;

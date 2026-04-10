@@ -6,22 +6,21 @@
 //
 // A module-level singleton accessor allows existing code to migrate incrementally.
 
-import { logWarning } from "../workflow/workflow-logger.js";
-import type { UnifiedRule, RulePhase } from "./rule-types.js";
-import type { DispatchAction, DispatchContext, DispatchRule } from "../auto/auto-dispatch.js";
+import { logWarning } from "../workflow/workflow-logger.ts";
+import type { UnifiedRule } from "./rule-types.ts";
+import type { DispatchAction, DispatchContext, DispatchRule } from "../auto/auto-dispatch.ts";
 import type {
   PostUnitHookConfig,
-  PreDispatchHookConfig,
   HookDispatchResult,
   PreDispatchResult,
   HookExecutionState,
   PersistedHookState,
   HookStatusEntry,
-} from "../domain/types.js";
-import { resolvePostUnitHooks, resolvePreDispatchHooks } from "../preferences/preferences.js";
+} from "../domain/types.ts";
+import { resolvePostUnitHooks, resolvePreDispatchHooks } from "../preferences/preferences.ts";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { parseUnitId } from "../domain/unit-id.js";
+import { parseUnitId } from "../domain/unit-id.ts";
 
 // ─── Artifact Path Resolution ──────────────────────────────────────────────
 
@@ -474,7 +473,7 @@ export class RuleRegistry {
     hookName: string,
     unitType: string,
     unitId: string,
-    basePath: string,
+    _basePath: string,
   ): HookDispatchResult | null {
     const hook = resolvePostUnitHooks().find(h => h.name === hookName);
     if (!hook) {

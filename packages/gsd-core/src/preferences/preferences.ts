@@ -6,7 +6,7 @@
  * ./preferences-validation.js, skill logic in ./preferences-skills.js,
  * and model logic in ./preferences-models.js.
  *
- * All symbols are re-exported here so that existing `import { ... } from "./preferences.js"`
+ * All symbols are re-exported here so that existing `import { ... } from "./preferences.ts"`
  * statements continue to work without modification.
  */
 
@@ -14,13 +14,13 @@ import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-import { gsdRoot } from "../persistence/paths.js";
+import { gsdRoot } from "../persistence/paths.ts";
 import { parse as parseYaml } from "yaml";
-import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile } from "../domain/types.js";
-import type { DynamicRoutingConfig } from "../routing/model-router.js";
-import { normalizeStringArray } from "../shared/format-utils.js";
-import { logWarning } from "../workflow/workflow-logger.js";
-import { resolveProfileDefaults as _resolveProfileDefaults } from "./preferences-models.js";
+import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile } from "../domain/types.ts";
+import type { DynamicRoutingConfig } from "../routing/model-router.ts";
+import { normalizeStringArray } from "../shared/format-utils.ts";
+import { logWarning } from "../workflow/workflow-logger.ts";
+import { resolveProfileDefaults as _resolveProfileDefaults } from "./preferences-models.ts";
 
 import {
   KNOWN_PREFERENCE_KEYS,
@@ -29,13 +29,13 @@ import {
   type GSDPreferences,
   type LoadedGSDPreferences,
   type SkillResolution,
-} from "./preferences-types.js";
-import { validatePreferences } from "./preferences-validation.js";
-import { formatSkillRef } from "./preferences-skills.js";
+} from "./preferences-types.ts";
+import { validatePreferences } from "./preferences-validation.ts";
+import { formatSkillRef } from "./preferences-skills.ts";
 
 // ─── Re-exports: types ──────────────────────────────────────────────────────
 // Every type/interface that was previously exported from this file is
-// re-exported so that downstream `import { Foo } from "./preferences.js"`
+// re-exported so that downstream `import { Foo } from "./preferences.ts"`
 // statements keep compiling.
 
 export type {
@@ -54,17 +54,17 @@ export type {
   LoadedGSDPreferences,
   SkillResolution,
   SkillResolutionReport,
-} from "./preferences-types.js";
+} from "./preferences-types.ts";
 
 // ─── Re-exports: validation ─────────────────────────────────────────────────
-export { validatePreferences } from "./preferences-validation.js";
+export { validatePreferences } from "./preferences-validation.ts";
 
 // ─── Re-exports: skills ─────────────────────────────────────────────────────
 export {
   resolveAllSkillReferences,
   resolveSkillDiscoveryMode,
   resolveSkillStalenessDays,
-} from "./preferences-skills.js";
+} from "./preferences-skills.ts";
 
 // ─── Re-exports: models ─────────────────────────────────────────────────────
 export {
@@ -81,7 +81,7 @@ export {
   resolveInlineLevel,
   resolveContextSelection,
   resolveSearchProviderFromPreferences,
-} from "./preferences-models.js";
+} from "./preferences-models.ts";
 
 // ─── Path Constants & Getters ───────────────────────────────────────────────
 
@@ -373,7 +373,7 @@ function mergePreferences(base: GSDPreferences, override: GSDPreferences): GSDPr
       ? { ...(base.phases ?? {}), ...(override.phases ?? {}) }
       : undefined,
     parallel: (base.parallel || override.parallel)
-      ? { ...(base.parallel ?? {}), ...(override.parallel ?? {}) } as import("../domain/types.js").ParallelConfig
+      ? { ...(base.parallel ?? {}), ...(override.parallel ?? {}) } as import("../domain/types.ts").ParallelConfig
       : undefined,
     verification_commands: mergeStringLists(base.verification_commands, override.verification_commands),
     verification_auto_fix: override.verification_auto_fix ?? base.verification_auto_fix,
@@ -387,7 +387,7 @@ function mergePreferences(base: GSDPreferences, override: GSDPreferences): GSDPr
     auto_visualize: override.auto_visualize ?? base.auto_visualize,
     auto_report: override.auto_report ?? base.auto_report,
     github: (base.github || override.github)
-      ? { ...(base.github ?? {}), ...(override.github ?? {}) } as import("../github-sync/types.js").GitHubSyncConfig
+      ? { ...(base.github ?? {}), ...(override.github ?? {}) } as import("../github-sync/types.ts").GitHubSyncConfig
       : undefined,
     service_tier: override.service_tier ?? base.service_tier,
     forensics_dedup: override.forensics_dedup ?? base.forensics_dedup,
@@ -563,7 +563,7 @@ export function getIsolationMode(): "none" | "worktree" | "branch" {
   return "none"; // default — no isolation, work on current branch
 }
 
-export function resolveParallelConfig(prefs: GSDPreferences | undefined): import("../domain/types.js").ParallelConfig {
+export function resolveParallelConfig(prefs: GSDPreferences | undefined): import("../domain/types.ts").ParallelConfig {
   return {
     enabled: prefs?.parallel?.enabled ?? false,
     max_workers: Math.max(1, Math.min(4, prefs?.parallel?.max_workers ?? 2)),

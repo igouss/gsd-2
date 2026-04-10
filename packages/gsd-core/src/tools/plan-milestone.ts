@@ -1,6 +1,6 @@
-import { clearParseCache } from "../persistence/files.js";
-import { isClosedStatus } from "../domain/status-guards.js";
-import { isNonEmptyString, validateStringArray } from "../verification/validation.js";
+import { clearParseCache } from "../persistence/files.ts";
+import { isClosedStatus } from "../domain/status-guards.ts";
+import { isNonEmptyString, validateStringArray } from "../verification/validation.ts";
 import {
   transaction,
   getMilestone,
@@ -10,13 +10,13 @@ import {
   insertSlice,
   upsertMilestonePlanning,
   upsertSlicePlanning,
-} from "../persistence/gsd-db.js";
-import { invalidateStateCache } from "../state/state.js";
-import { renderRoadmapFromDb } from "../reporting/markdown-renderer.js";
-import { renderAllProjections } from "../workflow/workflow-projections.js";
-import { writeManifest } from "../workflow/workflow-manifest.js";
-import { appendEvent } from "../workflow/workflow-events.js";
-import { logWarning } from "../workflow/workflow-logger.js";
+} from "../persistence/gsd-db.ts";
+import { invalidateStateCache } from "../state/state.ts";
+import { renderRoadmapFromDb } from "../reporting/markdown-renderer.ts";
+import { renderAllProjections } from "../workflow/workflow-projections.ts";
+import { writeManifest } from "../workflow/workflow-manifest.ts";
+import { appendEvent } from "../workflow/workflow-events.ts";
+import { logWarning } from "../workflow/workflow-logger.ts";
 
 export interface PlanMilestoneSliceInput {
   sliceId: string;

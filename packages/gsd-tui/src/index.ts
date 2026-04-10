@@ -5,4 +5,4 @@
  * interactive terminal UI components.
  */
 
-export { consoleEventSink, createBufferedEventSink } from "./console-event-sink.js";
+export { consoleEventSink, createBufferedEventSink } from "./console-event-sink.ts";

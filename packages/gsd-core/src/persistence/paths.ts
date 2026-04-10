@@ -12,8 +12,8 @@
 import { readdirSync, existsSync, realpathSync, Dirent } from "node:fs";
 import { join, dirname, normalize } from "node:path";
 import { spawnSync } from "node:child_process";
-import { nativeScanGsdTree, type GsdTreeEntry } from "../git/native-parser-bridge.js";
-import { DIR_CACHE_MAX } from "../domain/constants.js";
+import { type GsdTreeEntry } from "../git/native-parser-bridge.ts";
+import { DIR_CACHE_MAX } from "../domain/constants.ts";
 
 // ─── Directory Listing Cache ──────────────────────────────────────────────────
 
@@ -26,27 +26,6 @@ const dirListCache = new Map<string, string[]>();
 
 let nativeTreeCache: Map<string, GsdTreeEntry[]> | null = null;
 let nativeTreeBase: string | null = null;
-
-function getNativeTree(gsdDir: string): Map<string, GsdTreeEntry[]> | null {
-  if (nativeTreeCache && nativeTreeBase === gsdDir) return nativeTreeCache;
-
-  const entries = nativeScanGsdTree(gsdDir);
-  if (!entries) return null;
-
-  // Build a map of parent directory -> entries
-  const tree = new Map<string, GsdTreeEntry[]>();
-  for (const entry of entries) {
-    const parts = entry.path.split('/');
-    const parentPath = parts.slice(0, -1).join('/');
-    const parentKey = parentPath || '.';
-    if (!tree.has(parentKey)) tree.set(parentKey, []);
-    tree.get(parentKey)!.push(entry);
-  }
-
-  nativeTreeCache = tree;
-  nativeTreeBase = gsdDir;
-  return tree;
-}
 
 /**
  * Convert a native tree lookup into a relative key for the tree map.

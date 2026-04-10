@@ -2,15 +2,15 @@
 // CRUD for overrides, knowledge entries, and manifest status.
 
 import { resolve } from 'node:path';
-import { resolveMilestoneFile, resolveGsdRootFile } from './paths.js';
+import { resolveMilestoneFile, resolveGsdRootFile } from './paths.ts';
 
 import type {
   ManifestStatus,
-} from '../domain/types.js';
+} from '../domain/types.ts';
 
-import { checkExistingEnvKeys } from '../shared/env-utils.js';
-import { parseSecretsManifest } from './file-parsers.js';
-import { loadFile, saveFile } from './file-io.js';
+import { checkExistingEnvKeys } from '../shared/env-utils.ts';
+import { parseSecretsManifest } from './file-parsers.ts';
+import { loadFile, saveFile } from './file-io.ts';
 
 // ─── Manifest Status ──────────────────────────────────────────────────────
 

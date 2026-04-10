@@ -8,7 +8,7 @@
  * @see D001 (module location), D002 (200K fallback), D003 (section-boundary truncation)
  */
 
-import { type TokenProvider, getCharsPerToken } from "../routing/token-counter.js";
+import { type TokenProvider, getCharsPerToken } from "../routing/token-counter.ts";
 
 // ─── Budget ratio constants ──────────────────────────────────────────────────
 // Percentages of total context window allocated to each budget category.

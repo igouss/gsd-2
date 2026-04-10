@@ -17,11 +17,11 @@ import {
   resolveMilestonePath,
   resolveMilestoneFile,
   buildMilestoneFileName,
-} from "../persistence/paths.js";
-import { invalidateAllCaches } from "../state/cache.js";
-import { loadQueueOrder, saveQueueOrder } from "../state/queue-order.js";
-import { isDbAvailable, updateMilestoneStatus } from "../persistence/gsd-db.js";
-import { logWarning } from "../workflow/workflow-logger.js";
+} from "../persistence/paths.ts";
+import { invalidateAllCaches } from "../state/cache.ts";
+import { loadQueueOrder, saveQueueOrder } from "../state/queue-order.ts";
+import { isDbAvailable, updateMilestoneStatus } from "../persistence/gsd-db.ts";
+import { logWarning } from "../workflow/workflow-logger.ts";
 
 // ─── Park ──────────────────────────────────────────────────────────────────
 

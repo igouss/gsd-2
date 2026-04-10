@@ -9,7 +9,7 @@ import {
   findSliceIds,
   resolveSliceFile,
   findTaskFiles,
-} from './paths.js';
+} from './paths.ts';
 
 // ---------------------------------------------------------------------------
 // Types

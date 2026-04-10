@@ -2,8 +2,8 @@
 // Pure functions that take file content (string) and return typed data.
 // Zero Pi dependencies — uses only exported helpers from files.ts.
 
-import { splitFrontmatter, parseFrontmatterMap, extractBoldField } from '../persistence/files.js';
-import { normalizeStringArray } from "../shared/format-utils.js";
+import { splitFrontmatter, parseFrontmatterMap, extractBoldField } from '../persistence/files.ts';
+import { normalizeStringArray } from "../shared/format-utils.ts";
 
 import type {
   PlanningRoadmap,
@@ -18,7 +18,7 @@ import type {
   PlanningRequirement,
   PlanningState,
   PlanningConfig,
-} from './types.js';
+} from './types.ts';
 
 // Re-export PlanningProjectMeta — not in types.ts yet, use string for project field
 // Actually PlanningProjectMeta isn't in types.ts — project is stored as string | null.
@@ -330,7 +330,7 @@ function parsePlanFrontmatter(fm: Record<string, unknown>, fmLines: string[] | n
  * Falls back to plain markdown for quick-task plans that lack XML tags.
  */
 export function parseOldPlan(content: string, fileName: string = '', planNumber: string = ''): PlanningPlan {
-  const [fmLines, body] = splitFrontmatter(content);
+  const [fmLines] = splitFrontmatter(content);
   const fm = fmLines ? parseFrontmatterMap(fmLines) : {};
   const frontmatter = parsePlanFrontmatter(fm, fmLines);
 

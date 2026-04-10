@@ -1,8 +1,8 @@
 // GSD Database — Quality gate operations
 
-import type { GateRow, GateId, GateScope, GateStatus, GateVerdict } from "../domain/types.js";
-import { GSDError, GSD_STALE_STATE } from "../domain/errors.js";
-import { _getCurrentDb } from "./db-core.js";
+import type { GateRow, GateId, GateScope, GateStatus, GateVerdict } from "../domain/types.ts";
+import { GSDError, GSD_STALE_STATE } from "../domain/errors.ts";
+import { _getCurrentDb } from "./db-core.ts";
 
 function rowToGate(row: Record<string, unknown>): GateRow {
   return {

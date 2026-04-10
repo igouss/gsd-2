@@ -1,6 +1,6 @@
-import { clearParseCache } from "../persistence/files.js";
-import { isClosedStatus } from "../domain/status-guards.js";
-import { isNonEmptyString, validateStringArray } from "../verification/validation.js";
+import { clearParseCache } from "../persistence/files.ts";
+import { isClosedStatus } from "../domain/status-guards.ts";
+import { isNonEmptyString } from "../verification/validation.ts";
 import {
   transaction,
   getMilestone,
@@ -9,14 +9,14 @@ import {
   upsertSlicePlanning,
   upsertTaskPlanning,
   insertGateRow,
-} from "../persistence/gsd-db.js";
-import type { GateId } from "../domain/types.js";
-import { invalidateStateCache } from "../state/state.js";
-import { renderPlanFromDb } from "../reporting/markdown-renderer.js";
-import { renderAllProjections } from "../workflow/workflow-projections.js";
-import { writeManifest } from "../workflow/workflow-manifest.js";
-import { appendEvent } from "../workflow/workflow-events.js";
-import { logWarning } from "../workflow/workflow-logger.js";
+} from "../persistence/gsd-db.ts";
+import type { GateId } from "../domain/types.ts";
+import { invalidateStateCache } from "../state/state.ts";
+import { renderPlanFromDb } from "../reporting/markdown-renderer.ts";
+import { renderAllProjections } from "../workflow/workflow-projections.ts";
+import { writeManifest } from "../workflow/workflow-manifest.ts";
+import { appendEvent } from "../workflow/workflow-events.ts";
+import { logWarning } from "../workflow/workflow-logger.ts";
 
 export interface PlanSliceTaskInput {
   taskId: string;

@@ -2,9 +2,9 @@
 // Maps complexity tiers to models, enforcing downgrade-only semantics.
 // The user's configured model is always the ceiling.
 
-import type { ComplexityTier, ClassificationResult, TaskMetadata } from "../analysis/complexity-classifier.js";
-import { tierOrdinal } from "../analysis/complexity-classifier.js";
-import type { ResolvedModelConfig } from "../preferences/preferences.js";
+import type { ComplexityTier, ClassificationResult, TaskMetadata } from "../analysis/complexity-classifier.ts";
+import { tierOrdinal } from "../analysis/complexity-classifier.ts";
+import type { ResolvedModelConfig } from "../preferences/preferences.ts";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

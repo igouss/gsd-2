@@ -6,15 +6,15 @@
  * captures those in closures when constructing CoreLoopDeps.
  */
 
-import type { HarnessAdapter, OrchestratorEventSink } from "../adapters/harness-adapter.js";
-import type { AutoSession } from "./session.js";
-import type { GSDPreferences } from "../preferences/preferences-types.js";
-import type { GSDState } from "../domain/types.js";
-import type { SessionLockStatus } from "../session/session-lock.js";
-import type { DispatchAction } from "./auto-dispatch.js";
-import type { WorktreeResolver } from "../git/worktree-resolver.js";
-import type { CmuxLogLevel } from "../cmux/index.js";
-import type { JournalEntry } from "../persistence/journal.js";
+import type { HarnessAdapter, OrchestratorEventSink } from "../adapters/harness-adapter.ts";
+import type { AutoSession } from "./session.ts";
+import type { GSDPreferences } from "../preferences/preferences-types.ts";
+import type { GSDState } from "../domain/types.ts";
+import type { SessionLockStatus } from "../session/session-lock.ts";
+import type { DispatchAction } from "./auto-dispatch.ts";
+import type { WorktreeResolver } from "../git/worktree-resolver.ts";
+import type { CmuxLogLevel } from "../cmux/index.ts";
+import type { JournalEntry } from "../persistence/journal.ts";
 
 // ─── Types needed by CoreLoopDeps (originally in harness-coupled modules) ───
 

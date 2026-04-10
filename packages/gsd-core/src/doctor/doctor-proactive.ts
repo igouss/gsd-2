@@ -14,17 +14,17 @@
  *    after N units, escalates to LLM-assisted heal dispatch.
  */
 
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { gsdRoot, resolveGsdRootFile } from "../persistence/paths.js";
-import { readCrashLock, isLockProcessAlive, clearLock } from "../session/crash-recovery.js";
-import { abortAndReset } from "../git/git-self-heal.js";
-import { rebuildState } from "./doctor.js";
-import { deriveState } from "../state/state.js";
-import { resolveMilestoneIntegrationBranch } from "../git/git-service.js";
-import { nativeIsRepo, nativeHasChanges, nativeLastCommitEpoch, nativeGetCurrentBranch, nativeAddTracked, nativeCommit } from "../git/native-git-bridge.js";
-import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
-import { runEnvironmentChecks } from "./doctor-environment.js";
+import { gsdRoot, resolveGsdRootFile } from "../persistence/paths.ts";
+import { readCrashLock, isLockProcessAlive, clearLock } from "../session/crash-recovery.ts";
+import { abortAndReset } from "../git/git-self-heal.ts";
+import { rebuildState } from "./doctor.ts";
+import { deriveState } from "../state/state.ts";
+import { resolveMilestoneIntegrationBranch } from "../git/git-service.ts";
+import { nativeIsRepo, nativeHasChanges, nativeLastCommitEpoch, nativeGetCurrentBranch, nativeAddTracked, nativeCommit } from "../git/native-git-bridge.ts";
+import { loadEffectiveGSDPreferences } from "../preferences/preferences.ts";
+import { runEnvironmentChecks } from "./doctor-environment.ts";
 
 // ── Health Score Tracking ──────────────────────────────────────────────────
 

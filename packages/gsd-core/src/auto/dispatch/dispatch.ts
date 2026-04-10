@@ -5,20 +5,18 @@
  * This is the "what work unit do we run next?" phase.
  */
 
-import type { AutoSession } from "../session.js";
 import type {
   PhaseResult,
   IterationContext,
   LoopState,
   PreDispatchData,
   IterationData,
-} from "../types.js";
-import { MAX_RECOVERY_CHARS } from "../types.js";
-import { closeoutAndStop } from "../closeout.js";
-import { detectStuck } from "../guards/stuck-detection.js";
-import { debugLog } from "../../reporting/debug-logger.js";
-import { verifyExpectedArtifact, buildLoopRemediationSteps } from "../auto-recovery.js";
-import { diagnoseExpectedArtifact } from "../auto-artifact-paths.js";
+} from "../types.ts";
+import { closeoutAndStop } from "../closeout.ts";
+import { detectStuck } from "../guards/stuck-detection.ts";
+import { debugLog } from "../../reporting/debug-logger.ts";
+import { verifyExpectedArtifact, buildLoopRemediationSteps } from "../auto-recovery.ts";
+import { diagnoseExpectedArtifact } from "../auto-artifact-paths.ts";
 
 /**
  * Phase 3: Dispatch resolution — resolve next unit, stuck detection, pre-dispatch hooks.

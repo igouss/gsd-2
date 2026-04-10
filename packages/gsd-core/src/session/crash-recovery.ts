@@ -12,9 +12,9 @@
 
 import { readFileSync, unlinkSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { gsdRoot } from "../persistence/paths.js";
-import { atomicWriteSync } from "../persistence/atomic-write.js";
-import { effectiveLockFile } from "./session-lock.js";
+import { gsdRoot } from "../persistence/paths.ts";
+import { atomicWriteSync } from "../persistence/atomic-write.ts";
+import { effectiveLockFile } from "./session-lock.ts";
 
 export interface LockData {
   pid: number;

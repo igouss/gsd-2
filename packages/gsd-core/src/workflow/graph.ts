@@ -18,7 +18,7 @@
 import { parse, stringify } from "yaml";
 import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import type { WorkflowDefinition } from "./definition-loader.js";
+import type { WorkflowDefinition } from "./definition-loader.ts";
 
 // ─── Types ───────────────────────────────────────────────────────────────
 

@@ -3,7 +3,7 @@
 // Storage layer for auto-learned project memories. Follows context-store.ts patterns.
 // All functions degrade gracefully: return empty results when DB unavailable, never throw.
 
-import { isDbAvailable, _getAdapter, transaction } from './gsd-db.js';
+import { isDbAvailable, _getAdapter, transaction } from './gsd-db.ts';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

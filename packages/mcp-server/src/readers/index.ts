@@ -1,16 +1,16 @@
 // GSD MCP Server — readers barrel export
 // Copyright (c) 2026 Jeremy McSpadden <jeremy@fluxlabs.net>
 
-export { resolveGsdRoot, resolveRootFile } from './paths.js';
-export { readProgress } from './state.js';
-export type { ProgressResult } from './state.js';
-export { readRoadmap } from './roadmap.js';
-export type { RoadmapResult, MilestoneInfo, SliceInfo, TaskInfo } from './roadmap.js';
-export { readHistory } from './metrics.js';
-export type { HistoryResult, MetricsUnit } from './metrics.js';
-export { readCaptures } from './captures.js';
-export type { CapturesResult, CaptureEntry } from './captures.js';
-export { readKnowledge } from './knowledge.js';
-export type { KnowledgeResult, KnowledgeEntry } from './knowledge.js';
-export { runDoctorLite } from './doctor-lite.js';
-export type { DoctorResult, DoctorIssue } from './doctor-lite.js';
+export { resolveGsdRoot, resolveRootFile } from './paths.ts';
+export { readProgress } from './state.ts';
+export type { ProgressResult } from './state.ts';
+export { readRoadmap } from './roadmap.ts';
+export type { RoadmapResult, MilestoneInfo, SliceInfo, TaskInfo } from './roadmap.ts';
+export { readHistory } from './metrics.ts';
+export type { HistoryResult, MetricsUnit } from './metrics.ts';
+export { readCaptures } from './captures.ts';
+export type { CapturesResult, CaptureEntry } from './captures.ts';
+export { readKnowledge } from './knowledge.ts';
+export type { KnowledgeResult, KnowledgeEntry } from './knowledge.ts';
+export { runDoctorLite } from './doctor-lite.ts';
+export type { DoctorResult, DoctorIssue } from './doctor-lite.ts';

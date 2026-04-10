@@ -9,7 +9,6 @@
  */
 
 import { join } from "node:path";
-import { existsSync } from "node:fs";
 
 import type {
   HarnessAdapter,
@@ -31,7 +30,7 @@ import {
   releaseSessionLock,
 } from "@gsd-build/gsd-core";
 
-import { buildSystemPrompt, buildProjectContext } from "./system-prompt.js";
+import { buildSystemPrompt, buildProjectContext } from "./system-prompt.ts";
 
 // ---------------------------------------------------------------------------
 // Types

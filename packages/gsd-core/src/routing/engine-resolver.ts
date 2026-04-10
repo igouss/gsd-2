@@ -7,12 +7,12 @@
  * switch to skip the engine layer entirely.
  */
 
-import type { WorkflowEngine } from "../workflow/workflow-engine.js";
-import type { ExecutionPolicy } from "../execution/execution-policy.js";
-import { DevWorkflowEngine } from "../workflow/dev-workflow-engine.js";
-import { DevExecutionPolicy } from "../execution/dev-execution-policy.js";
-import { CustomWorkflowEngine } from "../workflow/custom-workflow-engine.js";
-import { CustomExecutionPolicy } from "../execution/custom-execution-policy.js";
+import type { WorkflowEngine } from "../workflow/workflow-engine.ts";
+import type { ExecutionPolicy } from "../execution/execution-policy.ts";
+import { DevWorkflowEngine } from "../workflow/dev-workflow-engine.ts";
+import { DevExecutionPolicy } from "../execution/dev-execution-policy.ts";
+import { CustomWorkflowEngine } from "../workflow/custom-workflow-engine.ts";
+import { CustomExecutionPolicy } from "../execution/custom-execution-policy.ts";
 
 /** A resolved engine + policy pair ready for the auto-loop. */
 export interface ResolvedEngine {

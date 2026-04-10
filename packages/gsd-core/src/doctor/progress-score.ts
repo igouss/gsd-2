@@ -16,8 +16,7 @@ import {
   getHealthHistory,
   getLatestHealthIssues,
   getLatestHealthFixes,
-  type HealthSnapshot,
-} from "./doctor-proactive.js";
+} from "./doctor-proactive.ts";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 

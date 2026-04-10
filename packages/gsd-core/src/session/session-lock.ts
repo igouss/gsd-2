@@ -19,8 +19,8 @@
 import { createRequire } from "node:module";
 import { existsSync, readFileSync, readdirSync, mkdirSync, unlinkSync, rmSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { gsdRoot } from "../persistence/paths.js";
-import { atomicWriteSync } from "../persistence/atomic-write.js";
+import { gsdRoot } from "../persistence/paths.ts";
+import { atomicWriteSync } from "../persistence/atomic-write.ts";
 
 const _require = createRequire(import.meta.url);
 

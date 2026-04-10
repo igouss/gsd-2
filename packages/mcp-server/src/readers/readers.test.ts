@@ -8,12 +8,12 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { randomBytes } from 'node:crypto';
 
-import { readProgress } from './state.js';
-import { readRoadmap } from './roadmap.js';
-import { readHistory } from './metrics.js';
-import { readCaptures } from './captures.js';
-import { readKnowledge } from './knowledge.js';
-import { runDoctorLite } from './doctor-lite.js';
+import { readProgress } from './state.ts';
+import { readRoadmap } from './roadmap.ts';
+import { readHistory } from './metrics.ts';
+import { readCaptures } from './captures.ts';
+import { readKnowledge } from './knowledge.ts';
+import { runDoctorLite } from './doctor-lite.ts';
 
 // ---------------------------------------------------------------------------
 // Test fixture helpers

@@ -3,7 +3,7 @@
  * Pure functions — no module state or side effects.
  */
 
-import type { BudgetEnforcementMode } from "../domain/types.js";
+import type { BudgetEnforcementMode } from "../domain/types.ts";
 
 export type BudgetAlertLevel = 0 | 75 | 80 | 90 | 100;
 

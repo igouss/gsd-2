@@ -5,13 +5,13 @@
  * These are the "should we keep going or bail?" checks that run every iteration.
  */
 
-import type { AutoSession } from "../session.js";
+import type { AutoSession } from "../session.ts";
 import type {
   PhaseResult,
   IterationContext,
-} from "../types.js";
-import { BUDGET_THRESHOLDS } from "../types.js";
-import { debugLog } from "../../reporting/debug-logger.js";
+} from "../types.ts";
+import { BUDGET_THRESHOLDS } from "../types.ts";
+import { debugLog } from "../../reporting/debug-logger.ts";
 import { basename } from "node:path";
 
 /**
@@ -26,7 +26,7 @@ export async function runGuards(
 
   // ── Stop/Backtrack directive guard (#3487) ──
   try {
-    const { loadStopCaptures, markCaptureExecuted } = await import("../captures.js");
+    const { loadStopCaptures, markCaptureExecuted } = await import("../captures.ts");
     const stopCaptures = loadStopCaptures(s.basePath);
     if (stopCaptures.length > 0) {
       const first = stopCaptures[0];
@@ -47,7 +47,7 @@ export async function runGuards(
       // For backtrack captures, write the backtrack trigger after pausing
       if (isBacktrack) {
         try {
-          const { executeBacktrack } = await import("../triage-resolution.js");
+          const { executeBacktrack } = await import("../triage-resolution.ts");
           executeBacktrack(s.basePath, mid, first);
         } catch (e) {
           debugLog("guards", { phase: "backtrack-execution-error", error: String(e) });

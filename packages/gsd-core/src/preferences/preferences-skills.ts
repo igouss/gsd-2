@@ -15,12 +15,12 @@ import type {
   SkillDiscoveryMode,
   SkillResolution,
   SkillResolutionReport,
-} from "./preferences-types.js";
-import { validatePreferences } from "./preferences-validation.js";
-import { loadEffectiveGSDPreferences } from "./preferences.js";
+} from "./preferences-types.ts";
+import { validatePreferences } from "./preferences-validation.ts";
+import { loadEffectiveGSDPreferences } from "./preferences.ts";
 
 // Re-export types so existing consumers of ./preferences-skills.js keep working
-export type { GSDSkillRule, SkillDiscoveryMode, SkillResolution, SkillResolutionReport } from "./preferences-types.js";
+export type { GSDSkillRule, SkillDiscoveryMode, SkillResolution, SkillResolutionReport } from "./preferences-types.ts";
 
 /**
  * Known skill directories, in priority order.

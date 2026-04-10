@@ -10,8 +10,8 @@
 import { join } from "node:path";
 import { mkdirSync } from "node:fs";
 
-import type { CompleteSliceParams } from "../domain/types.js";
-import { isClosedStatus } from "../domain/status-guards.js";
+import type { CompleteSliceParams } from "../domain/types.ts";
+import { isClosedStatus } from "../domain/status-guards.ts";
 import {
   transaction,
   insertMilestone,
@@ -21,16 +21,16 @@ import {
   getMilestone,
   updateSliceStatus,
   setSliceSummaryMd,
-} from "../persistence/gsd-db.js";
-import { resolveSliceFile, resolveSlicePath, clearPathCache } from "../persistence/paths.js";
-import { checkOwnership, sliceUnitKey } from "../state/unit-ownership.js";
-import { saveFile, clearParseCache } from "../persistence/files.js";
-import { invalidateStateCache } from "../state/state.js";
-import { renderRoadmapCheckboxes } from "../reporting/markdown-renderer.js";
-import { renderAllProjections } from "../workflow/workflow-projections.js";
-import { writeManifest } from "../workflow/workflow-manifest.js";
-import { appendEvent } from "../workflow/workflow-events.js";
-import { logWarning, logError } from "../workflow/workflow-logger.js";
+} from "../persistence/gsd-db.ts";
+import { resolveSlicePath, clearPathCache } from "../persistence/paths.ts";
+import { checkOwnership, sliceUnitKey } from "../state/unit-ownership.ts";
+import { saveFile, clearParseCache } from "../persistence/files.ts";
+import { invalidateStateCache } from "../state/state.ts";
+import { renderRoadmapCheckboxes } from "../reporting/markdown-renderer.ts";
+import { renderAllProjections } from "../workflow/workflow-projections.ts";
+import { writeManifest } from "../workflow/workflow-manifest.ts";
+import { appendEvent } from "../workflow/workflow-events.ts";
+import { logWarning, logError } from "../workflow/workflow-logger.ts";
 
 export interface CompleteSliceResult {
   sliceId: string;

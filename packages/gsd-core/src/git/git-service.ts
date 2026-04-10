@@ -11,32 +11,30 @@
 import { execFileSync, execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { gsdRoot } from "../persistence/paths.js";
-import { GIT_NO_PROMPT_ENV } from "./git-constants.js";
-import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
+import { gsdRoot } from "../persistence/paths.ts";
+import { GIT_NO_PROMPT_ENV } from "./git-constants.ts";
+import { loadEffectiveGSDPreferences } from "../preferences/preferences.ts";
 
 
 import {
   detectWorktreeName,
-} from "./worktree.js";
-import { SLICE_BRANCH_RE, QUICK_BRANCH_RE, WORKFLOW_BRANCH_RE } from "./branch-patterns.js";
+} from "./worktree.ts";
+import { SLICE_BRANCH_RE, QUICK_BRANCH_RE, WORKFLOW_BRANCH_RE } from "./branch-patterns.ts";
 import {
   nativeGetCurrentBranch,
   nativeDetectMainBranch,
   nativeBranchExists,
   nativeHasChanges,
   nativeAddAllWithExclusions,
-  nativeResetPaths,
   nativeHasStagedChanges,
   nativeCommit,
   nativeRmCached,
   nativeUpdateRef,
-  nativeAddPaths,
   nativeResetSoft,
   nativeCommitSubject,
-} from "./native-git-bridge.js";
-import { GSDError, GSD_MERGE_CONFLICT, GSD_GIT_ERROR } from "../domain/errors.js";
-import { getErrorMessage } from "../domain/error-utils.js";
+} from "./native-git-bridge.ts";
+import { GSDError, GSD_MERGE_CONFLICT, GSD_GIT_ERROR } from "../domain/errors.ts";
+import { getErrorMessage } from "../domain/error-utils.ts";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -251,7 +249,7 @@ export function readIntegrationBranch(basePath: string, milestoneId: string): st
  * The file is committed immediately so the metadata is persisted in git.
  */
 /** Re-export for backward compatibility — canonical definitions in branch-patterns.ts */
-export { QUICK_BRANCH_RE, WORKFLOW_BRANCH_RE } from "./branch-patterns.js";
+export { QUICK_BRANCH_RE, WORKFLOW_BRANCH_RE } from "./branch-patterns.ts";
 
 export function writeIntegrationBranch(
   basePath: string,
@@ -694,7 +692,6 @@ export class GitServiceImpl {
     const wtName = detectWorktreeName(this.basePath);
     if (wtName) {
       // Auto-mode worktrees use milestone/<MID> branches (wtName = milestone ID)
-      const milestoneBranch = `milestone/${wtName}`;
       const currentBranch = nativeGetCurrentBranch(this.basePath);
 
       // If we're on a milestone/<MID> branch, use it (auto-mode case)
@@ -791,7 +788,7 @@ export class GitServiceImpl {
  */
 export function createDraftPR(
   basePath: string,
-  milestoneId: string,
+  _milestoneId: string,
   title: string,
   body: string,
   opts?: { head?: string; base?: string },

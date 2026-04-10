@@ -9,9 +9,9 @@
  * harness-specific fields (cmdCtx, currentUnitModel as Model<Api>, etc.).
  */
 
-import type { GitServiceImpl } from "../git/git-service.js";
-import type { CaptureEntry } from "./captures.js";
-import type { BudgetAlertLevel } from "./auto-budget.js";
+import type { GitServiceImpl } from "../git/git-service.ts";
+import type { CaptureEntry } from "./captures.ts";
+import type { BudgetAlertLevel } from "./auto-budget.ts";
 
 // ─── Exported Types ──────────────────────────────────────────────────────────
 

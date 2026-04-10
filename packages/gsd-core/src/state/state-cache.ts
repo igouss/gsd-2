@@ -3,7 +3,7 @@
 // dispatch cycle (~100ms window), repeated calls return the cached value instead
 // of re-reading the entire .gsd/ tree from disk.
 
-import type { GSDState } from '../domain/types.js';
+import type { GSDState } from '../domain/types.ts';
 
 interface StateCache {
   basePath: string;

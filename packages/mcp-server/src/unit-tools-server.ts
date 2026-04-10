@@ -513,7 +513,7 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
     },
     async () => {
       try {
-        const { readProgress } = await import('./readers/state.js');
+        const { readProgress } = await import('./readers/state.ts');
         const result = await readProgress(projectDir);
         return jsonContent(result);
       } catch (err) {
@@ -530,7 +530,7 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
     },
     async () => {
       try {
-        const { readRoadmap } = await import('./readers/roadmap.js');
+        const { readRoadmap } = await import('./readers/roadmap.ts');
         const result = await readRoadmap(projectDir);
         return jsonContent(result);
       } catch (err) {
@@ -547,7 +547,7 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
     },
     async () => {
       try {
-        const { readKnowledge } = await import('./readers/knowledge.js');
+        const { readKnowledge } = await import('./readers/knowledge.ts');
         const result = await readKnowledge(projectDir);
         return jsonContent(result);
       } catch (err) {

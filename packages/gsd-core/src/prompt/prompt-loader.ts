@@ -18,11 +18,11 @@
  */
 
 import { readFileSync, readdirSync, existsSync } from "node:fs";
-import { GSDError, GSD_PARSE_ERROR } from "../domain/errors.js";
+import { GSDError, GSD_PARSE_ERROR } from "../domain/errors.ts";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
-import { logWarning } from "../workflow/workflow-logger.js";
+import { logWarning } from "../workflow/workflow-logger.ts";
 
 /**
  * Resolve the GSD extension directory.

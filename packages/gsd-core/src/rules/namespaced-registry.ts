@@ -10,7 +10,7 @@
  * and Pi's internal component resolution system.
  */
 
-import type { DiscoveredPlugin } from '../skills/marketplace-discovery.js';
+import type { DiscoveredPlugin } from '../skills/marketplace-discovery.ts';
 
 // ============================================================================
 // Type Definitions

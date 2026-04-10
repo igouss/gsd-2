@@ -13,7 +13,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { join } from "node:path";
 
-import type { DoctorIssue, DoctorIssueCode } from "./doctor-types.js";
+import type { DoctorIssue, DoctorIssueCode } from "./doctor-types.ts";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 

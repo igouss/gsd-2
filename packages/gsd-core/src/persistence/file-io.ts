@@ -3,17 +3,16 @@
 // UAT type extraction, context dependency parsing, milestone summary inlining.
 
 import { promises as fs } from 'node:fs';
-import { resolve } from 'node:path';
-import { atomicWriteAsync } from './atomic-write.js';
-import { resolveMilestoneFile, relMilestoneFile } from './paths.js';
-import { findMilestoneIds } from '../milestone/milestone-ids.js';
+import { atomicWriteAsync } from './atomic-write.ts';
+import { resolveMilestoneFile, relMilestoneFile } from './paths.ts';
+import { findMilestoneIds } from '../milestone/milestone-ids.ts';
 
 import type {
   RequirementCounts,
-} from '../domain/types.js';
+} from '../domain/types.ts';
 
-import { splitFrontmatter, parseFrontmatterMap } from "../shared/frontmatter.js";
-import { extractSection, parseBullets } from './file-helpers.js';
+import { splitFrontmatter, parseFrontmatterMap } from "../shared/frontmatter.ts";
+import { extractSection, parseBullets } from './file-helpers.ts';
 
 // ─── File I/O ──────────────────────────────────────────────────────────────
 

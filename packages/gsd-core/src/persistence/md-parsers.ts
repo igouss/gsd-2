@@ -1,27 +1,21 @@
-// GSD Extension - Legacy Parsers
-// parseRoadmap() and parsePlan() extracted from files.ts.
-// Used only by: md-importer.ts (migration), state.ts (pre-migration fallback),
-// markdown-renderer.ts (detectStaleRenders disk-vs-DB comparison),
-// commands-maintenance.ts (cold-path branch cleanup), and tests.
-//
-// NOT used in the dispatch loop or any hot-path runtime code.
+// Markdown parsers for GSD roadmap and plan files.
+// parseRoadmap() and parsePlan() try the native Rust parser first,
+// falling back to a JS implementation when unavailable.
 
-import { extractSection, parseBullets, extractBoldField, extractAllSections, registerCacheClearCallback } from '../persistence/files.js';
-import { splitFrontmatter } from "../shared/frontmatter.js";
-import { nativeParseRoadmap, nativeParsePlanFile } from '../git/native-parser-bridge.js';
-import { debugTime, debugCount } from '../reporting/debug-logger.js';
-import { CACHE_MAX } from '../domain/constants.js';
+import { extractSection, parseBullets, extractBoldField, extractAllSections, registerCacheClearCallback } from './files.ts';
+import { splitFrontmatter } from "../shared/frontmatter.ts";
+import { nativeParseRoadmap, nativeParsePlanFile } from '../git/native-parser-bridge.ts';
+import { debugTime, debugCount } from '../reporting/debug-logger.ts';
+import { CACHE_MAX } from '../domain/constants.ts';
 
 import type {
   Roadmap, BoundaryMapEntry,
   SlicePlan, TaskPlanEntry,
-} from '../domain/types.js';
+} from '../domain/types.ts';
 
-// Re-export parseRoadmapSlices so callers can import all legacy parsers from one module
-import { parseRoadmapSlices } from '../workflow/roadmap-slices.js';
-export { parseRoadmapSlices };
+import { parseRoadmapSlices } from '../workflow/roadmap-slices.ts';
 
-// ─── Parse Cache (local to this module) ───────────────────────────────────
+// ─── Parse Cache ─────────────────────────────────────────────────────────
 
 /** Fast composite key: length + first/mid/last 100 chars. The middle sample
  *  prevents collisions when only a few characters change in the interior of
@@ -46,13 +40,13 @@ function cachedParse<T>(content: string, tag: string, parseFn: (c: string) => T)
   return result;
 }
 
-/** Clear the legacy parser cache. Called by clearParseCache() in files.ts. */
-export function clearLegacyParseCache(): void {
+/** Clear the markdown parser cache. Called by clearParseCache() in files.ts. */
+export function clearMdParseCache(): void {
   _parseCache.clear();
 }
 
 // Register with files.ts so clearParseCache() also clears our cache
-registerCacheClearCallback(clearLegacyParseCache);
+registerCacheClearCallback(clearMdParseCache);
 
 // ─── Roadmap Parser ────────────────────────────────────────────────────────
 
@@ -88,7 +82,6 @@ function _parseRoadmapImpl(content: string): Roadmap {
     })();
   const successCriteria = scSection ? parseBullets(scSection) : [];
 
-  // Slices
   const slices = parseRoadmapSlices(content);
 
   // Boundary map

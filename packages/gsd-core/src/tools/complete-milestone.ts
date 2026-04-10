@@ -15,15 +15,15 @@ import {
   getMilestoneSlices,
   getSliceTasks,
   updateMilestoneStatus,
-} from "../persistence/gsd-db.js";
-import { resolveMilestonePath, clearPathCache } from "../persistence/paths.js";
-import { isClosedStatus } from "../domain/status-guards.js";
-import { saveFile, clearParseCache } from "../persistence/files.js";
-import { invalidateStateCache } from "../state/state.js";
-import { renderAllProjections, stripIdPrefix } from "../workflow/workflow-projections.js";
-import { writeManifest } from "../workflow/workflow-manifest.js";
-import { appendEvent } from "../workflow/workflow-events.js";
-import { logWarning, logError } from "../workflow/workflow-logger.js";
+} from "../persistence/gsd-db.ts";
+import { resolveMilestonePath, clearPathCache } from "../persistence/paths.ts";
+import { isClosedStatus } from "../domain/status-guards.ts";
+import { saveFile, clearParseCache } from "../persistence/files.ts";
+import { invalidateStateCache } from "../state/state.ts";
+import { renderAllProjections, stripIdPrefix } from "../workflow/workflow-projections.ts";
+import { writeManifest } from "../workflow/workflow-manifest.ts";
+import { appendEvent } from "../workflow/workflow-events.ts";
+import { logWarning, logError } from "../workflow/workflow-logger.ts";
 
 export interface CompleteMilestoneParams {
   milestoneId: string;

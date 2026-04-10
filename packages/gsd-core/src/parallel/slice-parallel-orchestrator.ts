@@ -17,21 +17,17 @@ import { spawn, type ChildProcess } from "node:child_process";
 import {
   appendFileSync,
   existsSync,
-  writeFileSync,
-  readFileSync,
   mkdirSync,
 } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { gsdRoot } from "../persistence/paths.js";
-import { createWorktree, worktreePath, removeWorktree } from "../git/worktree-manager.js";
-import { autoWorktreeBranch, runWorktreePostCreateHook } from "../auto/auto-worktree.js";
+import { gsdRoot } from "../persistence/paths.ts";
+import { createWorktree, worktreePath, removeWorktree } from "../git/worktree-manager.ts";
 import {
   writeSessionStatus,
-  removeSessionStatus,
-} from "../session/session-status-io.js";
-import { hasFileConflict } from "./slice-parallel-conflict.js";
-import { getErrorMessage } from "../domain/error-utils.js";
+} from "../session/session-status-io.ts";
+import { hasFileConflict } from "./slice-parallel-conflict.ts";
+import { getErrorMessage } from "../domain/error-utils.ts";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 

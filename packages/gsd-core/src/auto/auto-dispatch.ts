@@ -9,29 +9,26 @@
  * without modifying orchestration code.
  */
 
-import type { GSDState } from "../domain/types.js";
-import type { GSDPreferences } from "../preferences/preferences.js";
-import type { UatType } from "../persistence/files.js";
-import { loadFile, extractUatType, loadActiveOverrides } from "../persistence/files.js";
-import { isDbAvailable, getMilestoneSlices, getPendingGates, markAllGatesOmitted, getMilestone } from "../persistence/gsd-db.js";
-import { extractVerdict, isAcceptableUatVerdict } from "../analysis/verdict-parser.js";
+import type { GSDState } from "../domain/types.ts";
+import type { GSDPreferences } from "../preferences/preferences.ts";
+import { loadFile, extractUatType, loadActiveOverrides } from "../persistence/files.ts";
+import { isDbAvailable, getMilestoneSlices, getPendingGates, markAllGatesOmitted, getMilestone } from "../persistence/gsd-db.ts";
+import { extractVerdict, isAcceptableUatVerdict } from "../analysis/verdict-parser.ts";
 
 import {
   gsdRoot,
   resolveMilestoneFile,
   resolveMilestonePath,
   resolveSliceFile,
-  resolveSlicePath,
   resolveTaskFile,
   relSliceFile,
   buildMilestoneFileName,
-  buildSliceFileName,
-} from "../persistence/paths.js";
-import { parseRoadmap } from "../state/parsers-legacy.js";
+} from "../persistence/paths.ts";
+import { parseRoadmap } from "../persistence/md-parsers.ts";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { logWarning, logError } from "../workflow/workflow-logger.js";
+import { logWarning, logError } from "../workflow/workflow-logger.ts";
 import { join } from "node:path";
-import { hasImplementationArtifacts } from "./auto-recovery.js";
+import { hasImplementationArtifacts } from "./auto-recovery.ts";
 import {
   buildDiscussMilestonePrompt,
   buildResearchMilestonePrompt,
@@ -51,7 +48,7 @@ import {
   buildParallelResearchSlicesPrompt,
   checkNeedsReassessment,
   checkNeedsRunUat,
-} from "../prompt/auto-prompts.js";
+} from "../prompt/auto-prompts.ts";
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -74,7 +71,7 @@ export interface DispatchContext {
   midTitle: string;
   state: GSDState;
   prefs: GSDPreferences | undefined;
-  session?: import("../auto/session.js").AutoSession;
+  session?: import("../auto/session.ts").AutoSession;
 }
 
 export interface DispatchRule {
@@ -186,12 +183,12 @@ export function isVerificationNotApplicable(value: string): boolean {
 export const DISPATCH_RULES: DispatchRule[] = [
   {
     name: "rewrite-docs (override gate)",
-    match: async ({ mid, midTitle, state, basePath, session }) => {
+    match: async ({ mid, midTitle, state, basePath }) => {
       const pendingOverrides = await loadActiveOverrides(basePath);
       if (pendingOverrides.length === 0) return null;
       const count = getRewriteCount(basePath);
       if (count >= MAX_REWRITE_ATTEMPTS) {
-        const { resolveAllOverrides } = await import("../persistence/files.js");
+        const { resolveAllOverrides } = await import("../persistence/files.ts");
         await resolveAllOverrides(basePath);
         setRewriteCount(basePath, 0);
         return null;
@@ -271,8 +268,6 @@ export const DISPATCH_RULES: DispatchRule[] = [
     match: async ({ mid, basePath, prefs }) => {
       // Only applies when UAT dispatch is enabled
       if (!prefs?.uat_dispatch) return null;
-
-      const roadmapFile = resolveMilestoneFile(basePath, mid, "ROADMAP");
 
       // DB-first: get completed slices from DB
       let completedSliceIds: string[];
@@ -559,7 +554,7 @@ export const DISPATCH_RULES: DispatchRule[] = [
           getReadyTasks,
           chooseNonConflictingSubset,
           graphMetrics,
-        } = await import("../workflow/reactive-graph.js");
+        } = await import("../workflow/reactive-graph.ts");
 
         const taskIO = await loadSliceTaskIO(basePath, mid, sid);
         if (taskIO.length < 2) return null; // single task, no point
@@ -592,7 +587,7 @@ export const DISPATCH_RULES: DispatchRule[] = [
 
         // Persist dispatched batch so verification and recovery can check
         // exactly which tasks were sent.
-        const { saveReactiveState } = await import("../workflow/reactive-graph.js");
+        const { saveReactiveState } = await import("../workflow/reactive-graph.ts");
         saveReactiveState(basePath, mid, sid, {
           sliceId: sid,
           completed: [...completed],
@@ -838,7 +833,7 @@ export const DISPATCH_RULES: DispatchRule[] = [
   },
 ];
 
-import { getRegistry } from "../rules/rule-registry.js";
+import { getRegistry } from "../rules/rule-registry.ts";
 
 // ─── Resolver ─────────────────────────────────────────────────────────────
 

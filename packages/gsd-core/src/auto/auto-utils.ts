@@ -1,6 +1,6 @@
 // Shared utilities for the auto-loop modules (auto-post-unit, auto, etc.).
 
-import { debugLog } from "../reporting/debug-logger.js";
+import { debugLog } from "../reporting/debug-logger.ts";
 
 /**
  * Run a non-fatal operation, logging any error via `debugLog` and continuing.

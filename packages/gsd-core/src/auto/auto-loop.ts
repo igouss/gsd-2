@@ -6,9 +6,9 @@
  * continue to work without changes.
  */
 
-export { autoLoop } from "../auto/loop.js";
-export { isInfrastructureError, INFRA_ERROR_CODES } from "../auto/infra-errors.js";
-export { resolveAgentEnd, resolveAgentEndCancelled, isSessionSwitchInFlight, _resetPendingResolve, _setActiveSession } from "../auto/resolve.js";
-export { detectStuck } from "../auto/detect-stuck.js";
-export type { CoreLoopDeps, CloseoutOptions, PreVerificationOpts, AutoVerificationResult } from "../auto/loop-deps.js";
-export type { AgentEndEvent, ErrorContext, UnitResult } from "../auto/types.js";
+export { autoLoop } from "../auto/loop.ts";
+export { isInfrastructureError, INFRA_ERROR_CODES } from "../auto/infra-errors.ts";
+export { resolveAgentEnd, resolveAgentEndCancelled, isSessionSwitchInFlight, _resetPendingResolve, _setActiveSession } from "../auto/resolve.ts";
+export { detectStuck } from "../auto/detect-stuck.ts";
+export type { CoreLoopDeps, CloseoutOptions, PreVerificationOpts, AutoVerificationResult } from "../auto/loop-deps.ts";
+export type { AgentEndEvent, ErrorContext, UnitResult } from "../auto/types.ts";

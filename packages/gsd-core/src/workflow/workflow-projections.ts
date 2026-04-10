@@ -5,20 +5,19 @@
 import {
   _getAdapter,
   isDbAvailable,
-  getAllMilestones,
   getMilestone,
   getMilestoneSlices,
   getSliceTasks,
   getVerificationEvidence,
-} from "../persistence/gsd-db.js";
-import type { MilestoneRow, SliceRow, TaskRow, VerificationEvidenceRow } from "../persistence/gsd-db.js";
-import { atomicWriteSync } from "../persistence/atomic-write.js";
+} from "../persistence/gsd-db.ts";
+import type { MilestoneRow, SliceRow, TaskRow } from "../persistence/gsd-db.ts";
+import { atomicWriteSync } from "../persistence/atomic-write.ts";
 import { join } from "node:path";
 import { mkdirSync, existsSync } from "node:fs";
-import { logWarning } from "../workflow/workflow-logger.js";
-import { isClosedStatus } from "../domain/status-guards.js";
-import { deriveState } from "../state/state.js";
-import type { GSDState } from "../domain/types.js";
+import { logWarning } from "../workflow/workflow-logger.ts";
+import { isClosedStatus } from "../domain/status-guards.ts";
+import { deriveState } from "../state/state.ts";
+import type { GSDState } from "../domain/types.ts";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────
 

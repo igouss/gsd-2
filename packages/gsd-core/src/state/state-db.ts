@@ -4,18 +4,18 @@ import type {
   GSDState,
   ActiveRef,
   MilestoneRegistryEntry,
-} from '../domain/types.js';
+} from '../domain/types.ts';
 
 import {
   parseRoadmap,
   parsePlan,
-} from './parsers-legacy.js';
+} from '../persistence/md-parsers.ts';
 
 import {
   parseSummary,
   loadFile,
   parseRequirementCounts,
-} from '../persistence/files.js';
+} from '../persistence/files.ts';
 
 import {
   resolveMilestoneFile,
@@ -24,19 +24,18 @@ import {
   resolveTaskFile,
   resolveTasksDir,
   resolveGsdRootFile,
-} from '../persistence/paths.js';
+} from '../persistence/paths.ts';
 
-import { findMilestoneIds } from '../milestone/milestone-ids.js';
-import { loadQueueOrder, sortByQueueOrder } from './queue-order.js';
-import { isDeferredStatus } from '../domain/status-guards.js';
+import { findMilestoneIds } from '../milestone/milestone-ids.ts';
+import { loadQueueOrder, sortByQueueOrder } from './queue-order.ts';
+import { isDeferredStatus } from '../domain/status-guards.ts';
 
 import { join } from 'path';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { logWarning, logError } from '../workflow/workflow-logger.js';
-import { extractVerdict } from '../analysis/verdict-parser.js';
+import { logWarning, logError } from '../workflow/workflow-logger.ts';
+import { extractVerdict } from '../analysis/verdict-parser.ts';
 
 import {
-  isDbAvailable,
   getAllMilestones,
   getMilestoneSlices,
   getSliceTasks,
@@ -49,7 +48,7 @@ import {
   getPendingSliceGateCount,
   type MilestoneRow,
   type SliceRow,
-} from '../persistence/gsd-db.js';
+} from '../persistence/gsd-db.ts';
 
 import {
   isGhostMilestone,
@@ -57,7 +56,7 @@ import {
   stripMilestonePrefix,
   extractContextTitle,
   isStatusDone,
-} from './state-helpers.js';
+} from './state-helpers.ts';
 
 /**
  * Derive GSD state from the milestones/slices/tasks DB tables.
@@ -65,7 +64,7 @@ import {
  * are still checked on the filesystem since they aren't in DB tables.
  * Requirements also stay file-based via parseRequirementCounts().
  *
- * Must produce field-identical GSDState to _deriveStateImpl() for the same project.
+ * Primary state derivation path — DB is the source of truth.
  */
 export async function deriveStateFromDb(basePath: string): Promise<GSDState> {
   const requirements = parseRequirementCounts(await loadFile(resolveGsdRootFile(basePath, "REQUIREMENTS")));
@@ -463,7 +462,6 @@ export async function deriveStateFromDb(basePath: string): Promise<GSDState> {
   );
 
   let activeSlice: ActiveRef | null = null;
-  let activeSliceRow: SliceRow | null = null;
 
   // ── Slice-level parallel worker isolation ─────────────────────────────
   // When GSD_SLICE_LOCK is set, this process is a parallel worker scoped
@@ -473,7 +471,6 @@ export async function deriveStateFromDb(basePath: string): Promise<GSDState> {
     const lockedSlice = activeMilestoneSlices.find(s => s.id === sliceLock);
     if (lockedSlice) {
       activeSlice = { id: lockedSlice.id, title: lockedSlice.title };
-      activeSliceRow = lockedSlice;
     } else {
       logWarning("state", `GSD_SLICE_LOCK=${sliceLock} not found in active slices — worker has no assigned work`);
       // Don't silently continue — this is a dispatch error
@@ -495,7 +492,6 @@ export async function deriveStateFromDb(basePath: string): Promise<GSDState> {
       if (isDeferredStatus(s.status)) continue;
       if (s.depends.every(dep => doneSliceIds.has(dep))) {
         activeSlice = { id: s.id, title: s.title };
-        activeSliceRow = s;
         break;
       }
     }

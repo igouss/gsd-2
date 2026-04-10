@@ -7,9 +7,9 @@
  */
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import type { DynamicRoutingConfig } from "../routing/model-router.js";
-import { defaultRoutingConfig } from "../routing/model-router.js";
-import type { TokenProfile, InlineLevel } from "../domain/types.js";
+import type { DynamicRoutingConfig } from "../routing/model-router.ts";
+import { defaultRoutingConfig } from "../routing/model-router.ts";
+import type { TokenProfile, InlineLevel } from "../domain/types.ts";
 
 import type {
   GSDPreferences,
@@ -17,11 +17,11 @@ import type {
   GSDPhaseModelConfig,
   ResolvedModelConfig,
   AutoSupervisorConfig,
-} from "./preferences-types.js";
-import { loadEffectiveGSDPreferences, getGlobalGSDPreferencesPath } from "./preferences.js";
+} from "./preferences-types.ts";
+import { loadEffectiveGSDPreferences, getGlobalGSDPreferencesPath } from "./preferences.ts";
 
 // Re-export types so existing consumers of ./preferences-models.js keep working
-export type { GSDPhaseModelConfig, GSDModelConfig, GSDModelConfigV2, ResolvedModelConfig } from "./preferences-types.js";
+export type { GSDPhaseModelConfig, GSDModelConfig, GSDModelConfigV2, ResolvedModelConfig } from "./preferences-types.ts";
 
 /**
  * Resolve which model ID to use for a given auto-mode unit type.
@@ -387,7 +387,7 @@ export function resolveInlineLevel(): InlineLevel {
  * budget -> "smart", balanced/quality -> "full".
  * Explicit preference always wins.
  */
-export function resolveContextSelection(): import("../domain/types.js").ContextSelectionMode {
+export function resolveContextSelection(): import("../domain/types.ts").ContextSelectionMode {
   const prefs = loadEffectiveGSDPreferences();
   if (prefs?.preferences.context_selection) return prefs.preferences.context_selection;
   const profile = resolveEffectiveProfile();

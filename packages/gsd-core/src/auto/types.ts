@@ -5,11 +5,11 @@
  * No harness dependencies (ExtensionContext, ExtensionAPI).
  */
 
-import type { AutoSession } from "./session.js";
-import type { GSDPreferences } from "../preferences/preferences-types.js";
-import type { GSDState } from "../domain/types.js";
-import type { CmuxLogLevel } from "../cmux/index.js";
-import type { CoreLoopDeps } from "./loop-deps.js";
+import type { AutoSession } from "./session.ts";
+import type { GSDPreferences } from "../preferences/preferences-types.ts";
+import type { GSDState } from "../domain/types.ts";
+import type { CmuxLogLevel } from "../cmux/index.ts";
+import type { CoreLoopDeps } from "./loop-deps.ts";
 
 /**
  * Maximum total loop iterations before forced stop. Prevents runaway loops

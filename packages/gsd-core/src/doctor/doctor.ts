@@ -1,28 +1,28 @@
 import { existsSync, mkdirSync, lstatSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { loadFile, parseSummary, saveFile, parseTaskPlanMustHaves, countMustHavesMentionedInSummary } from "../persistence/files.js";
-import { parseRoadmap as parseLegacyRoadmap, parsePlan as parseLegacyPlan } from "../state/parsers-legacy.js";
-import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../persistence/gsd-db.js";
-import { resolveMilestoneFile, resolveMilestonePath, resolveSliceFile, resolveSlicePath, resolveTaskFile, resolveTasksDir, milestonesDir, gsdRoot, relMilestoneFile, relSliceFile, relTaskFile, relSlicePath, relGsdRootFile, resolveGsdRootFile, relMilestonePath } from "../persistence/paths.js";
-import { deriveState, isMilestoneComplete } from "../state/state.js";
-import { invalidateAllCaches } from "../state/cache.js";
-import { loadEffectiveGSDPreferences, type GSDPreferences } from "../preferences/preferences.js";
+import { loadFile, parseSummary, saveFile, parseTaskPlanMustHaves, countMustHavesMentionedInSummary } from "../persistence/files.ts";
+import { parseRoadmap, parsePlan } from "../persistence/md-parsers.ts";
+import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../persistence/gsd-db.ts";
+import { resolveMilestoneFile, resolveMilestonePath, resolveSliceFile, resolveSlicePath, resolveTaskFile, resolveTasksDir, milestonesDir, gsdRoot, relMilestoneFile, relSliceFile, relTaskFile, relSlicePath, relGsdRootFile, resolveGsdRootFile, relMilestonePath } from "../persistence/paths.ts";
+import { deriveState, isMilestoneComplete } from "../state/state.ts";
+import { invalidateAllCaches } from "../state/cache.ts";
+import { loadEffectiveGSDPreferences, type GSDPreferences } from "../preferences/preferences.ts";
 
-import type { DoctorIssue, DoctorIssueCode, DoctorReport } from "./doctor-types.js";
-import { GLOBAL_STATE_CODES } from "./doctor-types.js";
-import type { RoadmapSliceEntry } from "../domain/types.js";
-import { checkGitHealth, checkRuntimeHealth, checkGlobalHealth, checkEngineHealth } from "./doctor-checks.js";
-import { checkEnvironmentHealth } from "./doctor-environment.js";
-import { runProviderChecks } from "./doctor-providers.js";
+import type { DoctorIssue, DoctorIssueCode, DoctorReport } from "./doctor-types.ts";
+import { GLOBAL_STATE_CODES } from "./doctor-types.ts";
+import type { RoadmapSliceEntry } from "../domain/types.ts";
+import { checkGitHealth, checkRuntimeHealth, checkGlobalHealth, checkEngineHealth } from "./doctor-checks.ts";
+import { checkEnvironmentHealth } from "./doctor-environment.ts";
+import { runProviderChecks } from "./doctor-providers.ts";
 
 // ── Re-exports ─────────────────────────────────────────────────────────────
 // All public types and functions from extracted modules are re-exported here
-// so that existing imports from "./doctor.js" continue to work unchanged.
-export type { DoctorSeverity, DoctorIssueCode, DoctorIssue, DoctorReport, DoctorSummary } from "./doctor-types.js";
-export { summarizeDoctorIssues, filterDoctorIssues, formatDoctorReport, formatDoctorIssuesForPrompt, formatDoctorReportJson } from "./doctor-format.js";
-export { runEnvironmentChecks, runFullEnvironmentChecks, formatEnvironmentReport, type EnvironmentCheckResult } from "./doctor-environment.js";
-export { computeProgressScore, computeProgressScoreWithContext, formatProgressLine, formatProgressReport, type ProgressScore, type ProgressLevel } from "./progress-score.js";
+// so that existing imports from "./doctor.ts" continue to work unchanged.
+export type { DoctorSeverity, DoctorIssueCode, DoctorIssue, DoctorReport, DoctorSummary } from "./doctor-types.ts";
+export { summarizeDoctorIssues, filterDoctorIssues, formatDoctorReport, formatDoctorIssuesForPrompt, formatDoctorReportJson } from "./doctor-format.ts";
+export { runEnvironmentChecks, runFullEnvironmentChecks, formatEnvironmentReport, type EnvironmentCheckResult } from "./doctor-environment.ts";
+export { computeProgressScore, computeProgressScoreWithContext, formatProgressLine, formatProgressReport, type ProgressScore, type ProgressLevel } from "./progress-score.ts";
 
 /**
  * Characters that are used as delimiters in GSD state management documents
@@ -221,7 +221,7 @@ export async function selectDoctorScope(basePath: string, requestedScope?: strin
       const allDone = dbSlices.length > 0 && dbSlices.every(s => s.status === "complete");
       if (!allDone) return milestone.id;
     } else {
-      const roadmap = parseLegacyRoadmap(roadmapContent);
+      const roadmap = parseRoadmap(roadmapContent);
       if (!isMilestoneComplete(roadmap)) return milestone.id;
     }
   }
@@ -490,7 +490,7 @@ export async function runGSDDoctor(basePath: string, options?: { fix?: boolean; 
     } else {
       const activeMilestoneId = state.activeMilestone?.id;
       const activeSliceId = state.activeSlice?.id;
-      slices = parseLegacyRoadmap(roadmapContent).slices.map(s => ({
+      slices = parseRoadmap(roadmapContent).slices.map(s => ({
         ...s,
         // Legacy roadmaps only encode done vs not-done. For doctor's
         // missing-directory checks, treat every undone slice except the
@@ -623,7 +623,7 @@ export async function runGSDDoctor(basePath: string, options?: { fix?: boolean; 
 
       const planPath = resolveSliceFile(basePath, milestoneId, slice.id, "PLAN");
       const planContent = planPath ? await loadFile(planPath) : null;
-      // Normalize plan tasks: prefer DB, fall back to parsers-legacy
+      // Normalize plan tasks: prefer DB, fall back to md-parsers
       let plan: { tasks: Array<{ id: string; done: boolean; title: string; estimate?: string }> } | null = null;
       if (isDbAvailable()) {
         const dbTasks = getSliceTasks(milestoneId, slice.id);
@@ -632,7 +632,7 @@ export async function runGSDDoctor(basePath: string, options?: { fix?: boolean; 
         }
       }
       if (!plan && planContent) {
-        plan = parseLegacyPlan(planContent);
+        plan = parsePlan(planContent);
       }
       if (!plan) {
         if (!slice.done) {

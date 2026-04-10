@@ -5,17 +5,17 @@
  * This is the "did the work actually succeed?" phase.
  */
 
-import type { SidecarItem } from "../session.js";
-import type { PreVerificationOpts } from "../loop-deps.js";
+import type { SidecarItem } from "../session.ts";
+import type { PreVerificationOpts } from "../loop-deps.ts";
 import type {
   PhaseResult,
   IterationContext,
   LoopState,
   IterationData,
-} from "../types.js";
-import { MAX_FINALIZE_TIMEOUTS } from "../types.js";
-import { debugLog } from "../../reporting/debug-logger.js";
-import { withTimeout, FINALIZE_PRE_TIMEOUT_MS, FINALIZE_POST_TIMEOUT_MS } from "../finalize-timeout.js";
+} from "../types.ts";
+import { MAX_FINALIZE_TIMEOUTS } from "../types.ts";
+import { debugLog } from "../../reporting/debug-logger.ts";
+import { withTimeout, FINALIZE_PRE_TIMEOUT_MS, FINALIZE_POST_TIMEOUT_MS } from "../finalize-timeout.ts";
 
 /**
  * Phase 5: Post-unit finalize — pre/post verification, UAT pause, step-wizard.

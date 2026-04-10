@@ -6,9 +6,9 @@ import {
   relTaskFile,
   resolveSliceFile,
   resolveTaskFile,
-} from "../persistence/paths.js";
-import { loadFile, parseTaskPlanMustHaves, countMustHavesMentionedInSummary } from "../persistence/files.js";
-import { parseUnitId } from "../domain/unit-id.js";
+} from "../persistence/paths.ts";
+import { loadFile, parseTaskPlanMustHaves, countMustHavesMentionedInSummary } from "../persistence/files.ts";
+import { parseUnitId } from "../domain/unit-id.ts";
 
 export type UnitRuntimePhase =
   | "dispatched"

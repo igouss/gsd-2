@@ -1,18 +1,18 @@
 import { existsSync, readdirSync, realpathSync, rmSync, statSync } from "node:fs";
 import { join, sep } from "node:path";
 
-import type { DoctorIssue, DoctorIssueCode } from "./doctor-types.js";
-import { loadFile } from "../persistence/files.js";
-import { parseRoadmap as parseLegacyRoadmap } from "../state/parsers-legacy.js";
-import { isDbAvailable, getMilestoneSlices } from "../persistence/gsd-db.js";
-import { resolveMilestoneFile } from "../persistence/paths.js";
-import { deriveState, isMilestoneComplete } from "../state/state.js";
-import { listWorktrees, resolveGitDir, worktreesDir } from "../git/worktree-manager.js";
-import { abortAndReset } from "../git/git-self-heal.js";
-import { RUNTIME_EXCLUSION_PATHS, resolveMilestoneIntegrationBranch, writeIntegrationBranch } from "../git/git-service.js";
-import { nativeIsRepo, nativeWorktreeList, nativeWorktreeRemove, nativeBranchList, nativeBranchDelete, nativeLsFiles, nativeRmCached, nativeHasChanges, nativeLastCommitEpoch, nativeGetCurrentBranch, nativeAddTracked, nativeCommit } from "../git/native-git-bridge.js";
-import { getAllWorktreeHealth } from "../git/worktree-health.js";
-import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
+import type { DoctorIssue, DoctorIssueCode } from "./doctor-types.ts";
+import { loadFile } from "../persistence/files.ts";
+import { parseRoadmap } from "../persistence/md-parsers.ts";
+import { isDbAvailable, getMilestoneSlices } from "../persistence/gsd-db.ts";
+import { resolveMilestoneFile } from "../persistence/paths.ts";
+import { deriveState, isMilestoneComplete } from "../state/state.ts";
+import { listWorktrees, resolveGitDir, worktreesDir } from "../git/worktree-manager.ts";
+import { abortAndReset } from "../git/git-self-heal.ts";
+import { RUNTIME_EXCLUSION_PATHS, resolveMilestoneIntegrationBranch, writeIntegrationBranch } from "../git/git-service.ts";
+import { nativeIsRepo, nativeWorktreeList, nativeWorktreeRemove, nativeBranchList, nativeBranchDelete, nativeLsFiles, nativeRmCached, nativeHasChanges, nativeLastCommitEpoch, nativeGetCurrentBranch, nativeAddTracked, nativeCommit } from "../git/native-git-bridge.ts";
+import { getAllWorktreeHealth } from "../git/worktree-health.ts";
+import { loadEffectiveGSDPreferences } from "../preferences/preferences.ts";
 
 /**
  * Returns true if the directory contains only doctor artifacts
@@ -76,7 +76,7 @@ export async function checkGitHealth(
           const roadmapPath = resolveMilestoneFile(basePath, milestoneId, "ROADMAP");
           const roadmapContent = roadmapPath ? await loadFile(roadmapPath) : null;
           if (roadmapContent) {
-            const roadmap = parseLegacyRoadmap(roadmapContent);
+            const roadmap = parseRoadmap(roadmapContent);
             isComplete = isMilestoneComplete(roadmap);
           }
         }
@@ -136,7 +136,7 @@ export async function checkGitHealth(
           } else {
             const roadmapContent = roadmapPath ? await loadFile(roadmapPath) : null;
             if (!roadmapContent) continue;
-            const roadmap = parseLegacyRoadmap(roadmapContent);
+            const roadmap = parseRoadmap(roadmapContent);
             branchMilestoneComplete = isMilestoneComplete(roadmap);
           }
           if (branchMilestoneComplete) {
@@ -435,7 +435,7 @@ export async function checkGitHealth(
 
         if (health.safeToRemove && shouldFix("worktree_branch_merged") && !isCwd) {
           try {
-            const { removeWorktree } = await import("../git/worktree-manager.js");
+            const { removeWorktree } = await import("../git/worktree-manager.ts");
             removeWorktree(basePath, wt.name, { deleteBranch: true, branch: wt.branch });
             fixesApplied.push(`removed merged worktree "${wt.name}" and deleted branch ${wt.branch}`);
           } catch {

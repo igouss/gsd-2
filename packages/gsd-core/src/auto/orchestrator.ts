@@ -10,24 +10,24 @@
  */
 
 import { randomUUID } from "node:crypto";
-import type { AutoSession, SidecarItem } from "./session.js";
-import type { CoreLoopDeps } from "./loop-deps.js";
+import type { AutoSession, SidecarItem } from "./session.ts";
+import type { CoreLoopDeps } from "./loop-deps.ts";
 import {
   MAX_LOOP_ITERATIONS,
   type LoopState,
   type IterationContext,
   type IterationData,
-} from "./types.js";
-import { _clearCurrentResolve } from "./resolve.js";
-import { runPreDispatch } from "./milestone/pre-dispatch.js";
-import { runDispatch } from "./dispatch/dispatch.js";
-import { runGuards } from "./guards/guards.js";
-import { runUnitPhase } from "./execution/unit-phase.js";
-import { runFinalize } from "./finalize/finalize.js";
-import { debugLog } from "../reporting/debug-logger.js";
-import { isInfrastructureError } from "./infra-errors.js";
-import { resolveEngine } from "../routing/engine-resolver.js";
-import type { JournalEventType } from "../persistence/journal.js";
+} from "./types.ts";
+import { _clearCurrentResolve } from "./resolve.ts";
+import { runPreDispatch } from "./milestone/pre-dispatch.ts";
+import { runDispatch } from "./dispatch/dispatch.ts";
+import { runGuards } from "./guards/guards.ts";
+import { runUnitPhase } from "./execution/unit-phase.ts";
+import { runFinalize } from "./finalize/finalize.ts";
+import { debugLog } from "../reporting/debug-logger.ts";
+import { isInfrastructureError } from "./infra-errors.ts";
+import { resolveEngine } from "../routing/engine-resolver.ts";
+import type { JournalEventType } from "../persistence/journal.ts";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -69,7 +69,7 @@ function buildSidecarIterData(
 async function runCustomEnginePath(
   ic: IterationContext,
   loopState: LoopState,
-  emitJournal: JournalEmitter,
+  _emitJournal: JournalEmitter,
 ): Promise<{ action: "break" | "continue" | "next" }> {
   const { s, deps, iteration } = ic;
 

@@ -1,20 +1,17 @@
-import { join } from "node:path";
-
-import { loadFile } from "../persistence/files.js";
-import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../persistence/gsd-db.js";
-import { parseRoadmap, parsePlan } from "./parsers-legacy.js";
+import { loadFile } from "../persistence/files.ts";
+import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../persistence/gsd-db.ts";
+import { parseRoadmap, parsePlan } from "../persistence/md-parsers.ts";
 import {
   resolveMilestoneFile,
   resolveSliceFile,
-  resolveSlicePath,
   resolveTaskFile,
   resolveTasksDir,
-} from "../persistence/paths.js";
-import { deriveState } from "./state.js";
-import { extractVerdict } from "../analysis/verdict-parser.js";
-import { milestoneIdSort, findMilestoneIds } from "../auto/guided-flow.js";
-import type { RiskLevel } from "../domain/types.js";
-import { getSliceBranchName, detectWorktreeName } from "../git/worktree.js";
+} from "../persistence/paths.ts";
+import { deriveState } from "./state.ts";
+import { extractVerdict } from "../analysis/verdict-parser.ts";
+import { findMilestoneIds } from "../auto/guided-flow.ts";
+import type { RiskLevel } from "../domain/types.ts";
+import { getSliceBranchName, detectWorktreeName } from "../git/worktree.ts";
 
 export interface WorkspaceTaskTarget {
   id: string;
@@ -140,7 +137,7 @@ export interface IndexWorkspaceOptions {
   validate?: boolean;
 }
 
-export async function indexWorkspace(basePath: string, opts: IndexWorkspaceOptions = {}): Promise<GSDWorkspaceIndex> {
+export async function indexWorkspace(basePath: string, _opts: IndexWorkspaceOptions = {}): Promise<GSDWorkspaceIndex> {
   const milestoneIds = findMilestoneIds(basePath);
   const milestones: WorkspaceMilestoneTarget[] = [];
 

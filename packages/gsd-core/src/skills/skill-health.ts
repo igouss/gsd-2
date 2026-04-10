@@ -13,12 +13,12 @@
  * research identified as critical for skill quality.
  */
 
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
-import type { UnitMetrics, MetricsLedger } from "../reporting/metrics.js";
-import { formatCost, formatTokenCount, loadLedgerFromDisk } from "../reporting/metrics.js";
-import { getSkillLastUsed, detectStaleSkills } from "./skill-telemetry.js";
+import type { UnitMetrics } from "../reporting/metrics.ts";
+import { formatCost, formatTokenCount, loadLedgerFromDisk } from "../reporting/metrics.ts";
+import { detectStaleSkills } from "./skill-telemetry.ts";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

@@ -6,11 +6,11 @@
  */
 
 import { randomInt } from "node:crypto";
-import { logWarning } from "../workflow/workflow-logger.js";
+import { logWarning } from "../workflow/workflow-logger.ts";
 import { readdirSync, existsSync } from "node:fs";
-import { milestonesDir } from "../persistence/paths.js";
-import { loadQueueOrder, sortByQueueOrder } from "../state/queue-order.js";
-import { getErrorMessage } from "../domain/error-utils.js";
+import { milestonesDir } from "../persistence/paths.ts";
+import { loadQueueOrder, sortByQueueOrder } from "../state/queue-order.ts";
+import { getErrorMessage } from "../domain/error-utils.ts";
 
 // ─── Regex ──────────────────────────────────────────────────────────────────
 

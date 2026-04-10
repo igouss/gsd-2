@@ -1,5 +1,5 @@
-import { loadFile } from "../persistence/files.js";
-import { resolveSliceFile, resolveTaskFile, resolveTasksDir, resolveTaskFiles } from "../persistence/paths.js";
+import { loadFile } from "../persistence/files.ts";
+import { resolveSliceFile, resolveTaskFile, resolveTasksDir, resolveTaskFiles } from "../persistence/paths.ts";
 
 export interface ValidationIssue {
   severity: "info" | "warning" | "error";

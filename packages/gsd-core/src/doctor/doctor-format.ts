@@ -1,4 +1,4 @@
-import type { DoctorIssue, DoctorIssueCode, DoctorReport, DoctorSummary } from "./doctor-types.js";
+import type { DoctorIssue, DoctorIssueCode, DoctorReport, DoctorSummary } from "./doctor-types.ts";
 
 function matchesScope(unitId: string, scope?: string): boolean {
   if (!scope) return true;

@@ -2,9 +2,9 @@
 // Cross-platform desktop notifications for auto-mode events.
 
 import { execFileSync } from "node:child_process";
-import type { NotificationPreferences } from "../domain/types.js";
-import { loadEffectiveGSDPreferences } from "../preferences/preferences.js";
-import { CmuxClient, emitOsc777Notification, resolveCmuxConfig } from "../cmux/index.js";
+import type { NotificationPreferences } from "../domain/types.ts";
+import { loadEffectiveGSDPreferences } from "../preferences/preferences.ts";
+import { CmuxClient, emitOsc777Notification, resolveCmuxConfig } from "../cmux/index.ts";
 
 export type NotifyLevel = "info" | "success" | "warning" | "error";
 export type NotificationKind = "complete" | "error" | "budget" | "milestone" | "attention";

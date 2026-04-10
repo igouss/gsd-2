@@ -9,8 +9,8 @@
 // parseRoadmap(), parsePlan(), parseSummary() in files.ts.
 
 import { readFileSync, existsSync, mkdirSync } from "node:fs";
-import { logWarning } from "../workflow/workflow-logger.js";
-import { isClosedStatus } from "../domain/status-guards.js";
+import { logWarning } from "../workflow/workflow-logger.ts";
+import { isClosedStatus } from "../domain/status-guards.ts";
 import { join, relative } from "node:path";
 import { createRequire } from "node:module";
 import {
@@ -23,9 +23,9 @@ import {
   getArtifact,
   insertArtifact,
   getGateResults,
-} from "../persistence/gsd-db.js";
-import type { MilestoneRow, SliceRow, TaskRow, ArtifactRow } from "../persistence/gsd-db.js";
-import type { GateRow } from "../domain/types.js";
+} from "../persistence/gsd-db.ts";
+import type { MilestoneRow, SliceRow, TaskRow } from "../persistence/gsd-db.ts";
+import type { GateRow } from "../domain/types.ts";
 import {
   resolveMilestoneFile,
   resolveSliceFile,
@@ -34,10 +34,10 @@ import {
   gsdRoot,
   buildTaskFileName,
   buildSliceFileName,
-} from "../persistence/paths.js";
-import { saveFile, clearParseCache } from "../persistence/files.js";
-import { invalidateStateCache } from "../state/state.js";
-import { clearPathCache } from "../persistence/paths.js";
+} from "../persistence/paths.ts";
+import { saveFile, clearParseCache } from "../persistence/files.ts";
+import { invalidateStateCache } from "../state/state.ts";
+import { clearPathCache } from "../persistence/paths.ts";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
@@ -800,11 +800,11 @@ export function detectStaleRenders(basePath: string): StaleEntry[] {
   let parseRoadmap: (content: string) => { slices: Array<{ id: string; done: boolean }> };
   let parsePlan: (content: string) => { tasks: Array<{ id: string; done: boolean }> };
   try {
-    const m = _require("./parsers-legacy.ts");
+    const m = _require("../persistence/md-parsers.ts");
     parseRoadmap = m.parseRoadmap; parsePlan = m.parsePlan;
   } catch (e) {
-    logWarning("renderer", `parsers-legacy.ts require failed, falling back to .js: ${(e as Error).message}`);
-    const m = _require("./parsers-legacy.js");
+    logWarning("renderer", `md-parsers.ts require failed, falling back to .js: ${(e as Error).message}`);
+    const m = _require("../persistence/md-parsers.ts");
     parseRoadmap = m.parseRoadmap; parsePlan = m.parsePlan;
   }
 

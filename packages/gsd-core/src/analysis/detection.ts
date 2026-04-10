@@ -4,8 +4,8 @@
  * Barrel re-export. All implementation lives in detection-*.ts sub-modules.
  */
 
-export type { ProjectDetection, V1Detection, V2Detection, XcodePlatform, ProjectSignals } from "./detection-types.js";
-export { PROJECT_FILES } from "./detection-types.js";
-export { scanProjectFiles } from "./detection-markers.js";
-export { detectProjectSignals } from "./detection-signals.js";
-export { detectProjectState, detectV1Planning, hasGlobalSetup, isFirstEverLaunch } from "./detection-core.js";
+export type { ProjectDetection, V1Detection, V2Detection, XcodePlatform, ProjectSignals } from "./detection-types.ts";
+export { PROJECT_FILES } from "./detection-types.ts";
+export { scanProjectFiles } from "./detection-markers.ts";
+export { detectProjectSignals } from "./detection-signals.ts";
+export { detectProjectState, detectV1Planning, hasGlobalSetup, isFirstEverLaunch } from "./detection-core.ts";

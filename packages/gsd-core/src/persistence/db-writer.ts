@@ -8,16 +8,16 @@
 // Critical invariant: generated markdown must round-trip through
 // parseDecisionsTable() and parseRequirementsSections() with field fidelity.
 
-import { join, resolve } from 'node:path';
+import { resolve } from 'node:path';
 import { readFileSync, existsSync, statSync } from 'node:fs';
-import type { Decision, Requirement } from '../domain/types.js';
-import { resolveGsdRootFile } from './paths.js';
-import { saveFile } from './files.js';
-import { GSDError, GSD_STALE_STATE, GSD_IO_ERROR } from '../domain/errors.js';
-import { logWarning, logError } from '../workflow/workflow-logger.js';
-import { invalidateStateCache } from '../state/state.js';
-import { clearPathCache } from './paths.js';
-import { clearParseCache } from './files.js';
+import type { Decision, Requirement } from '../domain/types.ts';
+import { resolveGsdRootFile } from './paths.ts';
+import { saveFile } from './files.ts';
+import { GSDError, GSD_STALE_STATE, GSD_IO_ERROR } from '../domain/errors.ts';
+import { logWarning, logError } from '../workflow/workflow-logger.ts';
+import { invalidateStateCache } from '../state/state.ts';
+import { clearPathCache } from './paths.ts';
+import { clearParseCache } from './files.ts';
 
 // ─── Freeform Detection ───────────────────────────────────────────────────
 
@@ -208,7 +208,7 @@ export function generateRequirementsMd(requirements: Requirement[]): string {
  */
 export async function nextDecisionId(): Promise<string> {
   try {
-    const db = await import('./gsd-db.js');
+    const db = await import('./gsd-db.ts');
     const adapter = db._getAdapter();
     if (!adapter) return 'D001';
 
@@ -236,7 +236,7 @@ export async function nextDecisionId(): Promise<string> {
  */
 export async function nextRequirementId(): Promise<string> {
   try {
-    const db = await import('./gsd-db.js');
+    const db = await import('./gsd-db.ts');
     const adapter = db._getAdapter();
     if (!adapter) return 'R001';
 
@@ -283,7 +283,7 @@ export async function saveRequirementToDb(
   basePath: string,
 ): Promise<{ id: string }> {
   try {
-    const db = await import('./gsd-db.js');
+    const db = await import('./gsd-db.ts');
 
     // Atomic ID assignment + insert inside a transaction.
     const id = db.transaction(() => {
@@ -373,7 +373,7 @@ export interface SaveDecisionFields {
   rationale: string;
   revisable?: string;
   when_context?: string;
-  made_by?: import('../domain/types.js').DecisionMadeBy;
+  made_by?: import('../domain/types.ts').DecisionMadeBy;
 }
 
 /**
@@ -391,7 +391,7 @@ export async function saveDecisionToDb(
   basePath: string,
 ): Promise<{ id: string }> {
   try {
-    const db = await import('./gsd-db.js');
+    const db = await import('./gsd-db.ts');
 
     // Atomic ID assignment + insert inside a transaction to prevent
     // parallel calls from racing on the same MAX(id) value.
@@ -436,7 +436,7 @@ export async function saveDecisionToDb(
         choice: row['choice'] as string,
         rationale: row['rationale'] as string,
         revisable: row['revisable'] as string,
-        made_by: (row['made_by'] as string as import('../domain/types.js').DecisionMadeBy) ?? 'agent',
+        made_by: (row['made_by'] as string as import('../domain/types.ts').DecisionMadeBy) ?? 'agent',
         superseded_by: (row['superseded_by'] as string) ?? null,
       }));
     }
@@ -552,7 +552,7 @@ export async function updateRequirementInDb(
   basePath: string,
 ): Promise<void> {
   try {
-    const db = await import('./gsd-db.js');
+    const db = await import('./gsd-db.ts');
 
     let existing = db.getRequirementById(id);
 
@@ -565,7 +565,7 @@ export async function updateRequirementInDb(
       const reqFilePath = resolveGsdRootFile(basePath, 'REQUIREMENTS');
       try {
         const content = readFileSync(reqFilePath, 'utf-8');
-        const { parseRequirementsSections } = await import('./md-importer.js');
+        const { parseRequirementsSections } = await import('./md-importer.ts');
         const parsed = parseRequirementsSections(content);
         if (parsed.length > 0) {
           logWarning('manifest', `Seeding ${parsed.length} requirements from REQUIREMENTS.md into DB (first update triggers import)`, { fn: 'updateRequirementInDb' });
@@ -675,7 +675,7 @@ export async function saveArtifactToDb(
   basePath: string,
 ): Promise<void> {
   try {
-    const db = await import('./gsd-db.js');
+    const db = await import('./gsd-db.ts');
 
     // Guard against path traversal before any reads/writes
     const gsdDir = resolve(basePath, '.gsd');
