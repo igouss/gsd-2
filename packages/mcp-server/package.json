@@ -26,6 +26,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
     "test": "node --test dist/mcp-server.test.js"
   },
   "dependencies": {
