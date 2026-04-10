@@ -797,7 +797,8 @@ export interface StaleEntry {
 export function detectStaleRenders(basePath: string): StaleEntry[] {
   // Lazy-load parsers — intentional disk-vs-DB comparison requires parsers
   const _require = createRequire(import.meta.url);
-  let parseRoadmap: (...args: unknown[]) => unknown, parsePlan: (...args: unknown[]) => unknown;
+  let parseRoadmap: (content: string) => { slices: Array<{ id: string; done: boolean }> };
+  let parsePlan: (content: string) => { tasks: Array<{ id: string; done: boolean }> };
   try {
     const m = _require("./parsers-legacy.ts");
     parseRoadmap = m.parseRoadmap; parsePlan = m.parsePlan;

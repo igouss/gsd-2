@@ -200,7 +200,6 @@ export function getNextFallbackModel(
     return modelsToTry[0];
   }
 
-  let foundCurrent = false;
   for (let i = 0; i < modelsToTry.length; i++) {
     const mId = modelsToTry[i];
     // Check for exact match or provider/model suffix match
@@ -209,10 +208,8 @@ export function getNextFallbackModel(
     }
   }
 
-  // If the current model wasn't in our preference list, default to starting the sequence
-  if (!foundCurrent) {
-    return modelsToTry[0];
-  }
+  // Current model wasn't in our preference list — start the sequence
+  return modelsToTry[0];
 }
 
 /**
