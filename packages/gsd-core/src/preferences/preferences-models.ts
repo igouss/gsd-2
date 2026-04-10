@@ -205,7 +205,6 @@ export function getNextFallbackModel(
     const mId = modelsToTry[i];
     // Check for exact match or provider/model suffix match
     if (mId === currentModelId || (mId.includes("/") && mId.endsWith(`/${currentModelId}`))) {
-      foundCurrent = true;
       return modelsToTry[i + 1]; // Return the next one, or undefined if at the end
     }
   }

@@ -100,7 +100,7 @@ export async function atomicWriteAsyncWithOps(
   await ops.writeFile(tmpPath, content, encoding);
 
   let lastError: unknown = null;
-  let attempts = 0;
+  let attempts: number;
 
   for (attempts = 1; attempts <= MAX_RENAME_ATTEMPTS; attempts++) {
     try {
@@ -131,7 +131,7 @@ export function atomicWriteSyncWithOps(
   ops.writeFile(tmpPath, content, encoding);
 
   let lastError: unknown = null;
-  let attempts = 0;
+  let attempts: number;
 
   for (attempts = 1; attempts <= MAX_RENAME_ATTEMPTS; attempts++) {
     try {

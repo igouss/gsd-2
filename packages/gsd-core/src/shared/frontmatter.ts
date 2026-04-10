@@ -106,7 +106,6 @@ export function parseFrontmatterMap(lines: string[]): Record<string, unknown> {
   if (currentKey) {
     if (currentObj && Object.keys(currentObj).length > 0 && currentArray) {
       currentArray.push(currentObj);
-      currentObj = null;
     }
     if (currentArray) {
       result[currentKey] = currentArray;

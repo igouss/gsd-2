@@ -281,7 +281,7 @@ export function validateMigration(basePath: string): { discrepancies: string[] }
     return { discrepancies };
   }
 
-  let mdMilestoneCount = 0;
+  let mdMilestoneCount: number;
   let mdSliceCount = 0;
   let mdTaskCount = 0;
 

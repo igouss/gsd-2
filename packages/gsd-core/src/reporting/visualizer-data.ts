@@ -490,7 +490,7 @@ async function loadChangelogAndVerifications(basePath: string, milestones: Visua
       const cacheKey = `${ms.id}/${sl.id}`;
       const cached = changelogCache.get(cacheKey);
 
-      let mtime = 0;
+      let mtime: number;
       try {
         mtime = statSync(summaryFile).mtimeMs;
       } catch {

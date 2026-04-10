@@ -1499,7 +1499,7 @@ export function mergeMilestoneToMain(
   }
   milestoneTitle = milestoneTitle || milestoneId;
   const subject = `feat: ${milestoneTitle}`;
-  let body = "";
+  let body: string;
   if (completedSlices.length > 0) {
     const sliceLines = completedSlices
       .map((s) => `- ${s.id}: ${s.title}`)

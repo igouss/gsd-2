@@ -315,7 +315,6 @@ export async function deriveStateFromDb(basePath: string): Promise<GSDState> {
     const shell = firstDeferredQueuedShell;
     activeMilestone = { id: shell.id, title: shell.title };
     activeMilestoneSlices = [];
-    activeMilestoneFound = true;
     const entry = registry.find(e => e.id === shell.id);
     if (entry) entry.status = 'active';
   }
