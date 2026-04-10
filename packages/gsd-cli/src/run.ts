@@ -26,7 +26,7 @@ import {
 } from "@gsd-build/gsd-core";
 import type { ClaudeCodeAdapterOptions } from "@gsd-build/gsd-core";
 import { consoleEventSink } from "@gsd-build/gsd-tui";
-import { startMcpHost } from "./mcp-host.js";
+import { startMcpHost } from "./mcp-host.ts";
 
 // ---------------------------------------------------------------------------
 // Arg parsing
@@ -74,7 +74,6 @@ function parseArgs(): CliArgs {
       case "-h":
         printUsage();
         process.exit(0);
-        break;
       default:
         if (arg.startsWith("-")) {
           process.stderr.write(`Unknown option: ${arg}\n`);
@@ -166,7 +165,7 @@ export async function run(): Promise<void> {
   }
 
   // Run the minimal dispatch loop
-  const { minimalLoop } = await import("./minimal-loop.js");
+  const { minimalLoop } = await import("./minimal-loop.ts");
 
   try {
     // Resolve templates dir from gsd-core package
