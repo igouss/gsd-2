@@ -12,8 +12,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
+    "verbatimModuleSyntax": true,
     "declaration": true,
-    "esModuleInterop": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
     "rewriteRelativeImportExtensions": true
