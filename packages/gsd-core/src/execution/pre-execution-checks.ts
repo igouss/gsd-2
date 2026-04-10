@@ -89,7 +89,7 @@ export function extractPackageReferences(description: string): string[] {
   }
 
   // require('pkg') or import from 'pkg' in code blocks
-  const importPattern = /(?:require\s*\(\s*['"]|from\s+['"])([a-zA-Z0-9@/_-]+)['"\)]/g;
+  const importPattern = /(?:require\s*\(\s*['"]|from\s+['"])([a-zA-Z0-9@/_-]+)['")/]/g;
   let importMatch: RegExpExecArray | null;
   while ((importMatch = importPattern.exec(description)) !== null) {
     // Skip relative imports and node builtins

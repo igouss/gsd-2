@@ -229,7 +229,7 @@ function resolveTaskCountMax(contextWindow: number): number {
  */
 function splitIntoSections(content: string): string[] {
   // Match section boundaries: ### heading or --- divider at start of line
-  const pattern = /^(?=### |\-{3,}\s*$)/m;
+  const pattern = /^(?=### |-{3,}\s*$)/m;
   const parts = content.split(pattern).filter(p => p.length > 0);
   return parts;
 }

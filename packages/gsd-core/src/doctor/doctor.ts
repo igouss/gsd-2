@@ -35,7 +35,7 @@ export { computeProgressScore, computeProgressScoreWithContext, formatProgressLi
  * - "/" (forward slash, U+002F): used as the path separator in unit IDs (M001/S01)
  *   and git branch names (gsd/M001/S01). A slash in a title can break path resolution.
  */
-const TITLE_DELIMITER_RE = /[\u2014\u2013\/]/; // em dash, en dash, forward slash
+const TITLE_DELIMITER_RE = /[\u2014\u2013/]/; // em dash, en dash, forward slash
 
 /**
  * Check whether a milestone or slice title contains characters that conflict

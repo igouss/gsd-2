@@ -129,7 +129,7 @@ export class WorktreeResolver {
 
   /** Validate milestoneId to prevent path traversal. */
   private validateMilestoneId(milestoneId: string): void {
-    if (/[\/\\]|\.\./.test(milestoneId)) {
+    if (/[/\\]|\.\./.test(milestoneId)) {
       throw new Error(
         `Invalid milestoneId: ${milestoneId} — contains path separators or traversal`,
       );
