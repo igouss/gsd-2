@@ -10,7 +10,7 @@
  * pi-mono, or any MCP-capable harness) connects to this server via the
  * mcpConfigPath passed in UnitDispatchRequest.
  *
- * Tool handlers are imported from @gsd-build/gsd-core — pure functions
+ * Tool handlers are imported from @wtf-build/wtf-core — pure functions
  * with zero harness dependencies.
  */
 
@@ -61,8 +61,8 @@ function errorContent(
 }
 
 // ---------------------------------------------------------------------------
-// Imports from gsd-core — pure handler functions with zero harness deps.
-// Using static imports since gsd-core is a workspace dependency.
+// Imports from wtf-core — pure handler functions with zero harness deps.
+// Using static imports since wtf-core is a workspace dependency.
 // ---------------------------------------------------------------------------
 
 import {
@@ -88,7 +88,7 @@ import {
   nextMilestoneId,
   findMilestoneIds,
   queryJournal,
-} from '@gsd-build/gsd-core';
+} from '@wtf-build/wtf-core';
 
 // ---------------------------------------------------------------------------
 // Generic tool handler wrapper

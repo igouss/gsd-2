@@ -28,7 +28,7 @@ body:
     attributes:
       label: Summary
       description: One sentence describing what is broken.
-      placeholder: Running `/gsd inspect` reports "No GSD database available" even though `.gsd/gsd.db` exists.
+      placeholder: Running `/wtf inspect` reports "No WTF database available" even though `.wtf/wtf.db` exists.
     validations:
       required: true
 
@@ -40,7 +40,7 @@ body:
       placeholder: |
         1. Run `...`
         2. Open `...`
-        3. Execute `/gsd ...`
+        3. Execute `/wtf ...`
         4. Observe the failure
     validations:
       required: true
@@ -50,7 +50,7 @@ body:
     attributes:
       label: Expected behavior
       description: What should happen if the bug does not exist?
-      placeholder: GSD should open the existing database and continue.
+      placeholder: WTF should open the existing database and continue.
     validations:
       required: true
 
@@ -59,15 +59,15 @@ body:
     attributes:
       label: Actual behavior
       description: What happened instead, including user-visible errors.
-      placeholder: GSD exits the unit and shows an error message.
+      placeholder: WTF exits the unit and shows an error message.
     validations:
       required: true
 
   - type: input
-    id: gsd_version
+    id: wtf_version
     attributes:
-      label: GSD version
-      description: Run `gsd --version` and paste the exact version.
+      label: WTF version
+      description: Run `wtf --version` and paste the exact version.
       placeholder: "e.g. 2.33.1"
     validations:
       required: true

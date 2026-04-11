@@ -1,15 +1,15 @@
 {
-  "name": "gsd-pi",
+  "name": "wtf-pi",
   "version": "2.66.1",
   "description": "WTF — Work Then Finish coding agent",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gsd-build/gsd-2.git"
+    "url": "https://github.com/wtf-build/wtf-2.git"
   },
-  "homepage": "https://github.com/gsd-build/gsd-2#readme",
+  "homepage": "https://github.com/wtf-build/wtf-2#readme",
   "bugs": {
-    "url": "https://github.com/gsd-build/gsd-2/issues"
+    "url": "https://github.com/wtf-build/wtf-2/issues"
   },
   "type": "module",
   "workspaces": [
@@ -41,11 +41,11 @@
   },
   "packageManager": "npm@10.9.3",
   "scripts": {
-    "build:pi-tui": "npm run build -w @gsd/pi-tui",
-    "build:pi-ai": "npm run build -w @gsd/pi-ai",
-    "build:pi-agent-core": "npm run build -w @gsd/pi-agent-core",
-    "build:pi-coding-agent": "npm run build -w @gsd/pi-coding-agent",
-    "build:native-pkg": "npm run build -w @gsd/native",
+    "build:pi-tui": "npm run build -w @wtf/pi-tui",
+    "build:pi-ai": "npm run build -w @wtf/pi-ai",
+    "build:pi-agent-core": "npm run build -w @wtf/pi-agent-core",
+    "build:pi-coding-agent": "npm run build -w @wtf/pi-coding-agent",
+    "build:native-pkg": "npm run build -w @wtf/native",
     "build:pi": "npm run build:native-pkg && npm run build:pi-tui && npm run build:pi-ai && npm run build:pi-agent-core && npm run build:pi-coding-agent",
     "build": "npm run build:pi && tsc && npm run copy-resources && npm run copy-themes && npm run copy-export-html && node scripts/build-web-if-stale.cjs",
     "stage:web-host": "node scripts/stage-web-standalone.cjs",
@@ -89,8 +89,8 @@
     "release:changelog": "node scripts/generate-changelog.mjs",
     "release:bump": "node scripts/bump-version.mjs",
     "release:update-changelog": "node scripts/update-changelog.mjs",
-    "docker:build-runtime": "docker build --target runtime -t ghcr.io/gsd-build/gsd-pi .",
-    "docker:build-builder": "docker build --target builder -t ghcr.io/gsd-build/gsd-ci-builder .",
+    "docker:build-runtime": "docker build --target runtime -t ghcr.io/wtf-build/wtf-pi .",
+    "docker:build-builder": "docker build --target builder -t ghcr.io/wtf-build/wtf-ci-builder .",
     "prepublishOnly": "npm run sync-pkg-version && npm run sync-platform-versions && ([ \"$CI\" = 'true' ] || git diff --exit-code || (echo 'ERROR: version sync changed files — commit them before publishing' && exit 1)) && npm run build && npm run typecheck && npm run validate-pack",
     "test:live-regression": "node --experimental-strip-types tests/live-regression/run.ts"
   },
@@ -148,11 +148,11 @@
   },
   "optionalDependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.83",
-    "@gsd-build/engine-darwin-arm64": ">=2.10.2",
-    "@gsd-build/engine-darwin-x64": ">=2.10.2",
-    "@gsd-build/engine-linux-arm64-gnu": ">=2.10.2",
-    "@gsd-build/engine-linux-x64-gnu": ">=2.10.2",
-    "@gsd-build/engine-win32-x64-msvc": ">=2.10.2",
+    "@wtf-build/engine-darwin-arm64": ">=2.10.2",
+    "@wtf-build/engine-darwin-x64": ">=2.10.2",
+    "@wtf-build/engine-linux-arm64-gnu": ">=2.10.2",
+    "@wtf-build/engine-linux-x64-gnu": ">=2.10.2",
+    "@wtf-build/engine-win32-x64-msvc": ">=2.10.2",
     "fsevents": "~2.3.3",
     "koffi": "^2.9.0"
   },

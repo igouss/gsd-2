@@ -352,12 +352,12 @@ npm install --quiet 2>/dev/null
 git add -A
 git commit -m "Add .wtf project state" --quiet
 
-# ── 4. Build gsd-cli if needed ────────────────────────────────────────────────
-echo "→ Ensuring gsd-cli is built..."
+# ── 4. Build wtf-cli if needed ────────────────────────────────────────────────
+echo "→ Ensuring wtf-cli is built..."
 cd "$REPO_ROOT"
-if [[ ! -f packages/gsd-cli/dist/run.js ]]; then
-  npm run -w packages/gsd-core build --quiet
-  npm run -w packages/gsd-cli build --quiet
+if [[ ! -f packages/wtf-cli/dist/run.js ]]; then
+  npm run -w packages/wtf-core build --quiet
+  npm run -w packages/wtf-cli build --quiet
 fi
 
 # ── 5. Run wtf-run with timeout ───────────────────────────────────────────────
@@ -365,7 +365,7 @@ echo ""
 echo "=== Starting wtf-run (timeout: ${TIMEOUT}s) ==="
 echo ""
 
-WTF_RUN="$REPO_ROOT/packages/gsd-cli/dist/run.js"
+WTF_RUN="$REPO_ROOT/packages/wtf-cli/dist/run.js"
 
 set +e
 timeout "${TIMEOUT}s" node "$WTF_RUN" "$PROJECT_DIR" \

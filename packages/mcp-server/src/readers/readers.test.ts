@@ -14,7 +14,7 @@ import { readHistory } from './metrics.ts';
 import { readCaptures } from './captures.ts';
 import { readKnowledge } from './knowledge.ts';
 import { runDoctorLite } from './doctor-lite.ts';
-import { PROJECT_DIR_NAME } from "@gsd-build/gsd-core";
+import { PROJECT_DIR_NAME } from "@wtf-build/wtf-core";
 
 // ---------------------------------------------------------------------------
 // Test fixture helpers

@@ -1,12 +1,12 @@
 {
-  "name": "@wtf-build/mcp-server",
-  "version": "2.52.0",
-  "description": "MCP server exposing WTF orchestration tools for Claude Code, Cursor, and other MCP clients",
+  "name": "@wtf-build/wtf-tui",
+  "version": "0.1.0",
+  "description": "WTF terminal UI — console event sink and terminal output",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/wtf-build/wtf-2.git",
-    "directory": "packages/mcp-server"
+    "directory": "packages/wtf-tui"
   },
   "publishConfig": {
     "access": "public"
@@ -20,20 +20,12 @@
       "import": "./dist/index.js"
     }
   },
-  "bin": {
-    "wtf-mcp-server": "./dist/cli.js",
-    "wtf-unit-tools": "./dist/unit-tools-cli.js"
-  },
   "scripts": {
     "build": "tsc",
-    "typecheck": "tsc --noEmit",
-    "test": "node --test dist/mcp-server.test.js"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.27.1",
-    "@wtf-build/wtf-core": "^0.1.0",
-    "@wtf-build/rpc-client": "^2.52.0",
-    "zod": "^4.0.0"
+    "@wtf-build/wtf-core": "^0.1.0"
   },
   "devDependencies": {
     "@types/node": "^24.12.0",

@@ -1,16 +1,16 @@
-# @gsd-build/mcp-server
+# @wtf-build/mcp-server
 
 MCP server that gives executing agents access to WTF state-mutation tools. Runs inside the orchestrator process over SSE — single DB connection, no locking issues.
 
 ## Usage
 
 ```typescript
-import { createUnitToolsServer } from "@gsd-build/mcp-server";
+import { createUnitToolsServer } from "@wtf-build/mcp-server";
 
 const { server } = await createUnitToolsServer("/path/to/project");
 
 // Wire to an HTTP server with SSE transport
-// See gsd-cli/src/mcp-host.ts for the full example
+// See wtf-cli/src/mcp-host.ts for the full example
 ```
 
 The orchestrator generates an MCP config for the harness:
@@ -68,10 +68,10 @@ The orchestrator generates an MCP config for the harness:
 
 ## Architecture
 
-All tool handlers are pure functions imported from `@gsd-build/gsd-core`. The MCP server is a thin wrapper that exposes them over the Model Context Protocol.
+All tool handlers are pure functions imported from `@wtf-build/wtf-core`. The MCP server is a thin wrapper that exposes them over the Model Context Protocol.
 
 ```
-gsd-cli (orchestrator)
+wtf-cli (orchestrator)
   │
   ├─ starts HTTP server on random local port
   ├─ creates MCP server via createUnitToolsServer(projectDir)
@@ -81,7 +81,7 @@ gsd-cli (orchestrator)
        │
        └─ agent calls wtf_task_complete, wtf_plan_slice, etc.
             │
-            └─ SSE → orchestrator process → gsd-core handlers → .wtf/ DB + filesystem
+            └─ SSE → orchestrator process → wtf-core handlers → .wtf/ DB + filesystem
 ```
 
 ## License

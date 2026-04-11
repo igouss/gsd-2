@@ -1,12 +1,12 @@
 {
-  "name": "@wtf-build/mcp-server",
-  "version": "2.52.0",
-  "description": "MCP server exposing WTF orchestration tools for Claude Code, Cursor, and other MCP clients",
+  "name": "@wtf-build/wtf-cli",
+  "version": "0.1.0",
+  "description": "WTF standalone CLI — runs WTF orchestrator with Claude Code or any harness",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/wtf-build/wtf-2.git",
-    "directory": "packages/mcp-server"
+    "directory": "packages/wtf-cli"
   },
   "publishConfig": {
     "access": "public"
@@ -21,19 +21,16 @@
     }
   },
   "bin": {
-    "wtf-mcp-server": "./dist/cli.js",
-    "wtf-unit-tools": "./dist/unit-tools-cli.js"
+    "wtf-run": "./dist/run.js"
   },
   "scripts": {
     "build": "tsc",
-    "typecheck": "tsc --noEmit",
-    "test": "node --test dist/mcp-server.test.js"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.27.1",
     "@wtf-build/wtf-core": "^0.1.0",
-    "@wtf-build/rpc-client": "^2.52.0",
-    "zod": "^4.0.0"
+    "@wtf-build/wtf-tui": "^0.1.0",
+    "@wtf-build/mcp-server": "^2.52.0"
   },
   "devDependencies": {
     "@types/node": "^24.12.0",

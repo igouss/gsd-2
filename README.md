@@ -636,13 +636,13 @@ WTF is a TypeScript monorepo with four packages:
 
 ```
 packages/
-  gsd-cli/       CLI binary — loader, headless mode, onboarding, resource sync
-  gsd-core/      Harness-agnostic orchestration engine (the brain)
-  gsd-tui/       Terminal UI overlay and dashboard
+  wtf-cli/       CLI binary — loader, headless mode, onboarding, resource sync
+  wtf-core/      Harness-agnostic orchestration engine (the brain)
+  wtf-tui/       Terminal UI overlay and dashboard
   mcp-server/    MCP server exposing WTF tools to external integrations
 ```
 
-### gsd-cli — The Shell
+### wtf-cli — The Shell
 
 ```
 wtf (CLI binary)
@@ -661,12 +661,12 @@ wtf (CLI binary)
               └─ WTF-WORKFLOW.md    Manual bootstrap protocol
 ```
 
-### gsd-core — The Brain
+### wtf-core — The Brain
 
 Harness-agnostic orchestration engine. The directory structure screams what the system does:
 
 ```
-packages/gsd-core/src/
+packages/wtf-core/src/
   auto/              Autonomous execution engine — loop, dispatch, recovery, worktrees
   doctor/            Health diagnostics and self-healing
   execution/         Execution policies, pre/post checks, lifecycle hooks
@@ -762,8 +762,8 @@ Use expensive models where quality matters (planning, complex execution) and che
 
 ## Star History
 
-<a href="https://star-history.com/#gsd-build/gsd-2&Date">
-  <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=gsd-build/gsd-2&type=Date" />
+<a href="https://star-history.com/#wtf-build/wtf-2&Date">
+  <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=wtf-build/wtf-2&type=Date" />
 </a>
 
 ---
