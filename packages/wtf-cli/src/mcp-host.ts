@@ -11,8 +11,8 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
 import type { OrchestratorEventSink } from "@igouss/wtf-core";
-
-const MCP_PKG = "@modelcontextprotocol/sdk";
+import { createUnitToolsServer } from "@igouss/mcp-server";
+import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 
 export interface McpHostResult {
   /** URL for the SSE endpoint (e.g. "http://localhost:3456/sse") */
@@ -34,10 +34,6 @@ export async function startMcpHost(
   configDir: string,
   events: OrchestratorEventSink,
 ): Promise<McpHostResult> {
-  // Dynamic imports — same pattern as mcp-server package
-  const { createUnitToolsServer } = await import("@igouss/mcp-server");
-  const sseMod = await import(`${MCP_PKG}/server/sse.js`);
-  const SSEServerTransport = sseMod.SSEServerTransport;
 
   // Create the MCP server with all tools
   const { server: mcpServer } = await createUnitToolsServer(projectDir);

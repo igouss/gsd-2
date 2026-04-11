@@ -12,6 +12,11 @@ import { ensureGitignore } from "../git/gitignore.ts";
 import { readAllSessionStatuses, isSessionStale, removeSessionStatus } from "../session/session-status-io.ts";
 import { recoverFailedMigration } from "../persistence/migrate-external.ts";
 import { PROJECT_DIR_NAME } from "../domain/constants.ts";
+import { splitCompletedKey } from "../session/forensics.ts";
+import { verifyExpectedArtifact } from "../auto/auto-recovery.ts";
+import { clearPersistedHookState } from "../execution/post-unit-hooks.ts";
+import { pruneActivityLogs } from "../auto/activity-log.ts";
+import { pruneMetricsLedger } from "../reporting/metrics.ts";
 
 export async function checkRuntimeHealth(
   basePath: string,
@@ -121,13 +126,11 @@ export async function checkRuntimeHealth(
       for (const key of keys) {
         // Key format: "unitType/unitId" e.g. "execute-task/M001/S01/T01"
         // Hook units have compound types: "hook/<hookName>/unitId"
-        const { splitCompletedKey } = await import("../session/forensics.ts");
         const parsed = splitCompletedKey(key);
         if (!parsed) continue;
         const { unitType, unitId } = parsed;
 
         // Only validate artifact-producing unit types
-        const { verifyExpectedArtifact } = await import("../auto/auto-recovery.ts");
         if (!verifyExpectedArtifact(unitType, unitId, basePath)) {
           orphaned.push(key);
         }
@@ -182,7 +185,6 @@ export async function checkRuntimeHealth(
           });
 
           if (shouldFix("stale_hook_state")) {
-            const { clearPersistedHookState } = await import("../execution/post-unit-hooks.ts");
             clearPersistedHookState(basePath);
             fixesApplied.push("cleared stale hook-state.json");
           }
@@ -223,7 +225,6 @@ export async function checkRuntimeHealth(
         });
 
         if (shouldFix("activity_log_bloat")) {
-          const { pruneActivityLogs } = await import("../auto/activity-log.ts");
           pruneActivityLogs(activityDir, 7); // 7-day retention
           fixesApplied.push("pruned activity logs (7-day retention)");
         }
@@ -475,7 +476,6 @@ export async function checkRuntimeHealth(
             fixable: true,
           });
           if (shouldFix("metrics_ledger_bloat")) {
-            const { pruneMetricsLedger } = await import("../reporting/metrics.ts");
             const removed = pruneMetricsLedger(basePath, 1500);
             fixesApplied.push(`pruned metrics ledger: removed ${removed} oldest entries (${parsed.units.length - removed} remain)`);
           }

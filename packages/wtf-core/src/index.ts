@@ -68,7 +68,7 @@ export { queryJournal } from "./persistence/journal.ts";
 export { PROJECT_DIR_NAME } from "./domain/constants.ts";
 
 // Types
-export type { CompleteTaskParams, CompleteSliceParams } from "./domain/types.ts";
+export type { CompleteTaskParams, CompleteSliceParams } from "./tools/tool-params.types.ts";
 
 // Adapters
 export { ClaudeCodeAdapter } from "./adapters/claude-code.ts";

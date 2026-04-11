@@ -13,6 +13,8 @@ import type {
 import { BUDGET_THRESHOLDS } from "../types.ts";
 import { debugLog } from "../../reporting/debug-logger.ts";
 import { basename } from "node:path";
+import { loadStopCaptures, markCaptureExecuted } from "../captures.ts";
+import { executeBacktrack } from "../triage-resolution.ts";
 
 /**
  * Phase 2: Guards — stop directives, budget ceiling, context window, secrets re-check.
@@ -26,7 +28,6 @@ export async function runGuards(
 
   // ── Stop/Backtrack directive guard (#3487) ──
   try {
-    const { loadStopCaptures, markCaptureExecuted } = await import("../captures.ts");
     const stopCaptures = loadStopCaptures(s.basePath);
     if (stopCaptures.length > 0) {
       const first = stopCaptures[0]!;
@@ -47,7 +48,6 @@ export async function runGuards(
       // For backtrack captures, write the backtrack trigger after pausing
       if (isBacktrack) {
         try {
-          const { executeBacktrack } = await import("../triage-resolution.ts");
           executeBacktrack(s.basePath, mid, first);
         } catch (e) {
           debugLog("guards", { phase: "backtrack-execution-error", error: String(e) });

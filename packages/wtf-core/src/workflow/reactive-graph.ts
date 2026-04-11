@@ -13,7 +13,7 @@ import type { TaskIO, DerivedTaskNode, ReactiveExecutionState } from "../domain/
 import { loadFile, parseTaskPlanIO } from "../persistence/files.ts";
 import { isDbAvailable, getSliceTasks } from "../persistence/wtf-db.ts";
 import { parsePlan } from "../persistence/md-parsers.ts";
-import { resolveTasksDir, resolveTaskFiles } from "../persistence/paths.ts";
+import { resolveTasksDir, resolveTaskFiles, resolveSliceFile } from "../persistence/paths.ts";
 import { join } from "node:path";
 import { loadJsonFileOrNull, saveJsonFile } from "../persistence/json-persistence.ts";
 import { existsSync, unlinkSync } from "node:fs";
@@ -204,7 +204,6 @@ export async function loadSliceTaskIO(
   mid: string,
   sid: string,
 ): Promise<TaskIO[]> {
-  const { resolveSliceFile } = await import("../persistence/paths.ts");
   const slicePlanPath = resolveSliceFile(basePath, mid, sid, "PLAN");
   const planContent = slicePlanPath ? await loadFile(slicePlanPath) : null;
   if (!planContent) return [];

@@ -7,6 +7,9 @@
 import type { AutoSession } from "../session.ts";
 import type { CoreLoopDeps } from "../loop-deps.ts";
 import { basename } from "node:path";
+import { loadVisualizerData } from "../../reporting/visualizer-data.ts";
+import { generateHtmlReport } from "../../reporting/export-html.ts";
+import { writeReportSnapshot } from "../../reporting/reports.ts";
 
 /**
  * Resolve the base path for milestone reports.
@@ -26,10 +29,6 @@ export async function generateMilestoneReport(
   deps: CoreLoopDeps,
   milestoneId: string,
 ): Promise<void> {
-  const { loadVisualizerData } = await import("../../reporting/visualizer-data.ts");
-  const { generateHtmlReport } = await import("../../reporting/export-html.ts");
-  const { writeReportSnapshot } = await import("../../reporting/reports.ts");
-
   const reportBasePath = _resolveReportBasePath(s);
 
   const snapData = await loadVisualizerData(reportBasePath);

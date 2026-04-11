@@ -6,7 +6,7 @@
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import type { Decision, Requirement } from '../domain/types.ts';
+import type { Decision, Requirement, RequirementStatus, RequirementClass } from '../domain/types.ts';
 import {
   upsertDecision,
   upsertRequirement,
@@ -112,7 +112,7 @@ export function parseDecisionsTable(content: string): Omit<Decision, 'seq'>[] {
 
 // ─── REQUIREMENTS.md Parser ────────────────────────────────────────────────
 
-const STATUS_SECTIONS: Record<string, string> = {
+const STATUS_SECTIONS: Record<string, RequirementStatus> = {
   '## active': 'active',
   '## validated': 'validated',
   '## deferred': 'deferred',
@@ -128,7 +128,7 @@ export function parseRequirementsSections(content: string): Requirement[] {
   const lines = content.split('\n');
   const results: Requirement[] = [];
 
-  let currentSectionStatus: string | null = null;
+  let currentSectionStatus: RequirementStatus | null = null;
   let currentReq: Partial<Requirement> | null = null;
   let currentFullContentLines: string[] = [];
 
@@ -137,8 +137,8 @@ export function parseRequirementsSections(content: string): Requirement[] {
       currentReq.full_content = currentFullContentLines.join('\n').trim();
       results.push({
         id: currentReq.id!,
-        class: currentReq.class ?? '',
-        status: currentReq.status ?? currentSectionStatus ?? '',
+        class: (currentReq.class ?? '') as RequirementClass | "",
+        status: (currentReq.status ?? currentSectionStatus ?? 'active') as RequirementStatus,
         description: currentReq.description ?? '',
         why: currentReq.why ?? '',
         source: currentReq.source ?? '',
@@ -199,11 +199,11 @@ export function parseRequirementsSections(content: string): Requirement[] {
 
         switch (fieldName) {
           case 'class':
-            currentReq.class = value;
+            currentReq.class = value as RequirementClass | "";
             break;
           case 'status':
             // Bullet status takes precedence over section heading
-            currentReq.status = value;
+            currentReq.status = value as RequirementStatus;
             break;
           case 'description':
             currentReq.description = value;

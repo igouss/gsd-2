@@ -21,6 +21,8 @@ import { logWarning } from "../../workflow/workflow-logger.ts";
 import { verifyExpectedArtifact } from "../auto-recovery.ts";
 import { writeUnitRuntimeRecord } from "../../state/unit-runtime.ts";
 import { createCheckpoint, cleanupCheckpoint, rollbackToCheckpoint, resolveSafetyHarnessConfig } from "../../safety/safety-harness.ts";
+import { inlineWtfRootFile } from "../../prompt/auto-prompts.ts";
+import { writePhaseAnchor } from "../../execution/phase-anchor.ts";
 
 /**
  * Phase 4: Unit execution — dispatch prompt, await result, closeout, artifact verify.
@@ -164,7 +166,6 @@ export async function runUnitPhase(
   s.lastBaselineCharCount = undefined;
   if (deps.isDbAvailable()) {
     try {
-      const { inlineWtfRootFile } = await import("../../prompt/auto-prompts.ts");
       const [decisionsContent, requirementsContent, projectContent] =
         await Promise.all([
           inlineWtfRootFile(s.basePath, "decisions.md", "Decisions"),
@@ -398,7 +399,6 @@ export async function runUnitPhase(
   const anchorPhases = new Set(["research-milestone", "research-slice", "plan-milestone", "plan-slice"]);
   if (artifactVerified && mid && anchorPhases.has(unitType)) {
     try {
-      const { writePhaseAnchor } = await import("../../execution/phase-anchor.ts");
       writePhaseAnchor(s.basePath, mid, {
         phase: unitType,
         milestoneId: mid,

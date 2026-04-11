@@ -20,6 +20,7 @@
 
 import { resolve } from "node:path";
 import { existsSync } from "node:fs";
+import { createRequire } from "node:module";
 
 import {
   ClaudeCodeAdapter,
@@ -28,6 +29,7 @@ import {
 import type { ClaudeCodeAdapterOptions } from "@igouss/wtf-core";
 import { consoleEventSink } from "@igouss/wtf-tui";
 import { startMcpHost } from "./mcp-host.ts";
+import { minimalLoop } from "./minimal-loop.ts";
 
 // ---------------------------------------------------------------------------
 // Arg parsing
@@ -166,11 +168,8 @@ export async function run(): Promise<void> {
   }
 
   // Run the minimal dispatch loop
-  const { minimalLoop } = await import("./minimal-loop.ts");
-
   try {
     // Resolve templates dir from wtf-core package
-    const { createRequire } = await import("node:module");
     const require_ = createRequire(import.meta.url);
     const wtfCorePkg = require_.resolve("@igouss/wtf-core/package.json");
     const templatesDir = resolve(wtfCorePkg, "..", "dist", "templates");

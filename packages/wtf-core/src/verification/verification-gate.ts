@@ -9,6 +9,8 @@ import { join, basename } from "node:path";
 import type { AuditWarning, RuntimeError, VerificationCheck, VerificationResult } from "../domain/types.ts";
 import { DEFAULT_COMMAND_TIMEOUT_MS } from "../domain/constants.ts";
 import { rewriteCommandWithRtk } from "../shared/rtk.ts";
+import { processes as bgShellProcesses } from "../bg-shell/process-manager.ts";
+import { getConsoleLogs as getBrowserConsoleLogs } from "../browser-tools/state.ts";
 
 /** Maximum bytes of stdout/stderr to retain per command (10 KB). */
 const MAX_OUTPUT_BYTES = 10 * 1024;
@@ -348,8 +350,7 @@ export async function captureRuntimeErrors(
     if (options?.getProcesses) {
       processes = options.getProcesses();
     } else {
-      const mod = await import("../bg-shell/process-manager.ts");
-      processes = mod.processes;
+      processes = bgShellProcesses;
     }
 
     for (const [id, raw] of processes) {
@@ -424,8 +425,7 @@ export async function captureRuntimeErrors(
     if (options?.getConsoleLogs) {
       logs = options.getConsoleLogs();
     } else {
-      const mod = await import("../browser-tools/state.ts");
-      logs = mod.getConsoleLogs();
+      logs = getBrowserConsoleLogs();
     }
 
     for (const entry of logs) {

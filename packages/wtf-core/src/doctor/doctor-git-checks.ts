@@ -7,7 +7,7 @@ import { parseRoadmap } from "../persistence/md-parsers.ts";
 import { isDbAvailable, getMilestoneSlices } from "../persistence/wtf-db.ts";
 import { resolveMilestoneFile } from "../persistence/paths.ts";
 import { deriveState, isMilestoneComplete } from "../state/state.ts";
-import { listWorktrees, resolveGitDir, worktreesDir } from "../git/worktree-manager.ts";
+import { listWorktrees, resolveGitDir, worktreesDir, removeWorktree } from "../git/worktree-manager.ts";
 import { abortAndReset } from "../git/git-self-heal.ts";
 import { RUNTIME_EXCLUSION_PATHS, resolveMilestoneIntegrationBranch, writeIntegrationBranch } from "../git/git-service.ts";
 import { nativeIsRepo, nativeWorktreeList, nativeWorktreeRemove, nativeBranchList, nativeBranchDelete, nativeLsFiles, nativeRmCached, nativeHasChanges, nativeLastCommitEpoch, nativeGetCurrentBranch, nativeAddTracked, nativeCommit } from "../git/native-git-bridge.ts";
@@ -436,7 +436,6 @@ export async function checkGitHealth(
 
         if (health.safeToRemove && shouldFix("worktree_branch_merged") && !isCwd) {
           try {
-            const { removeWorktree } = await import("../git/worktree-manager.ts");
             removeWorktree(basePath, wt.name, { deleteBranch: true, branch: wt.branch });
             fixesApplied.push(`removed merged worktree "${wt.name}" and deleted branch ${wt.branch}`);
           } catch {

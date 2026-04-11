@@ -11,7 +11,7 @@
 
 import type { WTFState } from "../domain/types.ts";
 import type { WTFPreferences } from "../preferences/preferences.ts";
-import { loadFile, extractUatType, loadActiveOverrides } from "../persistence/files.ts";
+import { loadFile, extractUatType, loadActiveOverrides, resolveAllOverrides } from "../persistence/files.ts";
 import { isDbAvailable, getMilestoneSlices, getPendingGates, markAllGatesOmitted, getMilestone } from "../persistence/wtf-db.ts";
 import { extractVerdict, isAcceptableUatVerdict } from "../analysis/verdict-parser.ts";
 
@@ -29,6 +29,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { logWarning, logError } from "../workflow/workflow-logger.ts";
 import { join } from "node:path";
 import { hasImplementationArtifacts } from "./auto-recovery.ts";
+import { loadSliceTaskIO, deriveTaskGraph, isGraphAmbiguous, getReadyTasks, chooseNonConflictingSubset, graphMetrics, saveReactiveState } from "../workflow/reactive-graph.ts";
 import {
   buildDiscussMilestonePrompt,
   buildResearchMilestonePrompt,
@@ -188,7 +189,6 @@ export const DISPATCH_RULES: DispatchRule[] = [
       if (pendingOverrides.length === 0) return null;
       const count = getRewriteCount(basePath);
       if (count >= MAX_REWRITE_ATTEMPTS) {
-        const { resolveAllOverrides } = await import("../persistence/files.ts");
         await resolveAllOverrides(basePath);
         setRewriteCount(basePath, 0);
         return null;
@@ -547,15 +547,6 @@ export const DISPATCH_RULES: DispatchRule[] = [
       if (maxParallel <= 1) return null;
 
       try {
-        const {
-          loadSliceTaskIO,
-          deriveTaskGraph,
-          isGraphAmbiguous,
-          getReadyTasks,
-          chooseNonConflictingSubset,
-          graphMetrics,
-        } = await import("../workflow/reactive-graph.ts");
-
         const taskIO = await loadSliceTaskIO(basePath, mid, sid);
         if (taskIO.length < 2) return null; // single task, no point
 
@@ -587,7 +578,6 @@ export const DISPATCH_RULES: DispatchRule[] = [
 
         // Persist dispatched batch so verification and recovery can check
         // exactly which tasks were sent.
-        const { saveReactiveState } = await import("../workflow/reactive-graph.ts");
         saveReactiveState(basePath, mid, sid, {
           sliceId: sid,
           completed: [...completed],

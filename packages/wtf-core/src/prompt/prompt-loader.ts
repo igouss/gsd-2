@@ -26,31 +26,28 @@ import { logWarning } from "../workflow/workflow-logger.ts";
 import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 /**
- * Resolve the WTF extension directory.
+ * Resolve the dist root (package's dist/ directory).
  *
- * `import.meta.url` resolves to whichever copy of this module is executing.
- * On Windows (npm global install via MSYS2 / Git Bash) this can resolve to
- * the npm-global `AppData/Roaming/npm/…` path, which does NOT contain the
- * prompts/ and templates/ subtrees that initResources() copies to
- * `~/.wtf/agent/extensions/wtf/`. Detect the mismatch and fall back to
- * the user-local agent directory.
+ * Resources (prompts/, templates/) live at the dist root, separate from
+ * compiled code subdirectories. This module lives at dist/prompt/, so the
+ * dist root is one level up.
  */
-function resolveExtensionDir(): string {
+function resolveDistRoot(): string {
   const moduleDir = dirname(fileURLToPath(import.meta.url));
-  if (existsSync(join(moduleDir, "prompts"))) return moduleDir;
+  const distRoot = join(moduleDir, "..");
+  if (existsSync(join(distRoot, "prompts"))) return distRoot;
 
   // Fallback: user-local agent directory
   const wtfHome = process.env.WTF_HOME || join(homedir(), PROJECT_DIR_NAME);
   const agentWtfDir = join(wtfHome, "agent", "extensions", "wtf");
   if (existsSync(join(agentWtfDir, "prompts"))) return agentWtfDir;
 
-  // Last resort: return the module dir (warmCache will silently handle the miss)
-  return moduleDir;
+  return distRoot;
 }
 
-const __extensionDir = resolveExtensionDir();
-const promptsDir = join(__extensionDir, "prompts");
-const templatesDir = join(__extensionDir, "templates");
+const __distRoot = resolveDistRoot();
+const promptsDir = join(__distRoot, "prompts");
+const templatesDir = join(__distRoot, "templates");
 
 /**
  * Return the resolved templates directory path for use in prompts.

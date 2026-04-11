@@ -10,7 +10,7 @@
 import { join } from "node:path";
 import { mkdirSync } from "node:fs";
 
-import type { CompleteTaskParams } from "../domain/types.ts";
+import type { CompleteTaskParams } from "./tool-params.types.ts";
 import { isClosedStatus } from "../domain/status-guards.ts";
 import {
   transaction,

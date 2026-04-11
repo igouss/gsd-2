@@ -40,6 +40,13 @@ import { isDbAvailable, getMilestoneSlices } from "../persistence/wtf-db.ts";
 import { resetEvidence } from "../safety/evidence-collector.ts";
 import { createCheckpoint, cleanupCheckpoint, rollbackToCheckpoint } from "../safety/git-checkpoint.ts";
 import { resolveSafetyHarnessConfig } from "../safety/safety-harness.ts";
+import { loadVisualizerData } from "../reporting/visualizer-data.ts";
+import { generateHtmlReport } from "../reporting/export-html.ts";
+import { writeReportSnapshot } from "../reporting/reports.ts";
+import { loadStopCaptures, markCaptureExecuted } from "./captures.ts";
+import { executeBacktrack } from "./triage-resolution.ts";
+import { inlineWtfRootFile } from "../prompt/auto-prompts.ts";
+import { writePhaseAnchor } from "../execution/phase-anchor.ts";
 
 // ─── generateMilestoneReport ──────────────────────────────────────────────────
 
@@ -72,10 +79,6 @@ async function generateMilestoneReport(
   deps: CoreLoopDeps,
   milestoneId: string,
 ): Promise<void> {
-  const { loadVisualizerData } = await import("../reporting/visualizer-data.ts");
-  const { generateHtmlReport } = await import("../reporting/export-html.ts");
-  const { writeReportSnapshot } = await import("../reporting/reports.ts");
-
   const reportBasePath = _resolveReportBasePath(s);
 
   const snapData = await loadVisualizerData(reportBasePath);
@@ -756,7 +759,6 @@ export async function runGuards(
 
   // ── Stop/Backtrack directive guard (#3487) ──
   try {
-    const { loadStopCaptures, markCaptureExecuted } = await import("./captures.ts");
     const stopCaptures = loadStopCaptures(s.basePath);
     if (stopCaptures.length > 0) {
       const first = stopCaptures[0]!;
@@ -777,7 +779,6 @@ export async function runGuards(
       // For backtrack captures, write the backtrack trigger after pausing
       if (isBacktrack) {
         try {
-          const { executeBacktrack } = await import("./triage-resolution.ts");
           executeBacktrack(s.basePath, mid, first);
         } catch (e) {
           debugLog("guards", { phase: "backtrack-execution-error", error: String(e) });
@@ -1052,7 +1053,6 @@ export async function runUnitPhase(
   s.lastBaselineCharCount = undefined;
   if (deps.isDbAvailable()) {
     try {
-      const { inlineWtfRootFile } = await import("../prompt/auto-prompts.ts");
       const [decisionsContent, requirementsContent, projectContent] =
         await Promise.all([
           inlineWtfRootFile(s.basePath, "decisions.md", "Decisions"),
@@ -1286,7 +1286,6 @@ export async function runUnitPhase(
   const anchorPhases = new Set(["research-milestone", "research-slice", "plan-milestone", "plan-slice"]);
   if (artifactVerified && mid && anchorPhases.has(unitType)) {
     try {
-      const { writePhaseAnchor } = await import("../execution/phase-anchor.ts");
       writePhaseAnchor(s.basePath, mid, {
         phase: unitType,
         milestoneId: mid,

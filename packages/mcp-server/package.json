@@ -32,7 +32,6 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",
     "@igouss/wtf-core": "^0.1.0",
-    "@igouss/rpc-client": "^2.52.0",
     "zod": "^4.0.0"
   },
   "devDependencies": {

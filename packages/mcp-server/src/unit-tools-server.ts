@@ -15,29 +15,17 @@
  */
 
 import { z } from 'zod';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { readProgress } from './readers/state.ts';
+import { readRoadmap } from './readers/roadmap.ts';
+import { readKnowledge } from './readers/knowledge.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
-const MCP_PKG = '@modelcontextprotocol/sdk';
 const SERVER_NAME = 'wtf-unit-tools';
 const SERVER_VERSION = '0.1.0';
-
-// ---------------------------------------------------------------------------
-// MCP Server type (same as server.ts — dynamic import workaround)
-// ---------------------------------------------------------------------------
-
-interface McpServerInstance {
-  tool(
-    name: string,
-    description: string,
-    params: Record<string, unknown>,
-    handler: (args: Record<string, unknown>) => Promise<unknown>,
-  ): unknown;
-  connect(transport: unknown): Promise<void>;
-  close(): Promise<void>;
-}
 
 // ---------------------------------------------------------------------------
 // Tool result helpers
@@ -94,13 +82,14 @@ import {
 // Generic tool handler wrapper
 // ---------------------------------------------------------------------------
 
-type ToolHandler = (args: Record<string, unknown>) => Promise<unknown>;
+type ToolResult = { content: Array<{ type: 'text'; text: string }>; isError?: true };
+type ToolHandler = (args: Record<string, unknown>) => Promise<ToolResult>;
 
 function wrapHandler(
   projectDir: string,
   fn: (args: Record<string, unknown>, basePath: string) => Promise<unknown>,
 ): ToolHandler {
-  return async (args: Record<string, unknown>) => {
+  return async (args: Record<string, unknown>): Promise<ToolResult> => {
     try {
       const result = await fn(args, projectDir);
       if (result && typeof result === 'object' && 'error' in result) {
@@ -124,17 +113,12 @@ function wrapHandler(
  * directory. This is the server that executing agents connect to via mcpConfigPath.
  */
 export async function createUnitToolsServer(projectDir: string): Promise<{
-  server: McpServerInstance;
+  server: InstanceType<typeof McpServer>;
 }> {
-  const mcpMod = await import(`${MCP_PKG}/server/mcp.js`);
-  const McpServer = mcpMod.McpServer;
-
-  const server: McpServerInstance = new McpServer(
+  const server = new McpServer(
     { name: SERVER_NAME, version: SERVER_VERSION },
     { capabilities: { tools: {} } },
   );
-
-  // Static imports — no lazy loading needed
 
   // =====================================================================
   // Shared schemas (reused by aliases)
@@ -513,7 +497,6 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
     },
     async () => {
       try {
-        const { readProgress } = await import('./readers/state.ts');
         const result = await readProgress(projectDir);
         return jsonContent(result);
       } catch (err) {
@@ -530,7 +513,6 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
     },
     async () => {
       try {
-        const { readRoadmap } = await import('./readers/roadmap.ts');
         const result = await readRoadmap(projectDir);
         return jsonContent(result);
       } catch (err) {
@@ -547,7 +529,6 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
     },
     async () => {
       try {
-        const { readKnowledge } = await import('./readers/knowledge.ts');
         const result = await readKnowledge(projectDir);
         return jsonContent(result);
       } catch (err) {

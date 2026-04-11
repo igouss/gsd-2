@@ -5,7 +5,8 @@
 // All functions degrade gracefully: return empty results when DB unavailable, never throw.
 
 import { isDbAvailable, _getAdapter } from './wtf-db.ts';
-import type { Decision, Requirement } from '../domain/types.ts';
+import type { Decision, Requirement, RequirementClass, RequirementStatus } from '../domain/types.ts';
+import { extractAllSections } from './files.ts';
 
 // ─── Query Functions ───────────────────────────────────────────────────────
 
@@ -108,8 +109,8 @@ export function queryRequirements(opts?: RequirementQueryOpts): Requirement[] {
 
     return rows.map(row => ({
       id: row['id'] as string,
-      class: row['class'] as string,
-      status: row['status'] as string,
+      class: row['class'] as RequirementClass | "",
+      status: row['status'] as RequirementStatus,
       description: row['description'] as string,
       why: row['why'] as string,
       source: row['source'] as string,
@@ -224,9 +225,6 @@ export function queryProject(): string | null {
  */
 export async function queryKnowledge(content: string, keywords: string[]): Promise<string> {
   if (!content || keywords.length === 0) return '';
-
-  // Lazy import to avoid circular dependency
-  const { extractAllSections } = await import('./files.ts');
 
   const sections = extractAllSections(content, 2);
   if (sections.size === 0) return '';

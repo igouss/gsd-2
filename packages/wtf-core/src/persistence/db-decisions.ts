@@ -1,6 +1,6 @@
 // WTF Database — Decision + Requirement CRUD
 
-import type { Decision, Requirement } from "../domain/types.ts";
+import type { Decision, Requirement, RequirementClass, RequirementStatus } from "../domain/types.ts";
 import { WTFError, WTF_STALE_STATE } from "../domain/errors.ts";
 import { _getCurrentDb } from "./db-core.ts";
 
@@ -11,8 +11,8 @@ export function getRequirementById(id: string): Requirement | null {
   if (!row) return null;
   return {
     id: row["id"] as string,
-    class: row["class"] as string,
-    status: row["status"] as string,
+    class: row["class"] as RequirementClass | "",
+    status: row["status"] as RequirementStatus,
     description: row["description"] as string,
     why: row["why"] as string,
     source: row["source"] as string,

@@ -10,8 +10,7 @@
  */
 
 import { createUnitToolsServer } from './unit-tools-server.ts';
-
-const MCP_PKG = '@modelcontextprotocol/sdk';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 
 function parseArgs(): { projectDir: string } {
   const args = process.argv.slice(2);
@@ -30,7 +29,6 @@ async function main(): Promise<void> {
 
   const { server } = await createUnitToolsServer(projectDir);
 
-  const { StdioServerTransport } = await import(`${MCP_PKG}/server/stdio.js`);
   const transport = new StdioServerTransport();
 
   let cleaningUp = false;

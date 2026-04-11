@@ -10,7 +10,7 @@
 import { join } from "node:path";
 import { mkdirSync } from "node:fs";
 
-import type { CompleteSliceParams } from "../domain/types.ts";
+import type { CompleteSliceParams } from "./tool-params.types.ts";
 import { isClosedStatus } from "../domain/status-guards.ts";
 import {
   transaction,

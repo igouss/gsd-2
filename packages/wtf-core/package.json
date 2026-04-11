@@ -26,9 +26,13 @@
     "build": "tsc && cp -r src/templates dist/templates && cp -r src/prompts dist/prompts",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {},
+  "dependencies": {
+    "yaml": "^2.8.2",
+    "proper-lockfile": "^4.1.2"
+  },
   "devDependencies": {
     "@types/node": "^24.12.0",
+    "@types/proper-lockfile": "^4.1.4",
     "typescript": "^5.4.0"
   },
   "engines": {

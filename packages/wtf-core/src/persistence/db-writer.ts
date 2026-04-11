@@ -10,7 +10,7 @@
 
 import { resolve } from 'node:path';
 import { readFileSync, existsSync, statSync } from 'node:fs';
-import type { Decision, Requirement } from '../domain/types.ts';
+import type { Decision, Requirement, RequirementClass, RequirementStatus } from '../domain/types.ts';
 import { resolveWtfRootFile } from './paths.ts';
 import { saveFile } from './files.ts';
 import { WTFError, WTF_STALE_STATE, WTF_IO_ERROR } from '../domain/errors.ts';
@@ -19,6 +19,8 @@ import { invalidateStateCache } from '../state/state.ts';
 import { clearPathCache } from './paths.ts';
 import { clearParseCache } from './files.ts';
 import { PROJECT_DIR_NAME } from "../domain/constants.ts";
+import { _getAdapter, transaction, upsertRequirement, upsertDecision, updateSliceStatus, getRequirementById, insertArtifact } from './wtf-db.ts';
+import { parseRequirementsSections } from './md-importer.ts';
 
 // ─── Freeform Detection ───────────────────────────────────────────────────
 
@@ -209,8 +211,7 @@ export function generateRequirementsMd(requirements: Requirement[]): string {
  */
 export async function nextDecisionId(): Promise<string> {
   try {
-    const db = await import('./wtf-db.ts');
-    const adapter = db._getAdapter();
+    const adapter = _getAdapter();
     if (!adapter) return 'D001';
 
     const row = adapter
@@ -237,8 +238,7 @@ export async function nextDecisionId(): Promise<string> {
  */
 export async function nextRequirementId(): Promise<string> {
   try {
-    const db = await import('./wtf-db.ts');
-    const adapter = db._getAdapter();
+    const adapter = _getAdapter();
     if (!adapter) return 'R001';
 
     const row = adapter
@@ -259,8 +259,8 @@ export async function nextRequirementId(): Promise<string> {
 // ─── Save Requirement to DB + Regenerate Markdown ────────────────────────
 
 export interface SaveRequirementFields {
-  class: string;
-  status?: string;
+  class: RequirementClass | "";
+  status?: RequirementStatus;
   description: string;
   why: string;
   source: string;
@@ -284,11 +284,11 @@ export async function saveRequirementToDb(
   basePath: string,
 ): Promise<{ id: string }> {
   try {
-    const db = await import('./wtf-db.ts');
+
 
     // Atomic ID assignment + insert inside a transaction.
-    const id = db.transaction(() => {
-      const adapter = db._getAdapter();
+    const id = transaction(() => {
+      const adapter = _getAdapter();
       if (!adapter) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
 
       const row = adapter
@@ -314,19 +314,19 @@ export async function saveRequirementToDb(
         superseded_by: null,
       };
 
-      db.upsertRequirement(requirement);
+      upsertRequirement(requirement);
       return nextId;
     });
 
     // Fetch all requirements for full file regeneration
-    const adapter = db._getAdapter();
+    const adapter = _getAdapter();
     let allRequirements: Requirement[] = [];
     if (adapter) {
       const rows = adapter.prepare('SELECT * FROM requirements ORDER BY id').all();
       allRequirements = rows.map(row => ({
         id: row['id'] as string,
-        class: row['class'] as string,
-        status: row['status'] as string,
+        class: row['class'] as RequirementClass | "",
+        status: row['status'] as RequirementStatus,
         description: row['description'] as string,
         why: row['why'] as string,
         source: row['source'] as string,
@@ -347,7 +347,7 @@ export async function saveRequirementToDb(
     } catch (diskErr) {
       logError('manifest', 'disk write failed, rolling back DB row', { fn: 'saveRequirementToDb', error: String((diskErr as Error).message) });
       try {
-        const rollbackAdapter = db._getAdapter();
+        const rollbackAdapter = _getAdapter();
         rollbackAdapter?.prepare('DELETE FROM requirements WHERE id = :id').run({ ':id': id });
       } catch (rollbackErr) {
         logError('manifest', 'SPLIT BRAIN: disk write failed AND DB rollback failed — DB has orphaned row', { fn: 'saveRequirementToDb', id, error: String((rollbackErr as Error).message) });
@@ -392,12 +392,12 @@ export async function saveDecisionToDb(
   basePath: string,
 ): Promise<{ id: string }> {
   try {
-    const db = await import('./wtf-db.ts');
+
 
     // Atomic ID assignment + insert inside a transaction to prevent
     // parallel calls from racing on the same MAX(id) value.
-    const id = db.transaction(() => {
-      const adapter = db._getAdapter();
+    const id = transaction(() => {
+      const adapter = _getAdapter();
       if (!adapter) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
 
       const row = adapter
@@ -408,7 +408,7 @@ export async function saveDecisionToDb(
         ? 'D001'
         : `D${String(maxNum + 1).padStart(3, '0')}`;
 
-      db.upsertDecision({
+      upsertDecision({
         id: nextId,
         when_context: fields.when_context ?? '',
         scope: fields.scope,
@@ -424,7 +424,7 @@ export async function saveDecisionToDb(
     });
 
     // Fetch all decisions (including superseded for the full register)
-    const adapter = db._getAdapter();
+    const adapter = _getAdapter();
     let allDecisions: Decision[] = [];
     if (adapter) {
       const rows = adapter.prepare('SELECT * FROM decisions ORDER BY seq').all();
@@ -485,7 +485,7 @@ export async function saveDecisionToDb(
     try {
       const sliceRef = extractDeferredSliceRef(fields);
       if (sliceRef) {
-        db.updateSliceStatus(sliceRef.milestoneId, sliceRef.sliceId, 'deferred');
+        updateSliceStatus(sliceRef.milestoneId, sliceRef.sliceId, 'deferred');
       }
     } catch (deferErr) {
       // Non-fatal — log but don't fail the decision save
@@ -553,9 +553,9 @@ export async function updateRequirementInDb(
   basePath: string,
 ): Promise<void> {
   try {
-    const db = await import('./wtf-db.ts');
 
-    let existing = db.getRequirementById(id);
+
+    let existing = getRequirementById(id);
 
     // If requirement doesn't exist in DB, seed the entire requirements table
     // from REQUIREMENTS.md first (#3346). This handles the standard workflow
@@ -566,18 +566,17 @@ export async function updateRequirementInDb(
       const reqFilePath = resolveWtfRootFile(basePath, 'REQUIREMENTS');
       try {
         const content = readFileSync(reqFilePath, 'utf-8');
-        const { parseRequirementsSections } = await import('./md-importer.ts');
         const parsed = parseRequirementsSections(content);
         if (parsed.length > 0) {
           logWarning('manifest', `Seeding ${parsed.length} requirements from REQUIREMENTS.md into DB (first update triggers import)`, { fn: 'updateRequirementInDb' });
           for (const req of parsed) {
             // Only seed if not already in DB (avoid overwriting concurrent inserts)
-            if (!db.getRequirementById(req.id)) {
-              db.upsertRequirement(req);
+            if (!getRequirementById(req.id)) {
+              upsertRequirement(req);
             }
           }
           // Re-check after seeding
-          existing = db.getRequirementById(id);
+          existing = getRequirementById(id);
         }
       } catch {
         // REQUIREMENTS.md missing or unparseable — fall through to skeleton
@@ -606,17 +605,17 @@ export async function updateRequirementInDb(
       id: base.id, // ID cannot be changed
     };
 
-    db.upsertRequirement(merged);
+    upsertRequirement(merged);
 
     // Fetch ALL requirements (including superseded) for full file regeneration
-    const adapter = db._getAdapter();
+    const adapter = _getAdapter();
     let allRequirements: Requirement[] = [];
     if (adapter) {
       const rows = adapter.prepare('SELECT * FROM requirements ORDER BY id').all();
       allRequirements = rows.map(row => ({
         id: row['id'] as string,
-        class: row['class'] as string,
-        status: row['status'] as string,
+        class: row['class'] as RequirementClass | "",
+        status: row['status'] as RequirementStatus,
         description: row['description'] as string,
         why: row['why'] as string,
         source: row['source'] as string,
@@ -640,7 +639,7 @@ export async function updateRequirementInDb(
     } catch (diskErr) {
       logError('manifest', 'disk write failed, reverting DB row', { fn: 'updateRequirementInDb', error: String((diskErr as Error).message) });
       if (existing) {
-        db.upsertRequirement(existing);
+        upsertRequirement(existing);
       }
       throw diskErr;
     }
@@ -676,7 +675,7 @@ export async function saveArtifactToDb(
   basePath: string,
 ): Promise<void> {
   try {
-    const db = await import('./wtf-db.ts');
+
 
     // Guard against path traversal before any reads/writes
     const wtfDir = resolve(basePath, PROJECT_DIR_NAME);
@@ -700,7 +699,7 @@ export async function saveArtifactToDb(
       }
     }
 
-    db.insertArtifact({
+    insertArtifact({
       path: opts.path,
       artifact_type: opts.artifact_type,
       milestone_id: opts.milestone_id ?? null,
@@ -715,7 +714,7 @@ export async function saveArtifactToDb(
         await saveFile(fullPath, opts.content);
       } catch (diskErr) {
         logError('manifest', 'disk write failed, rolling back DB row', { fn: 'saveArtifactToDb', error: String((diskErr as Error).message) });
-        const rollbackAdapter = db._getAdapter();
+        const rollbackAdapter = _getAdapter();
         rollbackAdapter?.prepare('DELETE FROM artifacts WHERE path = :path').run({ ':path': opts.path });
         throw diskErr;
       }
