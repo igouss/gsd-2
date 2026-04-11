@@ -77,6 +77,7 @@ function parseArgs(): CliArgs {
       case "-h":
         printUsage();
         process.exit(0);
+        break; // unreachable, but satisfies no-fallthrough
       default:
         if (arg.startsWith("-")) {
           process.stderr.write(`Unknown option: ${arg}\n`);
