@@ -6,31 +6,31 @@
 # Last matching rule wins.
 
 # Default: maintainers review everything not explicitly matched below
-*                                   @wtf-build/maintainers
+*                                   @igouss/maintainers
 
 # Core agent orchestration — RFC required, senior review only
-packages/pi-agent-core/             @wtf-build/maintainers
-src/resources/extensions/wtf/       @wtf-build/maintainers
+packages/pi-agent-core/             @igouss/maintainers
+src/resources/extensions/wtf/       @igouss/maintainers
 
 # AI/LLM provider integrations
-packages/pi-ai/                     @wtf-build/maintainers
+packages/pi-ai/                     @igouss/maintainers
 
 # Terminal UI
-packages/pi-tui/                    @wtf-build/maintainers
+packages/pi-tui/                    @igouss/maintainers
 
 # Native bindings — platform-specific, needs careful review
-native/                             @wtf-build/maintainers
+native/                             @igouss/maintainers
 
 # CI/CD and release pipeline — high blast radius
-.github/                            @wtf-build/maintainers
-scripts/                            @wtf-build/maintainers
-Dockerfile                          @wtf-build/maintainers
+.github/                            @igouss/maintainers
+scripts/                            @igouss/maintainers
+Dockerfile                          @igouss/maintainers
 
 # Security-sensitive files — always require maintainer sign-off
-.secretscanignore                   @wtf-build/maintainers
-scripts/secret-scan.sh              @wtf-build/maintainers
-scripts/install-hooks.sh            @wtf-build/maintainers
+.secretscanignore                   @igouss/maintainers
+scripts/secret-scan.sh              @igouss/maintainers
+scripts/install-hooks.sh            @igouss/maintainers
 
 # Contributor-facing docs — keep accurate, maintainers approve
-CONTRIBUTING.md                     @wtf-build/maintainers
-VISION.md                           @wtf-build/maintainers
+CONTRIBUTING.md                     @igouss/maintainers
+VISION.md                           @igouss/maintainers

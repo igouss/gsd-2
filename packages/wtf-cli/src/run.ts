@@ -24,9 +24,9 @@ import { existsSync } from "node:fs";
 import {
   ClaudeCodeAdapter,
   PROJECT_DIR_NAME,
-} from "@wtf-build/wtf-core";
-import type { ClaudeCodeAdapterOptions } from "@wtf-build/wtf-core";
-import { consoleEventSink } from "@wtf-build/wtf-tui";
+} from "@igouss/wtf-core";
+import type { ClaudeCodeAdapterOptions } from "@igouss/wtf-core";
+import { consoleEventSink } from "@igouss/wtf-tui";
 import { startMcpHost } from "./mcp-host.ts";
 
 // ---------------------------------------------------------------------------
@@ -172,7 +172,7 @@ export async function run(): Promise<void> {
     // Resolve templates dir from wtf-core package
     const { createRequire } = await import("node:module");
     const require_ = createRequire(import.meta.url);
-    const wtfCorePkg = require_.resolve("@wtf-build/wtf-core/package.json");
+    const wtfCorePkg = require_.resolve("@igouss/wtf-core/package.json");
     const templatesDir = resolve(wtfCorePkg, "..", "dist", "templates");
 
     await minimalLoop({

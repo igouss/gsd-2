@@ -1,5 +1,5 @@
 /**
- * @wtf-build/wtf-core — Harness-agnostic WTF orchestration engine.
+ * @igouss/wtf-core — Harness-agnostic WTF orchestration engine.
  *
  * This package contains the core orchestration logic: auto-loop, state machine,
  * dispatch, prompt building, DB, journal, recovery — everything that does NOT

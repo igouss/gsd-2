@@ -9,7 +9,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { scanSkills, defaultSkillDirs, buildSkillsTable } from "./skills-loader.ts";
-import { PROJECT_DIR_NAME } from "@wtf-build/wtf-core";
+import { PROJECT_DIR_NAME } from "@igouss/wtf-core";
 
 export interface SystemPromptOptions {
   /** Path to wtf-core templates directory */

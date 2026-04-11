@@ -1,11 +1,11 @@
-# @wtf-build/mcp-server
+# @igouss/mcp-server
 
 MCP server that gives executing agents access to WTF state-mutation tools. Runs inside the orchestrator process over SSE — single DB connection, no locking issues.
 
 ## Usage
 
 ```typescript
-import { createUnitToolsServer } from "@wtf-build/mcp-server";
+import { createUnitToolsServer } from "@igouss/mcp-server";
 
 const { server } = await createUnitToolsServer("/path/to/project");
 
@@ -68,7 +68,7 @@ The orchestrator generates an MCP config for the harness:
 
 ## Architecture
 
-All tool handlers are pure functions imported from `@wtf-build/wtf-core`. The MCP server is a thin wrapper that exposes them over the Model Context Protocol.
+All tool handlers are pure functions imported from `@igouss/wtf-core`. The MCP server is a thin wrapper that exposes them over the Model Context Protocol.
 
 ```
 wtf-cli (orchestrator)

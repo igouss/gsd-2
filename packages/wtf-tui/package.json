@@ -1,11 +1,11 @@
 {
-  "name": "@wtf-build/wtf-tui",
+  "name": "@igouss/wtf-tui",
   "version": "0.1.0",
   "description": "WTF terminal UI — console event sink and terminal output",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wtf-build/wtf-3.git",
+    "url": "https://github.com/igouss/wtf-3.git",
     "directory": "packages/wtf-tui"
   },
   "publishConfig": {
@@ -25,7 +25,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@wtf-build/wtf-core": "^0.1.0"
+    "@igouss/wtf-core": "^0.1.0"
   },
   "devDependencies": {
     "@types/node": "^24.12.0",

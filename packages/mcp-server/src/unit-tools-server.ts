@@ -10,7 +10,7 @@
  * pi-mono, or any MCP-capable harness) connects to this server via the
  * mcpConfigPath passed in UnitDispatchRequest.
  *
- * Tool handlers are imported from @wtf-build/wtf-core — pure functions
+ * Tool handlers are imported from @igouss/wtf-core — pure functions
  * with zero harness dependencies.
  */
 
@@ -88,7 +88,7 @@ import {
   nextMilestoneId,
   findMilestoneIds,
   queryJournal,
-} from '@wtf-build/wtf-core';
+} from '@igouss/wtf-core';
 
 // ---------------------------------------------------------------------------
 // Generic tool handler wrapper

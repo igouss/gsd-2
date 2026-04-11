@@ -1,11 +1,11 @@
 {
-  "name": "@wtf-build/wtf-cli",
+  "name": "@igouss/wtf-cli",
   "version": "0.1.0",
   "description": "WTF standalone CLI — runs WTF orchestrator with Claude Code or any harness",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wtf-build/wtf-3.git",
+    "url": "https://github.com/igouss/wtf-3.git",
     "directory": "packages/wtf-cli"
   },
   "publishConfig": {
@@ -28,9 +28,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@wtf-build/wtf-core": "^0.1.0",
-    "@wtf-build/wtf-tui": "^0.1.0",
-    "@wtf-build/mcp-server": "^2.52.0"
+    "@igouss/wtf-core": "^0.1.0",
+    "@igouss/wtf-tui": "^0.1.0",
+    "@igouss/mcp-server": "^2.52.0"
   },
   "devDependencies": {
     "@types/node": "^24.12.0",

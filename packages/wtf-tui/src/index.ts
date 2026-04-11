@@ -1,5 +1,5 @@
 /**
- * @wtf-build/wtf-tui — Terminal UI for WTF.
+ * @igouss/wtf-tui — Terminal UI for WTF.
  *
  * Console event sink, terminal rendering, and any future
  * interactive terminal UI components.

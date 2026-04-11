@@ -9,7 +9,7 @@
  * sink to the orchestrator.
  */
 
-import type { OrchestratorEventSink } from "@wtf-build/wtf-core";
+import type { OrchestratorEventSink } from "@igouss/wtf-core";
 
 const LEVEL_PREFIX: Record<string, string> = {
   info:    "\x1b[36m[info]\x1b[0m",    // cyan

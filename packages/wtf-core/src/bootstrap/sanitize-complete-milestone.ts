@@ -8,7 +8,7 @@
  * boolean true, etc.  This sanitizer normalizes all fields so
  * handleCompleteMilestone never crashes on type mismatches.
  *
- * See: https://github.com/wtf-build/wtf-3/issues/3013
+ * See: https://github.com/igouss/wtf-3/issues/3013
  */
 
 import type { CompleteMilestoneParams } from "../tools/complete-milestone.ts";

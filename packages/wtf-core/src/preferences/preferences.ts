@@ -233,7 +233,7 @@ export function parsePreferencesMarkdown(content: string): WTFPreferences | null
     _warnedUnrecognizedFormat = true;
     console.warn(
       "[WTF] Warning: preferences file has unrecognized format — content does not use YAML frontmatter delimiters (---). " +
-      "Wrap your preferences in --- fences. See https://github.com/wtf-build/wtf-3/issues/2036",
+      "Wrap your preferences in --- fences. See https://github.com/igouss/wtf-3/issues/2036",
     );
   }
   return null;

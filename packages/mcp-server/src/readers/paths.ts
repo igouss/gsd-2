@@ -4,7 +4,7 @@
 import { existsSync, statSync, readdirSync } from 'node:fs';
 import { join, resolve, dirname, basename } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { PROJECT_DIR_NAME } from "@wtf-build/wtf-core";
+import { PROJECT_DIR_NAME } from "@igouss/wtf-core";
 
 /**
  * Resolve the .wtf/ root directory for a project.

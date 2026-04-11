@@ -1,8 +1,8 @@
 /**
- * @wtf-build/mcp-server — MCP server exposing WTF state-mutation tools.
+ * @igouss/mcp-server — MCP server exposing WTF state-mutation tools.
  *
  * The interactive session server (SessionManager, createMcpServer) depends on
- * @wtf-build/rpc-client which is not available in this repo. Those modules
+ * @igouss/rpc-client which is not available in this repo. Those modules
  * have been removed. This package now exports only the unit-tools server
  * and read-only state readers.
  */

@@ -14,7 +14,7 @@ import type {
   HarnessAdapter,
   OrchestratorEventSink,
   UnitDispatchResult,
-} from "@wtf-build/wtf-core";
+} from "@igouss/wtf-core";
 
 import {
   deriveState,
@@ -29,7 +29,7 @@ import {
   acquireSessionLock,
   releaseSessionLock,
   PROJECT_DIR_NAME,
-} from "@wtf-build/wtf-core";
+} from "@igouss/wtf-core";
 
 import { buildSystemPrompt, buildProjectContext } from "./system-prompt.ts";
 

@@ -10,7 +10,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
-import type { OrchestratorEventSink } from "@wtf-build/wtf-core";
+import type { OrchestratorEventSink } from "@igouss/wtf-core";
 
 const MCP_PKG = "@modelcontextprotocol/sdk";
 
@@ -35,7 +35,7 @@ export async function startMcpHost(
   events: OrchestratorEventSink,
 ): Promise<McpHostResult> {
   // Dynamic imports — same pattern as mcp-server package
-  const { createUnitToolsServer } = await import("@wtf-build/mcp-server");
+  const { createUnitToolsServer } = await import("@igouss/mcp-server");
   const sseMod = await import(`${MCP_PKG}/server/sse.js`);
   const SSEServerTransport = sseMod.SSEServerTransport;
 

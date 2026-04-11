@@ -1,11 +1,11 @@
 {
-  "name": "@wtf-build/wtf-core",
+  "name": "@igouss/wtf-core",
   "version": "0.1.0",
   "description": "WTF orchestration core — harness-agnostic task execution engine",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wtf-build/wtf-3.git",
+    "url": "https://github.com/igouss/wtf-3.git",
     "directory": "packages/wtf-core"
   },
   "publishConfig": {

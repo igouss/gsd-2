@@ -2,11 +2,11 @@
 
 # WTF 2
 
-**The evolution of [Work Then Finish](https://github.com/wtf-build/get-shit-done) — now a real coding agent.**
+**The evolution of [Work Then Finish](https://github.com/igouss/get-shit-done) — now a real coding agent.**
 
 [![npm version](https://img.shields.io/npm/v/wtf-pi?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/wtf-pi)
 [![npm downloads](https://img.shields.io/npm/dm/wtf-pi?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/wtf-pi)
-[![GitHub stars](https://img.shields.io/github/stars/wtf-build/WTF-2?style=for-the-badge&logo=github&color=181717)](https://github.com/wtf-build/WTF-2)
+[![GitHub stars](https://img.shields.io/github/stars/igouss/WTF-2?style=for-the-badge&logo=github&color=181717)](https://github.com/igouss/WTF-2)
 [![Discord](https://img.shields.io/badge/Discord-Join%20us-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/invite/nKXTsAcmbT)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 [![$WTF Token](https://img.shields.io/badge/$WTF-Dexscreener-1C1C1C?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iIzAwRkYwMCIvPjwvc3ZnPg==&logoColor=00FF00)](https://dexscreener.com/solana/dwudwjvan7bzkw9zwlbyv6kspdlvhwzrqy6ebk8xzxkv)
@@ -762,8 +762,8 @@ Use expensive models where quality matters (planning, complex execution) and che
 
 ## Star History
 
-<a href="https://star-history.com/#wtf-build/wtf-3&Date">
-  <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=wtf-build/wtf-3&type=Date" />
+<a href="https://star-history.com/#igouss/wtf-3&Date">
+  <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=igouss/wtf-3&type=Date" />
 </a>
 
 ---

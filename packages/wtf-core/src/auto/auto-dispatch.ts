@@ -117,7 +117,7 @@ const MAX_REWRITE_ATTEMPTS = 3;
 // ─── Disk-persisted rewrite attempt counter ──────────────────────────────────
 // The counter must survive session restarts (crash recovery, pause/resume,
 // step-mode). Storing it on the in-memory session object caused the circuit
-// breaker to never trip — see https://github.com/wtf-build/wtf-3/issues/2203
+// breaker to never trip — see https://github.com/igouss/wtf-3/issues/2203
 function rewriteCountPath(basePath: string): string {
   return join(wtfRoot(basePath), "runtime", "rewrite-count.json");
 }
@@ -170,7 +170,7 @@ export function incrementUatCount(basePath: string, mid: string, sid: string): n
  * operational verification is needed.  Covers common phrasings the planning
  * agent may use: "None", "None required", "N/A", "Not applicable", etc.
  *
- * @see https://github.com/wtf-build/wtf-3/issues/2931
+ * @see https://github.com/igouss/wtf-3/issues/2931
  */
 export function isVerificationNotApplicable(value: string): boolean {
   const v = (value ?? "").toLowerCase().trim().replace(/[.\s]+$/, "");

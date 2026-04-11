@@ -20,7 +20,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
-      image: ghcr.io/wtf-build/wtf-ci-builder:latest
+      image: ghcr.io/igouss/wtf-ci-builder:latest
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
@@ -127,11 +127,11 @@ jobs:
           DEV_VERSION: ${{ needs.dev-publish.outputs.dev-version }}
         run: |
           docker build --target runtime \
-            -t "ghcr.io/wtf-build/wtf-pi:next" \
-            -t "ghcr.io/wtf-build/wtf-pi:${DEV_VERSION}" \
+            -t "ghcr.io/igouss/wtf-pi:next" \
+            -t "ghcr.io/igouss/wtf-pi:${DEV_VERSION}" \
             .
-          docker push ghcr.io/wtf-build/wtf-pi:next
-          docker push "ghcr.io/wtf-build/wtf-pi:${DEV_VERSION}"
+          docker push ghcr.io/igouss/wtf-pi:next
+          docker push "ghcr.io/igouss/wtf-pi:${DEV_VERSION}"
 
   prod-release:
     name: Production Release
@@ -241,9 +241,9 @@ jobs:
         env:
           DEV_VERSION: ${{ needs.dev-publish.outputs.dev-version }}
         run: |
-          docker pull "ghcr.io/wtf-build/wtf-pi:${DEV_VERSION}"
-          docker tag "ghcr.io/wtf-build/wtf-pi:${DEV_VERSION}" ghcr.io/wtf-build/wtf-pi:latest
-          docker push ghcr.io/wtf-build/wtf-pi:latest
+          docker pull "ghcr.io/igouss/wtf-pi:${DEV_VERSION}"
+          docker tag "ghcr.io/igouss/wtf-pi:${DEV_VERSION}" ghcr.io/igouss/wtf-pi:latest
+          docker push ghcr.io/igouss/wtf-pi:latest
 
   update-builder:
     name: Update CI Builder Image
@@ -274,6 +274,6 @@ jobs:
         if: steps.check.outputs.changed == 'true'
         run: |
           docker build --target builder \
-            -t ghcr.io/wtf-build/wtf-ci-builder:latest \
+            -t ghcr.io/igouss/wtf-ci-builder:latest \
             .
-          docker push ghcr.io/wtf-build/wtf-ci-builder:latest
+          docker push ghcr.io/igouss/wtf-ci-builder:latest

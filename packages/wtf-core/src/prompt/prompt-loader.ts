@@ -146,7 +146,7 @@ export function loadPrompt(name: string, vars: Record<string, string> = {}): str
   for (const [key, value] of Object.entries(effectiveVars)) {
     // Use split/join instead of replaceAll to avoid JavaScript's special
     // replacement patterns ($', $`, $&) being interpreted in the value.
-    // See: https://github.com/wtf-build/wtf-3/issues/2968
+    // See: https://github.com/igouss/wtf-3/issues/2968
     content = content.split(`{{${key}}}`).join(value);
   }
 
