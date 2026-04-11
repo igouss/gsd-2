@@ -1,8 +1,8 @@
 /**
- * Validation logic for GSD preferences.
+ * Validation logic for WTF preferences.
  *
  * Pure validation -- no filesystem access, no loading, no merging.
- * Accepts a raw GSDPreferences object and returns a sanitized copy
+ * Accepts a raw WTFPreferences object and returns a sanitized copy
  * together with any errors and warnings.
  */
 
@@ -18,23 +18,23 @@ import {
 
   SKILL_ACTIONS,
   type WorkflowMode,
-  type GSDPreferences,
-  type GSDSkillRule,
+  type WTFPreferences,
+  type WTFSkillRule,
 } from "./preferences-types.ts";
 
 const VALID_TOKEN_PROFILES = new Set<TokenProfile>(["budget", "balanced", "quality"]);
 
-export function validatePreferences(preferences: GSDPreferences): {
-  preferences: GSDPreferences;
+export function validatePreferences(preferences: WTFPreferences): {
+  preferences: WTFPreferences;
   errors: string[];
   warnings: string[];
 } {
   const errors: string[] = [];
   const warnings: string[] = [];
-  const validated: GSDPreferences = {};
+  const validated: WTFPreferences = {};
 
   // ─── Unknown Key Detection ──────────────────────────────────────────
-  // Common key migration hints for pi-level settings that don't map to GSD prefs
+  // Common key migration hints for pi-level settings that don't map to WTF prefs
   const KEY_MIGRATION_HINTS: Record<string, string> = {
     taskIsolation: 'use "git.isolation" instead (values: worktree, branch, none)',
     task_isolation: 'use "git.isolation" instead (values: worktree, branch, none)',
@@ -97,7 +97,7 @@ export function validatePreferences(preferences: GSDPreferences): {
   validated.custom_instructions = normalizeStringArray(preferences.custom_instructions);
 
   if (preferences.skill_rules) {
-    const validRules: GSDSkillRule[] = [];
+    const validRules: WTFSkillRule[] = [];
     for (const rule of preferences.skill_rules) {
       if (!rule || typeof rule !== "object") {
         errors.push("invalid skill_rules entry");
@@ -108,11 +108,11 @@ export function validatePreferences(preferences: GSDPreferences): {
         errors.push("skill_rules entry missing when");
         continue;
       }
-      const validatedRule: GSDSkillRule = { when };
+      const validatedRule: WTFSkillRule = { when };
       for (const action of SKILL_ACTIONS) {
         const values = normalizeStringArray((rule as unknown as Record<string, unknown>)[action]);
         if (values.length > 0) {
-          validatedRule[action as keyof GSDSkillRule] = values as never;
+          validatedRule[action as keyof WTFSkillRule] = values as never;
         }
       }
       if (!validatedRule.use && !validatedRule.prefer && !validatedRule.avoid) {
@@ -174,7 +174,7 @@ export function validatePreferences(preferences: GSDPreferences): {
   if (preferences.search_provider !== undefined) {
     const validSearchProviders = new Set(["brave", "tavily", "ollama", "native", "auto"]);
     if (typeof preferences.search_provider === "string" && validSearchProviders.has(preferences.search_provider)) {
-      validated.search_provider = preferences.search_provider as GSDPreferences["search_provider"];
+      validated.search_provider = preferences.search_provider as WTFPreferences["search_provider"];
     } else {
       errors.push(`search_provider must be one of: brave, tavily, ollama, native, auto`);
     }
@@ -247,7 +247,7 @@ export function validatePreferences(preferences: GSDPreferences): {
   if (preferences.cmux !== undefined) {
     if (preferences.cmux && typeof preferences.cmux === "object") {
       const cmux = preferences.cmux as Record<string, unknown>;
-      const validatedCmux: NonNullable<GSDPreferences["cmux"]> = {};
+      const validatedCmux: NonNullable<WTFPreferences["cmux"]> = {};
       if (cmux.enabled !== undefined) validatedCmux.enabled = !!cmux.enabled;
       if (cmux.notifications !== undefined) validatedCmux.notifications = !!cmux.notifications;
       if (cmux.sidebar !== undefined) validatedCmux.sidebar = !!cmux.sidebar;
@@ -726,7 +726,7 @@ export function validatePreferences(preferences: GSDPreferences): {
       }
     }
     if (g.commit_docs !== undefined) {
-      warnings.push("git.commit_docs is deprecated — .gsd/ is managed externally and always gitignored. Remove this setting.");
+      warnings.push("git.commit_docs is deprecated — .wtf/ is managed externally and always gitignored. Remove this setting.");
     }
     if (g.manage_gitignore !== undefined) {
       if (typeof g.manage_gitignore === "boolean") git.manage_gitignore = g.manage_gitignore;
@@ -782,7 +782,7 @@ export function validatePreferences(preferences: GSDPreferences): {
   if (preferences.context_selection !== undefined) {
     const validModes = new Set(["full", "smart"]);
     if (typeof preferences.context_selection === "string" && validModes.has(preferences.context_selection)) {
-      validated.context_selection = preferences.context_selection as GSDPreferences["context_selection"];
+      validated.context_selection = preferences.context_selection as WTFPreferences["context_selection"];
     } else {
       errors.push(`context_selection must be one of: full, smart`);
     }
@@ -973,7 +973,7 @@ export function validatePreferences(preferences: GSDPreferences): {
   if (preferences.discuss_depth !== undefined) {
     const validDepths = new Set(["quick", "standard", "thorough"]);
     if (typeof preferences.discuss_depth === "string" && validDepths.has(preferences.discuss_depth)) {
-      validated.discuss_depth = preferences.discuss_depth as GSDPreferences["discuss_depth"];
+      validated.discuss_depth = preferences.discuss_depth as WTFPreferences["discuss_depth"];
     } else {
       errors.push(`discuss_depth must be one of: quick, standard, thorough`);
     }

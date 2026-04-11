@@ -1,7 +1,7 @@
 /**
  * definition-loader.ts — Parse and validate V1 YAML workflow definitions.
  *
- * Loads definition YAML files from `.gsd/workflow-defs/`, validates the
+ * Loads definition YAML files from `.wtf/workflow-defs/`, validates the
  * V1 schema shape, and returns typed TypeScript objects. Pure functions
  * with no engine or runtime dependencies — just `yaml` and `node:fs`.
  *

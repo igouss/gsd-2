@@ -1,4 +1,4 @@
-// GSD Auto-mode — Artifact Path Resolution
+// WTF Auto-mode — Artifact Path Resolution
 //
 // resolveExpectedArtifactPath and diagnoseExpectedArtifact moved here from
 // auto-recovery.ts (Phase 5 dead-code cleanup). The artifact verification
@@ -120,7 +120,7 @@ export function diagnoseExpectedArtifact(
     case "replan-slice":
       return `${relSliceFile(base, mid, sid!, "REPLAN")} + updated ${relSliceFile(base, mid, sid!, "PLAN")}`;
     case "rewrite-docs":
-      return "Active overrides resolved in .gsd/OVERRIDES.md + plan documents updated";
+      return "Active overrides resolved in .wtf/OVERRIDES.md + plan documents updated";
     case "reassess-roadmap":
       return `${relSliceFile(base, mid, sid!, "ASSESSMENT")} (roadmap reassessment)`;
     case "run-uat":

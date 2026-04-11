@@ -1,7 +1,7 @@
-// GSD MCP Server — readers barrel export
+// WTF MCP Server — readers barrel export
 // Copyright (c) 2026 Jeremy McSpadden <jeremy@fluxlabs.net>
 
-export { resolveGsdRoot, resolveRootFile } from './paths.ts';
+export { resolveWtfRoot, resolveRootFile } from './paths.ts';
 export { readProgress } from './state.ts';
 export type { ProgressResult } from './state.ts';
 export { readRoadmap } from './roadmap.ts';

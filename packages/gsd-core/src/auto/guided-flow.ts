@@ -8,12 +8,13 @@
 
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 /**
  * Scan the milestones directory and return sorted milestone IDs.
  */
 export function findMilestoneIds(basePath: string): string[] {
-  const milestonesDir = join(basePath, ".gsd", "milestones");
+  const milestonesDir = join(basePath, PROJECT_DIR_NAME, "milestones");
   try {
     return readdirSync(milestonesDir, { withFileTypes: true })
       .filter(d => d.isDirectory())

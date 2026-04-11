@@ -1,6 +1,6 @@
-// GSD Database — Slice CRUD + dependencies
+// WTF Database — Slice CRUD + dependencies
 
-import { GSDError, GSD_STALE_STATE } from "../domain/errors.ts";
+import { WTFError, WTF_STALE_STATE } from "../domain/errors.ts";
 import { _getCurrentDb } from "./db-core.ts";
 import { transaction } from "./db-core.ts";
 
@@ -68,7 +68,7 @@ export function insertSlice(s: {
   planning?: Partial<SlicePlanningRecord>;
 }): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `INSERT INTO slices (
       milestone_id, id, title, status, risk, depends, demo, created_at,
@@ -119,7 +119,7 @@ export function insertSlice(s: {
 
 export function upsertSlicePlanning(milestoneId: string, sliceId: string, planning: Partial<SlicePlanningRecord>): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `UPDATE slices SET
       goal = COALESCE(:goal, goal),
@@ -149,7 +149,7 @@ export function getSlice(milestoneId: string, sliceId: string): SliceRow | null 
 
 export function updateSliceStatus(milestoneId: string, sliceId: string, status: string, completedAt?: string): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `UPDATE slices SET status = :status, completed_at = :completed_at
      WHERE milestone_id = :milestone_id AND id = :id`,
@@ -163,7 +163,7 @@ export function updateSliceStatus(milestoneId: string, sliceId: string, status: 
 
 export function setSliceSummaryMd(milestoneId: string, sliceId: string, summaryMd: string, uatMd: string): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `UPDATE slices SET full_summary_md = :summary_md, full_uat_md = :uat_md WHERE milestone_id = :mid AND id = :sid`,
   ).run({ ":mid": milestoneId, ":sid": sliceId, ":summary_md": summaryMd, ":uat_md": uatMd });
@@ -183,7 +183,7 @@ export function updateSliceFields(milestoneId: string, sliceId: string, fields: 
   demo?: string;
 }): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `UPDATE slices SET
       title = COALESCE(:title, title),
@@ -203,7 +203,7 @@ export function updateSliceFields(milestoneId: string, sliceId: string, fields: 
 
 export function deleteSlice(milestoneId: string, sliceId: string): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   transaction(() => {
     const d = _getCurrentDb()!;
     // Cascade-style manual deletion: evidence → tasks → dependencies → slice

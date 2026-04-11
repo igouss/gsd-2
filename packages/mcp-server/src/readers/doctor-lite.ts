@@ -1,9 +1,9 @@
-// GSD MCP Server — lightweight structural health checks
+// WTF MCP Server — lightweight structural health checks
 // Copyright (c) 2026 Jeremy McSpadden <jeremy@fluxlabs.net>
 
 import { existsSync } from 'node:fs';
 import {
-  resolveGsdRoot,
+  resolveWtfRoot,
   resolveRootFile,
   findMilestoneIds,
   resolveMilestoneFile,
@@ -38,9 +38,9 @@ export interface DoctorResult {
 // Check implementations
 // ---------------------------------------------------------------------------
 
-function checkProjectLevel(gsdRoot: string, issues: DoctorIssue[]): void {
+function checkProjectLevel(wtfRoot: string, issues: DoctorIssue[]): void {
   // PROJECT.md should exist
-  const projectPath = resolveRootFile(gsdRoot, 'PROJECT.md');
+  const projectPath = resolveRootFile(wtfRoot, 'PROJECT.md');
   if (!existsSync(projectPath)) {
     issues.push({
       severity: 'warning',
@@ -53,24 +53,24 @@ function checkProjectLevel(gsdRoot: string, issues: DoctorIssue[]): void {
   }
 
   // STATE.md should exist if milestones exist
-  const milestones = findMilestoneIds(gsdRoot);
+  const milestones = findMilestoneIds(wtfRoot);
   if (milestones.length > 0) {
-    const statePath = resolveRootFile(gsdRoot, 'STATE.md');
+    const statePath = resolveRootFile(wtfRoot, 'STATE.md');
     if (!existsSync(statePath)) {
       issues.push({
         severity: 'warning',
         code: 'missing_state_md',
         scope: 'project',
         unitId: '',
-        message: 'STATE.md is missing — run /gsd status to regenerate',
+        message: 'STATE.md is missing — run /wtf status to regenerate',
         file: statePath,
       });
     }
   }
 }
 
-function checkMilestoneLevel(gsdRoot: string, mid: string, issues: DoctorIssue[]): void {
-  const mDir = resolveMilestoneDir(gsdRoot, mid);
+function checkMilestoneLevel(wtfRoot: string, mid: string, issues: DoctorIssue[]): void {
+  const mDir = resolveMilestoneDir(wtfRoot, mid);
   if (!mDir) {
     issues.push({
       severity: 'error',
@@ -83,10 +83,10 @@ function checkMilestoneLevel(gsdRoot: string, mid: string, issues: DoctorIssue[]
   }
 
   // CONTEXT.md should exist
-  const ctxPath = resolveMilestoneFile(gsdRoot, mid, 'CONTEXT');
+  const ctxPath = resolveMilestoneFile(wtfRoot, mid, 'CONTEXT');
   if (!ctxPath || !existsSync(ctxPath)) {
     // Check for draft
-    const draftPath = resolveMilestoneFile(gsdRoot, mid, 'CONTEXT-DRAFT');
+    const draftPath = resolveMilestoneFile(wtfRoot, mid, 'CONTEXT-DRAFT');
     if (!draftPath || !existsSync(draftPath)) {
       issues.push({
         severity: 'warning',
@@ -99,9 +99,9 @@ function checkMilestoneLevel(gsdRoot: string, mid: string, issues: DoctorIssue[]
   }
 
   // ROADMAP.md should exist if slices exist
-  const sliceIds = findSliceIds(gsdRoot, mid);
+  const sliceIds = findSliceIds(wtfRoot, mid);
   if (sliceIds.length > 0) {
-    const roadmapPath = resolveMilestoneFile(gsdRoot, mid, 'ROADMAP');
+    const roadmapPath = resolveMilestoneFile(wtfRoot, mid, 'ROADMAP');
     if (!roadmapPath || !existsSync(roadmapPath)) {
       issues.push({
         severity: 'warning',
@@ -116,10 +116,10 @@ function checkMilestoneLevel(gsdRoot: string, mid: string, issues: DoctorIssue[]
   // Check if all slices done but no SUMMARY
   if (sliceIds.length > 0) {
     const allDone = sliceIds.every((sid) => {
-      const tasks = findTaskFiles(gsdRoot, mid, sid);
+      const tasks = findTaskFiles(wtfRoot, mid, sid);
       return tasks.length > 0 && tasks.every((t) => t.hasSummary);
     });
-    const summaryPath = resolveMilestoneFile(gsdRoot, mid, 'SUMMARY');
+    const summaryPath = resolveMilestoneFile(wtfRoot, mid, 'SUMMARY');
     if (allDone && (!summaryPath || !existsSync(summaryPath))) {
       issues.push({
         severity: 'error',
@@ -133,12 +133,12 @@ function checkMilestoneLevel(gsdRoot: string, mid: string, issues: DoctorIssue[]
 }
 
 function checkSliceLevel(
-  gsdRoot: string, mid: string, sid: string, issues: DoctorIssue[],
+  wtfRoot: string, mid: string, sid: string, issues: DoctorIssue[],
 ): void {
   const unitId = `${mid}/${sid}`;
 
   // PLAN.md should exist
-  const planPath = resolveSliceFile(gsdRoot, mid, sid, 'PLAN');
+  const planPath = resolveSliceFile(wtfRoot, mid, sid, 'PLAN');
   if (!planPath || !existsSync(planPath)) {
     issues.push({
       severity: 'error',
@@ -150,7 +150,7 @@ function checkSliceLevel(
   }
 
   // Tasks should have plans
-  const tasks = findTaskFiles(gsdRoot, mid, sid);
+  const tasks = findTaskFiles(wtfRoot, mid, sid);
   for (const task of tasks) {
     const taskUnitId = `${unitId}/${task.id}`;
     if (!task.hasPlan) {
@@ -181,37 +181,37 @@ function checkSliceLevel(
 // ---------------------------------------------------------------------------
 
 export function runDoctorLite(projectDir: string, scope?: string): DoctorResult {
-  const gsdRoot = resolveGsdRoot(projectDir);
+  const wtfRoot = resolveWtfRoot(projectDir);
   const issues: DoctorIssue[] = [];
 
-  if (!existsSync(gsdRoot)) {
+  if (!existsSync(wtfRoot)) {
     return {
       ok: true,
       issues: [{
         severity: 'info',
-        code: 'no_gsd_directory',
+        code: 'no_wtf_directory',
         scope: 'project',
         unitId: '',
-        message: 'No .gsd/ directory found — project not initialized',
+        message: 'No .wtf/ directory found — project not initialized',
       }],
       counts: { error: 0, warning: 0, info: 1 },
     };
   }
 
   // Project-level checks
-  checkProjectLevel(gsdRoot, issues);
+  checkProjectLevel(wtfRoot, issues);
 
   // Milestone + slice checks
   const milestoneIds = scope
-    ? findMilestoneIds(gsdRoot).filter((id) => id === scope)
-    : findMilestoneIds(gsdRoot);
+    ? findMilestoneIds(wtfRoot).filter((id) => id === scope)
+    : findMilestoneIds(wtfRoot);
 
   for (const mid of milestoneIds) {
-    checkMilestoneLevel(gsdRoot, mid, issues);
+    checkMilestoneLevel(wtfRoot, mid, issues);
 
-    const sliceIds = findSliceIds(gsdRoot, mid);
+    const sliceIds = findSliceIds(wtfRoot, mid);
     for (const sid of sliceIds) {
-      checkSliceLevel(gsdRoot, mid, sid, issues);
+      checkSliceLevel(wtfRoot, mid, sid, issues);
     }
   }
 

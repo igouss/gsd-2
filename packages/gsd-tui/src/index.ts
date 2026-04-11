@@ -1,5 +1,5 @@
 /**
- * @gsd-build/gsd-tui — Terminal UI for GSD.
+ * @gsd-build/gsd-tui — Terminal UI for WTF.
  *
  * Console event sink, terminal rendering, and any future
  * interactive terminal UI components.

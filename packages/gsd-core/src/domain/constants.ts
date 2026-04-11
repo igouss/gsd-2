@@ -1,8 +1,13 @@
 /**
- * GSD Extension — Shared Constants
+ * WTF Extension — Shared Constants
  *
- * Centralized timeout and cache-size constants used across the GSD extension.
+ * Centralized timeout and cache-size constants used across the WTF extension.
  */
+
+// ─── Project Directory ───────────────────────────────────────────────────────
+
+/** The project-local directory name used for all WTF state and artifacts. */
+export const PROJECT_DIR_NAME = ".wtf";
 
 // ─── Timeouts ─────────────────────────────────────────────────────────────────
 
@@ -23,11 +28,11 @@ export const CACHE_MAX = 50;
 // ─── Tool Scoping ─────────────────────────────────────────────────────────────
 
 /**
- * GSD tools allowed during discuss flows (#2949).
+ * WTF tools allowed during discuss flows (#2949).
  *
  * xAI/Grok (and potentially other providers with grammar-based constrained
  * decoding) return "Grammar is too complex" (HTTP 400) when the combined
- * tool schemas exceed their internal grammar limit. The full GSD tool set
+ * tool schemas exceed their internal grammar limit. The full WTF tool set
  * registers ~33 tools with deeply nested schemas; discuss flows only need
  * a small subset.
  *
@@ -35,31 +40,31 @@ export const CACHE_MAX = 50;
  * sent to the provider stays well under provider limits.
  *
  * Included tools and why:
- *   - gsd_summary_save: writes CONTEXT.md artifacts (all discuss prompts)
- *   - gsd_save_summary: alias for above
- *   - gsd_decision_save: records decisions (discuss.md output phase)
- *   - gsd_save_decision: alias for above
- *   - gsd_plan_milestone: writes roadmap (discuss.md single/multi milestone)
- *   - gsd_milestone_plan: alias for above
- *   - gsd_milestone_generate_id: generates milestone IDs (discuss.md multi-milestone)
- *   - gsd_generate_milestone_id: alias for above
- *   - gsd_requirement_update: updates requirements during discuss
- *   - gsd_update_requirement: alias for above
+ *   - wtf_summary_save: writes CONTEXT.md artifacts (all discuss prompts)
+ *   - wtf_save_summary: alias for above
+ *   - wtf_decision_save: records decisions (discuss.md output phase)
+ *   - wtf_save_decision: alias for above
+ *   - wtf_plan_milestone: writes roadmap (discuss.md single/multi milestone)
+ *   - wtf_milestone_plan: alias for above
+ *   - wtf_milestone_generate_id: generates milestone IDs (discuss.md multi-milestone)
+ *   - wtf_generate_milestone_id: alias for above
+ *   - wtf_requirement_update: updates requirements during discuss
+ *   - wtf_update_requirement: alias for above
  */
 export const DISCUSS_TOOLS_ALLOWLIST: readonly string[] = [
   // Context / summary writing
-  "gsd_summary_save",
-  "gsd_save_summary",
+  "wtf_summary_save",
+  "wtf_save_summary",
   // Decision recording
-  "gsd_decision_save",
-  "gsd_save_decision",
+  "wtf_decision_save",
+  "wtf_save_decision",
   // Milestone planning (needed for discuss.md output phase)
-  "gsd_plan_milestone",
-  "gsd_milestone_plan",
+  "wtf_plan_milestone",
+  "wtf_milestone_plan",
   // Milestone ID generation (multi-milestone flow)
-  "gsd_milestone_generate_id",
-  "gsd_generate_milestone_id",
+  "wtf_milestone_generate_id",
+  "wtf_generate_milestone_id",
   // Requirement updates
-  "gsd_requirement_update",
-  "gsd_update_requirement",
+  "wtf_requirement_update",
+  "wtf_update_requirement",
 ];

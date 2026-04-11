@@ -12,16 +12,16 @@ import { defaultRoutingConfig } from "../routing/model-router.ts";
 import type { TokenProfile, InlineLevel } from "../domain/types.ts";
 
 import type {
-  GSDPreferences,
-  GSDModelConfigV2,
-  GSDPhaseModelConfig,
+  WTFPreferences,
+  WTFModelConfigV2,
+  WTFPhaseModelConfig,
   ResolvedModelConfig,
   AutoSupervisorConfig,
 } from "./preferences-types.ts";
-import { loadEffectiveGSDPreferences, getGlobalGSDPreferencesPath } from "./preferences.ts";
+import { loadEffectiveWTFPreferences, getGlobalWTFPreferencesPath } from "./preferences.ts";
 
 // Re-export types so existing consumers of ./preferences-models.js keep working
-export type { GSDPhaseModelConfig, GSDModelConfig, GSDModelConfigV2, ResolvedModelConfig } from "./preferences-types.ts";
+export type { WTFPhaseModelConfig, WTFModelConfig, WTFModelConfigV2, ResolvedModelConfig } from "./preferences-types.ts";
 
 /**
  * Resolve which model ID to use for a given auto-mode unit type.
@@ -41,11 +41,11 @@ export function resolveModelForUnit(unitType: string): string | undefined {
  * - Extended: `planning: { model: claude-opus-4-6, fallbacks: [glm-5, minimax-m2.5] }`
  */
 export function resolveModelWithFallbacksForUnit(unitType: string): ResolvedModelConfig | undefined {
-  const prefs = loadEffectiveGSDPreferences();
+  const prefs = loadEffectiveWTFPreferences();
   if (!prefs?.preferences.models) return undefined;
-  const m = prefs.preferences.models as GSDModelConfigV2;
+  const m = prefs.preferences.models as WTFModelConfigV2;
 
-  let phaseConfig: string | GSDPhaseModelConfig | undefined;
+  let phaseConfig: string | WTFPhaseModelConfig | undefined;
   switch (unitType) {
     case "research-milestone":
     case "research-slice":
@@ -108,7 +108,7 @@ export function resolveModelWithFallbacksForUnit(unitType: string): ResolvedMode
 }
 
 /**
- * Resolve the default session model from GSD preferences.
+ * Resolve the default session model from WTF preferences.
  *
  * Used at auto-mode bootstrap to override the session model that was
  * determined by settings.json (defaultProvider/defaultModel).  When
@@ -129,13 +129,13 @@ export function resolveModelWithFallbacksForUnit(unitType: string): ResolvedMode
 export function resolveDefaultSessionModel(
   sessionProvider?: string,
 ): { provider: string; id: string } | undefined {
-  const prefs = loadEffectiveGSDPreferences();
+  const prefs = loadEffectiveWTFPreferences();
   if (!prefs?.preferences.models) return undefined;
 
-  const m = prefs.preferences.models as GSDModelConfigV2;
+  const m = prefs.preferences.models as WTFModelConfigV2;
 
   // Priority: execution → planning → first configured value
-  const candidates: Array<string | GSDPhaseModelConfig | undefined> = [
+  const candidates: Array<string | WTFPhaseModelConfig | undefined> = [
     m.execution,
     m.planning,
     m.research,
@@ -237,12 +237,12 @@ export function validateModelId(modelId: string): boolean {
 }
 
 /**
- * Update the models section of the global GSD preferences file.
+ * Update the models section of the global WTF preferences file.
  * Performs a safe read-modify-write: reads current content, updates the models
  * YAML block, and writes back. Creates the file if it doesn't exist.
  */
-export function updatePreferencesModels(models: GSDModelConfigV2): void {
-  const prefsPath = getGlobalGSDPreferencesPath();
+export function updatePreferencesModels(models: WTFModelConfigV2): void {
+  const prefsPath = getGlobalWTFPreferencesPath();
 
   let content = "";
   if (existsSync(prefsPath)) {
@@ -255,7 +255,7 @@ export function updatePreferencesModels(models: GSDModelConfigV2): void {
     if (typeof value === "string") {
       lines.push(`  ${phase}: ${value}`);
     } else if (value && typeof value === "object") {
-      const config = value as GSDPhaseModelConfig;
+      const config = value as WTFPhaseModelConfig;
       lines.push(`  ${phase}:`);
       lines.push(`    model: ${config.model}`);
       if (config.provider) {
@@ -287,7 +287,7 @@ export function updatePreferencesModels(models: GSDModelConfigV2): void {
  * Returns the merged config with defaults applied.
  */
 export function resolveDynamicRoutingConfig(): DynamicRoutingConfig {
-  const prefs = loadEffectiveGSDPreferences();
+  const prefs = loadEffectiveWTFPreferences();
   const configured = prefs?.preferences.dynamic_routing;
   if (!configured) return defaultRoutingConfig();
   return {
@@ -297,7 +297,7 @@ export function resolveDynamicRoutingConfig(): DynamicRoutingConfig {
 }
 
 export function resolveAutoSupervisorConfig(): AutoSupervisorConfig {
-  const prefs = loadEffectiveGSDPreferences();
+  const prefs = loadEffectiveWTFPreferences();
   const configured = prefs?.preferences.auto_supervisor ?? {};
 
   return {
@@ -314,10 +314,10 @@ const VALID_TOKEN_PROFILES = new Set<TokenProfile>(["budget", "balanced", "quali
 
 /**
  * Resolve profile defaults for a given token profile tier.
- * Returns a partial GSDPreferences that is used as the base layer --
+ * Returns a partial WTFPreferences that is used as the base layer --
  * explicit user preferences always override these defaults.
  */
-export function resolveProfileDefaults(profile: TokenProfile): Partial<GSDPreferences> {
+export function resolveProfileDefaults(profile: TokenProfile): Partial<WTFPreferences> {
   switch (profile) {
     case "budget":
       return {
@@ -363,7 +363,7 @@ export function resolveProfileDefaults(profile: TokenProfile): Partial<GSDPrefer
  * Returns "balanced" when no profile is set (D046).
  */
 export function resolveEffectiveProfile(): TokenProfile {
-  const prefs = loadEffectiveGSDPreferences();
+  const prefs = loadEffectiveWTFPreferences();
   const profile = prefs?.preferences.token_profile;
   if (profile && VALID_TOKEN_PROFILES.has(profile)) return profile;
   return "balanced";
@@ -388,7 +388,7 @@ export function resolveInlineLevel(): InlineLevel {
  * Explicit preference always wins.
  */
 export function resolveContextSelection(): import("../domain/types.ts").ContextSelectionMode {
-  const prefs = loadEffectiveGSDPreferences();
+  const prefs = loadEffectiveWTFPreferences();
   if (prefs?.preferences.context_selection) return prefs.preferences.context_selection;
   const profile = resolveEffectiveProfile();
   return profile === "budget" ? "smart" : "full";
@@ -398,7 +398,7 @@ export function resolveContextSelection(): import("../domain/types.ts").ContextS
  * Resolve the search provider preference from preferences.md.
  * Returns undefined if not configured (caller falls back to existing behavior).
  */
-export function resolveSearchProviderFromPreferences(): GSDPreferences["search_provider"] | undefined {
-  const prefs = loadEffectiveGSDPreferences();
+export function resolveSearchProviderFromPreferences(): WTFPreferences["search_provider"] | undefined {
+  const prefs = loadEffectiveWTFPreferences();
   return prefs?.preferences.search_provider;
 }

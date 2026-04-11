@@ -27,7 +27,7 @@ export interface CostAccumulator {
 // ---------------------------------------------------------------------------
 
 export interface ExecuteOptions {
-  /** Command to send after '/gsd auto' (default: none) */
+  /** Command to send after '/wtf auto' (default: none) */
   command?: string;
 
   /** Model ID override */
@@ -36,7 +36,7 @@ export interface ExecuteOptions {
   /** Run in bare mode (skip user config) */
   bare?: boolean;
 
-  /** Path to CLI binary (overrides GSD_CLI_PATH and which resolution) */
+  /** Path to CLI binary (overrides WTF_CLI_PATH and which resolution) */
   cliPath?: string;
 }
 

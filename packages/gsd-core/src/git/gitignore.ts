@@ -1,5 +1,5 @@
 /**
- * GSD bootstrappers for .gitignore and PREFERENCES.md
+ * WTF bootstrappers for .gitignore and PREFERENCES.md
  *
  * Ensures baseline .gitignore exists with universally-correct patterns.
  * Creates an empty PREFERENCES.md template if it doesn't exist.
@@ -10,38 +10,39 @@ import { join } from "node:path";
 import { execFileSync } from "node:child_process";
 import { existsSync, lstatSync, readFileSync, writeFileSync } from "node:fs";
 import { nativeRmCached, nativeLsFiles } from "./native-git-bridge.ts";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 import { GIT_NO_PROMPT_ENV } from "./git-constants.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 /**
- * GSD runtime patterns for git index cleanup.
+ * WTF runtime patterns for git index cleanup.
  * With external state (symlink), these are a no-op in most cases,
  * but retained for backwards compatibility during migration.
  */
-const GSD_RUNTIME_PATTERNS = [
-  ".gsd/activity/",
-  ".gsd/forensics/",
-  ".gsd/runtime/",
-  ".gsd/worktrees/",
-  ".gsd/parallel/",
-  ".gsd/auto.lock",
-  ".gsd/metrics.json",
-  ".gsd/completed-units.json",
-  ".gsd/STATE.md",
-  ".gsd/gsd.db",
-  ".gsd/gsd.db-shm",   // SQLite WAL sidecar — always created alongside gsd.db (#2296)
-  ".gsd/gsd.db-wal",   // SQLite WAL sidecar — always created alongside gsd.db (#2296)
-  ".gsd/journal/",     // daily-rotated JSONL event journal (#2296)
-  ".gsd/doctor-history.jsonl", // doctor run history (#2296)
-  ".gsd/DISCUSSION-MANIFEST.json",
-  ".gsd/milestones/**/*-CONTINUE.md",
-  ".gsd/milestones/**/continue.md",
+const WTF_RUNTIME_PATTERNS = [
+  ".wtf/activity/",
+  ".wtf/forensics/",
+  ".wtf/runtime/",
+  ".wtf/worktrees/",
+  ".wtf/parallel/",
+  ".wtf/auto.lock",
+  ".wtf/metrics.json",
+  ".wtf/completed-units.json",
+  ".wtf/STATE.md",
+  ".wtf/wtf.db",
+  ".wtf/wtf.db-shm",   // SQLite WAL sidecar — always created alongside wtf.db (#2296)
+  ".wtf/wtf.db-wal",   // SQLite WAL sidecar — always created alongside wtf.db (#2296)
+  ".wtf/journal/",     // daily-rotated JSONL event journal (#2296)
+  ".wtf/doctor-history.jsonl", // doctor run history (#2296)
+  ".wtf/DISCUSSION-MANIFEST.json",
+  ".wtf/milestones/**/*-CONTINUE.md",
+  ".wtf/milestones/**/continue.md",
 ] as const;
 
 const BASELINE_PATTERNS = [
-  // ── GSD state directory (symlink to external storage) ──
-  ".gsd",
-  ".gsd-id",
+  // ── WTF state directory (symlink to external storage) ──
+  PROJECT_DIR_NAME,
+  ".wtf-id",
   ".bg-shell/",
 
   // ── OS junk ──
@@ -87,22 +88,22 @@ const BASELINE_PATTERNS = [
 ];
 
 /**
- * Check whether `.gsd` is covered by the project's `.gitignore`.
+ * Check whether `.wtf` is covered by the project's `.gitignore`.
  *
  * Uses `git check-ignore` for accurate evaluation — this respects nested
  * .gitignore files, global gitignore, and negation patterns. Returns true
- * only when git would actually ignore `.gsd/`.
+ * only when git would actually ignore `.wtf/`.
  *
  * Returns false (not ignored) if:
  *   - No `.gitignore` exists
- *   - `.gsd` is not listed in any active ignore rule
+ *   - `.wtf` is not listed in any active ignore rule
  *   - Not a git repo or git is unavailable
  */
-export function isGsdGitignored(basePath: string): boolean {
-  // Check both `.gsd` and `.gsd/` because `.gsd/` in .gitignore (trailing
+export function isWtfGitignored(basePath: string): boolean {
+  // Check both `.wtf` and `.wtf/` because `.wtf/` in .gitignore (trailing
   // slash = directory-only pattern) only matches the directory form. Using
   // both paths covers all gitignore pattern variants.
-  for (const path of [".gsd", ".gsd/"]) {
+  for (const path of [PROJECT_DIR_NAME, ".wtf/"]) {
     try {
       // git check-ignore exits 0 when the path IS ignored, 1 when it is NOT.
       execFileSync("git", ["check-ignore", "-q", path], {
@@ -110,7 +111,7 @@ export function isGsdGitignored(basePath: string): boolean {
         stdio: "pipe",
         env: GIT_NO_PROMPT_ENV,
       });
-      return true; // exit 0 → .gsd is ignored
+      return true; // exit 0 → .wtf is ignored
     } catch {
       // exit 1 → this form is NOT ignored, try the other
     }
@@ -119,31 +120,31 @@ export function isGsdGitignored(basePath: string): boolean {
 }
 
 /**
- * Check whether `.gsd/` contains files tracked by git.
- * If so, the project intentionally keeps `.gsd/` in version control
- * and we must NOT add `.gsd` to `.gitignore` or attempt migration.
+ * Check whether `.wtf/` contains files tracked by git.
+ * If so, the project intentionally keeps `.wtf/` in version control
+ * and we must NOT add `.wtf` to `.gitignore` or attempt migration.
  *
- * Returns true if git tracks at least one file under `.gsd/`.
+ * Returns true if git tracks at least one file under `.wtf/`.
  * Returns false (safe to ignore) if:
  *   - Not a git repo
- *   - `.gsd/` is a symlink (external state, should be ignored)
- *   - `.gsd/` doesn't exist
- *   - No tracked files found under `.gsd/`
+ *   - `.wtf/` is a symlink (external state, should be ignored)
+ *   - `.wtf/` doesn't exist
+ *   - No tracked files found under `.wtf/`
  */
-export function hasGitTrackedGsdFiles(basePath: string): boolean {
-  const localGsd = join(basePath, ".gsd");
+export function hasGitTrackedWtfFiles(basePath: string): boolean {
+  const localWtf = join(basePath, PROJECT_DIR_NAME);
 
-  // If .gsd doesn't exist or is already a symlink, no tracked files concern
-  if (!existsSync(localGsd)) return false;
+  // If .wtf doesn't exist or is already a symlink, no tracked files concern
+  if (!existsSync(localWtf)) return false;
   try {
-    if (lstatSync(localGsd).isSymbolicLink()) return false;
+    if (lstatSync(localWtf).isSymbolicLink()) return false;
   } catch {
     return false;
   }
 
-  // Check if git tracks any files under .gsd/
+  // Check if git tracks any files under .wtf/
   try {
-    const tracked = nativeLsFiles(basePath, ".gsd");
+    const tracked = nativeLsFiles(basePath, PROJECT_DIR_NAME);
     if (tracked.length > 0) return true;
 
     // nativeLsFiles swallows git failures and returns []. An empty result
@@ -168,9 +169,9 @@ export function hasGitTrackedGsdFiles(basePath: string): boolean {
  * Creates the file if missing; appends missing patterns.
  * Returns true if the file was created or modified, false if already complete.
  *
- * **Safety check:** If `.gsd/` contains git-tracked files (i.e., the project
- * intentionally keeps `.gsd/` in version control), the `.gsd` ignore pattern
- * is excluded to prevent data loss. Only the `.gsd` pattern is affected —
+ * **Safety check:** If `.wtf/` contains git-tracked files (i.e., the project
+ * intentionally keeps `.wtf/` in version control), the `.wtf` ignore pattern
+ * is excluded to prevent data loss. Only the `.wtf` pattern is affected —
  * all other baseline patterns are still applied normally.
  */
 export function ensureGitignore(
@@ -195,11 +196,11 @@ export function ensureGitignore(
       .filter((l) => l && !l.startsWith("#")),
   );
 
-  // Determine which patterns to apply. If .gsd/ has tracked files,
-  // exclude the ".gsd" pattern to prevent deleting tracked state.
-  const gsdIsTracked = hasGitTrackedGsdFiles(basePath);
-  const patternsToApply = gsdIsTracked
-    ? BASELINE_PATTERNS.filter((p) => p !== ".gsd")
+  // Determine which patterns to apply. If .wtf/ has tracked files,
+  // exclude the PROJECT_DIR_NAME pattern to prevent deleting tracked state.
+  const wtfIsTracked = hasGitTrackedWtfFiles(basePath);
+  const patternsToApply = wtfIsTracked
+    ? BASELINE_PATTERNS.filter((p) => p !== PROJECT_DIR_NAME)
     : BASELINE_PATTERNS;
 
   // Find patterns not yet present
@@ -210,7 +211,7 @@ export function ensureGitignore(
   // Build the block to append
   const block = [
     "",
-    "# ── GSD baseline (auto-generated) ──",
+    "# ── WTF baseline (auto-generated) ──",
     ...missing,
     "",
   ].join("\n");
@@ -232,11 +233,11 @@ export function ensureGitignore(
  *
  * Note: These are strictly runtime/ephemeral paths (activity logs, lock files,
  * metrics, STATE.md). They are always safe to untrack, even when the project
- * intentionally keeps other `.gsd/` files (like PROJECT.md, milestones/) in
+ * intentionally keeps other `.wtf/` files (like PROJECT.md, milestones/) in
  * version control.
  */
 export function untrackRuntimeFiles(basePath: string): void {
-  const runtimePaths = GSD_RUNTIME_PATTERNS;
+  const runtimePaths = WTF_RUNTIME_PATTERNS;
 
   for (const pattern of runtimePaths) {
     // Use -r for directory patterns (trailing slash), strip the slash for the command
@@ -250,7 +251,7 @@ export function untrackRuntimeFiles(basePath: string): void {
 }
 
 /**
- * Ensure basePath/.gsd/PREFERENCES.md exists as an empty template.
+ * Ensure basePath/.wtf/PREFERENCES.md exists as an empty template.
  * Creates the file with frontmatter only if it doesn't exist.
  * Returns true if created, false if already exists.
  *
@@ -258,8 +259,8 @@ export function untrackRuntimeFiles(basePath: string): void {
  * creating a duplicate when a lowercase file already exists.
  */
 export function ensurePreferences(basePath: string): boolean {
-  const preferencesPath = join(gsdRoot(basePath), "PREFERENCES.md");
-  const legacyPath = join(gsdRoot(basePath), "preferences.md");
+  const preferencesPath = join(wtfRoot(basePath), "PREFERENCES.md");
+  const legacyPath = join(wtfRoot(basePath), "preferences.md");
 
   if (existsSync(preferencesPath) || existsSync(legacyPath)) {
     return false;
@@ -277,15 +278,15 @@ skill_discovery: {}
 auto_supervisor: {}
 ---
 
-# GSD Skill Preferences
+# WTF Skill Preferences
 
 Project-specific guidance for skill selection and execution preferences.
 
-See \`~/.gsd/agent/extensions/gsd/docs/preferences-reference.md\` for full field documentation and examples.
+See \`~/.wtf/agent/extensions/wtf/docs/preferences-reference.md\` for full field documentation and examples.
 
 ## Fields
 
-- \`always_use_skills\`: Skills that must be available during all GSD operations
+- \`always_use_skills\`: Skills that must be available during all WTF operations
 - \`prefer_skills\`: Skills to prioritize when multiple options exist
 - \`avoid_skills\`: Skills to minimize or avoid (with lower priority than prefer)
 - \`skill_rules\`: Context-specific rules (e.g., "use tool X for Y type of work")

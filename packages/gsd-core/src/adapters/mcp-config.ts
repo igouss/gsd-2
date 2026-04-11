@@ -2,15 +2,15 @@
  * mcp-config.ts — Writes temporary MCP config JSON for executing agents.
  *
  * The config tells the harness (Claude Code, etc.) how to connect to the
- * GSD unit-tools MCP server so the agent can call gsd_task_complete,
- * gsd_decision_save, etc.
+ * WTF unit-tools MCP server so the agent can call wtf_task_complete,
+ * wtf_decision_save, etc.
  */
 
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
 export interface McpConfigOptions {
-  /** Command to run the unit-tools server (e.g. "node" or "gsd-unit-tools"). */
+  /** Command to run the unit-tools server (e.g. "node" or "wtf-unit-tools"). */
   command: string;
 
   /** Arguments to pass before --project-dir (e.g. ["/path/to/unit-tools-cli.js"]). */
@@ -24,15 +24,15 @@ export interface McpConfigOptions {
 }
 
 /**
- * Write an MCP config JSON file that points to the GSD unit-tools server.
+ * Write an MCP config JSON file that points to the WTF unit-tools server.
  * Returns the absolute path to the written config file.
  *
  * The config uses the Claude Code MCP config format:
  * ```json
  * {
  *   "mcpServers": {
- *     "gsd": {
- *       "command": "gsd-unit-tools",
+ *     "wtf": {
+ *       "command": "wtf-unit-tools",
  *       "args": ["--project-dir", "/path/to/project"]
  *     }
  *   }
@@ -44,7 +44,7 @@ export function writeMcpConfig(options: McpConfigOptions): string {
 
   const config = {
     mcpServers: {
-      gsd: {
+      wtf: {
         command: options.command,
         args: [
           ...(options.commandArgs ?? []),
@@ -55,7 +55,7 @@ export function writeMcpConfig(options: McpConfigOptions): string {
     },
   };
 
-  const configPath = join(options.configDir, "gsd-mcp-config.json");
+  const configPath = join(options.configDir, "wtf-mcp-config.json");
   writeFileSync(configPath, JSON.stringify(config, null, 2), "utf-8");
   return configPath;
 }

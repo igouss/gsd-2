@@ -4,10 +4,10 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { deriveState } from '../state/state.ts';
 import { parseSummary, loadFile } from '../persistence/files.ts';
-import { isDbAvailable, getMilestoneSlices, getSliceTasks } from '../persistence/gsd-db.ts';
+import { isDbAvailable, getMilestoneSlices, getSliceTasks } from '../persistence/wtf-db.ts';
 import { parseRoadmap, parsePlan } from '../persistence/md-parsers.ts';
 import { findMilestoneIds } from '../milestone/milestone-ids.ts';
-import { resolveMilestoneFile, resolveSliceFile, resolveGsdRootFile, gsdRoot } from '../persistence/paths.ts';
+import { resolveMilestoneFile, resolveSliceFile, resolveWtfRootFile, wtfRoot } from '../persistence/paths.ts';
 import {
   getLedger,
   getProjectTotals,
@@ -19,7 +19,7 @@ import {
   loadLedgerFromDisk,
 } from './metrics.ts';
 import { loadAllCaptures, countPendingCaptures } from '../auto/captures.ts';
-import { loadEffectiveGSDPreferences } from '../preferences/preferences.ts';
+import { loadEffectiveWTFPreferences } from '../preferences/preferences.ts';
 import { runProviderChecks, type ProviderCheckResult } from '../doctor/doctor-providers.ts';
 import { generateSkillHealthReport } from '../skills/skill-health.ts';
 import { runEnvironmentChecks, type EnvironmentCheckResult } from '../doctor/doctor-environment.ts';
@@ -545,7 +545,7 @@ async function loadChangelogAndVerifications(basePath: string, milestones: Visua
 // ─── Knowledge Loader ─────────────────────────────────────────────────────────
 
 function loadKnowledge(basePath: string): KnowledgeInfo {
-  const knowledgePath = resolveGsdRootFile(basePath, 'KNOWLEDGE');
+  const knowledgePath = resolveWtfRootFile(basePath, 'KNOWLEDGE');
   if (!existsSync(knowledgePath)) {
     return { rules: [], patterns: [], lessons: [], exists: false };
   }
@@ -589,7 +589,7 @@ function loadKnowledge(basePath: string): KnowledgeInfo {
 // ─── Health Loader ────────────────────────────────────────────────────────────
 
 function loadHealth(units: UnitMetrics[], totals: ProjectTotals | null, basePath: string): HealthInfo {
-  const prefs = loadEffectiveGSDPreferences();
+  const prefs = loadEffectiveWTFPreferences();
   const budgetCeiling = prefs?.preferences?.budget_ceiling;
   const tokenProfile = prefs?.preferences?.token_profile ?? 'standard';
 
@@ -639,7 +639,7 @@ function loadHealth(units: UnitMetrics[], totals: ProjectTotals | null, basePath
   // Doctor run history — persisted across sessions (sync read to keep loadHealth sync)
   let doctorHistory: VisualizerDoctorEntry[] = [];
   try {
-    const historyPath = join(gsdRoot(basePath), "doctor-history.jsonl");
+    const historyPath = join(wtfRoot(basePath), "doctor-history.jsonl");
     if (existsSync(historyPath)) {
       const lines = readFileSync(historyPath, "utf-8").split("\n").filter(l => l.trim());
       doctorHistory = lines.slice(-20).reverse().map(l => JSON.parse(l) as VisualizerDoctorEntry);

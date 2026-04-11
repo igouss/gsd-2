@@ -1,5 +1,5 @@
 /**
- * reopen-slice handler — the core operation behind gsd_slice_reopen.
+ * reopen-slice handler — the core operation behind wtf_slice_reopen.
  *
  * Resets a completed slice back to "in_progress" and resets ALL of its
  * tasks back to "pending". This is intentional — if you're reopening a
@@ -8,7 +8,7 @@
  * The parent milestone must still be open (not complete).
  */
 
-// GSD — reopen-slice tool handler
+// WTF — reopen-slice tool handler
 // Copyright (c) 2026 Jeremy McSpadden <jeremy@fluxlabs.net>
 
 import {
@@ -18,7 +18,7 @@ import {
   updateSliceStatus,
   updateTaskStatus,
   transaction,
-} from "../persistence/gsd-db.ts";
+} from "../persistence/wtf-db.ts";
 import { invalidateStateCache } from "../state/state.ts";
 import { isClosedStatus } from "../domain/status-guards.ts";
 import { renderAllProjections } from "../workflow/workflow-projections.ts";

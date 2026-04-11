@@ -6,13 +6,13 @@
 // execSync calls because git2 credential handling is too complex.
 
 import { execSync, execFileSync } from "node:child_process";
-import { GSDError, GSD_GIT_ERROR } from "../domain/errors.ts";
+import { WTFError, WTF_GIT_ERROR } from "../domain/errors.ts";
 import { GIT_NO_PROMPT_ENV } from "./git-constants.ts";
 import { getErrorMessage } from "../domain/error-utils.ts";
 
 // Issue #453: keep auto-mode bookkeeping on the stable git CLI path unless a
 // caller explicitly opts into the native helper.
-const NATIVE_GSD_GIT_ENABLED = process.env.GSD_ENABLE_NATIVE_GSD_GIT === "1";
+const NATIVE_WTF_GIT_ENABLED = process.env.WTF_ENABLE_NATIVE_WTF_GIT === "1";
 
 // ─── Native Module Types ──────────────────────────────────────────────────
 
@@ -115,11 +115,11 @@ let loadAttempted = false;
 function loadNative(): typeof nativeModule {
   if (loadAttempted) return nativeModule;
   loadAttempted = true;
-  if (!NATIVE_GSD_GIT_ENABLED) return nativeModule;
+  if (!NATIVE_WTF_GIT_ENABLED) return nativeModule;
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require("@gsd/native");
+    const mod = require("@wtf/native");
     if (mod.gitCurrentBranch && mod.gitHasChanges) {
       nativeModule = mod;
     }
@@ -143,7 +143,7 @@ function gitExec(basePath: string, args: string[], allowFailure = false): string
     }).trim();
   } catch {
     if (allowFailure) return "";
-    throw new GSDError(GSD_GIT_ERROR, `git ${args.join(" ")} failed in ${basePath}`);
+    throw new WTFError(WTF_GIT_ERROR, `git ${args.join(" ")} failed in ${basePath}`);
   }
 }
 
@@ -158,7 +158,7 @@ function gitFileExec(basePath: string, args: string[], allowFailure = false): st
     }).trim();
   } catch {
     if (allowFailure) return "";
-    throw new GSDError(GSD_GIT_ERROR, `git ${args.join(" ")} failed in ${basePath}`);
+    throw new WTFError(WTF_GIT_ERROR, `git ${args.join(" ")} failed in ${basePath}`);
   }
 }
 
@@ -721,7 +721,7 @@ export function nativeAddAllWithExclusions(basePath: string, exclusions: readonl
     if (stderr.includes("ignored by one of your .gitignore files")) {
       return;
     }
-    // When .gsd is a symlink, git rejects `:!.gsd/...` pathspecs with
+    // When .wtf is a symlink, git rejects `:!.wtf/...` pathspecs with
     // "beyond a symbolic link". Fall back to `git add -u` which only
     // stages changes to already-tracked files — O(tracked) not O(filesystem).
     // Using `git add -A` here would traverse the entire working tree,
@@ -730,7 +730,7 @@ export function nativeAddAllWithExclusions(basePath: string, exclusions: readonl
       gitFileExec(basePath, ["add", "-u"]);
       return;
     }
-    throw new GSDError(GSD_GIT_ERROR, `git add -A with exclusions failed in ${basePath}: ${getErrorMessage(err)}`);
+    throw new WTFError(WTF_GIT_ERROR, `git add -A with exclusions failed in ${basePath}: ${getErrorMessage(err)}`);
   }
 }
 
@@ -876,7 +876,7 @@ export function nativeMergeSquash(basePath: string, branch: string): GitMergeRes
       stderr.includes("overwritten by merge")
     ) {
       // Extract filenames from git stderr so callers can report which files
-      // are dirty instead of generically blaming .gsd/ (#2151).
+      // are dirty instead of generically blaming .wtf/ (#2151).
       // Git lists them as tab-indented lines between the "would be overwritten"
       // header and the "Please commit" footer.
       const dirtyFiles = stderr

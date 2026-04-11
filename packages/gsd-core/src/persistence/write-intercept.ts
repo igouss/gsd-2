@@ -1,4 +1,4 @@
-// GSD Extension — Write Intercept for Agent State File Blocks
+// WTF Extension — Write Intercept for Agent State File Blocks
 // Detects agent attempts to write authoritative state files and returns
 // an error directing the agent to use the engine tool API instead.
 
@@ -6,10 +6,10 @@ import { realpathSync } from "node:fs";
 import { resolve } from "node:path";
 
 /**
- * Patterns matching authoritative .gsd/ state files that agents must NOT write directly.
+ * Patterns matching authoritative .wtf/ state files that agents must NOT write directly.
  *
  * Only STATE.md is blocked — it is purely engine-rendered from DB state.
- * All other .gsd/ files are agent-authored content that agents create and
+ * All other .wtf/ files are agent-authored content that agents create and
  * update during discuss, plan, and execute phases:
  * - REQUIREMENTS.md — agents create during discuss, read during planning
  * - PROJECT.md — agents create during discuss, update at milestone close
@@ -19,11 +19,11 @@ import { resolve } from "node:path";
 const BLOCKED_PATTERNS: RegExp[] = [
   // STATE.md is the only purely engine-rendered file.
   // Case-insensitive to prevent bypass on macOS (case-insensitive APFS).
-  // (^|[/\\]) matches both absolute paths (/project/.gsd/…) and bare relative
-  // paths (.gsd/STATE.md) so a path without a leading separator is also blocked.
-  /(^|[/\\])\.gsd[/\\]STATE\.md$/i,
-  // Also match resolved symlink paths under ~/.gsd/projects/ (Pitfall #6)
-  /(^|[/\\])\.gsd[/\\]projects[/\\][^/\\]+[/\\]STATE\.md$/i,
+  // (^|[/\\]) matches both absolute paths (/project/.wtf/…) and bare relative
+  // paths (.wtf/STATE.md) so a path without a leading separator is also blocked.
+  /(^|[/\\])\.wtf[/\\]STATE\.md$/i,
+  // Also match resolved symlink paths under ~/.wtf/projects/ (Pitfall #6)
+  /(^|[/\\])\.wtf[/\\]projects[/\\][^/\\]+[/\\]STATE\.md$/i,
 ];
 
 /**
@@ -44,7 +44,7 @@ const BASH_STATE_PATTERNS: RegExp[] = [
 ];
 
 /**
- * Tests whether the given file path matches a blocked authoritative .gsd/ state file.
+ * Tests whether the given file path matches a blocked authoritative .wtf/ state file.
  * Resolves `..` segments via path.resolve() and attempts realpathSync for symlinks.
  */
 export function isBlockedStateFile(filePath: string): boolean {
@@ -78,13 +78,13 @@ function matchesBlockedPattern(path: string): boolean {
 }
 
 /**
- * Error message returned when an agent attempts to directly write an authoritative .gsd/ state file.
+ * Error message returned when an agent attempts to directly write an authoritative .wtf/ state file.
  * Directs the agent to use engine tool calls instead.
  */
-export const BLOCKED_WRITE_ERROR = `Direct writes to .gsd/STATE.md are blocked. Use engine tool calls instead:
-- To complete a task: call gsd_complete_task(milestone_id, slice_id, task_id, summary)
-- To complete a slice: call gsd_complete_slice(milestone_id, slice_id, summary, uat_result)
-- To save a decision: call gsd_save_decision(scope, decision, choice, rationale)
-- To start a task: call gsd_start_task(milestone_id, slice_id, task_id)
-- To record verification: call gsd_record_verification(milestone_id, slice_id, task_id, evidence)
-- To report a blocker: call gsd_report_blocker(milestone_id, slice_id, task_id, description)`;
+export const BLOCKED_WRITE_ERROR = `Direct writes to .wtf/STATE.md are blocked. Use engine tool calls instead:
+- To complete a task: call wtf_complete_task(milestone_id, slice_id, task_id, summary)
+- To complete a slice: call wtf_complete_slice(milestone_id, slice_id, summary, uat_result)
+- To save a decision: call wtf_save_decision(scope, decision, choice, rationale)
+- To start a task: call wtf_start_task(milestone_id, slice_id, task_id)
+- To record verification: call wtf_record_verification(milestone_id, slice_id, task_id, evidence)
+- To report a blocker: call wtf_report_blocker(milestone_id, slice_id, task_id, description)`;

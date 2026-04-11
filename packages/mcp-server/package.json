@@ -1,7 +1,7 @@
 {
   "name": "@gsd-build/mcp-server",
   "version": "2.52.0",
-  "description": "MCP server exposing GSD orchestration tools for Claude Code, Cursor, and other MCP clients",
+  "description": "MCP server exposing WTF orchestration tools for Claude Code, Cursor, and other MCP clients",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -21,8 +21,8 @@
     }
   },
   "bin": {
-    "gsd-mcp-server": "./dist/cli.js",
-    "gsd-unit-tools": "./dist/unit-tools-cli.js"
+    "wtf-mcp-server": "./dist/cli.js",
+    "wtf-unit-tools": "./dist/unit-tools-cli.js"
   },
   "scripts": {
     "build": "tsc",

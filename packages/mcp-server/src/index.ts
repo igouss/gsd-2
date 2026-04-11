@@ -1,5 +1,5 @@
 /**
- * @gsd-build/mcp-server — MCP server exposing GSD state-mutation tools.
+ * @gsd-build/mcp-server — MCP server exposing WTF state-mutation tools.
  *
  * The interactive session server (SessionManager, createMcpServer) depends on
  * @gsd-build/rpc-client which is not available in this repo. Those modules

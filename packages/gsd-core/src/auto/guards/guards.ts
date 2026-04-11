@@ -37,7 +37,7 @@ export async function runGuards(
 
       deps.events.notify(label, "warning");
       deps.sendDesktopNotification(
-        "GSD", label, "warning", "stop-directive",
+        "WTF", label, "warning", "stop-directive",
         basename(s.originalBasePath || s.basePath),
       );
 
@@ -72,7 +72,7 @@ export async function runGuards(
   if (budgetCeiling !== undefined && budgetCeiling > 0) {
     const currentLedger = deps.getLedger() as { units: unknown } | null;
     let costUnits = currentLedger?.units;
-    if (process.env.GSD_PARALLEL_WORKER && s.autoStartTime && Array.isArray(costUnits)) {
+    if (process.env.WTF_PARALLEL_WORKER && s.autoStartTime && Array.isArray(costUnits)) {
       const sessionStartISO = new Date(s.autoStartTime).toISOString();
       costUnits = costUnits.filter(
         (u: { startedAt?: string }) => u.startedAt != null && u.startedAt >= sessionStartISO,
@@ -103,30 +103,30 @@ export async function runGuards(
       if (threshold.pct === 100 && budgetEnforcementAction !== "none") {
         const msg = `Budget ceiling ${deps.formatCost(budgetCeiling)} reached (spent ${deps.formatCost(totalCost)}).`;
         if (budgetEnforcementAction === "halt") {
-          deps.sendDesktopNotification("GSD", msg, "error", "budget", basename(s.originalBasePath || s.basePath));
+          deps.sendDesktopNotification("WTF", msg, "error", "budget", basename(s.originalBasePath || s.basePath));
           await deps.stopAuto("Budget ceiling reached");
           debugLog("autoLoop", { phase: "exit", reason: "budget-halt" });
           return { action: "break", reason: "budget-halt" };
         }
         if (budgetEnforcementAction === "pause") {
           deps.events.notify(
-            `${msg} Pausing auto-mode — /gsd auto to override and continue.`,
+            `${msg} Pausing auto-mode — /wtf auto to override and continue.`,
             "warning",
           );
-          deps.sendDesktopNotification("GSD", msg, "warning", "budget", basename(s.originalBasePath || s.basePath));
+          deps.sendDesktopNotification("WTF", msg, "warning", "budget", basename(s.originalBasePath || s.basePath));
           deps.logCmuxEvent(prefs, msg, "warning");
           await deps.pauseAuto();
           debugLog("autoLoop", { phase: "exit", reason: "budget-pause" });
           return { action: "break", reason: "budget-pause" };
         }
         deps.events.notify(`${msg} Continuing (enforcement: warn).`, "warning");
-        deps.sendDesktopNotification("GSD", msg, "warning", "budget", basename(s.originalBasePath || s.basePath));
+        deps.sendDesktopNotification("WTF", msg, "warning", "budget", basename(s.originalBasePath || s.basePath));
         deps.logCmuxEvent(prefs, msg, "warning");
       } else if (threshold.pct < 100) {
         const msg = `${threshold.label}: ${deps.formatCost(totalCost)} / ${deps.formatCost(budgetCeiling)}`;
         deps.events.notify(msg, threshold.notifyLevel);
         deps.sendDesktopNotification(
-          "GSD",
+          "WTF",
           msg,
           threshold.notifyLevel,
           "budget",

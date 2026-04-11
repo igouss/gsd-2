@@ -1,9 +1,9 @@
-// GSD Extension — Routing History (Adaptive Learning)
+// WTF Extension — Routing History (Adaptive Learning)
 // Tracks success/failure per tier per unit-type pattern to improve
 // classification accuracy over time.
 
 import { join } from "node:path";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 import type { ComplexityTier } from "../domain/types.ts";
 import { loadJsonFile, saveJsonFile } from "../persistence/json-persistence.ts";
 
@@ -24,7 +24,7 @@ export interface RoutingHistoryData {
   version: 1;
   /** Keyed by pattern string, e.g. "execute-task:docs" or "complete-slice" */
   patterns: Record<string, PatternHistory>;
-  /** User feedback entries (from /gsd:rate-unit) */
+  /** User feedback entries (from /wtf:rate-unit) */
   feedback: FeedbackEntry[];
   /** Last updated timestamp */
   updatedAt: string;
@@ -264,7 +264,7 @@ function createEmptyHistory(): RoutingHistoryData {
 }
 
 function historyPath(base: string): string {
-  return join(gsdRoot(base), HISTORY_FILE);
+  return join(wtfRoot(base), HISTORY_FILE);
 }
 
 function isRoutingHistoryData(data: unknown): data is RoutingHistoryData {

@@ -1,5 +1,5 @@
 /**
- * GSD Crash Recovery
+ * WTF Crash Recovery
  *
  * Detects interrupted auto-mode sessions via a lock file.
  * Written on auto-start, updated on each unit dispatch, deleted on clean stop.
@@ -12,7 +12,7 @@
 
 import { readFileSync, unlinkSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 import { atomicWriteSync } from "../persistence/atomic-write.ts";
 import { effectiveLockFile } from "./session-lock.ts";
 
@@ -27,7 +27,7 @@ export interface LockData {
 }
 
 function lockPath(basePath: string): string {
-  return join(gsdRoot(basePath), effectiveLockFile());
+  return join(wtfRoot(basePath), effectiveLockFile());
 }
 
 /** Write or update the lock file with current auto-mode state. */
@@ -107,13 +107,13 @@ export function formatCrashInfo(lock: LockData): string {
 
   // Add recovery guidance based on what was happening when it crashed
   if (lock.unitType === "starting" && lock.unitId === "bootstrap") {
-    lines.push(`No work was lost. Run /gsd auto to restart.`);
+    lines.push(`No work was lost. Run /wtf auto to restart.`);
   } else if (lock.unitType.includes("research") || lock.unitType.includes("plan")) {
-    lines.push(`The ${lock.unitType} unit may be incomplete. Run /gsd auto to re-run it.`);
+    lines.push(`The ${lock.unitType} unit may be incomplete. Run /wtf auto to re-run it.`);
   } else if (lock.unitType.includes("execute")) {
-    lines.push(`Task execution was interrupted. Run /gsd auto to resume — completed work is preserved.`);
+    lines.push(`Task execution was interrupted. Run /wtf auto to resume — completed work is preserved.`);
   } else if (lock.unitType.includes("complete")) {
-    lines.push(`Slice/milestone completion was interrupted. Run /gsd auto to finish.`);
+    lines.push(`Slice/milestone completion was interrupted. Run /wtf auto to finish.`);
   }
 
   return lines.join("\n");

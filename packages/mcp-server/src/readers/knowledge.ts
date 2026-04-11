@@ -1,8 +1,8 @@
-// GSD MCP Server — knowledge base reader
+// WTF MCP Server — knowledge base reader
 // Copyright (c) 2026 Jeremy McSpadden <jeremy@fluxlabs.net>
 
 import { readFileSync, existsSync } from 'node:fs';
-import { resolveGsdRoot, resolveRootFile } from './paths.ts';
+import { resolveWtfRoot, resolveRootFile } from './paths.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -90,8 +90,8 @@ function parseKnowledgeMarkdown(content: string): KnowledgeEntry[] {
 // ---------------------------------------------------------------------------
 
 export function readKnowledge(projectDir: string): KnowledgeResult {
-  const gsd = resolveGsdRoot(projectDir);
-  const knowledgePath = resolveRootFile(gsd, 'KNOWLEDGE.md');
+  const wtf = resolveWtfRoot(projectDir);
+  const knowledgePath = resolveRootFile(wtf, 'KNOWLEDGE.md');
 
   if (!existsSync(knowledgePath)) {
     return { entries: [], counts: { rules: 0, patterns: 0, lessons: 0 } };

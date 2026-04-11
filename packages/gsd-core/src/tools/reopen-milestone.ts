@@ -1,7 +1,7 @@
-// GSD — reopen-milestone tool handler
+// WTF — reopen-milestone tool handler
 
 /**
- * reopen-milestone handler — the core operation behind gsd_milestone_reopen.
+ * reopen-milestone handler — the core operation behind wtf_milestone_reopen.
  *
  * Resets a closed milestone back to "active", all of its slices to
  * "in_progress", and all tasks to "pending". Cleans up stale filesystem
@@ -17,7 +17,7 @@ import {
   updateSliceStatus,
   updateTaskStatus,
   transaction,
-} from "../persistence/gsd-db.ts";
+} from "../persistence/wtf-db.ts";
 import { invalidateStateCache } from "../state/state.ts";
 import { isClosedStatus } from "../domain/status-guards.ts";
 import { renderAllProjections } from "../workflow/workflow-projections.ts";

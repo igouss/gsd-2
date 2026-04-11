@@ -1,4 +1,4 @@
-// GSD Extension - File Parsing Helpers
+// WTF Extension - File Parsing Helpers
 // Parse cache, markdown section extraction, and utility functions.
 // Pure functions, zero Pi dependencies.
 

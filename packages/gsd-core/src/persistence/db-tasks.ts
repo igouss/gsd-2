@@ -1,6 +1,6 @@
-// GSD Database — Task CRUD
+// WTF Database — Task CRUD
 
-import { GSDError, GSD_STALE_STATE } from "../domain/errors.ts";
+import { WTFError, WTF_STALE_STATE } from "../domain/errors.ts";
 import { _getCurrentDb } from "./db-core.ts";
 import { transaction } from "./db-core.ts";
 
@@ -94,7 +94,7 @@ export function insertTask(t: {
   planning?: Partial<TaskPlanningRecord>;
 }): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `INSERT INTO tasks (
       milestone_id, slice_id, id, title, status, one_liner, narrative,
@@ -159,7 +159,7 @@ export function insertTask(t: {
 
 export function updateTaskStatus(milestoneId: string, sliceId: string, taskId: string, status: string, completedAt?: string): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `UPDATE tasks SET status = :status, completed_at = :completed_at
      WHERE milestone_id = :milestone_id AND slice_id = :slice_id AND id = :id`,
@@ -182,7 +182,7 @@ export function setTaskBlockerDiscovered(milestoneId: string, sliceId: string, t
 
 export function upsertTaskPlanning(milestoneId: string, sliceId: string, taskId: string, planning: Partial<TaskPlanningRecord>): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `UPDATE tasks SET
       title = COALESCE(:title, title),
@@ -232,7 +232,7 @@ export function getSliceTasks(milestoneId: string, sliceId: string): TaskRow[] {
 
 export function setTaskSummaryMd(milestoneId: string, sliceId: string, taskId: string, md: string): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `UPDATE tasks SET full_summary_md = :md WHERE milestone_id = :mid AND slice_id = :sid AND id = :tid`,
   ).run({ ":mid": milestoneId, ":sid": sliceId, ":tid": taskId, ":md": md });
@@ -240,7 +240,7 @@ export function setTaskSummaryMd(milestoneId: string, sliceId: string, taskId: s
 
 export function deleteTask(milestoneId: string, sliceId: string, taskId: string): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   transaction(() => {
     const d = _getCurrentDb()!;
     // Must delete verification_evidence first (FK constraint)

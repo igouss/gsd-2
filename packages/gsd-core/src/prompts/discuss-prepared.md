@@ -311,7 +311,7 @@ Once all four layers are complete, you have gathered:
 
 ### Capability Contract
 
-Before writing a roadmap, produce or update `.gsd/REQUIREMENTS.md`.
+Before writing a roadmap, produce or update `.wtf/REQUIREMENTS.md`.
 
 Use it as the project's explicit capability contract. Requirements discovered during the 4-layer discussion should be captured here with source `user` or `inferred` as appropriate.
 
@@ -326,16 +326,16 @@ If the user raises a substantive objection, adjust the roadmap. Otherwise, prese
 ### Naming Convention
 
 Directories use bare IDs. Files use ID-SUFFIX format. Titles live inside file content, not in names.
-- Milestone dir: `.gsd/milestones/{{milestoneId}}/`
+- Milestone dir: `.wtf/milestones/{{milestoneId}}/`
 - Milestone files: `{{milestoneId}}-CONTEXT.md`, `{{milestoneId}}-ROADMAP.md`
 - Slice dirs: `S01/`, `S02/`, etc.
 
 ### Single Milestone
 
 Once the user is satisfied, in a single pass:
-1. `mkdir -p .gsd/milestones/{{milestoneId}}/slices`
-2. Write or update `.gsd/PROJECT.md` — use the **Project** output template below. Describe what the project is, its current state, and list the milestone sequence.
-3. Write or update `.gsd/REQUIREMENTS.md` — use the **Requirements** output template below. Confirm requirement states, ownership, and traceability before roadmap creation.
+1. `mkdir -p .wtf/milestones/{{milestoneId}}/slices`
+2. Write or update `.wtf/PROJECT.md` — use the **Project** output template below. Describe what the project is, its current state, and list the milestone sequence.
+3. Write or update `.wtf/REQUIREMENTS.md` — use the **Requirements** output template below. Confirm requirement states, ownership, and traceability before roadmap creation.
 
 **Depth-Preservation Guidance for context.md:**
 When writing context.md, preserve the user's exact terminology, emphasis, and specific framing from the discussion. Do not paraphrase user nuance into generic summaries. If the user said "craft feel," write "craft feel" — not "high-quality user experience." If they emphasized a specific constraint or negative requirement, carry that emphasis through verbatim. The context file is downstream agents' only window into this conversation — flattening specifics into generics loses the signal that shaped every decision.
@@ -348,8 +348,8 @@ When writing context.md, preserve the user's exact terminology, emphasis, and sp
 - Ecosystem Notes: key findings from the ecosystem brief
 
 4. Write `{{contextPath}}` — use the **Context Enhanced** output template below. Preserve key risks, unknowns, existing codebase constraints, integration points, and relevant requirements surfaced during discussion.
-5. Call `gsd_plan_milestone` to create the roadmap. Decompose into demoable vertical slices with risk, depends, demo sentences, proof strategy, verification classes, milestone definition of done, requirement coverage, and a boundary map. If the milestone crosses multiple runtime boundaries, include an explicit final integration slice that proves the assembled system works end-to-end in a real environment. Use the **Roadmap** output template below to structure the tool call parameters.
-6. For each architectural or pattern decision made during discussion, call `gsd_decision_save` — the tool auto-assigns IDs and regenerates `.gsd/DECISIONS.md` automatically.
+5. Call `wtf_plan_milestone` to create the roadmap. Decompose into demoable vertical slices with risk, depends, demo sentences, proof strategy, verification classes, milestone definition of done, requirement coverage, and a boundary map. If the milestone crosses multiple runtime boundaries, include an explicit final integration slice that proves the assembled system works end-to-end in a real environment. Use the **Roadmap** output template below to structure the tool call parameters.
+6. For each architectural or pattern decision made during discussion, call `wtf_decision_save` — the tool auto-assigns IDs and regenerates `.wtf/DECISIONS.md` automatically.
 7. {{commitInstruction}}
 
 After writing the files, say exactly: "Milestone {{milestoneId}} ready." — nothing else. Auto-mode will start automatically.
@@ -360,15 +360,15 @@ Once the user confirms the milestone split:
 
 #### Phase 1: Shared artifacts
 
-1. For each milestone, call `gsd_milestone_generate_id` to get its ID — never invent milestone IDs manually. Then `mkdir -p .gsd/milestones/<ID>/slices`.
-2. Write `.gsd/PROJECT.md` — use the **Project** output template below.
-3. Write `.gsd/REQUIREMENTS.md` — use the **Requirements** output template below. Capture Active, Deferred, Out of Scope, and any already Validated requirements. Later milestones may have provisional ownership where slice plans do not exist yet.
-4. For any architectural or pattern decisions made during discussion, call `gsd_decision_save` — the tool auto-assigns IDs and regenerates `.gsd/DECISIONS.md` automatically.
+1. For each milestone, call `wtf_milestone_generate_id` to get its ID — never invent milestone IDs manually. Then `mkdir -p .wtf/milestones/<ID>/slices`.
+2. Write `.wtf/PROJECT.md` — use the **Project** output template below.
+3. Write `.wtf/REQUIREMENTS.md` — use the **Requirements** output template below. Capture Active, Deferred, Out of Scope, and any already Validated requirements. Later milestones may have provisional ownership where slice plans do not exist yet.
+4. For any architectural or pattern decisions made during discussion, call `wtf_decision_save` — the tool auto-assigns IDs and regenerates `.wtf/DECISIONS.md` automatically.
 
 #### Phase 2: Primary milestone
 
 5. Write a full enhanced `CONTEXT.md` for the primary milestone (the one discussed in depth). Use the `context-enhanced` template.
-6. Call `gsd_plan_milestone` for **only the primary milestone** — detail-planning later milestones now is waste because the codebase will change. Include requirement coverage and a milestone definition of done.
+6. Call `wtf_plan_milestone` for **only the primary milestone** — detail-planning later milestones now is waste because the codebase will change. Include requirement coverage and a milestone definition of done.
 
 #### MANDATORY: depends_on Frontmatter in CONTEXT.md
 
@@ -396,7 +396,7 @@ For each remaining milestone **one at a time, in sequence**, decide the most lik
 
 #### Milestone Gate Tracking (MANDATORY for multi-milestone)
 
-After EVERY Phase 3 gate decision, immediately write or update `.gsd/DISCUSSION-MANIFEST.json` with the cumulative state. This file is mechanically validated by the system before auto-mode starts — if gates are incomplete, auto-mode will NOT start.
+After EVERY Phase 3 gate decision, immediately write or update `.wtf/DISCUSSION-MANIFEST.json` with the cumulative state. This file is mechanically validated by the system before auto-mode starts — if gates are incomplete, auto-mode will NOT start.
 
 ```json
 {

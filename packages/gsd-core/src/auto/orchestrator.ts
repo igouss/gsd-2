@@ -99,7 +99,7 @@ async function runCustomEnginePath(
 
   // dispatch.action === "dispatch"
   const step = dispatch.step!;
-  const gsdState = await deps.deriveState(s.basePath);
+  const wtfState = await deps.deriveState(s.basePath);
 
   const iterData: IterationData = {
     unitType: step.unitType,
@@ -107,7 +107,7 @@ async function runCustomEnginePath(
     prompt: step.prompt,
     finalPrompt: step.prompt,
     pauseAfterUatDispatch: false,
-    state: gsdState,
+    state: wtfState,
     mid: s.currentMilestoneId ?? "workflow",
     midTitle: "Workflow",
     isRetry: false,
@@ -275,7 +275,7 @@ export async function autoLoop(
     }
 
     try {
-      const prefs = deps.loadEffectiveGSDPreferences()?.preferences;
+      const prefs = deps.loadEffectiveWTFPreferences()?.preferences;
 
       // ── Check sidecar queue before deriveState ──
       let sidecarItem: SidecarItem | undefined;
@@ -302,7 +302,7 @@ export async function autoLoop(
 
       // ── Route to engine path or dev path ──
       const isCustomEngine = s.activeEngineId != null && s.activeEngineId !== "dev"
-        && !sidecarItem && process.env.GSD_ENGINE_BYPASS !== "1";
+        && !sidecarItem && process.env.WTF_ENGINE_BYPASS !== "1";
 
       const result = isCustomEngine
         ? await runCustomEnginePath(ic, loopState, emitJournal)

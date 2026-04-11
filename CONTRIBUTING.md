@@ -1,8 +1,8 @@
-# Contributing to GSD-2
+# Contributing to WTF-2
 
-We're glad you're here. GSD-2 is an open project and contributions are welcome across the entire codebase. We hold a high bar for what gets merged — not to be gatekeepers, but because every change ships to real users and stability matters.
+We're glad you're here. WTF-2 is an open project and contributions are welcome across the entire codebase. We hold a high bar for what gets merged — not to be gatekeepers, but because every change ships to real users and stability matters.
 
-Read [VISION.md](VISION.md) before contributing. It defines what GSD-2 is, what it isn't, and what we won't accept.
+Read [VISION.md](VISION.md) before contributing. It defines what WTF-2 is, what it isn't, and what we won't accept.
 
 ## Before you start
 
@@ -48,12 +48,12 @@ git fetch origin
 git rebase origin/main
 ```
 
-## Working with GSD (team workflow)
+## Working with WTF (team workflow)
 
-GSD uses worktree-based isolation for multi-developer work. If you're contributing with GSD running, enable team mode in your project preferences:
+WTF uses worktree-based isolation for multi-developer work. If you're contributing with WTF running, enable team mode in your project preferences:
 
 ```yaml
-# .gsd/PREFERENCES.md
+# .wtf/PREFERENCES.md
 ---
 version: 1
 mode: team
@@ -147,7 +147,7 @@ The codebase is organized into these areas. All are open to contributions:
 | Agent core | `packages/pi-agent-core` | Agent orchestration — RFC required for changes |
 | Coding agent | `packages/pi-coding-agent` | The main coding agent |
 | MCP server | `packages/mcp-server` | Project state tools and MCP protocol |
-| GSD extension | `src/resources/extensions/gsd/` | GSD workflow — RFC required for auto-mode |
+| WTF extension | `src/resources/extensions/wtf/` | WTF workflow — RFC required for auto-mode |
 | Other extensions | `src/resources/extensions/` | Browser, search, voice, MCP client, etc. |
 | Native engine | `native/` | Rust N-API modules (grep, git, AST, etc.) |
 | VS Code extension | `vscode-extension/` | Chat participant, sidebar, RPC integration |

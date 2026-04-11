@@ -5,7 +5,7 @@
  * This stub exports the types and no-op functions that gsd-core needs.
  */
 
-import type { GSDPreferences } from "../preferences/preferences.ts";
+import type { WTFPreferences } from "../preferences/preferences.ts";
 
 export type CmuxLogLevel = "info" | "progress" | "success" | "warning" | "error";
 
@@ -28,7 +28,7 @@ export interface ResolvedCmuxConfig extends CmuxEnvironment {
 export class CmuxClient {
   constructor(_config: ResolvedCmuxConfig) {}
 
-  static fromPreferences(_preferences: GSDPreferences | undefined): CmuxClient {
+  static fromPreferences(_preferences: WTFPreferences | undefined): CmuxClient {
     return new CmuxClient({
       available: false,
       cliAvailable: false,
@@ -64,7 +64,7 @@ export function emitOsc777Notification(_title: string, _body: string): void {
 }
 
 export function resolveCmuxConfig(
-  _preferences: GSDPreferences | undefined,
+  _preferences: WTFPreferences | undefined,
   _env: NodeJS.ProcessEnv = process.env,
 ): ResolvedCmuxConfig {
   return {

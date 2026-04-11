@@ -3,11 +3,11 @@
  *
  * Four synchronous functions for recovering from broken git state
  * during auto-mode operations. Uses only `git reset --hard HEAD` —
- * never `git clean` (which would delete untracked .gsd/ dirs).
+ * never `git clean` (which would delete untracked .wtf/ dirs).
  *
  * Observability: Each function returns structured results describing
  * what actions were taken. `formatGitError` maps raw git errors to
- * user-friendly messages suggesting `/gsd doctor`.
+ * user-friendly messages suggesting `/wtf doctor`.
  */
 
 import { existsSync, unlinkSync } from "node:fs";
@@ -87,23 +87,23 @@ export function abortAndReset(cwd: string): AbortAndResetResult {
 const ERROR_PATTERNS: Array<{ pattern: RegExp; message: string }> = [
   {
     pattern: /conflict|CONFLICT|merge conflict/i,
-    message: "A merge conflict occurred. Code changes on different branches touched the same files. Run `/gsd doctor` to diagnose.",
+    message: "A merge conflict occurred. Code changes on different branches touched the same files. Run `/wtf doctor` to diagnose.",
   },
   {
     pattern: /cannot checkout|did not match any|pathspec .* did not match/i,
-    message: "Git could not switch branches — the target branch may not exist or the working tree is dirty. Run `/gsd doctor` to diagnose.",
+    message: "Git could not switch branches — the target branch may not exist or the working tree is dirty. Run `/wtf doctor` to diagnose.",
   },
   {
     pattern: /HEAD detached|detached HEAD/i,
-    message: "Git is in a detached HEAD state — not on any branch. Run `/gsd doctor` to diagnose and reattach.",
+    message: "Git is in a detached HEAD state — not on any branch. Run `/wtf doctor` to diagnose and reattach.",
   },
   {
     pattern: /\.lock|Unable to create .* lock|lock file/i,
-    message: "A git lock file is blocking operations. Another git process may be running, or a previous one crashed. Run `/gsd doctor` to diagnose.",
+    message: "A git lock file is blocking operations. Another git process may be running, or a previous one crashed. Run `/wtf doctor` to diagnose.",
   },
   {
     pattern: /fatal: not a git repository/i,
-    message: "This directory is not a git repository. Run `/gsd doctor` to check your project setup.",
+    message: "This directory is not a git repository. Run `/wtf doctor` to check your project setup.",
   },
 ];
 
@@ -111,7 +111,7 @@ const ERROR_PATTERNS: Array<{ pattern: RegExp; message: string }> = [
  * Translate raw git error strings into user-friendly messages.
  *
  * Pattern-matches against common git error strings and returns
- * a non-technical message suggesting `/gsd doctor`. Returns the
+ * a non-technical message suggesting `/wtf doctor`. Returns the
  * original message if no pattern matches.
  */
 export function formatGitError(error: string | Error): string {
@@ -123,5 +123,5 @@ export function formatGitError(error: string | Error): string {
     }
   }
 
-  return `A git error occurred: ${errorStr.slice(0, 200)}. Run \`/gsd doctor\` for help.`;
+  return `A git error occurred: ${errorStr.slice(0, 200)}. Run \`/wtf doctor\` for help.`;
 }

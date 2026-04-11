@@ -1,6 +1,6 @@
 /**
  * Pre-unit git checkpoint and rollback for auto-mode safety harness.
- * Uses the existing refs/gsd/ namespace (already pruned by doctor).
+ * Uses the existing refs/wtf/ namespace (already pruned by doctor).
  *
  * Creates a lightweight ref at HEAD before unit execution. On failure,
  * the ref can be used to rollback the branch to the pre-unit state.
@@ -13,7 +13,7 @@ import { logWarning } from "../workflow/workflow-logger.ts";
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
-const CHECKPOINT_PREFIX = "refs/gsd/checkpoints/";
+const CHECKPOINT_PREFIX = "refs/wtf/checkpoints/";
 
 // ─── Public API ─────────────────────────────────────────────────────────────
 

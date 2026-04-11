@@ -41,6 +41,6 @@ Once investigation is complete:
 
 1. Use the **Context** output template below
 2. `mkdir -p` the milestone directory if needed
-3. Call `gsd_summary_save` with `milestone_id: {{milestoneId}}`, `artifact_type: "CONTEXT"`, and the full context markdown as `content` — the tool writes the file to disk and persists to DB. Preserve precise terminology from the codebase and prior context. Do not paraphrase into generic summaries. The context file is downstream agents' only window into this investigation.
+3. Call `wtf_summary_save` with `milestone_id: {{milestoneId}}`, `artifact_type: "CONTEXT"`, and the full context markdown as `content` — the tool writes the file to disk and persists to DB. Preserve precise terminology from the codebase and prior context. Do not paraphrase into generic summaries. The context file is downstream agents' only window into this investigation.
 4. {{commitInstruction}}
 5. Say exactly: `"{{milestoneId}} context written."` — nothing else.

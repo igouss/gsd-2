@@ -11,23 +11,24 @@ import { isAbsolute, join } from "node:path";
 import { statSync } from "node:fs";
 
 import type {
-  GSDPreferences,
+  WTFPreferences,
   SkillDiscoveryMode,
   SkillResolution,
   SkillResolutionReport,
 } from "./preferences-types.ts";
 import { validatePreferences } from "./preferences-validation.ts";
-import { loadEffectiveGSDPreferences } from "./preferences.ts";
+import { loadEffectiveWTFPreferences } from "./preferences.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 // Re-export types so existing consumers of ./preferences-skills.js keep working
-export type { GSDSkillRule, SkillDiscoveryMode, SkillResolution, SkillResolutionReport } from "./preferences-types.ts";
+export type { WTFSkillRule, SkillDiscoveryMode, SkillResolution, SkillResolutionReport } from "./preferences-types.ts";
 
 /**
  * Known skill directories, in priority order.
  * Searches both the skills.sh ecosystem directory (~/.agents/skills/) and
  * Claude Code's official directory (~/.claude/skills/). Project-level
  * directories for both conventions are included as well.
- * Legacy ~/.gsd/agent/skills/ is included as a fallback for pre-migration installs.
+ * Legacy ~/.wtf/agent/skills/ is included as a fallback for pre-migration installs.
  */
 export function getSkillSearchDirs(cwd: string): Array<{ dir: string; method: SkillResolution["method"] }> {
   const dirs: Array<{ dir: string; method: SkillResolution["method"] }> = [
@@ -37,8 +38,8 @@ export function getSkillSearchDirs(cwd: string): Array<{ dir: string; method: Sk
     { dir: join(homedir(), ".claude", "skills"), method: "user-skill" },
     { dir: join(cwd, ".claude", "skills"), method: "project-skill" },
   ];
-  // Legacy fallback — read skills from old GSD directory only if migration hasn't completed
-  const legacyDir = join(homedir(), ".gsd", "agent", "skills");
+  // Legacy fallback — read skills from old WTF directory only if migration hasn't completed
+  const legacyDir = join(homedir(), PROJECT_DIR_NAME, "agent", "skills");
   if (existsSync(legacyDir) && !existsSync(join(legacyDir, ".migrated-to-agents"))) {
     dirs.push({ dir: legacyDir, method: "user-skill" });
   }
@@ -110,7 +111,7 @@ export function resolveSkillReference(ref: string, cwd: string): SkillResolution
  * Resolve all skill references in a preferences object.
  * Caches resolution per reference string to avoid redundant filesystem scans.
  */
-export function resolveAllSkillReferences(preferences: GSDPreferences, cwd: string): SkillResolutionReport {
+export function resolveAllSkillReferences(preferences: WTFPreferences, cwd: string): SkillResolutionReport {
   const validated = validatePreferences(preferences).preferences;
   preferences = validated;
 
@@ -166,7 +167,7 @@ export function formatSkillRef(ref: string, resolutions: Map<string, SkillResolu
  * Defaults to "suggest" -- skills are identified during research but not installed automatically.
  */
 export function resolveSkillDiscoveryMode(): SkillDiscoveryMode {
-  const prefs = loadEffectiveGSDPreferences();
+  const prefs = loadEffectiveWTFPreferences();
   return prefs?.preferences.skill_discovery ?? "suggest";
 }
 
@@ -175,6 +176,6 @@ export function resolveSkillDiscoveryMode(): SkillDiscoveryMode {
  * Returns 0 if disabled, default 60 if not configured.
  */
 export function resolveSkillStalenessDays(): number {
-  const prefs = loadEffectiveGSDPreferences();
+  const prefs = loadEffectiveWTFPreferences();
   return prefs?.preferences.skill_staleness_days ?? 60;
 }

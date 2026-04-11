@@ -1,9 +1,9 @@
 /**
- * GSD Parallel Orchestrator — Core engine for parallel milestone orchestration.
+ * WTF Parallel Orchestrator — Core engine for parallel milestone orchestration.
  *
  * Manages worker lifecycle, budget tracking, and coordination. Workers are
  * separate processes spawned via child_process, each running in its own git
- * worktree with GSD_MILESTONE_LOCK env var set. The coordinator monitors
+ * worktree with WTF_MILESTONE_LOCK env var set. The coordinator monitors
  * workers via session status files (see session-status-io.ts).
  */
 
@@ -19,13 +19,13 @@ import {
 } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 import { createWorktree, worktreePath } from "../git/worktree-manager.ts";
-import { autoWorktreeBranch, runWorktreePostCreateHook, syncGsdStateToWorktree } from "../auto/auto-worktree.ts";
+import { autoWorktreeBranch, runWorktreePostCreateHook, syncWtfStateToWorktree } from "../auto/auto-worktree.ts";
 import { nativeBranchExists } from "../git/native-git-bridge.ts";
 import { readIntegrationBranch } from "../git/git-service.ts";
 import { resolveParallelConfig } from "../preferences/preferences.ts";
-import type { GSDPreferences } from "../preferences/preferences.ts";
+import type { WTFPreferences } from "../preferences/preferences.ts";
 import type { ParallelConfig } from "../domain/types.ts";
 import {
   writeSessionStatus,
@@ -91,17 +91,17 @@ export interface PersistedState {
 }
 
 function stateFilePath(basePath: string): string {
-  return join(gsdRoot(basePath), ORCHESTRATOR_STATE_FILE);
+  return join(wtfRoot(basePath), ORCHESTRATOR_STATE_FILE);
 }
 
 /**
- * Persist the current orchestrator state to .gsd/orchestrator.json.
+ * Persist the current orchestrator state to .wtf/orchestrator.json.
  * Uses atomic write (tmp + rename) to prevent partial reads.
  */
 export function persistState(basePath: string): void {
   if (!state) return;
   try {
-    const dir = gsdRoot(basePath);
+    const dir = wtfRoot(basePath);
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 
     const persisted: PersistedState = {
@@ -152,7 +152,7 @@ function isPidAlive(pid: number): boolean {
 }
 
 /**
- * Restore orchestrator state from .gsd/orchestrator.json.
+ * Restore orchestrator state from .wtf/orchestrator.json.
  * Checks PID liveness for each worker:
  * - Living PID → state "running", process stays null (no handle)
  * - Dead PID → removed from restored state
@@ -185,12 +185,12 @@ export function restoreState(basePath: string): PersistedState | null {
 }
 
 function workerLogPath(basePath: string, milestoneId: string): string {
-  return join(gsdRoot(basePath), "parallel", `${milestoneId}.stderr.log`);
+  return join(wtfRoot(basePath), "parallel", `${milestoneId}.stderr.log`);
 }
 
 function appendWorkerLog(basePath: string, milestoneId: string, chunk: string): void {
   try {
-    const dir = join(gsdRoot(basePath), "parallel");
+    const dir = join(wtfRoot(basePath), "parallel");
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
     appendFileSync(workerLogPath(basePath, milestoneId), chunk, "utf-8");
   } catch (e) {
@@ -245,7 +245,7 @@ function restoreRuntimeState(basePath: string): boolean {
 
   // Fallback: rebuild coordinator state from live session status files.
   // This covers cases where orchestrator.json is missing/corrupt but workers are
-  // still running and writing heartbeats under .gsd/parallel/.
+  // still running and writing heartbeats under .wtf/parallel/.
   cleanupStaleSessions(basePath);
   const statuses = readAllSessionStatuses(basePath);
   if (statuses.length === 0) {
@@ -330,7 +330,7 @@ export function getWorkerStatuses(basePath?: string): WorkerInfo[] {
  */
 export async function prepareParallelStart(
   basePath: string,
-  _prefs: GSDPreferences | undefined,
+  _prefs: WTFPreferences | undefined,
 ): Promise<ParallelCandidates & { orphans?: Array<{ milestoneId: string; pid: number; alive: boolean }> }> {
   // Detect orphaned sessions before eligibility analysis
   const sessions = readAllSessionStatuses(basePath);
@@ -357,10 +357,10 @@ export async function prepareParallelStart(
 export async function startParallel(
   basePath: string,
   milestoneIds: string[],
-  prefs: GSDPreferences | undefined,
+  prefs: WTFPreferences | undefined,
 ): Promise<{ started: string[]; errors: Array<{ mid: string; error: string }> }> {
   // Prevent workers from spawning nested parallel sessions
-  if (process.env.GSD_PARALLEL_WORKER) {
+  if (process.env.WTF_PARALLEL_WORKER) {
     return { started: [], errors: [{ mid: "all", error: "Cannot start parallel from within a parallel worker" }] };
   }
 
@@ -509,10 +509,10 @@ function createMilestoneWorktree(basePath: string, milestoneId: string): string 
   // Run post-create hook if configured
   runWorktreePostCreateHook(basePath, info.path);
 
-  // Copy .gsd/ planning artifacts (milestones, CONTEXT, ROADMAP, etc.) from the
+  // Copy .wtf/ planning artifacts (milestones, CONTEXT, ROADMAP, etc.) from the
   // project root into the worktree. Without this, workers for newly-planned
   // milestones can't find their roadmap and exit immediately (#2184 Bug 4).
-  syncGsdStateToWorktree(basePath, info.path);
+  syncWtfStateToWorktree(basePath, info.path);
 
   return info.path;
 }
@@ -521,10 +521,10 @@ function createMilestoneWorktree(basePath: string, milestoneId: string): string 
 
 /**
  * Spawn a worker process for a milestone.
- * The worker runs `gsd headless --json auto` in the milestone's worktree
- * with GSD_MILESTONE_LOCK set to isolate state derivation.
+ * The worker runs `wtf headless --json auto` in the milestone's worktree
+ * with WTF_MILESTONE_LOCK set to isolate state derivation.
  *
- * IMPORTANT: We use `headless --json auto` instead of `--print "/gsd auto"`.
+ * IMPORTANT: We use `headless --json auto` instead of `--print "/wtf auto"`.
  * --print mode calls session.prompt() which returns immediately after the
  * extension command handler fires, because auto-mode's ctx.newSession()
  * resets the session and unblocks the outer prompt() await. This causes
@@ -544,28 +544,28 @@ export function spawnWorker(
   if (!worker) return false;
   if (worker.process) return true; // already spawned
 
-  // Resolve the GSD CLI binary path
-  const binPath = resolveGsdBin();
+  // Resolve the WTF CLI binary path
+  const binPath = resolveWtfBin();
   if (!binPath) return false;
 
   let child: ChildProcess;
   try {
     const workerEnv: Record<string, string | undefined> = {
       ...process.env,
-      GSD_MILESTONE_LOCK: milestoneId,
+      WTF_MILESTONE_LOCK: milestoneId,
       // Pass the real project root so workers don't need to re-derive it.
       // Without this, process.cwd() resolves symlinks and the worktree
-      // path heuristic can match the user-level ~/.gsd instead of the
-      // project .gsd, causing writes to ~ and corrupting user config.
-      GSD_PROJECT_ROOT: basePath,
+      // path heuristic can match the user-level ~/.wtf instead of the
+      // project .wtf, causing writes to ~ and corrupting user config.
+      WTF_PROJECT_ROOT: basePath,
       // Prevent workers from spawning their own parallel sessions
-      GSD_PARALLEL_WORKER: "1",
+      WTF_PARALLEL_WORKER: "1",
     };
 
     // Apply worker model override if configured, so workers use a cheaper
     // model (e.g. Haiku) rather than inheriting the coordinator's model.
     if (state.config.worker_model) {
-      workerEnv.GSD_WORKER_MODEL = state.config.worker_model;
+      workerEnv.WTF_WORKER_MODEL = state.config.worker_model;
     }
 
     child = spawn(process.execPath, [binPath, "headless", "--json", "auto"], {
@@ -689,18 +689,18 @@ export function spawnWorker(
 }
 
 /**
- * Resolve the GSD CLI binary path.
- * Uses GSD_BIN_PATH env var (set by loader.ts) or falls back to
+ * Resolve the WTF CLI binary path.
+ * Uses WTF_BIN_PATH env var (set by loader.ts) or falls back to
  * finding the binary relative to the current module.
  */
-function resolveGsdBin(): string | null {
-  // GSD_BIN_PATH is set by loader.ts to the absolute path of dist/loader.js
-  if (process.env.GSD_BIN_PATH && existsSync(process.env.GSD_BIN_PATH)) {
-    return process.env.GSD_BIN_PATH;
+function resolveWtfBin(): string | null {
+  // WTF_BIN_PATH is set by loader.ts to the absolute path of dist/loader.js
+  if (process.env.WTF_BIN_PATH && existsSync(process.env.WTF_BIN_PATH)) {
+    return process.env.WTF_BIN_PATH;
   }
 
   // Fallback: try to find loader.js relative to this file
-  // This file is at dist/resources/extensions/gsd/parallel-orchestrator.js
+  // This file is at dist/resources/extensions/wtf/parallel-orchestrator.js
   // loader.js is at dist/loader.js
   let thisDir: string;
   try {
@@ -778,7 +778,7 @@ function processWorkerLine(basePath: string, milestoneId: string, line: string):
 
   // tool_execution_start can track current unit
   if (type === "extension_ui_request" && event.method === "notify") {
-    // GSD auto-mode sends notifications about current unit
+    // WTF auto-mode sends notifications about current unit
     const worker = state.workers.get(milestoneId);
     if (worker) {
       writeSessionStatus(basePath, {

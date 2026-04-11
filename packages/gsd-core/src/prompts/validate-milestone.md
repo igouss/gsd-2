@@ -25,13 +25,13 @@ All relevant context has been preloaded below — the roadmap, all slice summari
 Call `subagent` with `tasks: [...]` containing ALL THREE reviewers simultaneously:
 
 **Reviewer A — Requirements Coverage**
-Prompt: "Review milestone {{milestoneId}} requirements coverage. Working directory: {{workingDirectory}}. Read `.gsd/{{milestoneId}}/REQUIREMENTS.md` (or equivalent requirements file). For each requirement, check the slice SUMMARY files in `.gsd/{{milestoneId}}/` to determine if it is: COVERED (clearly demonstrated), PARTIAL (mentioned but not fully demonstrated), or MISSING (no evidence). Output a markdown table with columns: Requirement | Status | Evidence. End with a one-line verdict: PASS if all covered, NEEDS-ATTENTION if partials exist, FAIL if any missing."
+Prompt: "Review milestone {{milestoneId}} requirements coverage. Working directory: {{workingDirectory}}. Read `.wtf/{{milestoneId}}/REQUIREMENTS.md` (or equivalent requirements file). For each requirement, check the slice SUMMARY files in `.wtf/{{milestoneId}}/` to determine if it is: COVERED (clearly demonstrated), PARTIAL (mentioned but not fully demonstrated), or MISSING (no evidence). Output a markdown table with columns: Requirement | Status | Evidence. End with a one-line verdict: PASS if all covered, NEEDS-ATTENTION if partials exist, FAIL if any missing."
 
 **Reviewer B — Cross-Slice Integration**
 Prompt: "Review milestone {{milestoneId}} cross-slice integration. Working directory: {{workingDirectory}}. Read `{{roadmapPath}}` and find the boundary map (produces/consumes contracts). For each boundary, check that the producing slice's SUMMARY confirms it produced the artifact, and the consuming slice's SUMMARY confirms it consumed it. Output a markdown table: Boundary | Producer Summary | Consumer Summary | Status. End with a one-line verdict: PASS if all boundaries honored, NEEDS-ATTENTION if any gaps."
 
 **Reviewer C — UAT & Acceptance Criteria**
-Prompt: "Review milestone {{milestoneId}} UAT and acceptance criteria. Working directory: {{workingDirectory}}. Read `.gsd/{{milestoneId}}/CONTEXT.md` for acceptance criteria. Check for UAT-RESULT files in each slice directory. Verify each acceptance criterion maps to either a passing UAT result or clear SUMMARY evidence. Output a checklist: [ ] Criterion | Evidence. End with a one-line verdict: PASS if all criteria met, NEEDS-ATTENTION if gaps exist."
+Prompt: "Review milestone {{milestoneId}} UAT and acceptance criteria. Working directory: {{workingDirectory}}. Read `.wtf/{{milestoneId}}/CONTEXT.md` for acceptance criteria. Check for UAT-RESULT files in each slice directory. Verify each acceptance criterion maps to either a passing UAT result or clear SUMMARY evidence. Output a checklist: [ ] Criterion | Evidence. End with a one-line verdict: PASS if all criteria met, NEEDS-ATTENTION if gaps exist."
 
 ### Step 2 — Synthesize Findings
 
@@ -69,7 +69,7 @@ reviewers: 3
 <if verdict is not pass: specific actions required>
 ```
 
-**DB access safety:** Do NOT query `.gsd/gsd.db` directly via `sqlite3` or `node -e require('better-sqlite3')` — the engine owns the WAL connection. Use `gsd_milestone_status` to read milestone and slice state. All data you need is already inlined in the context above or accessible via the `gsd_*` tools. Direct DB access corrupts the WAL and bypasses tool-level validation.
+**DB access safety:** Do NOT query `.wtf/gsd.db` directly via `sqlite3` or `node -e require('better-sqlite3')` — the engine owns the WAL connection. Use `wtf_milestone_status` to read milestone and slice state. All data you need is already inlined in the context above or accessible via the `wtf_*` tools. Direct DB access corrupts the WAL and bypasses tool-level validation.
 
 If verdict is `needs-remediation`:
 - Add new slices to `{{roadmapPath}}` with unchecked `[ ]` status

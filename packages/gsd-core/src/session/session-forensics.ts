@@ -1,5 +1,5 @@
 /**
- * GSD Session Forensics — Deep analysis of pi session JSONL files
+ * WTF Session Forensics — Deep analysis of pi session JSONL files
  *
  * Pi's SessionManager persists every entry to disk via appendFileSync as it
  * happens. When a crash occurs, the session JSONL on disk contains every tool
@@ -11,7 +11,7 @@
  *
  * Used by:
  * - Crash recovery (reading the surviving pi session file)
- * - Stuck-retry diagnostics (reading GSD activity log copies)
+ * - Stuck-retry diagnostics (reading WTF activity log copies)
  *
  * Entry format (verified against real pi session files):
  * - Tool calls: { type: "toolCall", name: "bash", id: "toolu_...", arguments: { command: "..." } }
@@ -20,7 +20,7 @@
 
 import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { basename, join } from "node:path";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 import { truncateWithEllipsis } from "../shared/format-utils.ts";
 import { nativeParseJsonlTail } from "../git/native-parser-bridge.ts";
 import { MAX_JSONL_BYTES, parseJSONL } from "../persistence/jsonl-utils.ts";
@@ -88,7 +88,7 @@ function extractLastSession(entries: unknown[]): unknown[] {
 
 /**
  * Extract a structured execution trace from raw session entries.
- * Works with both pi session JSONL and GSD activity log JSONL.
+ * Works with both pi session JSONL and WTF activity log JSONL.
  */
 export function extractTrace(entries: unknown[]): ExecutionTrace {
   const toolCalls: ToolCall[] = [];
@@ -231,7 +231,7 @@ function getGitChanges(basePath: string): string | null {
 /**
  * Synthesize a full crash recovery briefing.
  *
- * Reads the surviving pi session file (or falls back to the last GSD activity
+ * Reads the surviving pi session file (or falls back to the last WTF activity
  * log), deep-parses it into an execution trace, combines with git state, and
  * formats a structured prompt section ready for injection.
  */
@@ -265,7 +265,7 @@ export function synthesizeCrashRecovery(
       }
     }
 
-    // Fallback: last GSD activity log
+    // Fallback: last WTF activity log
     if (!trace || trace.toolCallCount === 0) {
       const fallbackTrace = readLastActivityLog(activityDir);
       if (fallbackTrace && fallbackTrace.toolCallCount > 0) {
@@ -299,14 +299,14 @@ export function getDeepDiagnostic(basePath: string, worktreePath?: string): stri
   let trace: ExecutionTrace | null = null;
   try {
     if (worktreePath) {
-      const wtActivityDir = join(gsdRoot(worktreePath), "activity");
+      const wtActivityDir = join(wtfRoot(worktreePath), "activity");
       trace = readLastActivityLog(wtActivityDir);
     }
   } catch { /* non-fatal — fall through to root */ }
 
   // Fall back to root activity logs
   if (!trace || trace.toolCallCount === 0) {
-    const activityDir = join(gsdRoot(basePath), "activity");
+    const activityDir = join(wtfRoot(basePath), "activity");
     trace = readLastActivityLog(activityDir);
   }
 
@@ -320,7 +320,7 @@ export function getDeepDiagnostic(basePath: string, worktreePath?: string): stri
  */
 export function readActiveMilestoneId(basePath: string): string | null {
   try {
-    const statePath = join(gsdRoot(basePath), "STATE.md");
+    const statePath = join(wtfRoot(basePath), "STATE.md");
     if (!existsSync(statePath)) return null;
     const content = readFileSync(statePath, "utf-8");
     const match = /\*\*Active Milestone:\*\*\s*(\S+)/i.exec(content);

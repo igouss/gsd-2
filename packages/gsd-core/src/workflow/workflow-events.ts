@@ -3,6 +3,7 @@ import { appendFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { atomicWriteSync } from "../persistence/atomic-write.ts";
 import { logWarning } from "../workflow/workflow-logger.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 // ─── Session ID ───────────────────────────────────────────────────────────
 
@@ -33,9 +34,9 @@ export interface WorkflowEvent {
 // ─── appendEvent ─────────────────────────────────────────────────────────
 
 /**
- * Append one event to .gsd/event-log.jsonl.
+ * Append one event to .wtf/event-log.jsonl.
  * Computes a content hash from cmd+params (deterministic, independent of ts/actor/session).
- * Creates .gsd directory if needed.
+ * Creates .wtf directory if needed.
  */
 export function appendEvent(
   basePath: string,
@@ -52,7 +53,7 @@ export function appendEvent(
     hash,
     session_id: ENGINE_SESSION_ID,
   };
-  const dir = join(basePath, ".gsd");
+  const dir = join(basePath, PROJECT_DIR_NAME);
   mkdirSync(dir, { recursive: true });
   appendFileSync(join(dir, "event-log.jsonl"), JSON.stringify(fullEvent) + "\n", "utf-8");
 }
@@ -116,7 +117,7 @@ export function findForkPoint(
  * Active log retains only events from other milestones.
  * Archived file is kept on disk for forensics.
  *
- * @param basePath - Project root (parent of .gsd/)
+ * @param basePath - Project root (parent of .wtf/)
  * @param milestoneId - The milestone whose events should be archived
  * @returns { archived: number } — count of events moved to archive
  */
@@ -124,8 +125,8 @@ export function compactMilestoneEvents(
   basePath: string,
   milestoneId: string,
 ): { archived: number } {
-  const logPath = join(basePath, ".gsd", "event-log.jsonl");
-  const archivePath = join(basePath, ".gsd", `event-log-${milestoneId}.jsonl.archived`);
+  const logPath = join(basePath, PROJECT_DIR_NAME, "event-log.jsonl");
+  const archivePath = join(basePath, PROJECT_DIR_NAME, `event-log-${milestoneId}.jsonl.archived`);
 
   const allEvents = readEvents(logPath);
   const toArchive = allEvents.filter(

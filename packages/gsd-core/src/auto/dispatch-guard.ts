@@ -1,9 +1,9 @@
-// GSD Dispatch Guard — prevents out-of-order slice dispatch
+// WTF Dispatch Guard — prevents out-of-order slice dispatch
 
 import { resolveMilestoneFile } from "../persistence/paths.ts";
 import { findMilestoneIds } from "./guided-flow.ts";
 import { parseUnitId } from "../domain/unit-id.ts";
-import { isDbAvailable, getMilestoneSlices } from "../persistence/gsd-db.ts";
+import { isDbAvailable, getMilestoneSlices } from "../persistence/wtf-db.ts";
 import { parseRoadmap } from "../persistence/md-parsers.ts";
 import { isClosedStatus } from "../domain/status-guards.ts";
 import { readFileSync } from "node:fs";
@@ -27,12 +27,12 @@ export function getPriorSliceCompletionBlocker(
   const { milestone: targetMid, slice: targetSid } = parseUnitId(unitId);
   if (!targetMid || !targetSid) return null;
 
-  // Parallel worker isolation: when GSD_MILESTONE_LOCK is set, this worker
+  // Parallel worker isolation: when WTF_MILESTONE_LOCK is set, this worker
   // is scoped to a single milestone. Skip the cross-milestone dependency
   // check — other milestones are being handled by their own workers.
   // Without this, the dispatch guard sees incomplete slices in M010/M011
   // (cloned into the worktree DB) and blocks M012 from ever starting. #2797
-  const milestoneLock = process.env.GSD_MILESTONE_LOCK;
+  const milestoneLock = process.env.WTF_MILESTONE_LOCK;
 
   // Use findMilestoneIds to respect custom queue order.
   // Only check milestones that come BEFORE the target in queue order.

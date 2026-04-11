@@ -1,5 +1,5 @@
 /**
- * GSD Workflow Templates — Registry & Resolution
+ * WTF Workflow Templates — Registry & Resolution
  *
  * Loads the workflow template registry and resolves templates by name,
  * alias, or trigger-keyword matching against user input.
@@ -9,17 +9,18 @@ import { readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
-const __extensionDir = resolveGsdExtensionDir();
+const __extensionDir = resolveWtfExtensionDir();
 const registryPath = join(__extensionDir, "workflow-templates", "registry.json");
 
-/** Resolve the GSD extension dir with fallback to ~/.gsd/agent/extensions/gsd/. */
-function resolveGsdExtensionDir(): string {
+/** Resolve the WTF extension dir with fallback to ~/.wtf/agent/extensions/wtf/. */
+function resolveWtfExtensionDir(): string {
   const moduleDir = dirname(fileURLToPath(import.meta.url));
   if (existsSync(join(moduleDir, "workflow-templates"))) return moduleDir;
-  const gsdHome = process.env.GSD_HOME || join(homedir(), ".gsd");
-  const agentGsdDir = join(gsdHome, "agent", "extensions", "gsd");
-  if (existsSync(join(agentGsdDir, "workflow-templates"))) return agentGsdDir;
+  const wtfHome = process.env.WTF_HOME || join(homedir(), PROJECT_DIR_NAME);
+  const agentWtfDir = join(wtfHome, "agent", "extensions", "wtf");
+  if (existsSync(join(agentWtfDir, "workflow-templates"))) return agentWtfDir;
   return moduleDir;
 }
 
@@ -205,8 +206,8 @@ export function listTemplates(): string {
     lines.push("");
   }
 
-  lines.push("Usage: /gsd start <template> [description]");
-  lines.push("       /gsd templates info <name>");
+  lines.push("Usage: /wtf start <template> [description]");
+  lines.push("       /wtf templates info <name>");
 
   return lines.join("\n");
 }
@@ -224,7 +225,7 @@ export function getTemplateInfo(name: string): string | null {
     "",
     `Description: ${t.description}`,
     `Complexity:  ${t.estimated_complexity}`,
-    `Requires .gsd/: ${t.requires_project ? "yes" : "no"}`,
+    `Requires .wtf/: ${t.requires_project ? "yes" : "no"}`,
     "",
     "Phases:",
     ...t.phases.map((p, i) => `  ${i + 1}. ${p}`),

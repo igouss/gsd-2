@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# e2e-test.sh — Set up a throwaway project and run gsd-run against it.
+# e2e-test.sh — Set up a throwaway project and run wtf-run against it.
 # Usage: ./scripts/e2e-test.sh [--model <model>] [--timeout <seconds>]
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-PROJECT_DIR="/tmp/gsd-test-project"
-MODEL="${GSD_MODEL:-claude-sonnet-4-6}"
+PROJECT_DIR="/tmp/wtf-test-project"
+MODEL="${WTF_MODEL:-claude-sonnet-4-6}"
 TIMEOUT=360  # 6 minutes
 
 # ── Parse args ────────────────────────────────────────────────────────────────
@@ -18,7 +18,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-echo "=== GSD E2E Test ==="
+echo "=== WTF E2E Test ==="
 echo "Project:  $PROJECT_DIR"
 echo "Model:    $MODEL"
 echo "Timeout:  ${TIMEOUT}s"
@@ -38,7 +38,7 @@ echo "node_modules/" > .gitignore
 # Minimal package.json so the agent has a real project
 cat > package.json <<'PKGJSON'
 {
-  "name": "gsd-e2e-test",
+  "name": "wtf-e2e-test",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
@@ -82,13 +82,13 @@ SRC
 git add -A
 git commit -m "Initial project skeleton" --quiet
 
-# ── 3. Set up .gsd/ structure ─────────────────────────────────────────────────
-echo "→ Creating .gsd/ structure..."
-GSD="$PROJECT_DIR/.gsd"
-mkdir -p "$GSD/milestones/M001/slices/S01/tasks"
+# ── 3. Set up .wtf/ structure ─────────────────────────────────────────────────
+echo "→ Creating .wtf/ structure..."
+WTF="$PROJECT_DIR/.wtf"
+mkdir -p "$WTF/milestones/M001/slices/S01/tasks"
 
 # ── PROJECT.md ──
-cat > "$GSD/PROJECT.md" <<'PROJECT'
+cat > "$WTF/PROJECT.md" <<'PROJECT'
 # Project
 
 ## What This Is
@@ -113,7 +113,7 @@ Empty project skeleton with package.json and tsconfig.json. No implementation ye
 
 ## Capability Contract
 
-See `.gsd/REQUIREMENTS.md` for the explicit capability contract.
+See `.wtf/REQUIREMENTS.md` for the explicit capability contract.
 
 ## Milestone Sequence
 
@@ -121,14 +121,14 @@ See `.gsd/REQUIREMENTS.md` for the explicit capability contract.
 PROJECT
 
 # ── DECISIONS.md ──
-cat > "$GSD/DECISIONS.md" <<'DECISIONS'
+cat > "$WTF/DECISIONS.md" <<'DECISIONS'
 # Decisions
 
 (none yet)
 DECISIONS
 
 # ── REQUIREMENTS.md ──
-cat > "$GSD/REQUIREMENTS.md" <<'REQUIREMENTS'
+cat > "$WTF/REQUIREMENTS.md" <<'REQUIREMENTS'
 # Requirements
 
 - R001: Count words, lines, and characters from stdin or file input — **active**
@@ -137,8 +137,8 @@ cat > "$GSD/REQUIREMENTS.md" <<'REQUIREMENTS'
 REQUIREMENTS
 
 # ── STATE.md ──
-cat > "$GSD/STATE.md" <<'STATE'
-# GSD State
+cat > "$WTF/STATE.md" <<'STATE'
+# WTF State
 
 **Active Milestone:** M001: Word Counter CLI
 **Active Slice:** S01: Core Counting Logic + CLI
@@ -158,7 +158,7 @@ cat > "$GSD/STATE.md" <<'STATE'
 STATE
 
 # ── M001 CONTEXT ──
-cat > "$GSD/milestones/M001/M001-CONTEXT.md" <<'CONTEXT'
+cat > "$WTF/milestones/M001/M001-CONTEXT.md" <<'CONTEXT'
 # M001: Word Counter CLI
 
 **Gathered:** 2026-04-09
@@ -233,7 +233,7 @@ To call this milestone complete, we must prove:
 CONTEXT
 
 # ── M001 ROADMAP ──
-cat > "$GSD/milestones/M001/M001-ROADMAP.md" <<'ROADMAP'
+cat > "$WTF/milestones/M001/M001-ROADMAP.md" <<'ROADMAP'
 # M001: Word Counter CLI
 
 **Vision:** A working CLI word/line/char counter tool with tests.
@@ -291,7 +291,7 @@ This milestone is complete only when all are true:
 ROADMAP
 
 # ── S01 PLAN ──
-cat > "$GSD/milestones/M001/slices/S01/S01-PLAN.md" <<'PLAN'
+cat > "$WTF/milestones/M001/slices/S01/S01-PLAN.md" <<'PLAN'
 # S01: Core Counting Logic + CLI
 
 **Goal:** Implement word/line/char counting and a CLI that reads from stdin or file
@@ -348,9 +348,9 @@ echo "→ Installing dependencies..."
 cd "$PROJECT_DIR"
 npm install --quiet 2>/dev/null
 
-# Commit .gsd state
+# Commit .wtf state
 git add -A
-git commit -m "Add .gsd project state" --quiet
+git commit -m "Add .wtf project state" --quiet
 
 # ── 4. Build gsd-cli if needed ────────────────────────────────────────────────
 echo "→ Ensuring gsd-cli is built..."
@@ -360,15 +360,15 @@ if [[ ! -f packages/gsd-cli/dist/run.js ]]; then
   npm run -w packages/gsd-cli build --quiet
 fi
 
-# ── 5. Run gsd-run with timeout ───────────────────────────────────────────────
+# ── 5. Run wtf-run with timeout ───────────────────────────────────────────────
 echo ""
-echo "=== Starting gsd-run (timeout: ${TIMEOUT}s) ==="
+echo "=== Starting wtf-run (timeout: ${TIMEOUT}s) ==="
 echo ""
 
-GSD_RUN="$REPO_ROOT/packages/gsd-cli/dist/run.js"
+WTF_RUN="$REPO_ROOT/packages/gsd-cli/dist/run.js"
 
 set +e
-timeout "${TIMEOUT}s" node "$GSD_RUN" "$PROJECT_DIR" \
+timeout "${TIMEOUT}s" node "$WTF_RUN" "$PROJECT_DIR" \
   --model "$MODEL" \
   --verbose
 EXIT_CODE=$?
@@ -381,9 +381,9 @@ echo "Exit code: $EXIT_CODE"
 if [[ $EXIT_CODE -eq 124 ]]; then
   echo "⚠ Timed out after ${TIMEOUT}s (this is expected for the timeout guard)"
 elif [[ $EXIT_CODE -eq 0 ]]; then
-  echo "✓ gsd-run completed successfully"
+  echo "✓ wtf-run completed successfully"
 else
-  echo "✗ gsd-run failed with exit code $EXIT_CODE"
+  echo "✗ wtf-run failed with exit code $EXIT_CODE"
 fi
 
 # ── 6. Show what the agent produced ───────────────────────────────────────────
@@ -392,8 +392,8 @@ echo "=== Project state after run ==="
 echo "--- Files created ---"
 find "$PROJECT_DIR/src" -type f 2>/dev/null | sort
 echo ""
-echo "--- .gsd state ---"
-cat "$PROJECT_DIR/.gsd/STATE.md" 2>/dev/null || echo "(no STATE.md)"
+echo "--- .wtf state ---"
+cat "$PROJECT_DIR/.wtf/STATE.md" 2>/dev/null || echo "(no STATE.md)"
 echo ""
 echo "--- Git log ---"
 cd "$PROJECT_DIR"

@@ -1,24 +1,25 @@
-// GSD MCP Server — .gsd/ directory resolution
+// WTF MCP Server — .wtf/ directory resolution
 // Copyright (c) 2026 Jeremy McSpadden <jeremy@fluxlabs.net>
 
 import { existsSync, statSync, readdirSync } from 'node:fs';
 import { join, resolve, dirname, basename } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { PROJECT_DIR_NAME } from "@gsd-build/gsd-core";
 
 /**
- * Resolve the .gsd/ root directory for a project.
+ * Resolve the .wtf/ root directory for a project.
  *
  * Probes in order:
- *   1. projectDir/.gsd (fast path)
- *   2. git repo root/.gsd
+ *   1. projectDir/.wtf (fast path)
+ *   2. git repo root/.wtf
  *   3. Walk up from projectDir
- *   4. Fallback: projectDir/.gsd (even if missing — for init)
+ *   4. Fallback: projectDir/.wtf (even if missing — for init)
  */
-export function resolveGsdRoot(projectDir: string): string {
+export function resolveWtfRoot(projectDir: string): string {
   const resolved = resolve(projectDir);
 
-  // Fast path: .gsd/ in the given directory
-  const direct = join(resolved, '.gsd');
+  // Fast path: .wtf/ in the given directory
+  const direct = join(resolved, PROJECT_DIR_NAME);
   if (existsSync(direct) && statSync(direct).isDirectory()) {
     return direct;
   }
@@ -30,9 +31,9 @@ export function resolveGsdRoot(projectDir: string): string {
       encoding: 'utf-8',
       stdio: ['pipe', 'pipe', 'pipe'],
     }).trim();
-    const gitGsd = join(gitRoot, '.gsd');
-    if (existsSync(gitGsd) && statSync(gitGsd).isDirectory()) {
-      return gitGsd;
+    const gitWtf = join(gitRoot, PROJECT_DIR_NAME);
+    if (existsSync(gitWtf) && statSync(gitWtf).isDirectory()) {
+      return gitWtf;
     }
   } catch {
     // Not a git repo or git not available
@@ -41,7 +42,7 @@ export function resolveGsdRoot(projectDir: string): string {
   // Walk up from projectDir
   let dir = resolved;
   while (dir !== dirname(dir)) {
-    const candidate = join(dir, '.gsd');
+    const candidate = join(dir, PROJECT_DIR_NAME);
     if (existsSync(candidate) && statSync(candidate).isDirectory()) {
       return candidate;
     }
@@ -52,22 +53,22 @@ export function resolveGsdRoot(projectDir: string): string {
   return direct;
 }
 
-/** Resolve path to a .gsd/ root file (STATE.md, KNOWLEDGE.md, etc.) */
-export function resolveRootFile(gsdRoot: string, name: string): string {
-  return join(gsdRoot, name);
+/** Resolve path to a .wtf/ root file (STATE.md, KNOWLEDGE.md, etc.) */
+export function resolveRootFile(wtfRoot: string, name: string): string {
+  return join(wtfRoot, name);
 }
 
 /** Resolve path to milestones directory */
-export function milestonesDir(gsdRoot: string): string {
-  return join(gsdRoot, 'milestones');
+export function milestonesDir(wtfRoot: string): string {
+  return join(wtfRoot, 'milestones');
 }
 
 /**
  * Find all milestone directory IDs (M001, M002, etc.).
  * Handles both bare (M001/) and descriptor (M001-FLIGHT-SIM/) naming.
  */
-export function findMilestoneIds(gsdRoot: string): string[] {
-  const dir = milestonesDir(gsdRoot);
+export function findMilestoneIds(wtfRoot: string): string[] {
+  const dir = milestonesDir(wtfRoot);
   if (!existsSync(dir)) return [];
 
   const entries = readdirSync(dir, { withFileTypes: true });
@@ -86,8 +87,8 @@ export function findMilestoneIds(gsdRoot: string): string[] {
  * Resolve the actual directory name for a milestone ID.
  * M001 might live in M001/ or M001-SOME-DESCRIPTOR/.
  */
-export function resolveMilestoneDir(gsdRoot: string, milestoneId: string): string | null {
-  const dir = milestonesDir(gsdRoot);
+export function resolveMilestoneDir(wtfRoot: string, milestoneId: string): string | null {
+  const dir = milestonesDir(wtfRoot);
   if (!existsSync(dir)) return null;
 
   // Fast path: exact match
@@ -109,8 +110,8 @@ export function resolveMilestoneDir(gsdRoot: string, milestoneId: string): strin
  * Resolve a milestone-level file (M001-ROADMAP.md, M001-CONTEXT.md, etc.).
  * Handles various naming conventions.
  */
-export function resolveMilestoneFile(gsdRoot: string, milestoneId: string, suffix: string): string | null {
-  const mDir = resolveMilestoneDir(gsdRoot, milestoneId);
+export function resolveMilestoneFile(wtfRoot: string, milestoneId: string, suffix: string): string | null {
+  const mDir = resolveMilestoneDir(wtfRoot, milestoneId);
   if (!mDir) return null;
 
   const dirName = basename(mDir);
@@ -129,8 +130,8 @@ export function resolveMilestoneFile(gsdRoot: string, milestoneId: string, suffi
 }
 
 /** Find all slice IDs within a milestone (S01, S02, etc.) */
-export function findSliceIds(gsdRoot: string, milestoneId: string): string[] {
-  const mDir = resolveMilestoneDir(gsdRoot, milestoneId);
+export function findSliceIds(wtfRoot: string, milestoneId: string): string[] {
+  const mDir = resolveMilestoneDir(wtfRoot, milestoneId);
   if (!mDir) return [];
 
   const slicesDir = join(mDir, 'slices');
@@ -149,8 +150,8 @@ export function findSliceIds(gsdRoot: string, milestoneId: string): string[] {
 }
 
 /** Resolve the actual directory for a slice */
-export function resolveSliceDir(gsdRoot: string, milestoneId: string, sliceId: string): string | null {
-  const mDir = resolveMilestoneDir(gsdRoot, milestoneId);
+export function resolveSliceDir(wtfRoot: string, milestoneId: string, sliceId: string): string | null {
+  const mDir = resolveMilestoneDir(wtfRoot, milestoneId);
   if (!mDir) return null;
 
   const slicesDir = join(mDir, 'slices');
@@ -170,9 +171,9 @@ export function resolveSliceDir(gsdRoot: string, milestoneId: string, sliceId: s
 
 /** Resolve a slice-level file (S01-PLAN.md, etc.) */
 export function resolveSliceFile(
-  gsdRoot: string, milestoneId: string, sliceId: string, suffix: string,
+  wtfRoot: string, milestoneId: string, sliceId: string, suffix: string,
 ): string | null {
-  const sDir = resolveSliceDir(gsdRoot, milestoneId, sliceId);
+  const sDir = resolveSliceDir(wtfRoot, milestoneId, sliceId);
   if (!sDir) return null;
 
   const dirName = basename(sDir);
@@ -190,9 +191,9 @@ export function resolveSliceFile(
 
 /** Find all task files in a slice's tasks/ directory */
 export function findTaskFiles(
-  gsdRoot: string, milestoneId: string, sliceId: string,
+  wtfRoot: string, milestoneId: string, sliceId: string,
 ): Array<{ id: string; hasPlan: boolean; hasSummary: boolean }> {
-  const sDir = resolveSliceDir(gsdRoot, milestoneId, sliceId);
+  const sDir = resolveSliceDir(wtfRoot, milestoneId, sliceId);
   if (!sDir) return [];
 
   const tasksDir = join(sDir, 'tasks');

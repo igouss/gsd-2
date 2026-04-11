@@ -1,5 +1,5 @@
 /**
- * Pure GSD health widget logic.
+ * Pure WTF health widget logic.
  *
  * Separates project-state detection and line rendering from the widget's
  * runtime integrations so the regressions can be tested directly.
@@ -7,7 +7,7 @@
 
 import { existsSync } from "node:fs";
 import { detectProjectState } from "../analysis/detection.ts";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 
 export type HealthWidgetProjectState = "none" | "initialized" | "active";
 
@@ -26,10 +26,10 @@ export interface HealthWidgetData {
 }
 
 export function detectHealthWidgetProjectState(basePath: string): HealthWidgetProjectState {
-  if (!existsSync(gsdRoot(basePath))) return "none";
+  if (!existsSync(wtfRoot(basePath))) return "none";
 
   const { state } = detectProjectState(basePath);
-  return state === "v2-gsd" ? "active" : "initialized";
+  return state === "v2-wtf" ? "active" : "initialized";
 }
 
 function formatCost(n: number): string {
@@ -65,11 +65,11 @@ function truncateMessage(msg: string, maxLen: number): string {
  */
 export function buildHealthLines(data: HealthWidgetData): string[] {
   if (data.projectState === "none") {
-    return ["  GSD  No project loaded — run /gsd to start"];
+    return ["  WTF  No project loaded — run /wtf to start"];
   }
 
   if (data.projectState === "initialized") {
-    return ["  GSD  Project initialized — run /gsd to continue setup"];
+    return ["  WTF  Project initialized — run /wtf to continue setup"];
   }
 
   const parts: string[] = [];

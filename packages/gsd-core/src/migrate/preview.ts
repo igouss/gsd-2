@@ -1,14 +1,14 @@
-// GSD Migration Preview — Pre-write statistics
-// Pure function, no I/O. Computes counts from a GSDProject.
+// WTF Migration Preview — Pre-write statistics
+// Pure function, no I/O. Computes counts from a WTFProject.
 
-import type { GSDProject } from './types.ts';
+import type { WTFProject } from './types.ts';
 import type { MigrationPreview } from './writer.ts';
 
 /**
- * Compute pre-write statistics from a GSDProject without performing I/O.
+ * Compute pre-write statistics from a WTFProject without performing I/O.
  * Used to show the user what a migration will produce before writing anything.
  */
-export function generatePreview(project: GSDProject): MigrationPreview {
+export function generatePreview(project: WTFProject): MigrationPreview {
   let totalSlices = 0;
   let totalTasks = 0;
   let doneSlices = 0;

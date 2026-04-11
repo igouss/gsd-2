@@ -1,5 +1,5 @@
 /**
- * GSD Preparation — Structured brief generation for discussion LLM sessions.
+ * WTF Preparation — Structured brief generation for discussion LLM sessions.
  *
  * Produces structured briefs (codebase, prior context, ecosystem) before
  * the discussion LLM session starts.
@@ -15,6 +15,7 @@ import {
   scanProjectFiles,
 } from "../analysis/detection.ts";
 import { loadFile } from "../persistence/files.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
@@ -91,7 +92,7 @@ export interface RequirementEntry {
   status: "active" | "validated" | "deferred" | "out-of-scope";
 }
 
-/** Prior context brief aggregated from GSD artifacts. */
+/** Prior context brief aggregated from WTF artifacts. */
 export interface PriorContextBrief {
   /** Decisions grouped by scope. */
   decisions: {
@@ -852,31 +853,31 @@ const MAX_SECTION_CHARS = 2000;
 const MAX_PRIOR_CONTEXT_CHARS = 6000;
 
 /**
- * Aggregate prior context from GSD artifacts.
+ * Aggregate prior context from WTF artifacts.
  *
- * Reads DECISIONS.md, REQUIREMENTS.md, KNOWLEDGE.md from the .gsd directory
+ * Reads DECISIONS.md, REQUIREMENTS.md, KNOWLEDGE.md from the .wtf directory
  * and milestone summaries from each milestone's MILESTONE-SUMMARY.md file.
  *
- * @param basePath - Root directory of the project (contains .gsd/)
+ * @param basePath - Root directory of the project (contains .wtf/)
  * @returns PriorContextBrief with aggregated context
  */
 export async function aggregatePriorContext(basePath: string): Promise<PriorContextBrief> {
-  const gsdPath = join(basePath, ".gsd");
+  const wtfPath = join(basePath, PROJECT_DIR_NAME);
 
   // Load decisions
-  const decisionsContent = await loadFile(join(gsdPath, "DECISIONS.md"));
+  const decisionsContent = await loadFile(join(wtfPath, "DECISIONS.md"));
   const decisions = parseDecisions(decisionsContent);
 
   // Load requirements
-  const requirementsContent = await loadFile(join(gsdPath, "REQUIREMENTS.md"));
+  const requirementsContent = await loadFile(join(wtfPath, "REQUIREMENTS.md"));
   const requirements = parseRequirements(requirementsContent);
 
   // Load knowledge
-  const knowledgeContent = await loadFile(join(gsdPath, "KNOWLEDGE.md"));
+  const knowledgeContent = await loadFile(join(wtfPath, "KNOWLEDGE.md"));
   const knowledge = truncateSection(knowledgeContent || "", MAX_SECTION_CHARS);
 
   // Load milestone summaries
-  const summaries = await loadMilestoneSummaries(gsdPath);
+  const summaries = await loadMilestoneSummaries(wtfPath);
 
   return {
     decisions,
@@ -992,8 +993,8 @@ function parseRequirements(content: string | null): PriorContextBrief["requireme
  *
  * Returns combined content, truncated to MAX_SECTION_CHARS.
  */
-async function loadMilestoneSummaries(gsdPath: string): Promise<string> {
-  const milestonesPath = join(gsdPath, "milestones");
+async function loadMilestoneSummaries(wtfPath: string): Promise<string> {
+  const milestonesPath = join(wtfPath, "milestones");
   const summaries: string[] = [];
 
   try {

@@ -1,5 +1,5 @@
 /**
- * GSD Paths — ID-based path resolution
+ * WTF Paths — ID-based path resolution
  *
  * Directories use bare IDs: M001/, S01/, etc.
  * Files use ID-SUFFIX: M001-ROADMAP.md, S01-PLAN.md, T01-PLAN.md
@@ -12,8 +12,8 @@
 import { readdirSync, existsSync, realpathSync, Dirent } from "node:fs";
 import { join, dirname, normalize } from "node:path";
 import { spawnSync } from "node:child_process";
-import { type GsdTreeEntry } from "../git/native-parser-bridge.ts";
-import { DIR_CACHE_MAX } from "../domain/constants.ts";
+import { type WtfTreeEntry } from "../git/native-parser-bridge.ts";
+import { DIR_CACHE_MAX , PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 // ─── Directory Listing Cache ──────────────────────────────────────────────────
 
@@ -21,19 +21,19 @@ const dirEntryCache = new Map<string, Dirent[]>();
 const dirListCache = new Map<string, string[]>();
 
 // ─── Native Tree Cache ────────────────────────────────────────────────────────
-// When the native module is available, scan the entire .gsd/ tree in one call
+// When the native module is available, scan the entire .wtf/ tree in one call
 // and serve directory listings from memory instead of individual readdirSync calls.
 
-let nativeTreeCache: Map<string, GsdTreeEntry[]> | null = null;
+let nativeTreeCache: Map<string, WtfTreeEntry[]> | null = null;
 let nativeTreeBase: string | null = null;
 
 /**
  * Convert a native tree lookup into a relative key for the tree map.
- * Returns the relative path from the gsdDir, or null if the path isn't under gsdDir.
+ * Returns the relative path from the wtfDir, or null if the path isn't under wtfDir.
  */
-function nativeTreeKey(dirPath: string, gsdDir: string): string | null {
-  if (!dirPath.startsWith(gsdDir)) return null;
-  const rel = dirPath.slice(gsdDir.length).replace(/^\//, '');
+function nativeTreeKey(dirPath: string, wtfDir: string): string | null {
+  if (!dirPath.startsWith(wtfDir)) return null;
+  const rel = dirPath.slice(wtfDir.length).replace(/^\//, '');
   return rel || '.';
 }
 
@@ -41,7 +41,7 @@ function cachedReaddirWithTypes(dirPath: string): Dirent[] {
   const cached = dirEntryCache.get(dirPath);
   if (cached) return cached;
 
-  // Try native tree cache for paths under .gsd/
+  // Try native tree cache for paths under .wtf/
   if (nativeTreeBase) {
     const key = nativeTreeKey(dirPath, nativeTreeBase);
     if (key && nativeTreeCache) {
@@ -83,7 +83,7 @@ function cachedReaddir(dirPath: string): string[] {
   const cached = dirListCache.get(dirPath);
   if (cached) return cached;
 
-  // Try native tree cache for paths under .gsd/
+  // Try native tree cache for paths under .wtf/
   if (nativeTreeBase) {
     const key = nativeTreeKey(dirPath, nativeTreeBase);
     if (key && nativeTreeCache) {
@@ -235,7 +235,7 @@ export function resolveTaskJsonFiles(tasksDir: string, suffix: string): string[]
 
 // ─── Full Path Builders ────────────────────────────────────────────────────
 
-export const GSD_ROOT_FILES = {
+export const WTF_ROOT_FILES = {
   PROJECT: "PROJECT.md",
   DECISIONS: "DECISIONS.md",
   QUEUE: "QUEUE.md",
@@ -246,9 +246,9 @@ export const GSD_ROOT_FILES = {
   CODEBASE: "CODEBASE.md",
 } as const;
 
-export type GSDRootFileKey = keyof typeof GSD_ROOT_FILES;
+export type WTFRootFileKey = keyof typeof WTF_ROOT_FILES;
 
-const LEGACY_GSD_ROOT_FILES: Record<GSDRootFileKey, string> = {
+const LEGACY_WTF_ROOT_FILES: Record<WTFRootFileKey, string> = {
   PROJECT: "project.md",
   DECISIONS: "decisions.md",
   QUEUE: "queue.md",
@@ -259,53 +259,53 @@ const LEGACY_GSD_ROOT_FILES: Record<GSDRootFileKey, string> = {
   CODEBASE: "codebase.md",
 };
 
-// ─── GSD Root Discovery ───────────────────────────────────────────────────────
+// ─── WTF Root Discovery ───────────────────────────────────────────────────────
 
-const gsdRootCache = new Map<string, string>();
+const wtfRootCache = new Map<string, string>();
 
 /** Exported for tests only — do not call in production code. */
-export function _clearGsdRootCache(): void {
-  gsdRootCache.clear();
+export function _clearWtfRootCache(): void {
+  wtfRootCache.clear();
 }
 
 /**
- * Resolve the `.gsd` directory for a given project base path.
+ * Resolve the `.wtf` directory for a given project base path.
  *
  * Probe order:
- *   1. basePath/.gsd         — fast path (common case)
+ *   1. basePath/.wtf         — fast path (common case)
  *   2. git rev-parse root    — handles cwd-is-a-subdirectory
- *   3. Walk up from basePath — handles moved .gsd in an ancestor (bounded by git root)
- *   4. basePath/.gsd         — creation fallback (init scenario)
+ *   3. Walk up from basePath — handles moved .wtf in an ancestor (bounded by git root)
+ *   4. basePath/.wtf         — creation fallback (init scenario)
  *
  * Result is cached per basePath for the process lifetime.
  */
-export function gsdRoot(basePath: string): string {
-  const cached = gsdRootCache.get(basePath);
+export function wtfRoot(basePath: string): string {
+  const cached = wtfRootCache.get(basePath);
   if (cached) return cached;
 
-  const result = probeGsdRoot(basePath);
-  gsdRootCache.set(basePath, result);
+  const result = probeWtfRoot(basePath);
+  wtfRootCache.set(basePath, result);
   return result;
 }
 
 /**
- * Detect if a path is inside a .gsd/worktrees/<name>/ structure.
+ * Detect if a path is inside a .wtf/worktrees/<name>/ structure.
  *
- * GSD auto-worktrees live at <project>/.gsd/worktrees/<milestoneId>/.
- * When gsdRoot() is called with such a path, we must NOT walk up to the
- * project root's .gsd — each worktree manages its own .gsd state (#2594).
+ * WTF auto-worktrees live at <project>/.wtf/worktrees/<milestoneId>/.
+ * When wtfRoot() is called with such a path, we must NOT walk up to the
+ * project root's .wtf — each worktree manages its own .wtf state (#2594).
  *
  * Matches both forward-slash and platform-native separators to handle
  * Windows paths (path.sep = '\\') and normalized Unix paths.
  */
-function isInsideGsdWorktree(p: string): boolean {
-  // Match /.gsd/worktrees/<name> where <name> is the final segment or
+function isInsideWtfWorktree(p: string): boolean {
+  // Match /.wtf/worktrees/<name> where <name> is the final segment or
   // followed by a separator. The <name> segment must be non-empty.
   const sepFwd = "/";
   const sepNative = "\\";
   const markers = [
-    `${sepFwd}.gsd${sepFwd}worktrees${sepFwd}`,
-    `${sepNative}.gsd${sepNative}worktrees${sepNative}`,
+    `${sepFwd}.wtf${sepFwd}worktrees${sepFwd}`,
+    `${sepNative}.wtf${sepNative}worktrees${sepNative}`,
   ];
   for (const marker of markers) {
     const idx = p.indexOf(marker);
@@ -320,17 +320,17 @@ function isInsideGsdWorktree(p: string): boolean {
   return false;
 }
 
-function probeGsdRoot(rawBasePath: string): string {
+function probeWtfRoot(rawBasePath: string): string {
   // 1. Fast path — check the input path directly
-  const local = join(rawBasePath, ".gsd");
+  const local = join(rawBasePath, PROJECT_DIR_NAME);
   if (existsSync(local)) return local;
 
-  // 1b. Worktree guard (#2594) — if basePath is inside a .gsd/worktrees/<name>/
-  //     structure, return the worktree-local .gsd path immediately. Without this,
+  // 1b. Worktree guard (#2594) — if basePath is inside a .wtf/worktrees/<name>/
+  //     structure, return the worktree-local .wtf path immediately. Without this,
   //     the git-root probe (step 2) or walk-up (step 3) escapes to the project
-  //     root's .gsd, causing ensurePreconditions() and deriveState() to read/write
+  //     root's .wtf, causing ensurePreconditions() and deriveState() to read/write
   //     state in the wrong location.
-  if (isInsideGsdWorktree(rawBasePath)) return local;
+  if (isInsideWtfWorktree(rawBasePath)) return local;
 
   // Resolve symlinks so path comparisons work correctly across platforms
   // (e.g. macOS /var → /private/var). Use rawBasePath as fallback if not resolvable.
@@ -338,7 +338,7 @@ function probeGsdRoot(rawBasePath: string): string {
   try { basePath = realpathSync.native(rawBasePath); } catch { basePath = rawBasePath; }
 
   // Also check the resolved path for the worktree pattern (macOS /tmp → /private/tmp)
-  if (basePath !== rawBasePath && isInsideGsdWorktree(basePath)) return local;
+  if (basePath !== rawBasePath && isInsideWtfWorktree(basePath)) return local;
 
   // 2. Git root anchor — used as both probe target and walk-up boundary
   //    Only walk if we're inside a git project — prevents escaping into
@@ -356,7 +356,7 @@ function probeGsdRoot(rawBasePath: string): string {
   } catch { /* git not available */ }
 
   if (gitRoot) {
-    const candidate = join(gitRoot, ".gsd");
+    const candidate = join(gitRoot, PROJECT_DIR_NAME);
     if (existsSync(candidate)) return candidate;
   }
 
@@ -364,7 +364,7 @@ function probeGsdRoot(rawBasePath: string): string {
   if (gitRoot && basePath !== gitRoot) {
     let cur = dirname(basePath);
     while (cur !== basePath) {
-      const candidate = join(cur, ".gsd");
+      const candidate = join(cur, PROJECT_DIR_NAME);
       if (existsSync(candidate)) return candidate;
       if (cur === gitRoot) break;
       basePath = cur;
@@ -376,24 +376,24 @@ function probeGsdRoot(rawBasePath: string): string {
   return local;
 }
 export function milestonesDir(basePath: string): string {
-  return join(gsdRoot(basePath), "milestones");
+  return join(wtfRoot(basePath), "milestones");
 }
 
 export function resolveRuntimeFile(basePath: string): string {
-  return join(gsdRoot(basePath), "RUNTIME.md");
+  return join(wtfRoot(basePath), "RUNTIME.md");
 }
 
-export function resolveGsdRootFile(basePath: string, key: GSDRootFileKey): string {
-  const root = gsdRoot(basePath);
-  const canonical = join(root, GSD_ROOT_FILES[key]);
+export function resolveWtfRootFile(basePath: string, key: WTFRootFileKey): string {
+  const root = wtfRoot(basePath);
+  const canonical = join(root, WTF_ROOT_FILES[key]);
   if (existsSync(canonical)) return canonical;
-  const legacy = join(root, LEGACY_GSD_ROOT_FILES[key]);
+  const legacy = join(root, LEGACY_WTF_ROOT_FILES[key]);
   if (existsSync(legacy)) return legacy;
   return canonical;
 }
 
-export function relGsdRootFile(key: GSDRootFileKey): string {
-  return `.gsd/${GSD_ROOT_FILES[key]}`;
+export function relWtfRootFile(key: WTFRootFileKey): string {
+  return `.wtf/${WTF_ROOT_FILES[key]}`;
 }
 
 /**
@@ -467,20 +467,20 @@ export function resolveTaskFile(
   return file ? join(tDir, file) : null;
 }
 
-// ─── Relative Path Builders (for prompts — .gsd/milestones/...) ────────────
+// ─── Relative Path Builders (for prompts — .wtf/milestones/...) ────────────
 
 /**
- * Build relative .gsd/ path to a milestone directory.
+ * Build relative .wtf/ path to a milestone directory.
  * Uses the actual directory name on disk if it exists, otherwise bare ID.
  */
 export function relMilestonePath(basePath: string, milestoneId: string): string {
   const dir = resolveDir(milestonesDir(basePath), milestoneId);
-  if (dir) return `.gsd/milestones/${dir}`;
-  return `.gsd/milestones/${milestoneId}`;
+  if (dir) return `.wtf/milestones/${dir}`;
+  return `.wtf/milestones/${milestoneId}`;
 }
 
 /**
- * Build relative .gsd/ path to a milestone file.
+ * Build relative .wtf/ path to a milestone file.
  */
 export function relMilestoneFile(
   basePath: string, milestoneId: string, suffix: string
@@ -495,7 +495,7 @@ export function relMilestoneFile(
 }
 
 /**
- * Build relative .gsd/ path to a slice directory.
+ * Build relative .wtf/ path to a slice directory.
  */
 export function relSlicePath(
   basePath: string, milestoneId: string, sliceId: string
@@ -511,7 +511,7 @@ export function relSlicePath(
 }
 
 /**
- * Build relative .gsd/ path to a slice file.
+ * Build relative .wtf/ path to a slice file.
  */
 export function relSliceFile(
   basePath: string, milestoneId: string, sliceId: string, suffix: string
@@ -526,7 +526,7 @@ export function relSliceFile(
 }
 
 /**
- * Build relative .gsd/ path to a task file.
+ * Build relative .wtf/ path to a task file.
  */
 export function relTaskFile(
   basePath: string, milestoneId: string, sliceId: string,

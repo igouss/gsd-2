@@ -1,4 +1,4 @@
-You are debugging GSD itself. The user is donating their tokens to help find bugs in GSD's source code. Your job is to trace from symptom to root cause in the actual source and produce a filing-ready GitHub issue with specific file:line references and a concrete fix suggestion.
+You are debugging WTF itself. The user is donating their tokens to help find bugs in WTF's source code. Your job is to trace from symptom to root cause in the actual source and produce a filing-ready GitHub issue with specific file:line references and a concrete fix suggestion.
 
 ## User's Problem
 
@@ -8,9 +8,9 @@ You are debugging GSD itself. The user is donating their tokens to help find bug
 
 {{forensicData}}
 
-## GSD Source Location
+## WTF Source Location
 
-GSD extension source code is at: `{{gsdSourceDir}}`
+WTF extension source code is at: `{{wtfSourceDir}}`
 
 ### Source Map by Domain
 
@@ -28,7 +28,7 @@ GSD extension source code is at: `{{gsdSourceDir}}`
 ### Runtime Path Reference
 
 ```
-.gsd/
+.wtf/
 ├── PROJECT.md, DECISIONS.md, QUEUE.md, STATE.md, REQUIREMENTS.md, OVERRIDES.md, KNOWLEDGE.md, RUNTIME.md
 ├── auto.lock                    — crash lock (JSON: pid, unitType, unitId, sessionFile)
 ├── metrics.json                 — token/cost ledger (units array with cost, tokens, duration)
@@ -48,7 +48,7 @@ GSD extension source code is at: `{{gsdSourceDir}}`
 │   └── slices/{SID}/            — slice artifacts
 │       ├── {SID}-PLAN.md, {SID}-RESEARCH.md, {SID}-UAT.md, {SID}-SUMMARY.md
 │       └── tasks/{TID}-PLAN.md, {TID}-SUMMARY.md
-└── worktrees/{milestoneId}/     — per-milestone worktree with replicated .gsd/
+└── worktrees/{milestoneId}/     — per-milestone worktree with replicated .wtf/
 ```
 
 ### Activity Log Format
@@ -62,7 +62,7 @@ GSD extension source code is at: `{{gsdSourceDir}}`
 - `usage` field on assistant messages: `input`, `output`, `cacheRead`, `cacheWrite`, `totalTokens`, `cost`
 - **To trace a failure**: find the last activity log, search for `isError: true` tool results, then read the agent's reasoning text preceding that error
 
-### Journal Format (`.gsd/journal/`)
+### Journal Format (`.wtf/journal/`)
 
 The journal is a structured event log for auto-mode iterations. Each daily file contains JSONL entries:
 
@@ -114,9 +114,9 @@ A unit dispatched more than once (`type/id` appears multiple times) indicates a 
 
 4. **Form hypotheses** about which module and code path is responsible. Use the source map to identify candidate files.
 
-5. **Read the actual GSD source code** at `{{gsdSourceDir}}` to confirm or deny each hypothesis. Do not guess what code does — read it.
+5. **Read the actual WTF source code** at `{{wtfSourceDir}}` to confirm or deny each hypothesis. Do not guess what code does — read it.
 
-   **DB inspection:** If you need to check DB state as part of investigation, use `gsd_milestone_status` — never run `sqlite3 .gsd/gsd.db` or `node -e require('better-sqlite3')` directly. The engine holds a WAL write lock; direct access will either fail or return stale data.
+   **DB inspection:** If you need to check DB state as part of investigation, use `wtf_milestone_status` — never run `sqlite3 .wtf/gsd.db` or `node -e require('better-sqlite3')` directly. The engine holds a WAL write lock; direct access will either fail or return stale data.
 
 6. **Trace the code path** from the entry point (usually `auto-loop.ts` dispatch or `auto-dispatch.ts`) through to the failure point. Follow function calls across files.
 
@@ -133,7 +133,7 @@ A unit dispatched more than once (`type/id` appears multiple times) indicates a 
 
 Explain your findings:
 - **What happened** — the failure sequence reconstructed from activity logs and anomalies
-- **Why it happened** — root cause traced to specific code in GSD source, with `file:line` references
+- **Why it happened** — root cause traced to specific code in WTF source, with `file:line` references
 - **Code snippet** — the problematic code and what it should do instead
 - **Recovery** — what the user can do right now to get unstuck
 
@@ -152,13 +152,13 @@ cat > /tmp/gsd-forensic-issue.md << 'GSD_ISSUE_BODY'
 [1-2 sentence summary]
 
 ## Root Cause
-[Specific file:line in GSD source, with code snippet showing the bug]
+[Specific file:line in WTF source, with code snippet showing the bug]
 
 ## Expected Behavior
 [What the code should do instead — concrete fix suggestion]
 
 ## Environment
-- GSD version: [from report]
+- WTF version: [from report]
 - Model: [from report]
 - Unit: [type/id that failed]
 
@@ -191,7 +191,7 @@ Before creating the issue, you MUST:
 - Replace all absolute paths with relative paths
 - Remove any API keys, tokens, or credentials
 - Remove any environment variable values
-- Do not include user's project code — only GSD structural information (tool names, file names, error messages)
+- Do not include user's project code — only WTF structural information (tool names, file names, error messages)
 
 ## Report Saved
 

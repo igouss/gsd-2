@@ -1,5 +1,5 @@
 /**
- * minimal-loop.ts — Bare-bones GSD dispatch loop.
+ * minimal-loop.ts — Bare-bones WTF dispatch loop.
  *
  * deriveState → resolveDispatch → buildPrompt → adapter.dispatchUnit → repeat
  *
@@ -25,9 +25,10 @@ import {
   openDatabase,
   closeDatabase,
   isDbAvailable,
-  loadEffectiveGSDPreferences,
+  loadEffectiveWTFPreferences,
   acquireSessionLock,
   releaseSessionLock,
+  PROJECT_DIR_NAME,
 } from "@gsd-build/gsd-core";
 
 import { buildSystemPrompt, buildProjectContext } from "./system-prompt.ts";
@@ -54,7 +55,7 @@ const core = {
   openDatabase,
   closeDatabase,
   isDbAvailable,
-  loadEffectiveGSDPreferences,
+  loadEffectiveWTFPreferences,
   acquireSessionLock,
   releaseSessionLock,
 };
@@ -75,10 +76,10 @@ export async function minimalLoop(opts: MinimalLoopOptions): Promise<void> {
   const systemPrompt = buildSystemPrompt({ templatesDir, projectDir });
 
   // Open DB (creates + initializes schema if it doesn't exist)
-  const dbPath = join(projectDir, ".gsd", "gsd.db");
+  const dbPath = join(projectDir, PROJECT_DIR_NAME, "wtf.db");
   const opened = core.openDatabase(dbPath);
   if (!opened) {
-    events.notify("Failed to open .gsd/gsd.db — continuing without DB (state may not advance)", "warning");
+    events.notify("Failed to open .wtf/wtf.db — continuing without DB (state may not advance)", "warning");
   } else {
     events.notify("Database opened", "info");
   }
@@ -123,7 +124,7 @@ export async function minimalLoop(opts: MinimalLoopOptions): Promise<void> {
       events.progress({ unitType: "derive", unitId: mid, phase: "state-derived", iteration });
 
       // 2. Resolve dispatch
-      const prefs = core.loadEffectiveGSDPreferences()?.preferences;
+      const prefs = core.loadEffectiveWTFPreferences()?.preferences;
       const dispatch = await core.resolveDispatch({
         basePath: projectDir,
         mid,

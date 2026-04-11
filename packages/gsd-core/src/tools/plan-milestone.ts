@@ -10,7 +10,7 @@ import {
   insertSlice,
   upsertMilestonePlanning,
   upsertSlicePlanning,
-} from "../persistence/gsd-db.ts";
+} from "../persistence/wtf-db.ts";
 import { invalidateStateCache } from "../state/state.ts";
 import { renderRoadmapFromDb } from "../reporting/markdown-renderer.ts";
 import { renderAllProjections } from "../workflow/workflow-projections.ts";
@@ -213,7 +213,7 @@ export async function handlePlanMilestone(
         const incomingSliceIds = new Set(params.slices.map(s => s.sliceId));
         const droppedCompleted = completedSlices.filter(s => !incomingSliceIds.has(s.id));
         if (droppedCompleted.length > 0) {
-          guardError = `cannot re-plan milestone ${params.milestoneId}: ${droppedCompleted.length} completed slice(s) would be dropped (${droppedCompleted.map(s => s.id).join(", ")}). Use gsd_reassess_roadmap to modify the roadmap.`;
+          guardError = `cannot re-plan milestone ${params.milestoneId}: ${droppedCompleted.length} completed slice(s) would be dropped (${droppedCompleted.map(s => s.id).join(", ")}). Use wtf_reassess_roadmap to modify the roadmap.`;
           return;
         }
       }

@@ -8,7 +8,7 @@ import {
   upsertTaskPlanning,
   insertReplanHistory,
   deleteTask,
-} from "../persistence/gsd-db.ts";
+} from "../persistence/wtf-db.ts";
 import { invalidateStateCache } from "../state/state.ts";
 import { isClosedStatus } from "../domain/status-guards.ts";
 import { isNonEmptyString } from "../verification/validation.ts";

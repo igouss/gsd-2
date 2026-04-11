@@ -1,15 +1,15 @@
 /**
- * GSD Slice Parallel Orchestrator — Engine for parallel slice execution
+ * WTF Slice Parallel Orchestrator — Engine for parallel slice execution
  * within a single milestone.
  *
  * Mirrors the existing parallel-orchestrator.ts pattern at slice scope
  * instead of milestone scope. Workers are separate processes spawned via
- * child_process, each running in its own git worktree with GSD_SLICE_LOCK
- * + GSD_MILESTONE_LOCK env vars set.
+ * child_process, each running in its own git worktree with WTF_SLICE_LOCK
+ * + WTF_MILESTONE_LOCK env vars set.
  *
  * Key differences from milestone-level parallelism:
  * - Scope: slices within one milestone, not milestones within a project
- * - Lock env: GSD_SLICE_LOCK (in addition to GSD_MILESTONE_LOCK)
+ * - Lock env: WTF_SLICE_LOCK (in addition to WTF_MILESTONE_LOCK)
  * - Conflict check: file overlap between slice plans (slice-parallel-conflict.ts)
  */
 
@@ -21,7 +21,7 @@ import {
 } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 import { createWorktree, worktreePath, removeWorktree } from "../git/worktree-manager.ts";
 import {
   writeSessionStatus,
@@ -82,8 +82,8 @@ export function getSliceOrchestratorState(): SliceOrchestratorState | null {
 /**
  * Start parallel execution for eligible slices within a milestone.
  *
- * For each eligible slice: create a worktree, spawn `gsd --mode json --print "/gsd auto"`
- * with env GSD_SLICE_LOCK=<SID> + GSD_MILESTONE_LOCK=<MID> + GSD_PARALLEL_WORKER=1.
+ * For each eligible slice: create a worktree, spawn `wtf --mode json --print "/wtf auto"`
+ * with env WTF_SLICE_LOCK=<SID> + WTF_MILESTONE_LOCK=<MID> + WTF_PARALLEL_WORKER=1.
  */
 export async function startSliceParallel(
   basePath: string,
@@ -92,7 +92,7 @@ export async function startSliceParallel(
   opts: StartSliceParallelOpts = {},
 ): Promise<{ started: string[]; errors: Array<{ sid: string; error: string }> }> {
   // Prevent nesting: if already a parallel worker, refuse
-  if (process.env.GSD_PARALLEL_WORKER) {
+  if (process.env.WTF_PARALLEL_WORKER) {
     return { started: [], errors: [{ sid: "all", error: "Cannot start slice-parallel from within a parallel worker" }] };
   }
 
@@ -263,12 +263,12 @@ function filterConflictingSlices(
 // ─── Internal: Worker Spawning ─────────────────────────────────────────────
 
 /**
- * Resolve the GSD CLI binary path.
- * Same logic as parallel-orchestrator.ts resolveGsdBin().
+ * Resolve the WTF CLI binary path.
+ * Same logic as parallel-orchestrator.ts resolveWtfBin().
  */
-function resolveGsdBin(): string | null {
-  if (process.env.GSD_BIN_PATH && existsSync(process.env.GSD_BIN_PATH)) {
-    return process.env.GSD_BIN_PATH;
+function resolveWtfBin(): string | null {
+  if (process.env.WTF_BIN_PATH && existsSync(process.env.WTF_BIN_PATH)) {
+    return process.env.WTF_BIN_PATH;
   }
 
   let thisDir: string;
@@ -290,8 +290,8 @@ function resolveGsdBin(): string | null {
 
 /**
  * Spawn a worker process for a slice.
- * The worker runs `gsd --mode json --print "/gsd auto"` in the slice's worktree
- * with GSD_SLICE_LOCK, GSD_MILESTONE_LOCK, and GSD_PARALLEL_WORKER set.
+ * The worker runs `wtf --mode json --print "/wtf auto"` in the slice's worktree
+ * with WTF_SLICE_LOCK, WTF_MILESTONE_LOCK, and WTF_PARALLEL_WORKER set.
  */
 function spawnSliceWorker(
   basePath: string,
@@ -303,19 +303,19 @@ function spawnSliceWorker(
   if (!worker) return false;
   if (worker.process) return true;
 
-  const binPath = resolveGsdBin();
+  const binPath = resolveWtfBin();
   if (!binPath) return false;
 
   let child: ChildProcess;
   try {
-    child = spawn(process.execPath, [binPath, "--mode", "json", "--print", "/gsd auto"], {
+    child = spawn(process.execPath, [binPath, "--mode", "json", "--print", "/wtf auto"], {
       cwd: worker.worktreePath,
       env: {
         ...process.env,
-        GSD_SLICE_LOCK: sliceId,
-        GSD_MILESTONE_LOCK: milestoneId,
-        GSD_PROJECT_ROOT: basePath,
-        GSD_PARALLEL_WORKER: "1",
+        WTF_SLICE_LOCK: sliceId,
+        WTF_MILESTONE_LOCK: milestoneId,
+        WTF_PROJECT_ROOT: basePath,
+        WTF_PARALLEL_WORKER: "1",
       },
       stdio: ["ignore", "pipe", "pipe"],
       detached: false,
@@ -458,7 +458,7 @@ function processSliceWorkerLine(
 // ─── Logging ────────────────────────────────────────────────────────────────
 
 function sliceLogDir(basePath: string): string {
-  return join(gsdRoot(basePath), "parallel", "slice-logs");
+  return join(wtfRoot(basePath), "parallel", "slice-logs");
 }
 
 function appendSliceWorkerLog(

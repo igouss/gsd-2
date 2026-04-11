@@ -1,9 +1,9 @@
-// GSD MCP Server — roadmap structure reader
+// WTF MCP Server — roadmap structure reader
 // Copyright (c) 2026 Jeremy McSpadden <jeremy@fluxlabs.net>
 
 import { readFileSync, existsSync } from 'node:fs';
 import {
-  resolveGsdRoot,
+  resolveWtfRoot,
   findMilestoneIds,
   resolveMilestoneFile,
   findSliceIds,
@@ -150,15 +150,15 @@ function parseSlicePlanTasks(content: string): Array<{ id: string; title: string
 // Milestone title from CONTEXT.md or ROADMAP.md H1
 // ---------------------------------------------------------------------------
 
-function readMilestoneTitle(gsdRoot: string, mid: string): string {
-  const ctxPath = resolveMilestoneFile(gsdRoot, mid, 'CONTEXT');
+function readMilestoneTitle(wtfRoot: string, mid: string): string {
+  const ctxPath = resolveMilestoneFile(wtfRoot, mid, 'CONTEXT');
   if (ctxPath && existsSync(ctxPath)) {
     const content = readFileSync(ctxPath, 'utf-8');
     const h1 = content.match(/^#\s+(?:M\d+:?\s*)?(.+)/m);
     if (h1) return h1[1]!.trim();
   }
 
-  const roadmapPath = resolveMilestoneFile(gsdRoot, mid, 'ROADMAP');
+  const roadmapPath = resolveMilestoneFile(wtfRoot, mid, 'ROADMAP');
   if (roadmapPath && existsSync(roadmapPath)) {
     const content = readFileSync(roadmapPath, 'utf-8');
     const h1 = content.match(/^#\s+(?:M\d+:?\s*)?(.+)/m);
@@ -168,8 +168,8 @@ function readMilestoneTitle(gsdRoot: string, mid: string): string {
   return mid;
 }
 
-function readVision(gsdRoot: string, mid: string): string {
-  const roadmapPath = resolveMilestoneFile(gsdRoot, mid, 'ROADMAP');
+function readVision(wtfRoot: string, mid: string): string {
+  const roadmapPath = resolveMilestoneFile(wtfRoot, mid, 'ROADMAP');
   if (!roadmapPath || !existsSync(roadmapPath)) return '';
 
   const content = readFileSync(roadmapPath, 'utf-8');
@@ -182,8 +182,8 @@ function readVision(gsdRoot: string, mid: string): string {
 // ---------------------------------------------------------------------------
 
 export function readRoadmap(projectDir: string, filterMilestoneId?: string): RoadmapResult {
-  const gsd = resolveGsdRoot(projectDir);
-  let milestoneIds = findMilestoneIds(gsd);
+  const wtf = resolveWtfRoot(projectDir);
+  let milestoneIds = findMilestoneIds(wtf);
 
   if (filterMilestoneId) {
     milestoneIds = milestoneIds.filter((id) => id === filterMilestoneId);
@@ -192,19 +192,19 @@ export function readRoadmap(projectDir: string, filterMilestoneId?: string): Roa
   const milestones: MilestoneInfo[] = [];
 
   for (const mid of milestoneIds) {
-    const title = readMilestoneTitle(gsd, mid);
-    const vision = readVision(gsd, mid);
+    const title = readMilestoneTitle(wtf, mid);
+    const vision = readVision(wtf, mid);
 
-    const summaryPath = resolveMilestoneFile(gsd, mid, 'SUMMARY');
+    const summaryPath = resolveMilestoneFile(wtf, mid, 'SUMMARY');
     const hasSummary = summaryPath !== null && existsSync(summaryPath);
 
-    const roadmapPath = resolveMilestoneFile(gsd, mid, 'ROADMAP');
+    const roadmapPath = resolveMilestoneFile(wtf, mid, 'ROADMAP');
     let roadmapSlices: ReturnType<typeof parseRoadmapTable> = [];
     if (roadmapPath && existsSync(roadmapPath)) {
       roadmapSlices = parseRoadmapTable(readFileSync(roadmapPath, 'utf-8'));
     }
 
-    const fsSliceIds = findSliceIds(gsd, mid);
+    const fsSliceIds = findSliceIds(wtf, mid);
     const sliceIdSet = new Set([
       ...roadmapSlices.map((s) => s.id),
       ...fsSliceIds,
@@ -213,9 +213,9 @@ export function readRoadmap(projectDir: string, filterMilestoneId?: string): Roa
     const slices: SliceInfo[] = [];
     for (const sid of Array.from(sliceIdSet).sort()) {
       const roadmapEntry = roadmapSlices.find((s) => s.id === sid);
-      const taskFiles = findTaskFiles(gsd, mid, sid);
+      const taskFiles = findTaskFiles(wtf, mid, sid);
 
-      const planPath = resolveSliceFile(gsd, mid, sid, 'PLAN');
+      const planPath = resolveSliceFile(wtf, mid, sid, 'PLAN');
       let planTasks: ReturnType<typeof parseSlicePlanTasks> = [];
       if (planPath && existsSync(planPath)) {
         planTasks = parseSlicePlanTasks(readFileSync(planPath, 'utf-8'));

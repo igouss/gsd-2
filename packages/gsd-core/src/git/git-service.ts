@@ -1,7 +1,7 @@
 /**
- * GSD Git Service
+ * WTF Git Service
  *
- * Core git operations for GSD: types, constants, and pure helpers.
+ * Core git operations for WTF: types, constants, and pure helpers.
  * Higher-level operations (commit, staging, branching) build on these.
  *
  * This module centralizes the GitPreferences interface, runtime exclusion
@@ -11,9 +11,9 @@
 import { execFileSync, execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 import { GIT_NO_PROMPT_ENV } from "./git-constants.ts";
-import { loadEffectiveGSDPreferences } from "../preferences/preferences.ts";
+import { loadEffectiveWTFPreferences } from "../preferences/preferences.ts";
 
 
 import {
@@ -33,7 +33,7 @@ import {
   nativeResetSoft,
   nativeCommitSubject,
 } from "./native-git-bridge.ts";
-import { GSDError, GSD_MERGE_CONFLICT, GSD_GIT_ERROR } from "../domain/errors.ts";
+import { WTFError, WTF_MERGE_CONFLICT, WTF_GIT_ERROR } from "../domain/errors.ts";
 import { getErrorMessage } from "../domain/error-utils.ts";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -43,7 +43,7 @@ export interface GitPreferences {
   push_branches?: boolean;
   remote?: string;
   snapshots?: boolean;
-  /** Deprecated. .gsd/ is managed externally; retained for compatibility. */
+  /** Deprecated. .wtf/ is managed externally; retained for compatibility. */
   commit_docs?: boolean;
   pre_merge_check?: boolean | string;
   commit_type?: string;
@@ -55,10 +55,10 @@ export interface GitPreferences {
    *  - "none": (default) no git isolation — commits land on the user's current branch directly
    */
   isolation?: "worktree" | "branch" | "none";
-  /** When false, GSD will not modify .gitignore at all — no baseline patterns
+  /** When false, WTF will not modify .gitignore at all — no baseline patterns
    *  are added and no self-healing occurs. Use this if you manage your own
-   *  .gitignore and don't want GSD touching it.
-   *  Default: true (GSD ensures baseline patterns are present).
+   *  .gitignore and don't want WTF touching it.
+   *  Default: true (WTF ensures baseline patterns are present).
    */
   manage_gitignore?: boolean;
   /** Script to run after a worktree is created (#597).
@@ -77,7 +77,7 @@ export interface GitPreferences {
    *  Default: the main branch (from `main_branch` or auto-detected).
    */
   pr_target_branch?: string;
-  /** Whether to squash `gsd snapshot:` commits into the next real autoCommit.
+  /** Whether to squash `wtf snapshot:` commits into the next real autoCommit.
    *  Enabled by default. Set to false to keep snapshot commits in history
    *  for forensic inspection.
    */
@@ -107,9 +107,9 @@ export interface TaskCommitContext {
 
 /**
  * Build a meaningful conventional commit message from task execution context.
- * Format: `{type}: {description}` (clean conventional commit — no GSD IDs in subject).
+ * Format: `{type}: {description}` (clean conventional commit — no WTF IDs in subject).
  *
- * GSD metadata is placed in a `GSD-Task:` git trailer at the end of the body,
+ * WTF metadata is placed in a `WTF-Task:` git trailer at the end of the body,
  * following the same convention as `Signed-off-by:` or `Co-Authored-By:`.
  *
  * The description is the task summary one-liner if available (it describes
@@ -138,8 +138,8 @@ export function buildTaskCommitMessage(ctx: TaskCommitContext): string {
     bodyParts.push(fileLines);
   }
 
-  // Trailers: GSD-Task first, then Resolves
-  bodyParts.push(`GSD-Task: ${ctx.taskId}`);
+  // Trailers: WTF-Task first, then Resolves
+  bodyParts.push(`WTF-Task: ${ctx.taskId}`);
 
   if (ctx.issueNumber) {
     bodyParts.push(`Resolves #${ctx.issueNumber}`);
@@ -149,11 +149,11 @@ export function buildTaskCommitMessage(ctx: TaskCommitContext): string {
 }
 
 /**
- * Thrown when a slice merge hits code conflicts in non-.gsd files.
+ * Thrown when a slice merge hits code conflicts in non-.wtf files.
  * The working tree is left in a conflicted state (no reset) so the
  * caller can dispatch a fix-merge session to resolve it.
  */
-export class MergeConflictError extends GSDError {
+export class MergeConflictError extends WTFError {
   readonly conflictedFiles: string[];
   readonly strategy: "squash" | "merge";
   readonly branch: string;
@@ -166,9 +166,9 @@ export class MergeConflictError extends GSDError {
     mainBranch: string,
   ) {
     super(
-      GSD_MERGE_CONFLICT,
+      WTF_MERGE_CONFLICT,
       `${strategy === "merge" ? "Merge" : "Squash-merge"} of "${branch}" into "${mainBranch}" ` +
-      `failed with conflicts in ${conflictedFiles.length} non-.gsd file(s): ${conflictedFiles.join(", ")}`,
+      `failed with conflicts in ${conflictedFiles.length} non-.wtf file(s): ${conflictedFiles.join(", ")}`,
     );
     this.name = "MergeConflictError";
     this.conflictedFiles = conflictedFiles;
@@ -188,35 +188,35 @@ export interface PreMergeCheckResult {
 // ─── Constants ─────────────────────────────────────────────────────────────
 
 /**
- * GSD runtime paths that should be excluded from smart staging.
+ * WTF runtime paths that should be excluded from smart staging.
  * These are transient/generated artifacts that should never be committed.
  * Matches the union of SKIP_PATHS + SKIP_EXACT in worktree-manager.ts
  * and the first 7 entries in gitignore.ts BASELINE_PATTERNS.
  */
 export const RUNTIME_EXCLUSION_PATHS: readonly string[] = [
-  ".gsd/activity/",
-  ".gsd/runtime/",
-  ".gsd/worktrees/",
-  ".gsd/auto.lock",
-  ".gsd/metrics.json",
-  ".gsd/completed-units.json",
-  ".gsd/STATE.md",
-  ".gsd/gsd.db",
-  ".gsd/gsd.db-shm",   // SQLite WAL sidecar — always created alongside gsd.db (#2296)
-  ".gsd/gsd.db-wal",   // SQLite WAL sidecar — always created alongside gsd.db (#2296)
-  ".gsd/journal/",     // daily-rotated JSONL event journal (#2296)
-  ".gsd/doctor-history.jsonl", // doctor run history (#2296)
-  ".gsd/DISCUSSION-MANIFEST.json",
+  ".wtf/activity/",
+  ".wtf/runtime/",
+  ".wtf/worktrees/",
+  ".wtf/auto.lock",
+  ".wtf/metrics.json",
+  ".wtf/completed-units.json",
+  ".wtf/STATE.md",
+  ".wtf/wtf.db",
+  ".wtf/wtf.db-shm",   // SQLite WAL sidecar — always created alongside wtf.db (#2296)
+  ".wtf/wtf.db-wal",   // SQLite WAL sidecar — always created alongside wtf.db (#2296)
+  ".wtf/journal/",     // daily-rotated JSONL event journal (#2296)
+  ".wtf/doctor-history.jsonl", // doctor run history (#2296)
+  ".wtf/DISCUSSION-MANIFEST.json",
 ];
 
 // ─── Integration Branch Metadata ───────────────────────────────────────────
 
 /**
  * Path to the milestone metadata file that stores the integration branch.
- * Format: .gsd/milestones/<MID>/<MID>-META.json
+ * Format: .wtf/milestones/<MID>/<MID>-META.json
  */
 function milestoneMetaPath(basePath: string, milestoneId: string): string {
-  return join(gsdRoot(basePath), "milestones", milestoneId, `${milestoneId}-META.json`);
+  return join(wtfRoot(basePath), "milestones", milestoneId, `${milestoneId}-META.json`);
 }
 
 /**
@@ -264,7 +264,7 @@ export function writeIntegrationBranch(
   if (QUICK_BRANCH_RE.test(branch)) return;
   // Don't record workflow-template branches (hotfix, bugfix, spike, etc.) —
   // same root cause as quick-task branches (#2498). All templates create
-  // gsd/<templateId>/<slug> branches that are ephemeral.
+  // wtf/<templateId>/<slug> branches that are ephemeral.
   if (WORKFLOW_BRANCH_RE.test(branch)) return;
   // Validate
   if (!VALID_BRANCH_NAME.test(branch)) return;
@@ -275,7 +275,7 @@ export function writeIntegrationBranch(
   if (existingBranch === branch) return;
 
   const metaFile = milestoneMetaPath(basePath, milestoneId);
-  mkdirSync(join(gsdRoot(basePath), "milestones", milestoneId), { recursive: true });
+  mkdirSync(join(wtfRoot(basePath), "milestones", milestoneId), { recursive: true });
 
   // Merge with existing metadata if present
   let existing: Record<string, unknown> = {};
@@ -287,7 +287,7 @@ export function writeIntegrationBranch(
 
   existing.integrationBranch = branch;
   writeFileSync(metaFile, JSON.stringify(existing, null, 2) + "\n", "utf-8");
-  // .gsd/ is managed externally (symlinked) — metadata is not committed to git.
+  // .wtf/ is managed externally (symlinked) — metadata is not committed to git.
 }
 
 export type IntegrationBranchResolutionStatus = "recorded" | "fallback" | "missing";
@@ -408,7 +408,7 @@ export function runGit(basePath: string, args: string[], options: { allowFailure
   } catch (error) {
     if (options.allowFailure) return "";
     const message = getErrorMessage(error);
-    throw new GSDError(GSD_GIT_ERROR, `git ${args.join(" ")} failed in ${basePath}: ${filterGitSvnNoise(message)}`);
+    throw new WTFError(WTF_GIT_ERROR, `git ${args.join(" ")} failed in ${basePath}: ${filterGitSvnNoise(message)}`);
   }
 }
 
@@ -451,7 +451,7 @@ export class GitServiceImpl {
   }
 
   /**
-   * Smart staging: `git add -A` excluding GSD runtime paths via pathspec.
+   * Smart staging: `git add -A` excluding WTF runtime paths via pathspec.
    * Falls back to plain `git add -A` if the exclusion pathspec fails.
    * @param extraExclusions Additional pathspec exclusions beyond RUNTIME_EXCLUSION_PATHS.
    */
@@ -462,10 +462,10 @@ export class GitServiceImpl {
     // the git reset HEAD step below would otherwise undo the rm --cached.
     //
     // SAFETY: Only untrack the specific RUNTIME paths (activity/, runtime/,
-    // auto.lock, etc.) — NOT all of .gsd/. If .gsd/milestones/ files were
+    // auto.lock, etc.) — NOT all of .wtf/. If .wtf/milestones/ files were
     // previously tracked, they stay tracked until the milestone completes
     // and the worktree is torn down. This prevents a mid-execution behavioral
-    // discontinuity where the first half of a milestone has .gsd/ artifacts
+    // discontinuity where the first half of a milestone has .wtf/ artifacts
     // committed but the second half doesn't (#1326).
     if (!this._runtimeFilesCleanedUp) {
       let cleaned = false;
@@ -474,7 +474,7 @@ export class GitServiceImpl {
         if (removed.length > 0) cleaned = true;
       }
       if (cleaned) {
-        nativeCommit(this.basePath, "chore: untrack .gsd/ runtime files from git index", { allowEmpty: false });
+        nativeCommit(this.basePath, "chore: untrack .wtf/ runtime files from git index", { allowEmpty: false });
       }
       this._runtimeFilesCleanedUp = true;
     }
@@ -483,31 +483,31 @@ export class GitServiceImpl {
     // hashed by git. The old approach of `git add -A` followed by unstaging
     // hangs indefinitely on repos with large untracked artifact trees (#1605).
     //
-    // Exclude only RUNTIME paths from staging — not the entire .gsd/ directory.
-    // When .gsd/milestones/ files are already tracked in the index (projects
-    // where .gsd/ is not gitignored, or Windows junctions that git sees as
+    // Exclude only RUNTIME paths from staging — not the entire .wtf/ directory.
+    // When .wtf/milestones/ files are already tracked in the index (projects
+    // where .wtf/ is not gitignored, or Windows junctions that git sees as
     // real directories), they should continue to be committed. Excluding the
-    // entire .gsd/ directory mid-milestone causes silent commit failure where
+    // entire .wtf/ directory mid-milestone causes silent commit failure where
     // the second half of a milestone's artifacts are never committed (#1326).
     //
-    // If .gsd/ IS in .gitignore (the default for external state projects),
+    // If .wtf/ IS in .gitignore (the default for external state projects),
     // git add -A already skips it and the exclusions are harmless no-ops.
     const allExclusions = [...RUNTIME_EXCLUSION_PATHS, ...extraExclusions];
 
     // ── Parallel worker milestone scope (#1991) ──
-    // When GSD_MILESTONE_LOCK is set, this process is a parallel worker that
+    // When WTF_MILESTONE_LOCK is set, this process is a parallel worker that
     // must only commit files belonging to its own milestone. Exclude all other
     // milestone directories from staging to prevent cross-milestone pollution
     // (e.g., an M033 worker fabricating M032 artifacts in the same commit).
-    const milestoneLock = process.env.GSD_MILESTONE_LOCK;
+    const milestoneLock = process.env.WTF_MILESTONE_LOCK;
     if (milestoneLock) {
-      const msDir = join(gsdRoot(this.basePath), "milestones");
+      const msDir = join(wtfRoot(this.basePath), "milestones");
       if (existsSync(msDir)) {
         try {
           const entries = readdirSync(msDir, { withFileTypes: true });
           for (const entry of entries) {
             if (entry.isDirectory() && entry.name !== milestoneLock) {
-              allExclusions.push(`.gsd/milestones/${entry.name}/`);
+              allExclusions.push(`.wtf/milestones/${entry.name}/`);
             }
           }
         } catch {
@@ -546,7 +546,7 @@ export class GitServiceImpl {
    * (e.g. pre-switch commits, stop commits, state rebuild commits).
    *
    * Returns the commit message on success, or null if nothing to commit.
-   * @param extraExclusions Additional paths to exclude from staging (e.g. [".gsd/"] for pre-switch commits).
+   * @param extraExclusions Additional paths to exclude from staging (e.g. [".wtf/"] for pre-switch commits).
    */
   autoCommit(
     unitType: string,
@@ -566,10 +566,10 @@ export class GitServiceImpl {
 
     const message = taskContext
       ? buildTaskCommitMessage(taskContext)
-      : `chore: auto-commit after ${unitType}\n\nGSD-Unit: ${unitId}`;
+      : `chore: auto-commit after ${unitType}\n\nWTF-Unit: ${unitId}`;
     nativeCommit(this.basePath, message, { allowEmpty: false });
 
-    // Absorb any preceding gsd snapshot commits into this real commit.
+    // Absorb any preceding wtf snapshot commits into this real commit.
     // Walk backwards from HEAD~1 counting consecutive snapshot subjects,
     // then soft-reset to before them and re-commit with the same message.
     this.absorbSnapshotCommits(message);
@@ -578,7 +578,7 @@ export class GitServiceImpl {
   }
 
   /**
-   * Squash consecutive `gsd snapshot:` commits that sit immediately below
+   * Squash consecutive `wtf snapshot:` commits that sit immediately below
    * HEAD into the current HEAD commit. This keeps the git history clean
    * after automated snapshot commits are superseded by real work.
    *
@@ -595,13 +595,13 @@ export class GitServiceImpl {
       // Opt-in guard — users can disable to keep snapshot commits for forensics
       if (this.prefs.absorb_snapshot_commits === false) return;
 
-      const GSD_SNAPSHOT_PREFIX = "gsd snapshot:";
+      const WTF_SNAPSHOT_PREFIX = "wtf snapshot:";
       let count = 0;
 
       // Walk back from HEAD~1 counting consecutive snapshot commits (cap at 10)
       for (let i = 1; i <= 10; i++) {
         const subject = nativeCommitSubject(this.basePath, `HEAD~${i}`);
-        if (!subject.startsWith(GSD_SNAPSHOT_PREFIX)) break;
+        if (!subject.startsWith(WTF_SNAPSHOT_PREFIX)) break;
         count = i;
       }
 
@@ -641,8 +641,8 @@ export class GitServiceImpl {
 
       // Re-run smartStage so the same RUNTIME_EXCLUSION_PATHS apply.
       // Snapshot commits used nativeAddTracked (git add -u) which stages
-      // ALL tracked modifications including .gsd/ state files. Without
-      // re-staging, those .gsd/ changes leak into the absorbed commit.
+      // ALL tracked modifications including .wtf/ state files. Without
+      // re-staging, those .wtf/ changes leak into the absorbed commit.
       this.smartStage();
 
       try {
@@ -664,7 +664,7 @@ export class GitServiceImpl {
    * branches are created from and merged back into.
    *
    * This is often `main` or `master`, but not necessarily. When a user
-   * starts GSD on a feature branch like `f-123-new-thing`, that branch
+   * starts WTF on a feature branch like `f-123-new-thing`, that branch
    * is recorded as the integration target, and all slice branches merge
    * back into it — not the repo's default branch. The name "main branch"
    * in variable names is historical; think of it as "integration branch".
@@ -719,7 +719,7 @@ export class GitServiceImpl {
   /**
    * Create a snapshot ref for the given label (typically a slice branch name).
    * Enabled by default; opt out with prefs.snapshots === false.
-   * Ref path: refs/gsd/snapshots/<label>/<timestamp>
+   * Ref path: refs/wtf/snapshots/<label>/<timestamp>
    * The ref points at HEAD, capturing the current commit before destructive operations.
    */
   createSnapshot(label: string): void {
@@ -734,7 +734,7 @@ export class GitServiceImpl {
       + String(now.getMinutes()).padStart(2, "0")
       + String(now.getSeconds()).padStart(2, "0");
 
-    const refPath = `refs/gsd/snapshots/${label}/${ts}`;
+    const refPath = `refs/wtf/snapshots/${label}/${ts}`;
     nativeUpdateRef(this.basePath, refPath, "HEAD");
   }
 
@@ -812,7 +812,7 @@ export function createDraftPR(
 
 /** Create a GitServiceImpl with the current effective git preferences. */
 export function createGitService(basePath: string): GitServiceImpl {
-  const gitPrefs = loadEffectiveGSDPreferences()?.preferences?.git ?? {};
+  const gitPrefs = loadEffectiveWTFPreferences()?.preferences?.git ?? {};
   return new GitServiceImpl(basePath, gitPrefs);
 }
 

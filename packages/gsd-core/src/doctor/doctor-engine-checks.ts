@@ -2,11 +2,12 @@ import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 import type { DoctorIssue } from "./doctor-types.ts";
-import { isDbAvailable, _getAdapter } from "../persistence/gsd-db.ts";
+import { isDbAvailable, _getAdapter } from "../persistence/wtf-db.ts";
 import { resolveMilestoneFile } from "../persistence/paths.ts";
 import { deriveState } from "../state/state.ts";
 import { readEvents } from "../workflow/workflow-events.ts";
 import { renderAllProjections } from "../workflow/workflow-projections.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 export async function checkEngineHealth(
   basePath: string,
@@ -147,7 +148,7 @@ export async function checkEngineHealth(
   // relative to the event log and re-render them.
   try {
     if (isDbAvailable()) {
-      const eventLogPath = join(basePath, ".gsd", "event-log.jsonl");
+      const eventLogPath = join(basePath, PROJECT_DIR_NAME, "event-log.jsonl");
       const events = readEvents(eventLogPath);
       if (events.length > 0) {
         const lastEventTs = new Date(events[events.length - 1]!.ts).getTime();

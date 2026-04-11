@@ -1,29 +1,29 @@
 /**
- * GSD Error Types — Typed error hierarchy for diagnostics and crash recovery.
+ * WTF Error Types — Typed error hierarchy for diagnostics and crash recovery.
  *
- * All GSD-specific errors extend GSDError, which carries a stable `code`
+ * All WTF-specific errors extend WTFError, which carries a stable `code`
  * string suitable for programmatic matching. Error codes are defined as
  * constants so callers can switch on them without string-matching.
  */
 
 // ─── Error Codes ──────────────────────────────────────────────────────────────
 
-export const GSD_STALE_STATE = "GSD_STALE_STATE";
-export const GSD_LOCK_HELD = "GSD_LOCK_HELD";
-export const GSD_ARTIFACT_MISSING = "GSD_ARTIFACT_MISSING";
-export const GSD_GIT_ERROR = "GSD_GIT_ERROR";
-export const GSD_MERGE_CONFLICT = "GSD_MERGE_CONFLICT";
-export const GSD_PARSE_ERROR = "GSD_PARSE_ERROR";
-export const GSD_IO_ERROR = "GSD_IO_ERROR";
+export const WTF_STALE_STATE = "WTF_STALE_STATE";
+export const WTF_LOCK_HELD = "WTF_LOCK_HELD";
+export const WTF_ARTIFACT_MISSING = "WTF_ARTIFACT_MISSING";
+export const WTF_GIT_ERROR = "WTF_GIT_ERROR";
+export const WTF_MERGE_CONFLICT = "WTF_MERGE_CONFLICT";
+export const WTF_PARSE_ERROR = "WTF_PARSE_ERROR";
+export const WTF_IO_ERROR = "WTF_IO_ERROR";
 
 // ─── Base Error ───────────────────────────────────────────────────────────────
 
-export class GSDError extends Error {
+export class WTFError extends Error {
   readonly code: string;
 
   constructor(code: string, message: string, options?: ErrorOptions) {
     super(message, options);
-    this.name = "GSDError";
+    this.name = "WTFError";
     this.code = code;
   }
 }

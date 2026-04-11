@@ -1,4 +1,4 @@
-// GSD Database — Barrel re-export
+// WTF Database — Barrel re-export
 // All downstream imports use this module path; sub-modules contain the implementation.
 
 export type { DbAdapter, DbStatement } from "./db-core.ts";

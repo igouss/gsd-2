@@ -1,4 +1,4 @@
-// GSD Extension — Hook Engine Facade
+// WTF Extension — Hook Engine Facade
 //
 // Thin facade over RuleRegistry. All mutable state and logic lives in the
 // registry instance; these exported functions delegate through getOrCreateRegistry()

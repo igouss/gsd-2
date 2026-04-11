@@ -1,5 +1,5 @@
 /**
- * GSD Parallel Merge — Worktree reconciliation for parallel milestones.
+ * WTF Parallel Merge — Worktree reconciliation for parallel milestones.
  *
  * Handles merging completed milestone worktrees back to main branch
  * with safety checks for parallel execution context.
@@ -16,6 +16,7 @@ import { removeSessionStatus } from "../session/session-status-io.ts";
 import type { WorkerInfo } from "./parallel-orchestrator.ts";
 import { getErrorMessage } from "../domain/error-utils.ts";
 import { logWarning } from "../workflow/workflow-logger.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -35,10 +36,10 @@ export type MergeOrder = "sequential" | "by-completion";
 /**
  * Check whether a milestone is complete by querying its worktree SQLite DB.
  * Uses a subprocess to avoid disrupting the global DB singleton.
- * Returns true when milestones.status = 'complete' in the worktree's gsd.db.
+ * Returns true when milestones.status = 'complete' in the worktree's wtf.db.
  */
 export function isMilestoneCompleteInWorktreeDb(basePath: string, mid: string): boolean {
-  const dbPath = join(basePath, ".gsd", "worktrees", mid, ".gsd", "gsd.db");
+  const dbPath = join(basePath, PROJECT_DIR_NAME, "worktrees", mid, PROJECT_DIR_NAME, "wtf.db");
   if (!existsSync(dbPath)) return false;
 
   try {
@@ -56,11 +57,11 @@ export function isMilestoneCompleteInWorktreeDb(basePath: string, mid: string): 
 
 /**
  * Discover milestone IDs with status='complete' in their worktree DB,
- * scanning .gsd/worktrees/<MID>/.gsd/gsd.db for each worktree directory.
+ * scanning .wtf/worktrees/<MID>/.wtf/wtf.db for each worktree directory.
  */
 function discoverDbCompletedMilestones(basePath: string): Set<string> {
   const completed = new Set<string>();
-  const worktreeDir = join(basePath, ".gsd", "worktrees");
+  const worktreeDir = join(basePath, PROJECT_DIR_NAME, "worktrees");
   try {
     for (const entry of readdirSync(worktreeDir)) {
       if (entry.startsWith("M") && isMilestoneCompleteInWorktreeDb(basePath, entry)) {
@@ -115,7 +116,7 @@ export function determineMergeOrder(
         title: mid,
         pid: 0,
         process: null,
-        worktreePath: basePath ? join(basePath, ".gsd", "worktrees", mid) : "",
+        worktreePath: basePath ? join(basePath, PROJECT_DIR_NAME, "worktrees", mid) : "",
         startedAt: 0,
         state: "stopped",
         cost: 0,
@@ -232,7 +233,7 @@ export function formatMergeResults(results: MergeResult[]): string {
       for (const f of r.conflictFiles) {
         lines.push(`  - \`${f}\``);
       }
-      lines.push(`  Resolve conflicts manually and run \`/gsd parallel merge ${r.milestoneId}\` to retry.`);
+      lines.push(`  Resolve conflicts manually and run \`/wtf parallel merge ${r.milestoneId}\` to retry.`);
     } else {
       lines.push(`- **${r.milestoneId}** — failed: ${r.error}`);
     }

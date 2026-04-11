@@ -4,7 +4,7 @@ import { join, sep } from "node:path";
 import type { DoctorIssue, DoctorIssueCode } from "./doctor-types.ts";
 import { loadFile } from "../persistence/files.ts";
 import { parseRoadmap } from "../persistence/md-parsers.ts";
-import { isDbAvailable, getMilestoneSlices } from "../persistence/gsd-db.ts";
+import { isDbAvailable, getMilestoneSlices } from "../persistence/wtf-db.ts";
 import { resolveMilestoneFile } from "../persistence/paths.ts";
 import { deriveState, isMilestoneComplete } from "../state/state.ts";
 import { listWorktrees, resolveGitDir, worktreesDir } from "../git/worktree-manager.ts";
@@ -12,11 +12,12 @@ import { abortAndReset } from "../git/git-self-heal.ts";
 import { RUNTIME_EXCLUSION_PATHS, resolveMilestoneIntegrationBranch, writeIntegrationBranch } from "../git/git-service.ts";
 import { nativeIsRepo, nativeWorktreeList, nativeWorktreeRemove, nativeBranchList, nativeBranchDelete, nativeLsFiles, nativeRmCached, nativeHasChanges, nativeLastCommitEpoch, nativeGetCurrentBranch, nativeAddTracked, nativeCommit } from "../git/native-git-bridge.ts";
 import { getAllWorktreeHealth } from "../git/worktree-health.ts";
-import { loadEffectiveGSDPreferences } from "../preferences/preferences.ts";
+import { loadEffectiveWTFPreferences } from "../preferences/preferences.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 /**
  * Returns true if the directory contains only doctor artifacts
- * (e.g. `.gsd/doctor-history.jsonl`). These dirs are created by
+ * (e.g. `.wtf/doctor-history.jsonl`). These dirs are created by
  * appendDoctorHistory() writing to worktree-scoped paths during the audit
  * and should not be flagged as orphaned worktrees (#3105).
  */
@@ -25,10 +26,10 @@ function isDoctorArtifactOnly(dirPath: string): boolean {
     const entries = readdirSync(dirPath);
     // Empty dir — not a doctor artifact, still orphaned
     if (entries.length === 0) return false;
-    // Only a .gsd subdirectory
-    if (entries.length === 1 && entries[0] === ".gsd") {
-      const gsdEntries = readdirSync(join(dirPath, ".gsd"));
-      return gsdEntries.length <= 1 && gsdEntries.every(e => e === "doctor-history.jsonl");
+    // Only a .wtf subdirectory
+    if (entries.length === 1 && entries[0] === PROJECT_DIR_NAME) {
+      const wtfEntries = readdirSync(join(dirPath, PROJECT_DIR_NAME));
+      return wtfEntries.length <= 1 && wtfEntries.every(e => e === "doctor-history.jsonl");
     }
     return false;
   } catch {
@@ -241,8 +242,8 @@ export async function checkGitHealth(
 
   // ── Legacy slice branches ──────────────────────────────────────────────
   try {
-    const branchList = nativeBranchList(basePath, "gsd/*/*")
-      .filter((branch) => !branch.startsWith("gsd/quick/"));
+    const branchList = nativeBranchList(basePath, "wtf/*/*")
+      .filter((branch) => !branch.startsWith("wtf/quick/"));
     if (branchList.length > 0) {
       issues.push({
         severity: "info",
@@ -276,7 +277,7 @@ export async function checkGitHealth(
   // and causes the next merge operation to fail silently.
   try {
     const state = await deriveState(basePath);
-    const gitPrefs = loadEffectiveGSDPreferences()?.preferences?.git ?? {};
+    const gitPrefs = loadEffectiveWTFPreferences()?.preferences?.git ?? {};
     for (const milestone of state.registry) {
       if (milestone.status === "complete") continue;
       const resolution = resolveMilestoneIntegrationBranch(basePath, milestone.id, gitPrefs);
@@ -319,8 +320,8 @@ export async function checkGitHealth(
   try {
     const wtDir = worktreesDir(basePath);
     if (existsSync(wtDir)) {
-      // Resolve symlinks and normalize separators so that symlinked .gsd
-      // paths (e.g. ~/.gsd/projects/<hash>/worktrees/…) match the paths
+      // Resolve symlinks and normalize separators so that symlinked .wtf
+      // paths (e.g. ~/.wtf/projects/<hash>/worktrees/…) match the paths
       // returned by `git worktree list`.
       const normalizePath = (p: string): string => {
         try { p = realpathSync(p); } catch { /* path may not exist */ }
@@ -336,7 +337,7 @@ export async function checkGitHealth(
         } catch { continue; }
         const normalizedFullPath = normalizePath(fullPath);
         if (!registeredPaths.has(normalizedFullPath)) {
-          // Skip directories that only contain doctor artifacts (.gsd/doctor-history.jsonl).
+          // Skip directories that only contain doctor artifacts (.wtf/doctor-history.jsonl).
           // appendDoctorHistory() can recreate these dirs during the audit itself,
           // causing a circular false positive (#3105 Bug 1).
           if (isDoctorArtifactOnly(fullPath)) continue;
@@ -368,7 +369,7 @@ export async function checkGitHealth(
   // longer ago than the configured threshold, flag it and optionally
   // auto-commit a safety snapshot so work isn't lost.
   try {
-    const prefs = loadEffectiveGSDPreferences()?.preferences ?? {};
+    const prefs = loadEffectiveWTFPreferences()?.preferences ?? {};
     const thresholdMinutes = prefs.stale_commit_threshold_minutes ?? 30;
 
     if (thresholdMinutes > 0) {
@@ -393,15 +394,15 @@ export async function checkGitHealth(
           if (shouldFix("stale_uncommitted_changes")) {
             try {
               nativeAddTracked(basePath);
-              const commitMsg = `gsd snapshot: uncommitted changes after ${mins}m inactivity`;
+              const commitMsg = `wtf snapshot: uncommitted changes after ${mins}m inactivity`;
               const result = nativeCommit(basePath, commitMsg);
               if (result) {
-                fixesApplied.push(`created gsd snapshot after ${mins}m of uncommitted changes`);
+                fixesApplied.push(`created wtf snapshot after ${mins}m of uncommitted changes`);
               } else {
-                fixesApplied.push("gsd snapshot skipped — nothing to commit after staging tracked files");
+                fixesApplied.push("wtf snapshot skipped — nothing to commit after staging tracked files");
               }
             } catch {
-              fixesApplied.push("failed to create gsd snapshot commit");
+              fixesApplied.push("failed to create wtf snapshot commit");
             }
           }
         }
@@ -412,8 +413,8 @@ export async function checkGitHealth(
   }
 
   // ── Worktree lifecycle checks ──────────────────────────────────────────
-  // Check GSD-managed worktrees for: merged branches, stale work, dirty
-  // state, and unpushed commits. Only worktrees under .gsd/worktrees/.
+  // Check WTF-managed worktrees for: merged branches, stale work, dirty
+  // state, and unpushed commits. Only worktrees under .wtf/worktrees/.
   try {
     const healthStatuses = getAllWorktreeHealth(basePath);
     const cwd = process.cwd();

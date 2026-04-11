@@ -69,7 +69,7 @@ export interface BudgetAllocation {
 }
 
 // ─── Minimal interface slices for dependency injection ───────────────────────
-// These avoid coupling to full ModelRegistry/GSDPreferences types in tests.
+// These avoid coupling to full ModelRegistry/WTFPreferences types in tests.
 
 export interface MinimalModel {
   id: string;

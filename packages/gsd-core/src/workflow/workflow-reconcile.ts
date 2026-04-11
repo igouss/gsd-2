@@ -16,7 +16,7 @@ import {
   upsertDecision,
   openDatabase,
   setTaskBlockerDiscovered,
-} from "../persistence/gsd-db.ts";
+} from "../persistence/wtf-db.ts";
 import { isClosedStatus } from "../domain/status-guards.ts";
 import { invalidateStateCache } from "../state/state.ts";
 import { clearPathCache } from "../persistence/paths.ts";
@@ -24,6 +24,7 @@ import { clearParseCache } from "../persistence/files.ts";
 import { writeManifest } from "./workflow-manifest.ts";
 import { atomicWriteSync } from "../persistence/atomic-write.ts";
 import { acquireSyncLock, releaseSyncLock } from "../session/sync-lock.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 // ─── Replay Helpers ──────────────────────────────────────────────────────────
 
@@ -47,7 +48,7 @@ export function replaySliceComplete(milestoneId: string, sliceId: string, ts: st
     const incompleteTasks = tasks.filter(t => !isClosedStatus(t.status));
     if (incompleteTasks.length > 0) {
       process.stderr.write(
-        `[gsd] reconcile: skipping complete_slice replay for ${sliceId} — ` +
+        `[wtf] reconcile: skipping complete_slice replay for ${sliceId} — ` +
         `${incompleteTasks.length} task(s) still pending\n`,
       );
       return;
@@ -74,7 +75,7 @@ export interface ReconcileResult {
 
 /**
  * Replay a list of WorkflowEvents by dispatching each to the appropriate
- * gsd-db function.  This replaces the old engine.replayAll() pattern with
+ * wtf-db function.  This replaces the old engine.replayAll() pattern with
  * direct DB calls.
  */
 function replayEvents(events: WorkflowEvent[]): void {
@@ -150,7 +151,7 @@ function replayEvents(events: WorkflowEvent[]): void {
         break;
       }
       case "plan_milestone": {
-        // Replay milestone creation — uses INSERT OR IGNORE (gsd-db's insertMilestone is safe)
+        // Replay milestone creation — uses INSERT OR IGNORE (wtf-db's insertMilestone is safe)
         const mId = p["milestoneId"] as string;
         if (mId) {
           insertMilestone({ id: mId, title: (p["title"] as string) ?? mId });
@@ -327,7 +328,7 @@ export function detectConflicts(
 // ─── writeConflictsFile ───────────────────────────────────────────────────────
 
 /**
- * Write a human-readable CONFLICTS.md to basePath/.gsd/CONFLICTS.md.
+ * Write a human-readable CONFLICTS.md to basePath/.wtf/CONFLICTS.md.
  * Lists each conflict with both sides' event payloads and resolution instructions.
  */
 export function writeConflictsFile(
@@ -340,7 +341,7 @@ export function writeConflictsFile(
     `# Merge Conflicts — ${timestamp}`,
     "",
     `Conflicts detected merging worktree \`${worktreePath}\` into \`${basePath}\`.`,
-    `Run \`gsd resolve-conflict\` to resolve each conflict.`,
+    `Run \`wtf resolve-conflict\` to resolve each conflict.`,
     "",
   ];
 
@@ -359,12 +360,12 @@ export function writeConflictsFile(
       lines.push(`  params: ${JSON.stringify(event.params)}`);
     }
     lines.push("");
-    lines.push(`**Resolve with:** \`gsd resolve-conflict --entity ${conflict.entityType}:${conflict.entityId} --pick [main|worktree]\``);
+    lines.push(`**Resolve with:** \`wtf resolve-conflict --entity ${conflict.entityType}:${conflict.entityId} --pick [main|worktree]\``);
     lines.push("");
   });
 
   const content = lines.join("\n");
-  const dir = join(basePath, ".gsd");
+  const dir = join(basePath, PROJECT_DIR_NAME);
   mkdirSync(dir, { recursive: true });
   atomicWriteSync(join(dir, "CONFLICTS.md"), content);
 }
@@ -407,8 +408,8 @@ function _reconcileWorktreeLogsInner(
   worktreeBasePath: string,
 ): ReconcileResult {
   // Step 1: Read both logs
-  const mainLogPath = join(mainBasePath, ".gsd", "event-log.jsonl");
-  const wtLogPath = join(worktreeBasePath, ".gsd", "event-log.jsonl");
+  const mainLogPath = join(mainBasePath, PROJECT_DIR_NAME, "event-log.jsonl");
+  const wtLogPath = join(worktreeBasePath, PROJECT_DIR_NAME, "event-log.jsonl");
 
   const mainEvents = readEvents(mainLogPath);
   const wtEvents = readEvents(wtLogPath);
@@ -432,7 +433,7 @@ function _reconcileWorktreeLogsInner(
     writeConflictsFile(mainBasePath, conflicts, worktreeBasePath);
     const conflictSummary = conflicts.slice(0, 3).map(c => `${c.entityType}:${c.entityId}`).join(", ");
     const truncated = conflicts.length > 3 ? `... and ${conflicts.length - 3} more` : "";
-    logError("reconcile", `${conflicts.length} conflict(s) detected on ${conflictSummary}${truncated}. Details: .gsd/CONFLICTS.md`, { count: String(conflicts.length), path: join(mainBasePath, ".gsd", "CONFLICTS.md") });
+    logError("reconcile", `${conflicts.length} conflict(s) detected on ${conflictSummary}${truncated}. Details: .wtf/CONFLICTS.md`, { count: String(conflicts.length), path: join(mainBasePath, PROJECT_DIR_NAME, "CONFLICTS.md") });
     return { autoMerged: 0, conflicts };
   }
 
@@ -453,11 +454,11 @@ function _reconcileWorktreeLogsInner(
   const baseEvents = mainEvents.slice(0, forkPoint + 1);
   const mergedLog = baseEvents.concat(merged);
   const logContent = mergedLog.map((e) => JSON.stringify(e)).join("\n") + (mergedLog.length > 0 ? "\n" : "");
-  mkdirSync(join(mainBasePath, ".gsd"), { recursive: true });
-  atomicWriteSync(join(mainBasePath, ".gsd", "event-log.jsonl"), logContent);
+  mkdirSync(join(mainBasePath, PROJECT_DIR_NAME), { recursive: true });
+  atomicWriteSync(join(mainBasePath, PROJECT_DIR_NAME, "event-log.jsonl"), logContent);
 
   // Step 8: Replay into DB (wrapped in a transaction by replayEvents)
-  openDatabase(join(mainBasePath, ".gsd", "gsd.db"));
+  openDatabase(join(mainBasePath, PROJECT_DIR_NAME, "wtf.db"));
   replayEvents(merged);
 
   // Step 9: Write manifest
@@ -492,7 +493,7 @@ function _reconcileWorktreeLogsInner(
  *     params: {JSON}
  */
 export function listConflicts(basePath: string): ConflictEntry[] {
-  const conflictsPath = join(basePath, ".gsd", "CONFLICTS.md");
+  const conflictsPath = join(basePath, PROJECT_DIR_NAME, "CONFLICTS.md");
   if (!existsSync(conflictsPath)) return [];
 
   const content = readFileSync(conflictsPath, "utf-8");
@@ -594,7 +595,7 @@ export function resolveConflict(
   const eventsToReplay = pick === "main" ? conflict.mainSideEvents : conflict.worktreeSideEvents;
 
   // Replay resolved events through the DB (updates DB state)
-  openDatabase(join(basePath, ".gsd", "gsd.db"));
+  openDatabase(join(basePath, PROJECT_DIR_NAME, "wtf.db"));
   replayEvents(eventsToReplay);
 
   // Append resolved events to the event log
@@ -623,7 +624,7 @@ export function resolveConflict(
  * No-op if CONFLICTS.md does not exist.
  */
 export function removeConflictsFile(basePath: string): void {
-  const conflictsPath = join(basePath, ".gsd", "CONFLICTS.md");
+  const conflictsPath = join(basePath, PROJECT_DIR_NAME, "CONFLICTS.md");
   if (existsSync(conflictsPath)) {
     unlinkSync(conflictsPath);
   }

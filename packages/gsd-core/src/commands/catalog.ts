@@ -4,25 +4,26 @@ import { join } from "node:path";
 
 import { loadRegistry } from "../workflow/workflow-templates.ts";
 import { resolveProjectRoot } from "../git/worktree.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
-const gsdHome = process.env.GSD_HOME || join(homedir(), ".gsd");
+const wtfHome = process.env.WTF_HOME || join(homedir(), PROJECT_DIR_NAME);
 
-export interface GsdCommandDefinition {
+export interface WtfCommandDefinition {
   cmd: string;
   desc: string;
 }
 
-type CompletionMap = Record<string, readonly GsdCommandDefinition[]>;
+type CompletionMap = Record<string, readonly WtfCommandDefinition[]>;
 
-export const GSD_COMMAND_DESCRIPTION =
-  "GSD — Get Shit Done: /gsd help|start|templates|next|auto|stop|pause|status|widget|visualize|queue|quick|discuss|capture|triage|dispatch|history|undo|undo-task|reset-slice|rate|skip|export|cleanup|mode|prefs|config|keys|hooks|run-hook|skill-health|doctor|logs|forensics|changelog|migrate|remote|steer|knowledge|new-milestone|parallel|cmux|park|unpark|init|setup|inspect|extensions|update|fast|mcp|rethink|codebase|notifications";
+export const WTF_COMMAND_DESCRIPTION =
+  "WTF — Work Then Finish: /wtf help|start|templates|next|auto|stop|pause|status|widget|visualize|queue|quick|discuss|capture|triage|dispatch|history|undo|undo-task|reset-slice|rate|skip|export|cleanup|mode|prefs|config|keys|hooks|run-hook|skill-health|doctor|logs|forensics|changelog|migrate|remote|steer|knowledge|new-milestone|parallel|cmux|park|unpark|init|setup|inspect|extensions|update|fast|mcp|rethink|codebase|notifications";
 
-export const TOP_LEVEL_SUBCOMMANDS: readonly GsdCommandDefinition[] = [
+export const TOP_LEVEL_SUBCOMMANDS: readonly WtfCommandDefinition[] = [
   { cmd: "help", desc: "Categorized command reference with descriptions" },
-  { cmd: "next", desc: "Explicit step mode (same as /gsd)" },
+  { cmd: "next", desc: "Explicit step mode (same as /wtf)" },
   { cmd: "auto", desc: "Autonomous mode — research, plan, execute, commit, repeat" },
   { cmd: "stop", desc: "Stop auto mode gracefully" },
-  { cmd: "pause", desc: "Pause auto-mode (preserves state, /gsd auto to resume)" },
+  { cmd: "pause", desc: "Pause auto-mode (preserves state, /wtf auto to resume)" },
   { cmd: "status", desc: "Progress dashboard" },
   { cmd: "widget", desc: "Cycle widget: full → small → min → off" },
   { cmd: "visualize", desc: "Open 10-tab workflow visualizer (progress, timeline, deps, metrics, health, agent, changes, knowledge, captures, export)" },
@@ -52,9 +53,9 @@ export const TOP_LEVEL_SUBCOMMANDS: readonly GsdCommandDefinition[] = [
   { cmd: "doctor", desc: "Runtime health checks with auto-fix" },
   { cmd: "logs", desc: "Browse activity logs, debug logs, and metrics" },
   { cmd: "forensics", desc: "Examine execution logs" },
-  { cmd: "init", desc: "Project init wizard — detect, configure, bootstrap .gsd/" },
+  { cmd: "init", desc: "Project init wizard — detect, configure, bootstrap .wtf/" },
   { cmd: "setup", desc: "Global setup status and configuration" },
-  { cmd: "migrate", desc: "Migrate a v1 .planning directory to .gsd format" },
+  { cmd: "migrate", desc: "Migrate a v1 .planning directory to .wtf format" },
   { cmd: "remote", desc: "Control remote auto-mode" },
   { cmd: "steer", desc: "Hard-steer plan documents during execution" },
   { cmd: "inspect", desc: "Show SQLite DB diagnostics" },
@@ -64,7 +65,7 @@ export const TOP_LEVEL_SUBCOMMANDS: readonly GsdCommandDefinition[] = [
   { cmd: "cmux", desc: "Manage cmux integration (status, sidebar, notifications, splits)" },
   { cmd: "park", desc: "Park a milestone — skip without deleting" },
   { cmd: "unpark", desc: "Reactivate a parked milestone" },
-  { cmd: "update", desc: "Update GSD to the latest version" },
+  { cmd: "update", desc: "Update WTF to the latest version" },
   { cmd: "start", desc: "Start a workflow template (bugfix, spike, feature, etc.)" },
   { cmd: "templates", desc: "List available workflow templates" },
   { cmd: "extensions", desc: "Manage extensions (list, enable, disable, info)" },
@@ -72,7 +73,7 @@ export const TOP_LEVEL_SUBCOMMANDS: readonly GsdCommandDefinition[] = [
   { cmd: "mcp", desc: "MCP server status and connectivity check (status, check <server>)" },
   { cmd: "rethink", desc: "Conversational project reorganization — reorder, park, discard, add milestones" },
   { cmd: "workflow", desc: "Custom workflow lifecycle (new, run, list, validate, pause, resume)" },
-  { cmd: "codebase", desc: "Generate and manage codebase map (.gsd/CODEBASE.md)" },
+  { cmd: "codebase", desc: "Generate and manage codebase map (.wtf/CODEBASE.md)" },
 ];
 
 const NESTED_COMPLETIONS: CompletionMap = {
@@ -161,7 +162,7 @@ const NESTED_COMPLETIONS: CompletionMap = {
     { cmd: "branches", desc: "Remove merged milestone and legacy branches" },
     { cmd: "snapshots", desc: "Remove old execution snapshots" },
     { cmd: "worktrees", desc: "Remove merged/safe-to-delete worktrees" },
-    { cmd: "projects", desc: "Audit orphaned ~/.gsd/projects/ state directories" },
+    { cmd: "projects", desc: "Audit orphaned ~/.wtf/projects/ state directories" },
     { cmd: "projects --fix", desc: "Delete orphaned project state directories (cannot be undone)" },
   ],
   knowledge: [
@@ -177,7 +178,7 @@ const NESTED_COMPLETIONS: CompletionMap = {
     { cmd: "refactor", desc: "Inventory, plan waves, migrate, verify" },
     { cmd: "security-audit", desc: "Scan, triage, remediate, re-scan" },
     { cmd: "dep-upgrade", desc: "Assess, upgrade, fix breaks, verify" },
-    { cmd: "full-project", desc: "Complete GSD workflow with full ceremony" },
+    { cmd: "full-project", desc: "Complete WTF workflow with full ceremony" },
     { cmd: "resume", desc: "Resume an in-progress workflow" },
     { cmd: "--list", desc: "List all available templates" },
     { cmd: "--dry-run", desc: "Preview workflow without executing" },
@@ -246,7 +247,7 @@ const NESTED_COMPLETIONS: CompletionMap = {
 
 function filterOptions(
   partial: string,
-  options: readonly GsdCommandDefinition[],
+  options: readonly WtfCommandDefinition[],
   prefix = "",
 ) {
   const normalizedPrefix = prefix ? `${prefix} ` : "";
@@ -261,7 +262,7 @@ function filterOptions(
 
 function getExtensionCompletions(prefix: string, action: string) {
   try {
-    const extDir = join(gsdHome, "agent", "extensions");
+    const extDir = join(wtfHome, "agent", "extensions");
     const ids: Array<{ id: string; name: string }> = [];
     for (const entry of readdirSync(extDir, { withFileTypes: true })) {
       if (!entry.isDirectory()) continue;
@@ -288,7 +289,7 @@ function getExtensionCompletions(prefix: string, action: string) {
   }
 }
 
-export function getGsdArgumentCompletions(prefix: string): Array<{ value: string; label: string; description: string }> {
+export function getWtfArgumentCompletions(prefix: string): Array<{ value: string; label: string; description: string }> {
   const hasTrailingSpace = prefix.endsWith(" ");
   const parts = prefix.trim().split(/\s+/);
   if (hasTrailingSpace && parts.length >= 1) {
@@ -348,7 +349,7 @@ export function getGsdArgumentCompletions(prefix: string): Array<{ value: string
   // Workflow definition-name completion for `workflow run <name>` and `workflow validate <name>`
   if (command === "workflow" && (subcommand === "run" || subcommand === "validate") && parts.length <= 3) {
     try {
-      const defsDir = join(resolveProjectRoot(process.cwd()), ".gsd", "workflow-defs");
+      const defsDir = join(resolveProjectRoot(process.cwd()), PROJECT_DIR_NAME, "workflow-defs");
       if (existsSync(defsDir)) {
         return readdirSync(defsDir)
           .filter((f) => f.endsWith(".yaml") && f.startsWith(third))

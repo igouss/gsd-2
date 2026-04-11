@@ -1,4 +1,4 @@
-// GSD Extension - File I/O
+// WTF Extension - File I/O
 // Load/save files, requirement counting, task plan IO extraction,
 // UAT type extraction, context dependency parsing, milestone summary inlining.
 
@@ -116,7 +116,7 @@ export function parseTaskPlanIO(content: string): { inputFiles: string[]; output
 // ─── UAT Type Extractor ────────────────────────────────────────────────────
 
 /**
- * The four UAT classification types recognised by GSD auto-mode.
+ * The four UAT classification types recognised by WTF auto-mode.
  * `undefined` is returned (not this union) when no type can be determined.
  */
 export type UatType = 'artifact-driven' | 'live-runtime' | 'human-experience' | 'mixed' | 'browser-executable' | 'runtime-executable';

@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to GSD are documented in this file.
+All notable changes to WTF are documented in this file.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
@@ -11,49 +11,49 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 - **pi-tui**: revert contentCursorRow, use hardwareCursorRow as movement baseline
 - **pi-tui**: use contentCursorRow for render movement baseline instead of cursorRow
-- **gsd**: add logWarning to empty catch block in orphaned worktree cleanup
-- **gsd**: add consecutiveFinalizeTimeouts to LoopState in journal tests
-- **gsd**: add escalation and unit-detach guards to finalize timeout handlers
-- **gsd**: add timeout guard around postUnitPreVerification to prevent auto-loop hang
-- **gsd**: OS-specific keyboard shortcut hints via formatShortcut helper
+- **wtf**: add logWarning to empty catch block in orphaned worktree cleanup
+- **wtf**: add consecutiveFinalizeTimeouts to LoopState in journal tests
+- **wtf**: add escalation and unit-detach guards to finalize timeout handlers
+- **wtf**: add timeout guard around postUnitPreVerification to prevent auto-loop hang
+- **wtf**: OS-specific keyboard shortcut hints via formatShortcut helper
 - **subagent**: support list-style tools frontmatter
 - clear autocomplete rows from content bottom
 - parse annotated pre-exec file paths
-- **gsd**: add orphaned milestone branch audit at auto-mode bootstrap
+- **wtf**: add orphaned milestone branch audit at auto-mode bootstrap
 
 ## [2.66.0] - 2026-04-08
 
 ### Added
-- **gsd**: add fast path for queued milestone discussion
-- **gsd**: add /gsd show-config command
+- **wtf**: add fast path for queued milestone discussion
+- **wtf**: add /wtf show-config command
 - **reactive**: graph diagnostics and subagent_model config
 - **dispatch**: parallel research slices and parallel milestone validation
 - **parallel**: worker model override for parallel milestone workers
 
 ### Fixed
-- **gsd**: validate depth verification answer before unlocking write-gate
-- **gsd**: revert unknown artifact check to warn-and-proceed
-- **gsd**: add missing cmd field to test base WorkflowEvent
-- **gsd**: address remaining adversarial review findings for wave 3
-- **gsd**: detect concurrent event log growth during reconcile
-- **gsd**: address adversarial review findings for wave 3
-- **gsd**: address adversarial review findings for wave 2
-- **gsd**: address adversarial review findings for wave 1
-- **gsd**: WAL-safe migration backup + stronger regression tests
-- **gsd**: consistency and cleanup (wave 5/5)
-- **gsd**: write safety — atomic writes and randomized tmp paths (wave 4/5)
-- **gsd**: session and recovery robustness (wave 3/5)
-- **gsd**: event log and reconciliation robustness (wave 2/5)
-- **gsd**: critical state machine data integrity fixes (wave 1/5)
-- **gsd**: critical state machine data integrity fixes (wave 1/5)
-- **gsd**: remove ecosystem research stub and address adversarial review
-- **gsd**: suppress model change notification in auto-mode unless verbose
-- **gsd**: exclude task.files from checkTaskOrdering to prevent false positives
+- **wtf**: validate depth verification answer before unlocking write-gate
+- **wtf**: revert unknown artifact check to warn-and-proceed
+- **wtf**: add missing cmd field to test base WorkflowEvent
+- **wtf**: address remaining adversarial review findings for wave 3
+- **wtf**: detect concurrent event log growth during reconcile
+- **wtf**: address adversarial review findings for wave 3
+- **wtf**: address adversarial review findings for wave 2
+- **wtf**: address adversarial review findings for wave 1
+- **wtf**: WAL-safe migration backup + stronger regression tests
+- **wtf**: consistency and cleanup (wave 5/5)
+- **wtf**: write safety — atomic writes and randomized tmp paths (wave 4/5)
+- **wtf**: session and recovery robustness (wave 3/5)
+- **wtf**: event log and reconciliation robustness (wave 2/5)
+- **wtf**: critical state machine data integrity fixes (wave 1/5)
+- **wtf**: critical state machine data integrity fixes (wave 1/5)
+- **wtf**: remove ecosystem research stub and address adversarial review
+- **wtf**: suppress model change notification in auto-mode unless verbose
+- **wtf**: exclude task.files from checkTaskOrdering to prevent false positives
 - **state**: skip ghost check for queued milestones in registry build
 - **ci**: replace empty catch blocks and raw stderr with logWarning
 - **logging**: add debugLog to empty catch in reopen-milestone
 - **state-machine**: 9 resilience fixes + 86 regression tests (#3161)
-- **gsd**: add incremental persistence to discuss prompts
+- **wtf**: add incremental persistence to discuss prompts
 - replace empty catch with logWarning for silent-catch-diagnostics test
 - **test**: escape regex metacharacters in skip-by-preference pattern test
 - **test**: search for numbered step definitions in prompt ordering test
@@ -61,71 +61,71 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **test**: update action count for note captures now included in results
 - **test**: remove extraneous test file from wrong branch
 - **test**: update worktree sync tests to use separate milestone IDs
-- **gsd**: use valid LogComponent type for stale branch guard warning
+- **wtf**: use valid LogComponent type for stale branch guard warning
 - **test**: update rogue detection test for auto-remediation behavior
 - **test**: update stuck-planning test to expect executing after reconciliation
 - **test**: update file path consistency tests for inputs-only checking
 - **test**: add CONTEXT file to queued milestone ghost detection test
 - **test**: update needs-remediation test to expect validating-milestone phase
-- **gsd**: import all-done milestones as complete during DB migration
-- **gsd**: allow milestone completion when validation skipped by preference
-- **gsd**: set slice sequence at all three insertion sites
-- **gsd**: four prompt/runtime fixes for completion and session stability
-- **gsd**: default insertMilestone status to queued instead of active
-- **gsd**: suppress repeated frontmatter YAML parse warnings
-- **gsd**: normalize list inputs in complete-task + fix roadmap dep parsing
-- **gsd**: open DB before status derivation + respect isolation:none in quick
-- **gsd**: add .bg-shell/ to baseline gitignore patterns
+- **wtf**: import all-done milestones as complete during DB migration
+- **wtf**: allow milestone completion when validation skipped by preference
+- **wtf**: set slice sequence at all three insertion sites
+- **wtf**: four prompt/runtime fixes for completion and session stability
+- **wtf**: default insertMilestone status to queued instead of active
+- **wtf**: suppress repeated frontmatter YAML parse warnings
+- **wtf**: normalize list inputs in complete-task + fix roadmap dep parsing
+- **wtf**: open DB before status derivation + respect isolation:none in quick
+- **wtf**: add .bg-shell/ to baseline gitignore patterns
 - **tui**: prevent Enter key infinite loop in interview notes mode
 - **provider**: handle Enter key to initiate auth setup in provider manager
-- **gsd**: cap run-uat dispatch attempts to prevent infinite replay loop
+- **wtf**: cap run-uat dispatch attempts to prevent infinite replay loop
 - **mcp**: use createRequire to resolve SDK wildcard subpath imports
-- **gsd**: mark note captures as executed in executeTriageResolutions
-- **gsd**: validate main_branch preference exists before using in merge
-- **gsd**: handle deleted cwd in projectRoot to prevent ENOENT crash
-- **gsd**: skip current milestone in syncWorktreeStateBack to prevent merge conflicts
-- **gsd**: add structuredQuestionsAvailable conditional to slice discuss
-- **gsd**: restore full tool set after discuss flow scoping
-- **gsd**: tighten verifyExpectedArtifact to prevent rogue-write false positives
-- **gsd**: add verification gate to complete-slice tool
-- **gsd**: fix pre-execution-checks false positives from backticks and task.files
-- **gsd**: stop renderAllProjections from overwriting authoritative PLAN.md
-- **gsd**: auto-checkout to main when isolation:none finds stale milestone branch
-- **gsd**: auto-remediate stale slice DB status when SUMMARY exists on disk
-- **gsd**: open DB on demand in gsd_milestone_status for non-auto sessions
-- **gsd**: detect phantom milestones from abandoned gsd_milestone_generate_id
-- **gsd**: force re-validation when verdict is needs-remediation
-- **gsd**: exclude closed slices from findMissingSummaries check
-- **gsd**: recover from stale lockfile after crash or SIGKILL
-- **gsd**: add createdAt timestamp and 30s age guard to staleness check
-- **gsd**: clear stale pendingAutoStart after /clear interrupts discussion
-- **gsd**: suppress misleading warnings for expected ENOENT/EISDIR conditions
-- **gsd**: extract real error from message content when errorMessage is useless
-- **gsd**: extract real error from message content when errorMessage is useless
-- **gsd**: show accurate pause message for queued-user-message skip
-- **gsd**: treat queued-user-message skip as non-retryable interruption
-- **gsd**: recognize "Not provided." default in isVerificationNotApplicable
-- **gsd**: discoverManifests skips symlinked extension directories
-- **gsd**: recognize "Not provided." default in isVerificationNotApplicable
-- **gsd**: reconcile plan-file tasks into DB when planner skips persistence (#3600)
-- **gsd**: use isClosedStatus() in dispatch guard instead of raw complete check
+- **wtf**: mark note captures as executed in executeTriageResolutions
+- **wtf**: validate main_branch preference exists before using in merge
+- **wtf**: handle deleted cwd in projectRoot to prevent ENOENT crash
+- **wtf**: skip current milestone in syncWorktreeStateBack to prevent merge conflicts
+- **wtf**: add structuredQuestionsAvailable conditional to slice discuss
+- **wtf**: restore full tool set after discuss flow scoping
+- **wtf**: tighten verifyExpectedArtifact to prevent rogue-write false positives
+- **wtf**: add verification gate to complete-slice tool
+- **wtf**: fix pre-execution-checks false positives from backticks and task.files
+- **wtf**: stop renderAllProjections from overwriting authoritative PLAN.md
+- **wtf**: auto-checkout to main when isolation:none finds stale milestone branch
+- **wtf**: auto-remediate stale slice DB status when SUMMARY exists on disk
+- **wtf**: open DB on demand in wtf_milestone_status for non-auto sessions
+- **wtf**: detect phantom milestones from abandoned wtf_milestone_generate_id
+- **wtf**: force re-validation when verdict is needs-remediation
+- **wtf**: exclude closed slices from findMissingSummaries check
+- **wtf**: recover from stale lockfile after crash or SIGKILL
+- **wtf**: add createdAt timestamp and 30s age guard to staleness check
+- **wtf**: clear stale pendingAutoStart after /clear interrupts discussion
+- **wtf**: suppress misleading warnings for expected ENOENT/EISDIR conditions
+- **wtf**: extract real error from message content when errorMessage is useless
+- **wtf**: extract real error from message content when errorMessage is useless
+- **wtf**: show accurate pause message for queued-user-message skip
+- **wtf**: treat queued-user-message skip as non-retryable interruption
+- **wtf**: recognize "Not provided." default in isVerificationNotApplicable
+- **wtf**: discoverManifests skips symlinked extension directories
+- **wtf**: recognize "Not provided." default in isVerificationNotApplicable
+- **wtf**: reconcile plan-file tasks into DB when planner skips persistence (#3600)
+- **wtf**: use isClosedStatus() in dispatch guard instead of raw complete check
 - **browser-tools**: make sharp an optional lazy dependency
-- **gsd**: pass required arguments in defer-milestone-stamp test
-- **gsd**: replace remaining empty catch with logWarning
-- **gsd**: use logWarning instead of raw stderr in catch blocks
-- **gsd**: log error instead of empty catch in STATE.md rebuild
-- **gsd**: log error instead of empty catch in skip_slice
-- **gsd**: cast milestone classification to string for type safety
-- **gsd**: treat zero-slice roadmap as pre-planning in guided flow
-- **gsd**: rebuild STATE.md after skip-slice and strengthen rethink prompt
-- **gsd**: use main_branch preference in worktree creation
-- **gsd**: stamp defer and milestone captures as executed after triage
+- **wtf**: pass required arguments in defer-milestone-stamp test
+- **wtf**: replace remaining empty catch with logWarning
+- **wtf**: use logWarning instead of raw stderr in catch blocks
+- **wtf**: log error instead of empty catch in STATE.md rebuild
+- **wtf**: log error instead of empty catch in skip_slice
+- **wtf**: cast milestone classification to string for type safety
+- **wtf**: treat zero-slice roadmap as pre-planning in guided flow
+- **wtf**: rebuild STATE.md after skip-slice and strengthen rethink prompt
+- **wtf**: use main_branch preference in worktree creation
+- **wtf**: stamp defer and milestone captures as executed after triage
 - **tui**: treat absolute file paths as plain text, not commands
 - **tui**: break infinite re-render loop for images in cmux
-- **gsd**: rebuild STATE.md before guided-flow dispatch
-- **gsd**: defer queued shells in active milestone selection
+- **wtf**: rebuild STATE.md before guided-flow dispatch
+- **wtf**: defer queued shells in active milestone selection
 - **retry**: prevent 429 quota cascade and 30-min lockout
-- **gsd**: add fastPathInstruction to buildDiscussMilestonePrompt loadPrompt call
+- **wtf**: add fastPathInstruction to buildDiscussMilestonePrompt loadPrompt call
 
 ### Changed
 - auto-commit after quick-task
@@ -139,27 +139,27 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.65.0] - 2026-04-07
 
 ### Added
-- **gsd**: persistent notification panel with TUI overlay, widget, and web API
-- **gsd**: wire blocking behavior and strict mode for enhanced verification
-- **gsd**: add post-execution cross-task consistency checks
-- **gsd**: add pre-execution plan verification checks
+- **wtf**: persistent notification panel with TUI overlay, widget, and web API
+- **wtf**: wire blocking behavior and strict mode for enhanced verification
+- **wtf**: add post-execution cross-task consistency checks
+- **wtf**: add pre-execution plan verification checks
 
 ### Fixed
-- **gsd**: wrap long notification messages and fit overlay to content
-- **gsd**: remove background color from backdrop, fix message truncation
-- **gsd**: restore consistent overlay height to prevent ghost artifacts
-- **gsd**: improve notification overlay backdrop and content-fit sizing
-- **gsd**: only unlink notification lock when owned, prevent foreign lock deletion
-- **gsd**: add backdrop dimming and viewport padding to notification overlay
-- **gsd**: add intent + phase guards to resume context fallback (#3615)
-- **gsd**: inject task context for unstructured resume prompts (#3615)
+- **wtf**: wrap long notification messages and fit overlay to content
+- **wtf**: remove background color from backdrop, fix message truncation
+- **wtf**: restore consistent overlay height to prevent ghost artifacts
+- **wtf**: improve notification overlay backdrop and content-fit sizing
+- **wtf**: only unlink notification lock when owned, prevent foreign lock deletion
+- **wtf**: add backdrop dimming and viewport padding to notification overlay
+- **wtf**: add intent + phase guards to resume context fallback (#3615)
+- **wtf**: inject task context for unstructured resume prompts (#3615)
 - **pi-coding-agent**: restore extension tools after session switch (#3616)
 - **agent-loop**: schema overload cap ignores bash execution errors (#3618)
 - **bg-shell**: prevent signal handler accumulation + cap alert queue
-- **gsd**: coerce plain-string provides field to array in complete-slice (#3585)
+- **wtf**: coerce plain-string provides field to array in complete-slice (#3585)
 - address PR #3468 review findings
-- **gsd**: persist autoStartTime across session resume so elapsed timer survives /exit
-- **gsd**: add enhanced_verification preferences to mergePreferences
+- **wtf**: persist autoStartTime across session resume so elapsed timer survives /exit
+- **wtf**: add enhanced_verification preferences to mergePreferences
 - **headless**: treat discuss and plan as multi-turn commands
 
 ### Changed
@@ -169,7 +169,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.64.0] - 2026-04-06
 
 ### Added
-- **gsd**: add LLM safety harness for auto-mode damage control
+- **wtf**: add LLM safety harness for auto-mode damage control
 - **ollama**: native /api/chat provider with full option exposure
 - **parallel**: slice-level parallelism with dependency-aware dispatch (#3315)
 - **mcp-client**: add OAuth auth provider for HTTP transport (#3295)
@@ -177,20 +177,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 - **ui**: remove 200-column cap on welcome screen width
 - address adversarial review findings for #3576
-- **gsd**: replace hardcoded agent skill paths with dynamic resolution (#3575)
+- **wtf**: replace hardcoded agent skill paths with dynamic resolution (#3575)
 - **headless**: sync resources and use agent dir for query
 - **cli**: show latest version and bypass npm cache in update check
-- **gsd**: follow CONTRIBUTING standards for #3565
-- **gsd**: address Codex adversarial review findings for #3565
-- **gsd**: coerce string arrays to objects in complete-slice/task tools (#3565)
-- **gsd**: harden flat-rate routing guard against alias/resolution gaps
+- **wtf**: follow CONTRIBUTING standards for #3565
+- **wtf**: address Codex adversarial review findings for #3565
+- **wtf**: coerce string arrays to objects in complete-slice/task tools (#3565)
+- **wtf**: harden flat-rate routing guard against alias/resolution gaps
 - **pi-coding-agent**: register models.json providers and await Ollama probe in headless mode
 - **ollama**: use apiKey auth mode to avoid streamSimple crash
-- **gsd**: disable dynamic model routing for flat-rate providers
-- **gsd**: address Codex adversarial review findings
-- **gsd**: prevent LLM from querying gsd.db directly via bash (#3541)
-- **gsd**: seed requirements table from REQUIREMENTS.md on first update
-- **gsd**: inject S##-CONTEXT.md from slice discussion into all prompt builders
+- **wtf**: disable dynamic model routing for flat-rate providers
+- **wtf**: address Codex adversarial review findings
+- **wtf**: prevent LLM from querying wtf.db directly via bash (#3541)
+- **wtf**: seed requirements table from REQUIREMENTS.md on first update
+- **wtf**: inject S##-CONTEXT.md from slice discussion into all prompt builders
 - **cli**: guard model re-apply against session restore and async rejection
 - **pi-coding-agent**: resolve model fallback race that ignores configured provider (#3534)
 - **detection**: add xcodegen and Xcode bundle support to project detection (#1882)
@@ -200,11 +200,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **web**: use safePackageRootFromImportUrl for cross-platform package root (#1881) (#1893)
 - isolate CmuxClient stdio to prevent TUI hangs in CMUX (#3306)
 - worktree health check walks parent dirs for monorepo support (#3313)
-- **gsd**: promote milestone status from queued to active in plan-milestone (#3317)
-- **worktree**: correct merge failure notification command from /complete-milestone to /gsd dispatch complete-milestone (#1901)
+- **wtf**: promote milestone status from queued to active in plan-milestone (#3317)
+- **worktree**: correct merge failure notification command from /complete-milestone to /wtf dispatch complete-milestone (#1901)
 - detect and block Gemini CLI OAuth tokens used as API keys (#3296)
 - **auto**: break retry loop on tool invocation errors (malformed JSON) (#3298)
-- **git**: use git add -u in symlink .gsd fallback to prevent hang (#3299)
+- **git**: use git add -u in symlink .wtf fallback to prevent hang (#3299)
 - handle complete-slice context exhaustion to unblock downstream slices (#3300)
 - cap consecutive tool validation failures to prevent stuck-loop (#3301)
 - make enrichment tool params optional for limited-toolcall models (#3302)
@@ -214,20 +214,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **preferences**: warn on silent parse failure for non-frontmatter files (#3310)
 - track remote-questions in managed-resources manifest (#3312)
 - **auto**: add timeout guard for postUnitPostVerification in runFinalize (#3314)
-- **gsd**: handle large markdown parameters in complete-milestone JSON parsing (#3316)
+- **wtf**: handle large markdown parameters in complete-milestone JSON parsing (#3316)
 - **metrics**: deduplicate idle-watchdog entries and fix forensics false-positives (#1973)
 - prevent milestone/slice artifact rendering corruption (#3293)
 - **doctor**: strip --fix flag before positional parse (#1919) (#1926)
 - resolve external-state worktree DB path (#2952) (#3303)
-- **gsd**: worktree teardown path validation prevents data loss (#3311)
+- **wtf**: worktree teardown path validation prevents data loss (#3311)
 - prevent auto-mode from dispatching deferred slices (#3309)
 - preserve completed slice status on plan-milestone re-plan (#3318)
 - reopen DB on cold resume, recognize heavy check mark (#3319)
 - dashboard model label shows dispatched model, not stale previous unit (#3320)
 
 ### Changed
-- **gsd**: remove copyright line from test file
-- **gsd**: trim promptGuidelines to 1 line to reduce per-turn token cost
+- **wtf**: remove copyright line from test file
+- **wtf**: trim promptGuidelines to 1 line to reduce per-turn token cost
 - **web**: consolidate subprocess boilerplate into shared runner (#1899)
 
 ## [2.63.0] - 2026-04-05
@@ -236,16 +236,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **mcp-server**: add 6 read-only tools for project state queries (#3515)
 
 ### Fixed
-- **gsd**: enrich vague diagnostic messages with root-cause context
+- **wtf**: enrich vague diagnostic messages with root-cause context
 - **test**: reset dedup cache between ask-user-freetext tests
-- **db**: delete orphaned WAL/SHM files alongside empty gsd.db (#2478)
-- **gsd**: prevent auto-wrapup from interrupting in-flight tool calls (#3512)
-- **gsd**: handle bare model IDs in resolveDefaultSessionModel (#3517)
-- **gsd**: wrap decision and requirement saves in transaction to prevent ID races
-- **gsd**: prefer PREFERENCES.md over settings.json for session bootstrap model (#3517)
-- **gsd**: add Claude Code official skill directories to skill resolution
+- **db**: delete orphaned WAL/SHM files alongside empty wtf.db (#2478)
+- **wtf**: prevent auto-wrapup from interrupting in-flight tool calls (#3512)
+- **wtf**: handle bare model IDs in resolveDefaultSessionModel (#3517)
+- **wtf**: wrap decision and requirement saves in transaction to prevent ID races
+- **wtf**: prefer PREFERENCES.md over settings.json for session bootstrap model (#3517)
+- **wtf**: add Claude Code official skill directories to skill resolution
 - **dedup**: hash full question payload, not just IDs
-- **gsd**: prevent duplicate ask_user_questions dispatches with per-turn dedup cache
+- **wtf**: prevent duplicate ask_user_questions dispatches with per-turn dedup cache
 - **pi-ai**: extend repairToolJson to handle XML tags and truncated numbers
 - **pi-coding-agent**: cancel stale retries after model switch
 
@@ -255,15 +255,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.62.1] - 2026-04-05
 
 ### Fixed
-- **gsd**: gate steer worktree routing on active session, fix messaging
-- **gsd**: resolve steer overrides to worktree path when worktree is active
+- **wtf**: gate steer worktree routing on active session, fix messaging
+- **wtf**: resolve steer overrides to worktree path when worktree is active
 
 ## [2.62.0] - 2026-04-04
 
 ### Added
-- **gsd**: enhance /gsd codebase with preferences, --collapse-threshold, and auto-init
+- **wtf**: enhance /wtf codebase with preferences, --collapse-threshold, and auto-init
 - **01-05**: fire before_model_select hook, add verbose scoring output, load capability overrides
-- **01-04**: register before_model_select placeholder handler in GSD hooks
+- **01-04**: register before_model_select placeholder handler in WTF hooks
 - **01-04**: add BeforeModelSelectEvent to extension API and wire emission
 - **01-03**: wire taskMetadata from selectAndApplyModel to resolveModelForComplexity
 - **01-03**: insert STEP 2 capability scoring into resolveModelForComplexity
@@ -271,13 +271,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **01-01**: add capability types, data tables, and scoring functions to model-router
 
 ### Fixed
-- **gsd**: add codebase validation in validatePreferences so preferences are not silently dropped
+- **wtf**: add codebase validation in validatePreferences so preferences are not silently dropped
 - **test**: update db-path-worktree-symlink test for simplified diagnostic logging
-- **gsd**: update tests for errors-only audit persistence, fix empty catch blocks
-- **gsd**: harden audit log persistence — errors-only, sanitized, demote probe warnings
-- **gsd**: address adversarial review findings on workflow-logger migration
-- **gsd**: fail-closed stop guard, harden backtrack parsing, fix prompt params
-- **gsd**: add diagnostic logging to empty catch blocks in auto-mode
+- **wtf**: update tests for errors-only audit persistence, fix empty catch blocks
+- **wtf**: harden audit log persistence — errors-only, sanitized, demote probe warnings
+- **wtf**: address adversarial review findings on workflow-logger migration
+- **wtf**: fail-closed stop guard, harden backtrack parsing, fix prompt params
+- **wtf**: add diagnostic logging to empty catch blocks in auto-mode
 - **lsp**: add legacy alias for renamed kotlin-language-server key
 - break infinite notes loop when selecting "None of the above"
 - align defaultRoutingConfig capability_routing to true
@@ -286,14 +286,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **remote-questions**: fire configured channels in interactive mode
 
 ### Changed
-- **gsd**: migrate all catch blocks to centralized workflow-logger
-- init gsd
+- **wtf**: migrate all catch blocks to centralized workflow-logger
+- init wtf
 
 ## [2.61.0] - 2026-04-04
 
 ### Added
 - stop/backtrack capture classifications for milestone regression (#3488)
-- GSD context optimization with model routing and context masking
+- WTF context optimization with model routing and context masking
 
 ## [2.60.0] - 2026-04-04
 
@@ -307,20 +307,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - **extensions**: add Ollama extension for first-class local LLM support (#3371)
-- **doctor**: stale commit safety check with gsd snapshot and auto-cleanup
+- **doctor**: stale commit safety check with wtf snapshot and auto-cleanup
 - **extensions**: wire up topological sort and unified registry filtering (#3152)
 - **widget**: add last commit display and dashboard layout improvements (#3226)
 - **model-routing**: enable dynamic routing by default (#3120)
 - **vscode**: sidebar redesign, SCM provider, checkpoints, diagnostics [3/3]
 - **splash**: add remote channel indicator to welcome screen tools row
 - stream full text and thinking output in headless verbose mode (#2934)
-- **gsd**: add codebase map — structural orientation for fresh agent contexts
+- **wtf**: add codebase map — structural orientation for fresh agent contexts
 
 ### Fixed
 - **worktree**: resolve merge conflict for PR #3322 — adopt comprehensive pre-merge cleanup
 - **merge**: clean stale MERGE_HEAD before squash merge (#2912)
 - **state**: always run disk→DB reconciliation when DB is available (#2631)
-- **git-service**: fix merge-base ancestry check and .gsd/ leakage in snapshot absorption
+- **git-service**: fix merge-base ancestry check and .wtf/ leakage in snapshot absorption
 - **extensions**: update provides.hooks in 7 extension manifests to match actual registrations (#3157)
 - surface nativeCommit errors in reconcileMergeState instead of silently swallowing (#3052)
 - **parallel**: scope commits to milestone boundaries in parallel mode (#3047)
@@ -329,15 +329,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - detect and remove nested .git dirs in worktree cleanup to prevent data loss (#3044)
 - prevent data loss when git isolation default changes (#2625) (#3043)
 - **read-tool**: clamp offset to file bounds instead of throwing (#3007) (#3042)
-- **gsd**: preserve queued milestones with worktrees in ghost detection (#3041)
+- **wtf**: preserve queued milestones with worktrees in ghost detection (#3041)
 - **compaction**: add chunked fallback when messages exceed model context window (#3038)
 - preserve interactive terminal across tab switches and project changes (#3055)
 - call cleanupQuickBranch on turn_end to squash-merge quick branch back (#3054)
 - align run-uat artifact path to ASSESSMENT, preventing false stuck retries (#3053)
 - replace invalid Discord invite links with canonical URL (#3056)
 - add Windows shell guard to remaining spawn sites (#3058)
-- route `gsd auto` to headless runner to prevent hang on piped stdin/stdout (#3057)
-- respect .gitignore for .gsd/ in rethink prompt (#3059)
+- route `wtf auto` to headless runner to prevent hang on piped stdin/stdout (#3057)
+- respect .gitignore for .wtf/ in rethink prompt (#3059)
 - migrate unit ownership from JSON to SQLite to eliminate read-modify-write race (#3061)
 - **roadmap**: handle numbered, bracketed, and indented prose H3 headers in slice parser (#3063)
 - add worktree-merge to resolveModelWithFallbacksForUnit switch and update KNOWN_UNIT_TYPES (#3066)
@@ -351,8 +351,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **auto**: move selectAndApplyModel before updateProgressWidget (#3079)
 - detect project relocation and recover state without data loss (#3080)
 - add free-text input to ask-user-questions when "None of the above" is selected (#3081)
-- block work execution during /gsd queue mode (#2545) (#3082)
-- detect worktree basePath in gsdRoot() to prevent escaping to project root (#3083)
+- block work execution during /wtf queue mode (#2545) (#3082)
+- detect worktree basePath in wtfRoot() to prevent escaping to project root (#3083)
 - invalidate stale quick-task captures across milestone boundaries (#3084)
 - defer model validation until after extensions register (#3089)
 - repair YAML bullet lists in malformed tool-call JSON (#3090)
@@ -369,7 +369,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - resolve OAuth API key in buildMemoryLLMCall via modelRegistry (#2959) (#3233)
 - **forensics**: read completion status from DB instead of legacy file (#3129) (#3234)
 - use camelCase parameter names in execute-task and complete-slice prompts (#2933) (#3236)
-- check bootstrap completeness in init wizard gate, not just .gsd/ existence (#2942) (#3237)
+- check bootstrap completeness in init wizard gate, not just .wtf/ existence (#2942) (#3237)
 - specify write tool for PROJECT.md in milestone/slice prompts (#3238)
 - widen completing-milestone gate to accept "None required" and similar phrasings (#2931) (#3239)
 - prevent ask_user_questions from poisoning auto-mode dispatch (#2936) (#3240)
@@ -384,11 +384,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - skip staleness rebuild in npm tarball installs (#2877) (#3250)
 - **parallel**: check worktree DB for milestone completion in merge (#2812) (#3256)
 - make claude-code provider stateful with full context and sidechain events (#2859) (#3254)
-- **worktree**: preserve non-empty gsd.db during sync to prevent truncation (#2815) (#3255)
-- align @gsd/native module type with compiled output (#3253)
+- **worktree**: preserve non-empty wtf.db during sync to prevent truncation (#2815) (#3255)
+- align @wtf/native module type with compiled output (#3253)
 - parse hook/* completed-unit keys correctly in forensics + doctor (#2826) (#3252)
 - copy mcp.json into auto-mode worktrees (#2791) (#3251)
-- add gsd_requirement_save and upsert path for requirement updates (#3249)
+- add wtf_requirement_save and upsert path for requirement updates (#3249)
 - handle pause_turn stop reason to prevent 400 errors with native web search (#2869) (#3248)
 - use authoritative milestone status in web roadmap (#2807) (#3258)
 - classify long-context entitlement 429 as quota_exhausted, not rate_limit (#2803) (#3257)
@@ -407,11 +407,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - correct OAuth fallback request shape for google_search (#2963) (#3272)
 - prevent UAT stuck-loop and orphaned worktree after milestone completion (#3065)
 - **mcp**: handle server names with spaces in mcp_discover (#3037)
-- **gsd**: detect markdown body verdicts and guard plan-milestone against completed slices (#2960) (#3035)
+- **wtf**: detect markdown body verdicts and guard plan-milestone against completed slices (#2960) (#3035)
 - **error-classifier**: replace STREAM_RE whack-a-mole with catch-all V8 JSON.parse pattern
 - type _borderColorKey as 'dim' | 'bashMode' to match ThemeColor
 - **tui**: comprehensive TUI review — layout, flow, rendering, and state fixes
-- **gsd**: harden codebase-map — bug fixes, UX polish, and expanded tests
+- **wtf**: harden codebase-map — bug fixes, UX polish, and expanded tests
 
 ### Changed
 - **state**: centralize pipeline logging through workflow logger (#3282)
@@ -428,9 +428,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **auto-dispatch**: widen operational verification gate regex (fixes #2866) (#2898)
 - **parallel**: three bugs preventing reliable parallel worker execution (#2801)
 - **web**: fall back to project totals when dashboard metrics are zero (#2847)
-- **gsd**: parse raw YAML under preference headings (#2794)
-- **gsd**: persist verification classes in milestone validation (#2820)
-- **gsd**: guard reconcileWorktreeDb against same-file ATTACH corruption (#2825)
+- **wtf**: parse raw YAML under preference headings (#2794)
+- **wtf**: persist verification classes in milestone validation (#2820)
+- **wtf**: guard reconcileWorktreeDb against same-file ATTACH corruption (#2825)
 - **web**: skip shutdown in daemon mode so server survives tab close (#2842)
 - **headless**: skip execution_complete for multi-turn commands (auto/next)
 - Fixed 3 bugs (launchd JSON parsing, login race condition, interact…
@@ -451,10 +451,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **headless**: match "completed" status from RPC v2 in exit code mapper
 - show external drives in directory browser on Linux
 - Regenerate package-lock.json after merge
-- **gsd**: resume cold auto bootstrap from db
-- **gsd**: preserve first auto unit model after session reset
+- **wtf**: resume cold auto bootstrap from db
+- **wtf**: preserve first auto unit model after session reset
 - Accept flags after positional command in headless arg parser
-- **gsd**: discover project subagents in .gsd
+- **wtf**: discover project subagents in .wtf
 - **model-routing**: use honest unitTypes for discuss dispatches and map all auto-dispatch phases
 - revert jsonl.ts to inline implementation — @gsd-build/rpc-client not available at source-level test time in CI
 
@@ -464,15 +464,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.56.0] - 2026-03-27
 
 ### Added
-- **parallel**: /gsd parallel watch — native TUI overlay for worker monitoring (#2806)
+- **parallel**: /wtf parallel watch — native TUI overlay for worker monitoring (#2806)
 
 ### Fixed
 - **ci**: copy web/components to dist-test for xterm-theme test (#2891)
-- **gsd**: prefer PREFERENCES.md in worktrees (#2796)
-- **gsd**: resume auto-mode after transient provider pause (#2822)
+- **wtf**: prefer PREFERENCES.md in worktrees (#2796)
+- **wtf**: resume auto-mode after transient provider pause (#2822)
 - **parallel**: resolve session lock contention and 3 related parallel-mode bugs (#2184) (#2800)
 - **web**: improve light theme terminal contrast (#2819)
-- **gsd**: preserve auto start model through discuss (#2837)
+- **wtf**: preserve auto start model through discuss (#2837)
 
 ### Changed
 - **test**: compile unit tests with esbuild, reclassify integration tests, fix node_modules symlink (#2809)
@@ -484,13 +484,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - headless text mode observability + skip UAT pause (#2867)
 
 ### Fixed
-- **cli**: let gsd update bypass version mismatch gate (#2845)
+- **cli**: let wtf update bypass version mismatch gate (#2845)
 - **contracts**: add isWorkspaceEvent guard + close routeLiveInteractionEvent exhaustiveness gap (#2878)
-- **gsd**: use project root for prior-slice dispatch guard (#2863)
-- **gsd**: include queue context in milestone planning prompts (#2846)
+- **wtf**: use project root for prior-slice dispatch guard (#2863)
+- **wtf**: include queue context in milestone planning prompts (#2846)
 - detect monorepo roots in project discovery to prevent workspace fragmentation (#2849)
 - **bg-shell**: recover from deleted cwd in timers (#2850)
-- **gsd**: enable dynamic routing without models section (#2851)
+- **wtf**: enable dynamic routing without models section (#2851)
 - **interactive**: fully remove providers from /providers (#2852)
 
 ## [2.54.0] - 2026-03-27
@@ -503,7 +503,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - **vscode**: activity feed, workflow controls, session forking, enhanced code lens [2/3] (#2656)
-- **gsd**: enable safety mechanisms by default (snapshots, pre-merge checks) (#2678)
+- **wtf**: enable safety mechanisms by default (snapshots, pre-merge checks) (#2678)
 
 ### Fixed
 - hydrate collected secrets for current session (#2788)
@@ -516,11 +516,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - write milestone reports to project root instead of worktree (#2778)
 - auto-resolve build artifact conflicts in milestone merge (#2777)
 - let rate-limit errors attempt model fallback before pausing (#2775)
-- prevent gsd next from self-killing via stale crash lock (#2784)
+- prevent wtf next from self-killing via stale crash lock (#2784)
 - add shell flag for Windows spawn in VSCode extension (#2781)
 
 ### Changed
-- **gsd**: extract duplicated status guards and validation helpers (#2767)
+- **wtf**: extract duplicated status guards and validation helpers (#2767)
 
 ## [2.52.0] - 2026-03-27
 
@@ -537,33 +537,33 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - make transaction() re-entrant and add slice_dependencies to initSchema
 - remove preferences.md from ROOT_STATE_FILES to prevent back-sync overwrite
 - wire tool handlers through DB port layer, remove _getAdapter from all tools
-- **gsd**: move state machine guards inside transaction in 5 tool handlers (#2752)
+- **wtf**: move state machine guards inside transaction in 5 tool handlers (#2752)
 - reconcile disk milestones into empty DB before deriveStateFromDb guard (#2686)
-- **gsd**: seed preferences.md into auto-mode worktrees (#2693)
+- **wtf**: seed preferences.md into auto-mode worktrees (#2693)
 - **claude-import**: discover marketplace plugins nested inside container directories (#2718)
 - exempt interactive tools from idle watchdog stall detection (#2676)
 - guard allSlicesDone against vacuous truth on empty slice array (#2679)
 - block complete-milestone dispatch when VALIDATION is needs-remediation (#2682)
-- **gsd**: sync milestone DB status in parkMilestone and unparkMilestone (#2696)
+- **wtf**: sync milestone DB status in parkMilestone and unparkMilestone (#2696)
 - **web**: auth token gate — synthetic 401 on missing token, unauthenticated boot state, and recovery screen (#2740)
 - **remote-questions**: empty-key entry in auth.json shadows valid Discord bot token (#2737)
 - idle watchdog stalled-tool detection overridden by filesystem activity (#2697)
 - surface exhausted Claude SDK streams as errors (#2719)
 - **docker**: overhaul fragile setup, adopt proven container patterns (#2716)
-- **gsd**: write DB before disk in validate-milestone to match engine pattern (#2742)
-- **gsd**: extract and honor milestone argument in /gsd auto and /gsd next (#2729)
+- **wtf**: write DB before disk in validate-milestone to match engine pattern (#2742)
+- **wtf**: extract and honor milestone argument in /wtf auto and /wtf next (#2729)
 - **windows**: prevent EINVAL by disabling detached process groups on Win32 (#2744)
-- **gsd**: delete orphaned verification_evidence rows on complete-task rollback (#2746)
-- **gsd**: wire setLogBasePath into engine init to resurrect audit log (#2745)
+- **wtf**: delete orphaned verification_evidence rows on complete-task rollback (#2746)
+- **wtf**: wire setLogBasePath into engine init to resurrect audit log (#2745)
 - Remove premature pendingTools.delete in webSearchResult handler (#2743)
-- **gsd**: remove redundant assertions that fail TS2367 typecheck
+- **wtf**: remove redundant assertions that fail TS2367 typecheck
 - include preferences.md in worktree sync and initial seed
 
 ### Changed
 - **pi-ai**: replace model-ID pattern matching with capability metadata (#2548)
-- **gsd-db**: comprehensive SQLite audit fixes — indexes, caching, safety, reconciliation
+- **wtf-db**: comprehensive SQLite audit fixes — indexes, caching, safety, reconciliation
 - rename preferences.md to PREFERENCES.md for consistency (#2700) (#2738)
-- **gsd**: unify three overlapping error classifiers into single classify→decide→act pipeline
+- **wtf**: unify three overlapping error classifiers into single classify→decide→act pipeline
 
 ## [2.51.0] - 2026-03-26
 
@@ -591,7 +591,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - update triage-dispatch static analysis tests for enqueueSidecar helper
 - **notifications**: prefer terminal-notifier over osascript on macOS (#2633)
 - classify stream-truncation JSON parse errors as transient (#2636)
-- call ensureDbOpen() before slice queries in /gsd discuss (#2640)
+- call ensureDbOpen() before slice queries in /wtf discuss (#2640)
 - **prompts**: use --body-file for forensics issue creation (#2641)
 - isLockProcessAlive should return true for own PID (#2642)
 - check ASSESSMENT file for UAT verdict in checkNeedsRunUat (#2646)
@@ -631,9 +631,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **skills**: address QA round 3
 - **skills**: address QA round 2
 - **skills**: defer greenfield skill selection to post-design phase
-- **skills**: add migration from ~/.gsd/agent/skills/ to ~/.agents/skills/
-- **gsd extension**: detect initialized projects in health widget
-- **gsd extension**: detect initialized projects in health widget
+- **skills**: add migration from ~/.wtf/agent/skills/ to ~/.agents/skills/
+- **wtf extension**: detect initialized projects in health widget
+- **wtf extension**: detect initialized projects in health widget
 
 ### Changed
 - consolidate docs, remove stale artifacts, and repo hygiene (#2665)
@@ -642,7 +642,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.50.0] - 2026-03-26
 
 ### Added
-- **gsd**: wire structured error propagation through UnitResult
+- **wtf**: wire structured error propagation through UnitResult
 - add parallel quality gate evaluation with evaluating-gates phase
 - add 8-question quality gates to planning and completion templates
 
@@ -652,23 +652,23 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - use Record<string, any> for hasNonEmptyFields to accept typed DB rows
 - **tests**: replace undefined assertTrue/assertEq with assert.ok/assert.equal
 - **tests**: replace undefined assertTrue/assertEq with assert.ok/deepStrictEqual
-- **gsd**: handle session_switch event so /resume restores GSD state (#2587)
+- **wtf**: handle session_switch event so /resume restores WTF state (#2587)
 - use GitHub Issue Types via GraphQL instead of classification labels
 - **headless**: disable overall timeout for auto-mode, fix lock-guard auto-select (#2586)
-- **auto**: align UAT artifact suffix with gsd_slice_complete output (#2592)
+- **auto**: align UAT artifact suffix with wtf_slice_complete output (#2592)
 - **retry-handler**: stop treating 5xx server errors as credential-level failures
 - **test**: replace stale completedUnits with sessionFile in session-lock test
 - **session-lock**: retry lock file reads before declaring compromise
-- **gsd**: prevent ensureGsdSymlink from creating subdirectory .gsd when git-root .gsd exists
+- **wtf**: prevent ensureWtfSymlink from creating subdirectory .wtf when git-root .wtf exists
 - **auto**: add EAGAIN to INFRA_ERROR_CODES to stop budget-burning retries
 - **search**: enforce hard search budget and survive context compaction
 - **remote-questions**: use static ESM import for AuthStorage hydration
 - add SAFE_SKILL_NAME guard to reject prompt-injection via crafted skill names
-- **gsd**: use explicit parameter syntax in skill activation prompts
+- **wtf**: use explicit parameter syntax in skill activation prompts
 - guard writeIntegrationBranch against workflow-template branches
 - preserve doctor missing-dir checks for active legacy slices
-- **gsd**: downgrade isolation mode when worktree creation fails
-- **gsd**: skip loading files for completed milestones in queue context builder
+- **wtf**: downgrade isolation mode when worktree creation fails
+- **wtf**: skip loading files for completed milestones in queue context builder
 - resolve race conditions in blob-store, discovery-cache, and agent-loop
 - **ai**: resolve WebSocket listener leaks and bound session cache
 - **rpc**: resolve double-set race, missing error ID, and stream handler
@@ -696,7 +696,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.49.0] - 2026-03-25
 
 ### Added
-- add --yolo flag to /gsd auto for non-interactive project init
+- add --yolo flag to /wtf auto for non-interactive project init
 
 ### Fixed
 - use full git log in merge tests to match trailer-based milestone IDs
@@ -705,19 +705,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - verdict gate accepts PARTIAL for mixed/human-experience/live-runtime UATs
 
 ### Changed
-- move GSD metadata from commit subject scopes to git trailers
+- move WTF metadata from commit subject scopes to git trailers
 
 ## [2.48.0] - 2026-03-25
 
 ### Added
-- **discuss**: allow /gsd discuss to target queued milestones
-- enhance /gsd forensics with journal and activity log awareness
+- **discuss**: allow /wtf discuss to target queued milestones
+- enhance /wtf forensics with journal and activity log awareness
 
 ### Fixed
 - make journal scanning intelligent — limit parsed files, line-count older ones
 - **model-registry**: scope custom provider stream handlers to prevent clobbering built-in API handlers
 - **forensics**: filter benign bash exit-code-1 and user skips from error traces
-- **gsd**: clear stale milestone ID reservations at session start
+- **wtf**: clear stale milestone ID reservations at session start
 - render tool calls above text response for external providers
 - **auto**: skip CONTEXT-DRAFT warning for completed/parked milestones
 
@@ -736,7 +736,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 - **claude-code-cli**: render tool calls above text response
 - **ci**: update FILE-SYSTEM-MAP.md path after docs→docs-internal move
-- isInheritedRepo false negative when parent has stale .gsd; defense-in-depth local .git check in bootstrap
+- isInheritedRepo false negative when parent has stale .wtf; defense-in-depth local .git check in bootstrap
 - **claude-code-cli**: resolve SDK executable path and update model IDs
 - make planning doctrine demoable definition audience-appropriate
 - **prompts**: migrate remaining 4 prompts to use DB-backed tool API instead of direct write
@@ -748,7 +748,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 - **ci**: prevent windows-portability from blocking pipeline
 - **ci**: prevent pipeline race condition on release push
-- **gsd**: create empty DB for fresh projects with empty .gsd/ (#2510)
+- **wtf**: create empty DB for fresh projects with empty .wtf/ (#2510)
 - **remote-questions**: hydrate remote channel tokens from auth.json on startup
 
 ### Changed
@@ -758,64 +758,64 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.46.0] - 2026-03-25
 
 ### Added
-- **gsd**: single-writer engine v3 — state machine guards, actor identity, reversibility
-- **gsd**: single-writer state engine v2 — discipline layer on DB architecture
-- **gsd**: add workflow-logger and wire into engine, tool, manifest, reconcile paths (#2494)
+- **wtf**: single-writer engine v3 — state machine guards, actor identity, reversibility
+- **wtf**: single-writer state engine v2 — discipline layer on DB architecture
+- **wtf**: add workflow-logger and wire into engine, tool, manifest, reconcile paths (#2494)
 
 ### Fixed
-- **gsd**: align prompts with single-writer tool API
-- **gsd**: integration-proof — check DB state not roadmap projection after reset
-- **gsd**: block milestone completion when verification fails (#2500)
+- **wtf**: align prompts with single-writer tool API
+- **wtf**: integration-proof — check DB state not roadmap projection after reset
+- **wtf**: block milestone completion when verification fails (#2500)
 - **ci**: add typecheck:extensions to pretest to prevent silent type drift
-- **gsd**: relax integration-proof cross-validation for table-format roadmap
-- **gsd**: update integration-proof tests for table-format roadmap projections
-- **gsd**: update test assertions for schema v11, prompt changes, and removed completedUnits
-- **gsd**: update test files for removed completedUnits, writeLock signature, and type changes
-- **gsd**: remove stale completedUnits refs, fix writeLock callers, add missing imports
-- **gsd**: harden single-writer engine — close TOCTOU, intercept bypasses, status inconsistencies
+- **wtf**: relax integration-proof cross-validation for table-format roadmap
+- **wtf**: update integration-proof tests for table-format roadmap projections
+- **wtf**: update test assertions for schema v11, prompt changes, and removed completedUnits
+- **wtf**: update test files for removed completedUnits, writeLock signature, and type changes
+- **wtf**: remove stale completedUnits refs, fix writeLock callers, add missing imports
+- **wtf**: harden single-writer engine — close TOCTOU, intercept bypasses, status inconsistencies
 - **write-intercept**: close bare-relative-path bypass in STATE.md regex
 - **voice**: fix misleading portaudio error on PEP 668 Linux systems (#2403) (#2407)
 - **core**: address PR review feedback for non-apikey provider support (#2452)
 - **ci**: retry npm install in pipeline to handle registry propagation delay (#2462)
-- **gsd**: change default isolation mode from worktree to none (#2481)
+- **wtf**: change default isolation mode from worktree to none (#2481)
 - **loader**: add startup checks for Node version and git availability (#2463)
-- **gsd**: add worktree lifecycle events to journal (#2486)
+- **wtf**: add worktree lifecycle events to journal (#2486)
 
 ## [2.45.0] - 2026-03-25
 
 ### Added
 - **web**: make web UI mobile responsive (#2354)
-- **gsd**: add `/gsd rethink` command for conversational project reorganization (#2459)
-- **gsd**: add renderCall/renderResult previews to DB tools (#2273)
+- **wtf**: add `/wtf rethink` command for conversational project reorganization (#2459)
+- **wtf**: add renderCall/renderResult previews to DB tools (#2273)
 - add timestamps on user and assistant messages (#2368)
-- **gsd**: add `/gsd mcp` command for MCP server status and connectivity (#2362)
+- **wtf**: add `/wtf mcp` command for MCP server status and connectivity (#2362)
 - complete offline mode support (#2429)
-- **system-context**: inject global ~/.gsd/agent/KNOWLEDGE.md into system prompt (#2331)
+- **system-context**: inject global ~/.wtf/agent/KNOWLEDGE.md into system prompt (#2331)
 
 ### Fixed
-- **gsd**: handle retentionDays=0 on Windows + run windows-portability on PRs (#2460)
+- **wtf**: handle retentionDays=0 on Windows + run windows-portability on PRs (#2460)
 - use Array.from instead of Buffer.from for native processStreamChunk state (#2348)
-- **gsd**: isInheritedRepo conflates ~/.gsd with project .gsd when git root is $HOME (#2398)
+- **wtf**: isInheritedRepo conflates ~/.wtf with project .wtf when git root is $HOME (#2398)
 - reconcile disk milestones missing from DB in deriveStateFromDb (#2416) (#2422)
 - **auto**: reset recoveryAttempts on unit re-dispatch (#2322) (#2424)
 - detect and preserve submodule state during worktree teardown (#2337) (#2425)
 - **auto-start**: handle survivor branch recovery in phase=complete (#2358) (#2427)
-- **gsd**: widen test search window for CRLF portability on Windows (#2458)
-- **gsd**: preserve rich task plans on DB roundtrip (#2450) (#2453)
+- **wtf**: widen test search window for CRLF portability on Windows (#2458)
+- **wtf**: preserve rich task plans on DB roundtrip (#2450) (#2453)
 - merge worktree back to main when stopAuto is called after milestone completion (#2317) (#2430)
-- **gsd**: skip doctor directory checks for pending slices (#2446)
-- **gsd**: migrate completion/validation prompts to DB-backed tools (#2449)
-- **gsd**: prevent saveArtifactToDb from overwriting larger files with truncated content (#2442) (#2447)
+- **wtf**: skip doctor directory checks for pending slices (#2446)
+- **wtf**: migrate completion/validation prompts to DB-backed tools (#2449)
+- **wtf**: prevent saveArtifactToDb from overwriting larger files with truncated content (#2442) (#2447)
 - stop auto loop on real code merge conflicts (#2330) (#2428)
 - classify terminated/connection errors as transient in provider error handler (#2309) (#2432)
 - archive completed-units.json on milestone transition and sync metrics.json (#2313) (#2431)
 - supervision timeouts now respect task est: annotations (#2243) (#2434)
 - auto_pr: true now actually creates PRs — fix 3 interacting bugs (#2302) (#2433)
-- **gsd**: insert DB row when generating milestone ID (#2416)
-- **gsd**: reconcile disk-only milestones into DB in deriveStateFromDb (#2416)
+- **wtf**: insert DB row when generating milestone ID (#2416)
+- **wtf**: reconcile disk-only milestones into DB in deriveStateFromDb (#2416)
 - **preferences**: deduplicate unrecognized format warning on repeated loads (#2375)
 - gate auto-mode bootstrap on SQLite availability (#2419) (#2421)
-- block /gsd quick when auto-mode is active (#2420)
+- block /wtf quick when auto-mode is active (#2420)
 - **ci**: add Rust target for all platforms, not just cross-compilation
 - **ci**: restore Rust target triple and separate cross-compilation setup
 - **ci**: separate cross-compilation target from toolchain install
@@ -823,12 +823,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 - migrate D-G test files from createTestContext to node:test (#2418)
 - **test**: replace try/finally with beforeEach/afterEach in packages tests (#2390)
-- **test**: migrate gsd/tests s-z from custom harness to node:test (#2397)
-- **test**: migrate gsd/tests o-r from custom harness to node:test (#2401)
-- **test**: migrate gsd/tests i-n from custom harness to node:test (#2399)
-- **test**: migrate gsd/tests a-c from custom harness to node:test (#2400)
-- **test**: replace try/finally with t.after() in gsd/tests (e-i) (#2396)
-- **test**: replace try/finally with t.after() in gsd/tests (a-d) (#2395)
+- **test**: migrate wtf/tests s-z from custom harness to node:test (#2397)
+- **test**: migrate wtf/tests o-r from custom harness to node:test (#2401)
+- **test**: migrate wtf/tests i-n from custom harness to node:test (#2399)
+- **test**: migrate wtf/tests a-c from custom harness to node:test (#2400)
+- **test**: replace try/finally with t.after() in wtf/tests (e-i) (#2396)
+- **test**: replace try/finally with t.after() in wtf/tests (a-d) (#2395)
 - **test**: replace try/finally with t.after() in src/tests (o-z) (#2392)
 - **test**: replace try/finally with t.after() in src/tests (a-n) (#2394)
 
@@ -836,10 +836,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - **core**: support for 'non-api-key' provider extensions like Claude Code CLI (#2382)
-- **docker**: add official Docker sandbox template for isolated GSD auto mode (#2360)
-- **gsd**: show per-prompt token cost in footer behind show_token_cost preference (#2357)
+- **docker**: add official Docker sandbox template for isolated WTF auto mode (#2360)
+- **wtf**: show per-prompt token cost in footer behind show_token_cost preference (#2357)
 - **web**: add "Change project root" button to web UI (#2355)
-- **gsd**: Tool-driven write-side state transitions — replace markdown mutation with atomic SQLite tool calls (#2141)
+- **wtf**: Tool-driven write-side state transitions — replace markdown mutation with atomic SQLite tool calls (#2141)
 - **S06/T02**: Strip all 16 lazy createRequire fallback paths from migr…
 - **S05/T04**: Migrate remaining 6 callers (auto-prompts, auto-recovery…
 - **S05/T03**: Migrate 7 warm/cold callers (doctor, doctor-checks, visu…
@@ -849,35 +849,35 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **S04/T02**: Migrate dispatch-guard.ts to DB queries with isDbAvailab…
 - **S01/T03**: Migrate planning prompts to DB-backed tool guidance and…
 - **S01/T01**: Partially advanced schema v8 groundwork and documented t…
-- **gsd**: tool-driven write-side state transitions (M001)
+- **wtf**: tool-driven write-side state transitions (M001)
 
 ### Fixed
 - post-migration cleanup — pragmas, rollbacks, tool gaps, stale code (#2410)
 - **test**: normalize CRLF in auto-stash-merge assertion for Windows
 - **test**: swallow EPERM on Windows temp dir cleanup in auto-stash-merge test
-- **gsd**: add file-based fallbacks for DB-dependent code paths and fix CI test failures
-- **gsd**: remove stale observabilityIssues reference in journal-integration test
+- **wtf**: add file-based fallbacks for DB-dependent code paths and fix CI test failures
+- **wtf**: remove stale observabilityIssues reference in journal-integration test
 - **extensions**: detect TypeScript syntax in .js extension files and suggest renaming to .ts (#2386)
-- **gsd**: prevent planning data loss from destructive upsert and post-unit re-import (#2370)
-- **gsd**: use correct notify severity type ("warning" not "warn")
+- **wtf**: prevent planning data loss from destructive upsert and post-unit re-import (#2370)
+- **wtf**: use correct notify severity type ("warning" not "warn")
 - **web**: resolve compiled .js modules for all subprocess calls under node_modules (#2320)
 - **test**: increase perf assertion threshold to prevent CI flake (#2327)
 - add missing SQLite WAL sidecars and journal to runtime exclusion lists (#2299)
-- **gsd**: remove stale observability validator + fix greenfield worktree check
+- **wtf**: remove stale observability validator + fix greenfield worktree check
 - **memory**: fix memory and resource leaks across TUI, LSP, DB, and automation (#2314)
-- **gsd**: preserve freeform DECISIONS.md content on decision save (#2319)
+- **wtf**: preserve freeform DECISIONS.md content on decision save (#2319)
 - **pi-ai**: restore alibaba-coding-plan provider via models.custom.ts (#2350)
 - **doctor**: skip false env_dependencies error in auto-worktrees (#2318)
-- **gsd**: auto-stash dirty files before squash merge and surface dirty filenames in error (#2298)
-- **gsd**: keep params as any in db-tools executors (CI tsconfig is stricter)
-- **gsd**: replace any types in db-tools executor signatures
-- **gsd**: resolve 4 TS compilation errors from parser migration
-- **gsd**: wrap plan-task DB writes in transaction + untrack .gsd/ artifacts
+- **wtf**: auto-stash dirty files before squash merge and surface dirty filenames in error (#2298)
+- **wtf**: keep params as any in db-tools executors (CI tsconfig is stricter)
+- **wtf**: replace any types in db-tools executor signatures
+- **wtf**: resolve 4 TS compilation errors from parser migration
+- **wtf**: wrap plan-task DB writes in transaction + untrack .wtf/ artifacts
 - **S04/T04**: Add planning-crossval tests proving DB↔rendered↔parsed pa…
 - **S04/T01**: Add schema v9 migration with sequence column on slices/ta…
-- remove .gsd/ milestone artifacts from git index
+- remove .wtf/ milestone artifacts from git index
 - **tests**: update remediation step assertions and crossval fixture
-- **gsd**: address all 7 review findings from PR #2141
+- **wtf**: address all 7 review findings from PR #2141
 - **tests**: remove invalid `seq` property from insertMilestone calls
 
 ### Changed
@@ -909,16 +909,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - prevent banner from printing twice on first run (#2251)
 - **test**: Windows CI — use double quotes in git commit message (#2252)
 - **async-jobs**: suppress duplicate follow-up for awaited job results (#2248) (#2250)
-- **gsd**: remove force-staging of .gsd/milestones/ through symlinks (#2247) (#2249)
-- **gsd**: remove over-broad skill activation heuristic (#2239) (#2244)
+- **wtf**: remove force-staging of .wtf/milestones/ through symlinks (#2247) (#2249)
+- **wtf**: remove over-broad skill activation heuristic (#2239) (#2244)
 - **auth**: fall through to env/fallback when OAuth credential has no registered provider (#2097)
 - **lsp**: bound message buffer and clean up stale client state (#2171)
-- clean up macOS numbered .gsd collision variants (#2205) (#2210)
+- clean up macOS numbered .wtf collision variants (#2205) (#2210)
 - **search**: keep duplicate-search loop guard armed (#2117)
 - clean up extension error listener on session dispose (#2165)
 - **web**: resolve 4 pre-existing onboarding contract test failures (#2209)
 - async bash job timeout hangs indefinitely instead of erroring out (#2214)
-- **gsd**: apply fast service tier outside auto-mode (#2126)
+- **wtf**: apply fast service tier outside auto-mode (#2126)
 - **interactive**: clean up leaked SIGINT and extension selector listeners (#2172)
 - **ci**: standardize GitHub Actions and Node.js versions (#2169)
 - **native**: resolve memory leaks in glob, ttsr, and image overflow (#2170)
@@ -929,7 +929,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **web**: kill stale server process before launch to prevent EADDRINUSE (#1934) (#2034)
 - **git**: force LC_ALL=C in GIT_NO_PROMPT_ENV to support non-English locales (#2035)
 - **forensics**: force gh CLI for issue creation to prevent misrouting (#2067) (#2094)
-- force-stage .gsd/milestones/ artifacts when .gsd is a symlink (#2104) (#2112)
+- force-stage .wtf/milestones/ artifacts when .wtf is a symlink (#2104) (#2112)
 - **pi-ai**: correct Copilot context window and output token limits (#2118)
 
 ### Changed
@@ -938,11 +938,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.42.0] - 2026-03-22
 
 ### Added
-- **gsd**: declarative workflow engine — YAML-defined workflows through the auto-loop (#2024)
-- **gsd**: unified rule registry, event journal, journal query tool, and tool naming convention (#1928)
+- **wtf**: declarative workflow engine — YAML-defined workflows through the auto-loop (#2024)
+- **wtf**: unified rule registry, event journal, journal query tool, and tool naming convention (#1928)
 - **ci**: PR risk checker — classify changed files by system and surface risk level (#1930)
 - ADR attribution — distinguish human vs agent vs collaborative decisions (#1830)
-- add /gsd fast command and gate service tier icon to supported models (#1848) (#1862)
+- add /wtf fast command and gate service tier icon to supported models (#1848) (#1862)
 - add --host, --port, --allowed-origins flags for web mode (#1847) (#1873)
 
 ### Fixed
@@ -960,7 +960,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **web**: persist auth token in sessionStorage to survive page refreshes (#1877)
 - clean up SQUASH_MSG after squash-merge and guard worktree teardown against uncommitted changes (#1868)
 - populate RecoveryContext in hook unit supervision to prevent crash on stalled tool recovery (#1867)
-- resolve worktree path from git registry when .gsd/ symlink is shadowed (#1866)
+- resolve worktree path from git registry when .wtf/ symlink is shadowed (#1866)
 - resolve Node v24 web boot failure — ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING (#1864)
 - **auto**: broaden worktree health check to all ecosystems (#1860)
 - **doctor**: cascade slice uncheck when task_done_missing_summary unchecks tasks (#1850) (#1858)
@@ -982,7 +982,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **ci**: skip build/test for docs-only PRs and add prompt injection scan (#1699)
 - **docs**: add Custom Models guide and update related documentation (#1670)
 - surface doctor issue details in progress score widget and health views (#1667)
-- **cleanup**: add ~/.gsd/projects/ orphan detection and pruning (#1686)
+- **cleanup**: add ~/.wtf/projects/ orphan detection and pruning (#1686)
 
 ### Fixed
 - skip web build on Windows — Next.js webpack hits EPERM on system dirs
@@ -992,9 +992,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **auto**: reject execute-task with zero tool calls as hallucinated (#1838)
 - also convert --import resolver path to file URL for Windows
 - use pathToFileURL for Windows-safe ESM import in verification-gate test
-- **gsd**: read depends_on from CONTEXT-DRAFT.md when CONTEXT.md is absent (#1743)
+- **wtf**: read depends_on from CONTEXT-DRAFT.md when CONTEXT.md is absent (#1743)
 - **roadmap**: detect ✓ completion marker in prose slice headers (#1816)
-- **auto**: reverse-sync root-level .gsd files on worktree teardown (#1831)
+- **auto**: reverse-sync root-level .wtf files on worktree teardown (#1831)
 - **tui**: prevent freeze when using @ file finder (#1832)
 - prevent silent data loss when milestone merge fails due to dirty working tree (#1752)
 - **verification**: avoid DEP0190 by passing command to shell explicitly (#1827)
@@ -1009,11 +1009,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - use realpathSync.native on Windows to resolve 8.3 short paths
 - detect and skip ghost milestone directories in deriveState() (#1817)
 - create milestone directory when triage defers to a not-yet-existing milestone (#1813)
-- add @gsd/pi-tui to test module resolver in dist-redirect (#1811)
+- add @wtf/pi-tui to test module resolver in dist-redirect (#1811)
 - surface unmapped active requirements when all milestones complete (#1805)
 - normalize paths in tests to handle Windows 8.3 short-path forms (#1804)
 - share milestone ID reservation between preview and tool (#1569) (#1802)
-- **tui,gsd**: tool-call loop guard + TUI stack overflow prevention (#1801)
+- **tui,wtf**: tool-call loop guard + TUI stack overflow prevention (#1801)
 - validate paused-session milestone before restoring it (#1664) (#1800)
 - detect REPLAN-TRIGGER.md in deriveState for triage-initiated replans (#1798)
 - dispatch uat targets last completed slice instead of activeSlice (#1693) (#1796)
@@ -1046,27 +1046,27 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - prevent getLoadedSkills crash and auto-build workspace packages (#1767)
 - session lock multi-path cleanup and false positive hardening (#1578) (#1765)
 - robust node_modules symlink handling to prevent extension loading failures (#1762)
-- lazy-load @gsd/pi-tui in shared/ui.ts to prevent /exit crash (#1761)
+- lazy-load @wtf/pi-tui in shared/ui.ts to prevent /exit crash (#1761)
 - validate worktree .git file and fix metrics toolCall casing (#1713) (#1754)
 - verify implementation artifacts before milestone completion (#1703) (#1760)
 - make task closeout crash-safe by unchecking orphaned checkboxes (#1650) (#1759)
 - preserve milestone branch on merge-back during transitions (#1573) (#1758)
 - write crash lock after newSession so it records correct session path (#1757)
-- handle symlinked .gsd in git add pathspec exclusions (#1712) (#1756)
+- handle symlinked .wtf in git add pathspec exclusions (#1712) (#1756)
 - guard worktree teardown on empty merge to prevent data loss (#1672) (#1755)
 - resolve symlinks in doctor orphaned-worktree check (#1715) (#1753)
 - silence spurious extension load error for non-extension libraries (#1709) (#1747)
 - reset completion state when post_unit_hooks retry_on signal is consumed (#1746)
-- route needs-discussion phase to showSmartEntry, preventing infinite /gsd loop (#1745)
+- route needs-discussion phase to showSmartEntry, preventing infinite /wtf loop (#1745)
 - **roadmap**: parse table-format slices in roadmap files (#1741)
 - extract milestone title from CONTEXT.md when ROADMAP is missing (#1729)
-- **gsd**: harden auto-mode telemetry — metrics idempotency, elapsed guard, title sanitization (#1722)
-- **gsd**: make saveJsonFile atomic via write-tmp-rename pattern (#1719)
-- **gsd**: syncWorktreeStateBack recurses into tasks/ subdirectory (#1678) (#1718)
+- **wtf**: harden auto-mode telemetry — metrics idempotency, elapsed guard, title sanitization (#1722)
+- **wtf**: make saveJsonFile atomic via write-tmp-rename pattern (#1719)
+- **wtf**: syncWorktreeStateBack recurses into tasks/ subdirectory (#1678) (#1718)
 - prevent parallel worktree path resolution from escaping to home directory (#1677)
 - add web search budget awareness to discuss and queue prompts (#1702)
 - harden auto-mode against stale integration metadata and Windows file locks (#1633)
-- **autocomplete**: repair /gsd skip, add widget/next completions, add discuss to hint (#1675)
+- **autocomplete**: repair /wtf skip, add widget/next completions, add discuss to hint (#1675)
 - **search**: keep loop guard armed after firing to prevent infinite loop restart (#1671) (#1674)
 - **worktree**: detect default branch instead of hardcoding "main" on milestone merge (#1668) (#1669)
 - remove duplicate TUI header rendered on session_start (#1663)
@@ -1083,7 +1083,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - **pi**: add Skill tool resolution (#1661)
 - health check phase 2 — real-time doctor issue visibility across widget, visualizer, and HTML reports (#1644)
-- upgrade forensics prompt to full-access GSD debugger (#1660)
+- upgrade forensics prompt to full-access WTF debugger (#1660)
 
 ### Fixed
 - prune stale env-utils.js from extensions root, preventing startup load error (#1655)
@@ -1099,21 +1099,21 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.39.0] - 2026-03-20
 
 ### Added
-- **gsd**: activate matching skills in dispatched prompts (#1630)
-- **gsd**: add .gsd/RUNTIME.md template for declared runtime context (#1626)
-- **gsd**: create draft PR on milestone completion when git.auto_pr enabled (#1627)
-- **gsd**: add browser-executable and runtime-executable UAT types (#1620)
+- **wtf**: activate matching skills in dispatched prompts (#1630)
+- **wtf**: add .wtf/RUNTIME.md template for declared runtime context (#1626)
+- **wtf**: create draft PR on milestone completion when git.auto_pr enabled (#1627)
+- **wtf**: add browser-executable and runtime-executable UAT types (#1620)
 - apply model preferences in guided flow for milestone planning (#1614)
-- **gsd**: GitHub sync extension — auto-sync to Issues, PRs, Milestones (#1603)
-- add GSD_PROJECT_ID env var to override project hash (#1600)
-- add GSD_HOME env var to override global ~/.gsd directory (#1566)
-- **gsd**: add 13 enhancements to /gsd doctor (#1583)
-- feat(ui): minimal GSD welcome screen on startup (#1584)
+- **wtf**: GitHub sync extension — auto-sync to Issues, PRs, Milestones (#1603)
+- add WTF_PROJECT_ID env var to override project hash (#1600)
+- add WTF_HOME env var to override global ~/.wtf directory (#1566)
+- **wtf**: add 13 enhancements to /wtf doctor (#1583)
+- feat(ui): minimal WTF welcome screen on startup (#1584)
 
 ### Fixed
-- recover + prevent #1364 .gsd/ data-loss (v2.30.0–v2.38.0) (#1635)
+- recover + prevent #1364 .wtf/ data-loss (v2.30.0–v2.38.0) (#1635)
 - treat summary as terminal artifact even when roadmap slices are unchecked (#1632)
-- **gsd**: close residual #1364 data-loss vectors on v2.36.0+ (#1637)
+- **wtf**: close residual #1364 data-loss vectors on v2.36.0+ (#1637)
 - auto-resolve npm subpath exports in extension loader (#1624)
 - create node_modules symlink for dynamic import resolution in extensions (#1623)
 - filter cross-milestone errors from health tracker escalation (#1621)
@@ -1123,34 +1123,34 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - resolve ${VAR} env references in MCP client .mcp.json configs (#1609)
 - return "dispatched" after doctor heal to prevent session race (#1580) (#1610)
 - update Anthropic OAuth endpoints to platform.claude.com (#1608)
-- lazy-open GSD database on first tool call in manual sessions (#1606)
-- **gsd**: detect anthropic-vertex in provider doctor (#1598)
-- **gsd**: tighten prompt automation contracts (#1556)
-- **gsd**: harden auto-mode agent loop — session teardown, unit correlation, sidecar perf (#1592)
+- lazy-open WTF database on first tool call in manual sessions (#1606)
+- **wtf**: detect anthropic-vertex in provider doctor (#1598)
+- **wtf**: tighten prompt automation contracts (#1556)
+- **wtf**: harden auto-mode agent loop — session teardown, unit correlation, sidecar perf (#1592)
 - break remaining shared/mod.js barrel imports in report generation chain (#1588)
 - apply pi manifest opt-out to extension-discovery.ts (#1545)
-- detect worktree paths resolved through .gsd symlinks (#1585)
+- detect worktree paths resolved through .wtf symlinks (#1585)
 
 ### Changed
-- **gsd**: unify sidecar mini-loop into main dispatch path (#1617)
+- **wtf**: unify sidecar mini-loop into main dispatch path (#1617)
 - **auto-loop**: initial cleanup — hoist constant, cache prefs per iteration (#1616)
-- **gsd**: add 30K char hard cap on prompt preamble (#1619)
-- **gsd**: replace stuck counter with sliding-window detection (#1618)
+- **wtf**: add 30K char hard cap on prompt preamble (#1619)
+- **wtf**: replace stuck counter with sliding-window detection (#1618)
 - **auto-loop**: 5 code smell fixes (#1602)
-- **gsd**: replace session-scoped promise bridge with per-unit one-shot (#1595)
-- **gsd**: remove prompt compression subsystem (~4,100 lines) (#1597)
-- **gsd**: crashproof stopAuto with independent try/catch per cleanup step (#1596)
+- **wtf**: replace session-scoped promise bridge with per-unit one-shot (#1595)
+- **wtf**: remove prompt compression subsystem (~4,100 lines) (#1597)
+- **wtf**: crashproof stopAuto with independent try/catch per cleanup step (#1596)
 
 ## [2.38.0] - 2026-03-20
 
 ### Added
-- **gsd**: ADR-004 — derived-graph reactive task execution (#1546)
+- **wtf**: ADR-004 — derived-graph reactive task execution (#1546)
 - add anthropic-vertex provider for Claude on Vertex AI (#1533)
 
 ### Fixed
 - **ci**: reduce GitHub Actions minutes ~60-70% (~10k → ~3-4k/month) (#1552)
-- **gsd**: reactive batch verification + dependency-based carry-forward (#1549)
-- **gsd**: enforce backtick file paths in task plan IO sections (#1548)
+- **wtf**: reactive batch verification + dependency-based carry-forward (#1549)
+- **wtf**: enforce backtick file paths in task plan IO sections (#1548)
 
 ## [2.37.1] - 2026-03-20
 
@@ -1166,7 +1166,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - **dashboard**: two-column layout with redesigned widget (#1530)
-- integrate cmux with gsd runtime (#1532)
+- integrate cmux with wtf runtime (#1532)
 
 ### Fixed
 - add session-level search budget to prevent unbounded native web search (#1309) (#1529)
@@ -1181,30 +1181,30 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - preserve user messages during abort with origin-aware queue clearing (#1439) (#1521)
 - remove broken SwiftUI skill and add CI reference check (#1476) (#1520)
 - wire escalateTier into auto-loop retry path (#1505) (#1519)
-- prevent bare /gsd from stealing session lock from running auto-mode (#1507) (#1517)
-- wire dead token-profile defaults and add /gsd rate command (#1505) (#1516)
+- prevent bare /wtf from stealing session lock from running auto-mode (#1507) (#1517)
+- wire dead token-profile defaults and add /wtf rate command (#1505) (#1516)
 - prevent false-positive session lock loss during sleep/event loop stalls (#1512) (#1513)
-- **gsd**: filter non-milestone directories from findMilestoneIds (#1494) (#1508)
-- **gsd**: accept 'passed' as terminal validation verdict (#1429) (#1509)
+- **wtf**: filter non-milestone directories from findMilestoneIds (#1494) (#1508)
+- **wtf**: accept 'passed' as terminal validation verdict (#1429) (#1509)
 - add missing imports breaking CI build (#1511)
-- prevent ensureGitignore from adding .gsd when tracked in git (#1364) (#1367)
+- prevent ensureGitignore from adding .wtf when tracked in git (#1364) (#1367)
 - check project root .env when secrets gate runs in worktree (#1387) (#1470)
 - realign cwd before dispatch + clean stale merge state on failure (#1389) (#1400)
 - create milestones/ directory in worktree when missing (#1374)
 - inject network_idle warning into hook prompts (#1345) (#1401)
 - verify symlink after migration + fix test failures (#1377) (#1404)
-- validate CWD instead of project root when running from a GSD worktree (#1317) (#1504)
-- **gsd**: detect initialized health widget projects (#1432)
-- smarter .gsd root discovery — git-root anchor + walk-up replaces symlink hack (#1386)
-- correct GSD-WORKFLOW.md fallback path and sync to agentDir (#1375)
+- validate CWD instead of project root when running from a WTF worktree (#1317) (#1504)
+- **wtf**: detect initialized health widget projects (#1432)
+- smarter .wtf root discovery — git-root anchor + walk-up replaces symlink hack (#1386)
+- correct WTF-WORKFLOW.md fallback path and sync to agentDir (#1375)
 - always include reasoning.encrypted_content for OpenAI reasoning models
-- **gsd**: avoid EISDIR crash in file loader
-- **gsd**: open existing database on inspect
+- **wtf**: avoid EISDIR crash in file loader
+- **wtf**: open existing database on inspect
 
 ## [2.35.0] - 2026-03-19
 
 ### Added
-- **gsd**: add /gsd changelog command with LLM-summarized release notes (#1465)
+- **wtf**: add /wtf changelog command with LLM-summarized release notes (#1465)
 
 ### Fixed
 - restore lsp single-server selector export
@@ -1249,8 +1249,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - auto-discard bootstrap crash locks and clean auto.lock on exit (#1397)
 - harden quick-task branch lifecycle — disk recovery + integration branch guard (#1342)
 - skip verification retry on spawn infra errors (ETIMEDOUT, ENOENT) (#1340)
-- keep external GSD state stable in worktrees (#1334)
-- stop excluding all .gsd/ from commits — only exclude runtime files (#1326) (#1328)
+- keep external WTF state stable in worktrees (#1334)
+- stop excluding all .wtf/ from commits — only exclude runtime files (#1326) (#1328)
 - handle ECOMPROMISED in uncaughtException guard and align retry onCompromised (#1322) (#1332)
 
 ## [2.33.1] - 2026-03-19
@@ -1270,7 +1270,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 - align retry lock path with primary lock settings to prevent ECOMPROMISED (#1307)
 - skip symlinks in makeTreeWritable to prevent EPERM on NixOS/nix-darwin (#1303)
-- handle Windows EPERM on .gsd migration rename with copy+delete fallback (#1296)
+- handle Windows EPERM on .wtf migration rename with copy+delete fallback (#1296)
 - add actionable recovery guidance to crash info messages (#1295)
 - resolve main repo root in worktrees for stable identity hash (#1294)
 - merge quick-task branch back to original after completion (#1293)
@@ -1291,7 +1291,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 - skip crash recovery when auto.lock was written by current process (#1289)
 - load worktree-cli extension modules via jiti instead of static ESM imports (#1285)
-- **gsd**: prevent concurrent dispatch during skip chains (#1272) (#1283)
+- **wtf**: prevent concurrent dispatch during skip chains (#1272) (#1283)
 - skip non-artifact UAT dispatch in auto-mode (#1277)
 
 ### Changed
@@ -1304,7 +1304,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.31.2] - 2026-03-18
 
 ### Fixed
-- **gsd**: stop replaying completed run-uat units (#1270)
+- **wtf**: stop replaying completed run-uat units (#1270)
 
 ## [2.31.1] - 2026-03-18
 
@@ -1321,13 +1321,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 - remove stale git-commit assertion in worktree test after commit_docs removal
 - remove commit_docs test that broke CI after type removal (#1258)
-- replace blanket git clean .gsd/ with targeted runtime file removal (#1252)
+- replace blanket git clean .wtf/ with targeted runtime file removal (#1252)
 - invalidate caches inside discuss loop to detect newly written slice context (#1249)
 - robust prose slice header parsing — handle H1-H4, bold, dots, no-separator variants (#1248)
-- clean up stranded .gsd.lock/ directory to prevent false lock conflicts (#1251)
+- clean up stranded .wtf.lock/ directory to prevent false lock conflicts (#1251)
 
 ### Changed
-- remove dead commit_docs preference (incompatible with external .gsd/ state) (#1258)
+- remove dead commit_docs preference (incompatible with external .wtf/ state) (#1258)
 
 ## [2.30.0] - 2026-03-18
 
@@ -1335,7 +1335,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - add extension manifest + registry for user-managed enable/disable (#1238)
 - add model health indicator to auto-mode progress widget (#1232)
 - simplify auto pipeline — merge research into planning, mechanical completion (ADR-003) (#1235)
-- add create-gsd-extension skill (#1229)
+- add create-wtf-extension skill (#1229)
 - add built-in skill authoring system (ADR-003) (#1228)
 - **prefs**: two-step provider→model picker in preferences wizard (#1218)
 - workflow templates — right-sized workflows for every task type (#1185)
@@ -1343,17 +1343,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 - align react-best-practices skill name with directory name (#1234)
 - gate slice progression on UAT verdict, not just file existence (#1241)
-- invalidate caches before roadmap check in /gsd discuss (#1240)
+- invalidate caches before roadmap check in /wtf discuss (#1240)
 - use shell: true for LSP spawn on Windows to resolve .cmd executables (#1233)
 - increase headless new-milestone timeout and limit investigation scope (#1230)
-- clean untracked .gsd/ files before squash-merge to prevent failure (#1239)
+- clean untracked .wtf/ files before squash-merge to prevent failure (#1239)
 - graceful fallback when native addon is unavailable on unsupported platforms (#1225)
 - replace ambiguous double-question in discussion reflection step (#1226)
 - kill non-persistent bg processes between auto-mode units (#1217)
 - Two-column dashboard layout with task checklist (#1195)
 
 ### Changed
-- move .gsd/ to external state directory with symlink (ADR-002) (#1242)
+- move .wtf/ to external state directory with symlink (ADR-002) (#1242)
 - replace MCPorter with native MCP client (#1210)
 - extend json-persistence utility and migrate top JSON I/O callsites (#1216)
 - deduplicate dispatchDoctorHeal — keep single copy in commands-handlers.ts (#1211)
@@ -1367,30 +1367,30 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **ci**: automate prod-release with version bump, changelog, and tag push (#1194)
 - auto-open HTML reports in default browser on manual export (#1164)
 - upgrade to Node.js 24 LTS across CI, Docker, and package config (#1165)
-- add /gsd logs command to browse activity, debug, and metrics logs (#1162)
+- add /wtf logs command to browse activity, debug, and metrics logs (#1162)
 - **browser-tools**: configurable screenshot resolution, format, and quality (#1152)
 - add pre-commit secret scanner and CI secret detection (#1148)
-- **mcporter**: add .gsd/mcp.json per-project MCP config support (#1141)
+- **mcporter**: add .wtf/mcp.json per-project MCP config support (#1141)
 - **metrics**: add API request counter for copilot/subscription users (#1140)
 - per-milestone depth verification + queue-flow write-gate (#1116)
 - add OSC 8 clickable hyperlinks for file paths in export notifications (#1114)
 - park/discard actions for in-progress milestones (#1107)
 - **ci**: implement three-stage promotion pipeline (Dev → Test → Prod) (#1098)
 - cache-ordered prompt assembly and dashboard cache hit rate (#1094)
-- add comprehensive API key manager (/gsd keys) (#1089)
+- add comprehensive API key manager (/wtf keys) (#1089)
 - **ci**: add multi-stage Dockerfile for CI builder and runtime images
-- **gsd**: add directory safeguards for system/home paths (#1053)
+- **wtf**: add directory safeguards for system/home paths (#1053)
 - enhance HTML report with derived metrics, visualizations, and interactivity (#1078)
 - auto-extract lessons to KNOWLEDGE.md on slice/milestone completion (#711) (#1081)
 - auto-create PR on milestone completion (#687) (#1084)
 - wire semantic chunking, add preferences, metrics, and docs
 - add token optimization suite for prompt caching, compression, and smart context selection
-- **autocomplete**: add /thinking completions, GSD subcommand descriptions, and test coverage (#1019)
+- **autocomplete**: add /thinking completions, WTF subcommand descriptions, and test coverage (#1019)
 - add respectGitignoreInPicker setting for @ file picker (#979) (#1016)
 - **prefs**: add search_provider to preferences.md (#1001)
 - add `--events` flag for JSONL stream filtering (#1000)
 - add 10 bundled skills for UI, quality, and code optimization (#999)
-- **ux**: group model list by provider in /gsd prefs wizard (#993)
+- **ux**: group model list by provider in /wtf prefs wizard (#993)
 - add `--answers` flag for headless answer injection (#982)
 - add project onboarding detection and init wizard
 
@@ -1415,10 +1415,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **ci**: skip init smoke test in non-TTY CI environments (#1172)
 - **ci**: skip publish when version already exists on npm (#1166)
 - **ci**: use local binary for pipeline smoke test (#1163)
-- prevent concurrent GSD sessions from overlapping on same project (#1154)
+- prevent concurrent WTF sessions from overlapping on same project (#1154)
 - exclude completion-transition errors from health escalation at task level (#1157)
 - **ci**: skip git-diff guard in prepublishOnly during CI (#1160)
-- /gsd quick respects git isolation: none preference (#1156)
+- /wtf quick respects git isolation: none preference (#1156)
 - text-based fallbacks for RPC mode where TUI widgets produce empty turns (#1112)
 - **headless-query**: use jiti to load extension .ts modules (#1143)
 - pause auto-mode when env variables needed instead of blocking (#1147)
@@ -1433,10 +1433,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - dispatch guard skips parked milestones — they no longer block later milestone dispatch (#1126)
 - worktree reassess-roadmap loop — existsSync fallback in checkNeedsReassessment (#1117)
 - **lsp**: use where.exe on Windows to resolve command paths (#1134)
-- **gsd-db**: auto-initialize database when tools are called (#1133)
+- **wtf-db**: auto-initialize database when tools are called (#1133)
 - inline preferences path to fix remote questions setup (#1110) (#1111)
 - **ci**: add safe.directory for containerized pipeline job (#1108)
-- remove .gsd/ from tracking, ignore entire directory
+- remove .wtf/ from tracking, ignore entire directory
 - update tests for god-file decomposition
 - strip model variant suffix for API key auth (#1097) (#1099)
 - match both milestoneId and sliceId when filtering duplicate blocker cards
@@ -1446,7 +1446,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - reject prose Verify: fields from being executed as shell commands (#1066) (#1068)
 - restore session model on error instead of reading stale global prefs (#1065) (#1067)
 - prevent run-uat re-dispatch loop when roadmap checkbox update fails (#1063) (#1064)
-- inline compareSemver in gsd extension to fix broken relative import (#1058)
+- inline compareSemver in wtf extension to fix broken relative import (#1058)
 - disable reasoning for MiniMax-M2.5 in alibaba-coding-plan provider (#1003) (#1055)
 - improve LSP diagnostics when no servers detected (#1082) (#1086)
 - prevent summarizing phase stall by retrying dropped agent_end events (#1072)
@@ -1454,7 +1454,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - add barrel files for remote-questions, ttsr, and shared extensions (#1048)
 - consolidate frontmatter parsing into shared module (#1040)
 - always ensure tasks/ directory exists for slice units (#900) (#1050)
-- centralize GSD timeout and cache constants (#1038)
+- centralize WTF timeout and cache constants (#1038)
 - improve RemotePromptRecord.ref type safety (#1041)
 - document silent catch handlers in browser-tools (#1037)
 - use literal union types in RuntimeErrorJSON for type safety (#1034)
@@ -1465,22 +1465,22 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **security**: use execFile for browser URL opening to prevent shell injection (#1022)
 - prevent duplicate milestone IDs when generating multiple before persisting (#961) (#1018)
 - consolidate duplicate formatting functions (#1011)
-- **gsd**: delete orphaned complexity.ts (#1005)
+- **wtf**: delete orphaned complexity.ts (#1005)
 - **search**: consolidate duplicate Brave API helpers (#1010)
 - merge worktree to main when all milestones complete (#962) (#1007)
-- **gsd**: deduplicate resolveGitHeadPath function (#1015)
+- **wtf**: deduplicate resolveGitHeadPath function (#1015)
 - add missing package.json subpath exports and oauth stubs (#1014)
-- **gsd**: consolidate string-array normalizer functions into shared utility (#1009)
+- **wtf**: consolidate string-array normalizer functions into shared utility (#1009)
 - **browser-tools**: document intentional silent catches, add debug logging for others (#1013)
 - consolidate duplicate VerificationCheck/Result type definitions (#1008)
-- **gsd**: add GIT_NO_PROMPT_ENV to gitFileExec and deduplicate constant (#1006)
+- **wtf**: add GIT_NO_PROMPT_ENV to gitFileExec and deduplicate constant (#1006)
 - **remote-questions**: add null coalesce for optional threadUrl (#1004)
 - auto-resume on transient server errors, not just rate limits (#886) (#957)
 - replace ambiguous compound question in reflection step (#963) (#1002)
-- **gsd**: remove STATE.md update instructions from all prompts (#983)
-- **gsd**: clear all caches after discuss dispatch so picker sees new CONTEXT files (#981)
+- **wtf**: remove STATE.md update instructions from all prompts (#983)
+- **wtf**: clear all caches after discuss dispatch so picker sees new CONTEXT files (#981)
 - **auto**: dispatch retry after verification gate failure (#998)
-- enforce GSDError usage and activate unused error codes (#997)
+- enforce WTFError usage and activate unused error codes (#997)
 - unify extension discovery logic (#995)
 - deduplicate tierLabel/tierOrdinal exports (#988)
 - deduplicate getMainBranch implementations (#994)
@@ -1519,9 +1519,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **resource-loader**: extract syncResourceDir to eliminate triplicated sync logic (#1036)
 - **bg-shell**: split 1604-line god file into tool, command, and lifecycle modules (#1049)
 - **headless**: split 772-line god file into events, UI, and context modules (#1047)
-- **gsd**: extract safeCopy/safeMkdir helpers to replace repetitive try/catch FS patterns (#1043)
-- **gsd**: extract atomicWriteSync utility to replace 6 duplicate write-tmp-rename patterns (#1046)
-- **gsd**: unify duplicate padRight/truncate into shared format-utils (#1045)
+- **wtf**: extract safeCopy/safeMkdir helpers to replace repetitive try/catch FS patterns (#1043)
+- **wtf**: extract atomicWriteSync utility to replace 6 duplicate write-tmp-rename patterns (#1046)
+- **wtf**: unify duplicate padRight/truncate into shared format-utils (#1045)
 - **loader**: consolidate 5 duplicate package.json version reads into cached helper (#1042)
 - **headless**: remove duplicate jsonLine, use serializeJsonLine from pi-coding-agent (#1039)
 - fix unicode regex discrepancy and standardize function naming (#1031)
@@ -1534,9 +1534,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.28.0] - 2026-03-17
 
 ### Added
-- `gsd headless query` command for instant, read-only state inspection — returns phase, cost, progress, and next-unit as parseable JSON without spawning an LLM session
-- `/gsd update` slash command for in-session self-update
-- `/gsd export --html --all` for retrospective milestone reports
+- `wtf headless query` command for instant, read-only state inspection — returns phase, cost, progress, and next-unit as parseable JSON without spawning an LLM session
+- `/wtf update` slash command for in-session self-update
+- `/wtf export --html --all` for retrospective milestone reports
 
 ### Fixed
 - Failure recovery & resume safeguards: atomic file writes, OAuth fetch timeouts (30s), RPC subprocess exit detection, extension command context guards, bash temp file cleanup, settings write queue flush, LSP init retry with backoff, crash detection on session resume, blob garbage collection
@@ -1572,7 +1572,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Web search loop broken with consecutive duplicate guard
 - Transient network errors retried before model fallback
 - Parallel worker PID tracking, spawn-status race, and exit persistence
-- `/gsd discuss` now recommends next undiscussed slice
+- `/wtf discuss` now recommends next undiscussed slice
 - Roadmap parser allows suffix text after `## Slices` heading
 - User's model choice no longer overwritten when API key is temporarily unavailable
 - Reassess-roadmap skip loop broken by preventing re-persistence of evicted keys
@@ -1595,9 +1595,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - Model selector grouped by provider with model type, provider, and API docs fields
 - `require_slice_discussion` option to pause auto-mode before each slice for human review
-- Discussion status indicators in `/gsd discuss` slice picker
+- Discussion status indicators in `/wtf discuss` slice picker
 - Worker NDJSON monitoring and budget enforcement for parallel orchestration
-- `gsd_generate_milestone_id` tool for multi-milestone unique ID generation
+- `wtf_generate_milestone_id` tool for multi-milestone unique ID generation
 - Alt+V clipboard image paste shortcut on macOS
 - Hashline edit mode integration into active workflow
 - Fallback parser for prose-style roadmaps without `## Slices` section
@@ -1618,9 +1618,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Extended idle timeout for headless new-milestone
 - EPIPE handling in LSP sendNotification with proper process exit wait
 - Debug logging for silent early-return paths in dispatchNextUnit
-- Untracked .gsd/ state files removed before milestone merge checkout
+- Untracked .wtf/ state files removed before milestone merge checkout
 - Crash prevention when cancelling OAuth provider login dialog
-- Resource staleness check compares gsdVersion instead of syncedAt
+- Resource staleness check compares wtfVersion instead of syncedAt
 - Unique temp paths in saveFile() to prevent parallel write collisions
 - Validation/summary file generation for completed milestones during migration
 - Cache invalidation before initial state derivation in startAuto
@@ -1661,7 +1661,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Headless `new-milestone` command for programmatic milestone creation
 - Interactive update prompt on startup when a new version is available
 - Symlink-based development workflow for `src/resources/`
-- Descriptions added to `/gsd` autocomplete commands
+- Descriptions added to `/wtf` autocomplete commands
 - `validate-milestone` phase and dispatch
 
 ### Fixed
@@ -1686,8 +1686,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - **VS Code extension** — full extension with chat participant, RPC integration, marketplace publishing under FluxLabs publisher
-- **`gsd headless`** — redesigned headless mode for full workflow orchestration: auto-responds to prompts, detects completion, supports `--json` output and `--timeout` flags
-- **`gsd sessions`** — interactive session picker for browsing and resuming saved sessions (#721)
+- **`wtf headless`** — redesigned headless mode for full workflow orchestration: auto-responds to prompts, detects completion, supports `--json` output and `--timeout` flags
+- **`wtf sessions`** — interactive session picker for browsing and resuming saved sessions (#721)
 - **10 new browser tools** — `browser_save_pdf`, `browser_save_state`, `browser_restore_state`, `browser_mock_route`, `browser_block_urls`, `browser_clear_routes`, `browser_emulate_device`, `browser_extract`, `browser_visual_diff`, `browser_zoom_region`, `browser_generate_test`, `browser_check_injection`, `browser_action_cache` (#698)
 - **Structured discussion rounds** — `ask_user_questions` in guided-discuss-milestone for better requirement gathering (#688)
 - **`validate-milestone` prompt** — milestone validation prompt and template
@@ -1697,7 +1697,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Background shell performance** — optimized hot path with parallel git queries and lazy workspace validation
 
 ### Fixed
-- Forensics uses `GSD_VERSION` env var instead of fragile package.json path traversal; now worktree-aware to prevent stale root misdiagnosis
+- Forensics uses `WTF_VERSION` env var instead of fragile package.json path traversal; now worktree-aware to prevent stale root misdiagnosis
 - Background commands rewritten to prevent pipe-open hang; stalled-tool detection added with prompt guidance
 - Auto mode breaks infinite skip loop on repeatedly-skipped completed units
 - Roadmap parser expands range syntax in depends (e.g. `S01-S04` → `S01,S02,S03,S04`)
@@ -1714,9 +1714,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.22.0] - 2026-03-16
 
 ### Added
-- **`/gsd forensics`** — post-mortem investigation of auto-mode failures with structured root-cause analysis
-- **Claude marketplace import** — import Claude marketplace plugins as namespaced GSD components
-- **MCP server mode** — run GSD as an MCP server with `--mode mcp`
+- **`/wtf forensics`** — post-mortem investigation of auto-mode failures with structured root-cause analysis
+- **Claude marketplace import** — import Claude marketplace plugins as namespaced WTF components
+- **MCP server mode** — run WTF as an MCP server with `--mode mcp`
 - **`/review` skill** — code review with diff-aware context
 - **`/test` skill** — test generation and execution
 - **`/lint` skill** — linting integration
@@ -1724,7 +1724,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **File watcher** — chokidar-based file watching for live updates
 - **`git.isolation: "none"`** — disable worktree isolation for projects that don't need it
 - **E2E smoke tests** — end-to-end test suite for extension integration
-- **Subcommand help** — inline help text for all GSD subcommands
+- **Subcommand help** — inline help text for all WTF subcommands
 
 ### Fixed
 - `verificationBudget` passed correctly to execute-task prompt template
@@ -1766,23 +1766,23 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.20.0] - 2026-03-16
 
 ### Added
-- **Telegram remote questions** — receive and respond to GSD questions via Telegram bot alongside existing Slack and Discord channels (#645)
-- **`/gsd quick`** — execute a quick task with GSD guarantees (atomic commits, state tracking) without the full planning overhead (#437)
-- **`/gsd mode`** — workflow mode system with solo and team presets that configure defaults for milestone IDs, git commit behavior, and documentation settings (#651)
-- **`/gsd help`** — categorized command reference with descriptions for all GSD subcommands (#630)
-- **`/gsd doctor`** — 7 runtime health checks with auto-fix for common state corruption issues (#646)
+- **Telegram remote questions** — receive and respond to WTF questions via Telegram bot alongside existing Slack and Discord channels (#645)
+- **`/wtf quick`** — execute a quick task with WTF guarantees (atomic commits, state tracking) without the full planning overhead (#437)
+- **`/wtf mode`** — workflow mode system with solo and team presets that configure defaults for milestone IDs, git commit behavior, and documentation settings (#651)
+- **`/wtf help`** — categorized command reference with descriptions for all WTF subcommands (#630)
+- **`/wtf doctor`** — 7 runtime health checks with auto-fix for common state corruption issues (#646)
 - **Agent instructions injection** — `agent-instructions.md` loaded into every agent session for persistent per-project behavioral guidance (#437)
 - **Skill lifecycle management** — telemetry tracking, health dashboard, and heal-skill command for managing custom skills (#599)
 - **SQLite context store** — surgical prompt injection from structured knowledge base for precise context engineering (#619)
 - **Context-window budget engine** — proportional prompt sizing that allocates context budget across system prompt sections based on relevance (#660)
 - **LSP activated by default** — Language Server Protocol now auto-activates with call hierarchy, formatting, signature help, and synchronized edits (#639)
 - **Extension smoke tests** — CI catches import failures, circular deps, and module resolution issues across all bundled extensions
-- **`gsd --debug` mode** — structured JSONL diagnostic logging for troubleshooting dispatch and state issues (#468)
-- **Worktree post-create hook** — run custom setup scripts when GSD creates a new worktree (#597)
+- **`wtf --debug` mode** — structured JSONL diagnostic logging for troubleshooting dispatch and state issues (#468)
+- **Worktree post-create hook** — run custom setup scripts when WTF creates a new worktree (#597)
 
 ### Fixed
 - **CPU spinning from regex backtracking** — replaced `[\s\S]*?` regex in preferences parser with indexOf-based scanning (#468)
-- **Model config bleed between concurrent GSD instances** — isolated model configuration per session (#650)
+- **Model config bleed between concurrent WTF instances** — isolated model configuration per session (#650)
 - **Onboarding wizard repeats** — skip onboarding for extension-based providers that don't require auth.json credentials (#589)
 - **Session tool rebuild on cwd change** — tools now rebuild correctly when working directory changes mid-session (#633)
 - **Auto mode state derivation after discussion fallthrough** — re-derives state to prevent stale dispatches (#609)
@@ -1798,8 +1798,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.19.0] - 2026-03-16
 
 ### Added
-- **Workflow visualizer** — `/gsd visualize` opens a full-screen TUI overlay with four tabs: Progress (milestone/slice/task tree), Dependencies (ASCII dep graph), Metrics (cost/token bar charts), and Timeline (chronological execution history). Supports Tab/1-4 switching, per-tab scrolling, auto-refresh every 2s, and optional auto-trigger after milestone completion via `auto_visualize` preference (#626)
-- **Mid-execution capture & triage** — `/gsd capture` lets you fire-and-forget thoughts during auto-mode. The system triages accumulated captures at natural seams between tasks, classifies impact into five types (quick-task, inject, defer, replan, note), and proposes action with user confirmation. Dashboard shows pending capture count badge. Capture context injected into replan and reassess prompts (#512)
+- **Workflow visualizer** — `/wtf visualize` opens a full-screen TUI overlay with four tabs: Progress (milestone/slice/task tree), Dependencies (ASCII dep graph), Metrics (cost/token bar charts), and Timeline (chronological execution history). Supports Tab/1-4 switching, per-tab scrolling, auto-refresh every 2s, and optional auto-trigger after milestone completion via `auto_visualize` preference (#626)
+- **Mid-execution capture & triage** — `/wtf capture` lets you fire-and-forget thoughts during auto-mode. The system triages accumulated captures at natural seams between tasks, classifies impact into five types (quick-task, inject, defer, replan, note), and proposes action with user confirmation. Dashboard shows pending capture count badge. Capture context injected into replan and reassess prompts (#512)
 - **Dynamic model routing** — complexity-based model routing classifies units into light/standard/heavy tiers and routes to cheaper models when appropriate, reducing token consumption 20-50% on capped plans. Includes budget-pressure-aware routing, cross-provider cost comparison, escalation on failure, adaptive learning from routing history (rolling 50-entry window with user feedback support), and task plan introspection (code block counting, complexity keyword detection) (#579)
 - **Feature-branch lifecycle integration test** — proves milestone worktrees branch from and merge back to feature branches, never touching main (#624)
 - **Discord integration parity with Slack** — plus new remote-questions documentation (#620)
@@ -1812,12 +1812,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.18.0] - 2026-03-16
 
 ### Added
-- **Milestone queue reorder** — `/gsd queue` supports reordering milestone execution priority with dependency-aware validation, persistent ordering via `.gsd/QUEUE-ORDER.json` (#460)
-- **`.gsd/KNOWLEDGE.md`** — persistent project-specific context file loaded into agent prompts. New `/gsd knowledge` command with `rule`, `pattern`, and `lesson` subcommands for adding entries (#585)
+- **Milestone queue reorder** — `/wtf queue` supports reordering milestone execution priority with dependency-aware validation, persistent ordering via `.wtf/QUEUE-ORDER.json` (#460)
+- **`.wtf/KNOWLEDGE.md`** — persistent project-specific context file loaded into agent prompts. New `/wtf knowledge` command with `rule`, `pattern`, and `lesson` subcommands for adding entries (#585)
 - **Dynamic model discovery** — runtime model enumeration from provider APIs (Ollama, OpenAI, Google, OpenRouter) with per-provider TTL caching and discovery adapters. New `ProviderManagerComponent` TUI for managing providers with auth status and model counts (#581)
 - **Expanded preferences wizard** — all configurable fields now exposed in the setup wizard, model ID validation, and `updatePreferencesModels()` for safe read-modify-write of model config (#580)
 - **Comprehensive documentation** — 12 new docs covering getting started, auto-mode, commands, configuration, token optimization, cost management, git strategy, team workflows, skills, migration, troubleshooting, and architecture (#605)
-- **`resolveProjectRoot()`** — all GSD commands resolve the effective project root from worktree paths instead of using raw `process.cwd()`, preventing path confusion across worktree boundaries (#602)
+- **`resolveProjectRoot()`** — all WTF commands resolve the effective project root from worktree paths instead of using raw `process.cwd()`, preventing path confusion across worktree boundaries (#602)
 - **1,813 lines of new tests** — 13 new test files covering discovery cache, model discovery, model registry, models-json-writer, auto-worktree, derive-state-deps, in-flight tool tracking, knowledge, memory leak guards, preferences wizard fields, queue order, queue reorder E2E, and stale worktree cwd
 
 ### Fixed
@@ -1839,13 +1839,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - **Token optimization profiles** — `budget`, `balanced`, and `quality` presets that coordinate model selection, phase skipping, and context compression to reduce token usage by 40-60% on budget mode
 - **Complexity-based task routing** — automatically classifies tasks as simple/standard/heavy and routes to appropriate models, with persistent learning from routing history
-- **`git.commit_docs` preference** — set to `false` to keep `.gsd/` planning artifacts local-only, useful for teams where only some members use GSD
+- **`git.commit_docs` preference** — set to `false` to keep `.wtf/` planning artifacts local-only, useful for teams where only some members use WTF
 
 ### Changed
 - Updated Ollama cloud provider model catalog
 
 ### Fixed
-- Native binary hangs in GSD auto-mode paths (#453)
+- Native binary hangs in WTF auto-mode paths (#453)
 - Auto-mode can be stopped from a different terminal (#586)
 - Parse cache collision causing false loop detection on `complete-slice` (#583)
 - Exhaustive switch handling and cleanup in Google provider (#587)
@@ -1853,7 +1853,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.16.0] - 2026-03-15
 
 ### Added
-- `/gsd steer` command — hard-steer plan documents during execution without stopping the pipeline
+- `/wtf steer` command — hard-steer plan documents during execution without stopping the pipeline
 - Native git operations via libgit2 — ~70 fewer process spawns per dispatch cycle
 - Native performance optimizations for `deriveState`, JSONL parsing, and path resolution
 - Default model upgraded to Opus 4.6 with 1M context variant
@@ -1903,14 +1903,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 - Executor agents now receive explicit working directory, preventing writes to main repo instead of worktree (#543)
-- Merge loop and .gsd/ conflict auto-resolution in worktree model, `git.isolation` preference restored (#536)
+- Merge loop and .wtf/ conflict auto-resolution in worktree model, `git.isolation` preference restored (#536)
 - Arrow keys no longer insert escape sequences as text during LLM streaming (#493)
 - YAML preferences parser hardened for OpenRouter model IDs with special characters (#488)
 - `@` file autocomplete debounced to prevent TUI freeze on large codebases (#448)
 - Auto-mode stops cleanly when dispatch gap watchdog fails (#537)
 - Synchronous I/O removed from hot paths (#540)
 - Silent catch blocks now capture error references for crash diagnostics (#546)
-- `ctx.log` error in GSD provider recovery path fixed
+- `ctx.log` error in WTF provider recovery path fixed
 - TUI resource leaks patched in loader, cancellable-loader, input, and editor components (#482)
 - Hardcoded ANSI escapes replaced with chalk for consistent terminal handling (#482)
 
@@ -1922,13 +1922,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.14.3] - 2026-03-15
 
 ### Fixed
-- **Copy planning artifacts into new auto-worktrees** — `createAutoWorktree` now copies `.gsd/milestones/`, `DECISIONS.md`, `REQUIREMENTS.md`, `PROJECT.md` from the source repo into the worktree. Prevents plan-slice loops in projects with pre-v2.14.0 `.gitignore`.
+- **Copy planning artifacts into new auto-worktrees** — `createAutoWorktree` now copies `.wtf/milestones/`, `DECISIONS.md`, `REQUIREMENTS.md`, `PROJECT.md` from the source repo into the worktree. Prevents plan-slice loops in projects with pre-v2.14.0 `.gitignore`.
 
 ## [2.14.2] - 2026-03-15
 
 ### Fixed
 - **Dispatch reentrancy deadlock** — `_dispatching` flag was never reset after first dispatch, permanently blocking all subsequent unit dispatches. Wrapped in try/finally.
-- **`.gitignore` self-heal** — existing projects with blanket `.gsd/` ignore now auto-remove it on next auto-mode start, replacing with explicit runtime-only patterns so planning artifacts are tracked in git.
+- **`.gitignore` self-heal** — existing projects with blanket `.wtf/` ignore now auto-remove it on next auto-mode start, replacing with explicit runtime-only patterns so planning artifacts are tracked in git.
 - **Discuss depth verification** — render summary as chat text (markdown renders), use ask_user_questions for short confirmation only.
 
 ## [2.14.1] - 2026-03-15
@@ -1941,13 +1941,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - **Discussion manifest** — mechanical process verification for multi-milestone context discussions
-- **Session-internal `/gsd config`** — configure GSD settings within a running session
+- **Session-internal `/wtf config`** — configure WTF settings within a running session
 - **Model selection UI** — select list instead of free-text input for model preferences
-- **Startup performance** — faster GSD launch via optimized initialization
+- **Startup performance** — faster WTF launch via optimized initialization
 
 ### Changed
 - **Branchless worktree architecture** — eliminated slice branches entirely. All work commits sequentially on `milestone/<MID>` within auto-mode worktrees. No branch creation, switching, or merging within a worktree. ~2600 lines of merge/conflict/branch-switching code removed.
-- **`.gitignore` overhaul** — planning artifacts (`.gsd/milestones/`) are tracked in git naturally. Only runtime files are gitignored. No more force-add hacks.
+- **`.gitignore` overhaul** — planning artifacts (`.wtf/milestones/`) are tracked in git naturally. Only runtime files are gitignored. No more force-add hacks.
 - **Multi-milestone enforcement** — `depends_on` frontmatter enforced in multi-milestone CONTEXT.md
 
 ### Fixed
@@ -1956,8 +1956,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Dispatch recovery hardening** — artifact fallback when completion key missing, TUI freeze prevention on cascading skips, reentrancy guard, atomic writes, stale runtime record cleanup, git index.lock cleanup
 - **Hook orchestration** — finalize runtime records, add supervision, fix retry
 - **Empty slice plan stays in planning** — no longer incorrectly transitions to summarizing
-- **Prefs wizard** — launch directly from `/gsd prefs`, fix parse/serialize cycle for empty arrays
-- **Discussion routing** — `/gsd discuss` routes to draft when phase is needs-discussion
+- **Prefs wizard** — launch directly from `/wtf prefs`, fix parse/serialize cycle for empty arrays
+- **Discussion routing** — `/wtf discuss` routes to draft when phase is needs-discussion
 
 ### Removed
 - `ensureSliceBranch()`, `switchToMain()`, `mergeSliceToMain()`, `mergeSliceToMilestone()`
@@ -2004,7 +2004,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Auto-mode dispatch loop when `cachedReaddir` returns stale data after unit writes files
 - Parse and path caches cleared alongside state cache after unit completion
 - `bg_shell` hangs indefinitely when `ready_port` server fails to start — now transitions to error state with stderr context
-- Em dash and slash characters in milestone/slice titles corrupting GSD state management
+- Em dash and slash characters in milestone/slice titles corrupting WTF state management
 - Guided-flow self-heals stale runtime records from crashed auto-mode sessions on wizard start
 - CI smoke test ANSI code stripping
 
@@ -2043,7 +2043,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Read resources from dist/ to prevent branch-drift in npm-link setups (#314)
 - Always use native Anthropic web search when available (#374)
 - CI smoke test — wait for registry propagation, show errors (#383)
-- Bypass pre-commit hooks on GSD infrastructure commits to prevent lint-staged empty commit errors (#385)
+- Bypass pre-commit hooks on WTF infrastructure commits to prevent lint-staged empty commit errors (#385)
 
 ## [2.10.12] - 2026-03-14
 
@@ -2051,7 +2051,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Multi-milestone readiness flow with per-milestone discussion gate (#377)
 
 ### Fixed
-- Fix `npx gsd-pi@latest` failing with `ERR_MODULE_NOT_FOUND: Cannot find package '@gsd/pi-coding-agent'`. The loader now creates workspace package symlinks at runtime before importing, so it works even when `npx` skips postinstall scripts (#380)
+- Fix `npx wtf-pi@latest` failing with `ERR_MODULE_NOT_FOUND: Cannot find package '@wtf/pi-coding-agent'`. The loader now creates workspace package symlinks at runtime before importing, so it works even when `npx` skips postinstall scripts (#380)
 
 ## [2.10.11] - 2026-03-14
 
@@ -2068,7 +2068,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Opus 4.6 1M as default model, model selector UX improvements, Discord onboarding (#290)
 
 ### Fixed
-- Fix broken `npm install` / `npx gsd-pi@latest` caused by unpublished `@gsd/*` workspace packages leaking into npm dependencies. Workspace cross-references removed from published package metadata; packages resolve via bundled `node_modules/` at runtime (#369)
+- Fix broken `npm install` / `npx wtf-pi@latest` caused by unpublished `@wtf/*` workspace packages leaking into npm dependencies. Workspace cross-references removed from published package metadata; packages resolve via bundled `node_modules/` at runtime (#369)
 - Add pre-publish tarball install validation (`validate-pack`) to CI and publish pipeline, preventing broken packages from reaching npm
 - Handle empty index after runtime file stripping in squash-merge (#364)
 - Add retry logic for transient network/auth failures instead of crashing (#365)
@@ -2077,7 +2077,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.10.9] - 2026-03-14
 
 ### Added
-- Team collaboration: multiple users can work on the same repo without milestone name clashes by checking in `.gsd/` planning artifacts (#338)
+- Team collaboration: multiple users can work on the same repo without milestone name clashes by checking in `.wtf/` planning artifacts (#338)
 
 ### Changed
 - Execute-task loop detection uses adaptive reconciliation instead of hard-stopping, reducing false positives (#342)
@@ -2091,9 +2091,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Secrets skip in auto mode no longer crashes (#352)
 - Untracked runtime files discarded before branch switch to prevent checkout conflicts (#346)
 - TUI crash/corruption on code blocks with lines exceeding terminal width (#343)
-- Infinite skip loop in `gsd auto` broken by adding roadmap completion check
+- Infinite skip loop in `wtf auto` broken by adding roadmap completion check
 - Model ID variant suffix stripped correctly for OAuth Anthropic API calls
-- `.gsd/` planning artifacts force-added and `handleAgentEnd` reentrancy guarded (#341)
+- `.wtf/` planning artifacts force-added and `handleAgentEnd` reentrancy guarded (#341)
 
 ## [2.10.8] - 2026-03-14
 
@@ -2142,7 +2142,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Async background jobs extension for non-blocking task execution (#260)
 - Multi-credential round-robin with rate-limit fallback across API keys
 - Bash interceptor to block commands that duplicate dedicated tools (Read, Write, Edit, Grep, Glob)
-- `gsd update` subcommand for self-update (#273)
+- `wtf update` subcommand for self-update (#273)
 - Task isolation for subagent filesystem safety (#254)
 - Native Rust streaming JSON parser (#266)
 - Web search provider selection added to onboarding wizard (#278)
@@ -2151,8 +2151,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Simplified onboarding into two-step auth flow — plain language instead of OAuth jargon (#274)
 
 ### Fixed
-- `optionalDependencies` in published `gsd-pi@2.10.4` were still pinned to `2.10.2`, causing users to install the broken engine binaries that 2.10.4 was meant to fix (#276)
-- Auto-resolve `.gsd/` planning artifact conflicts during slice merge (#264)
+- `optionalDependencies` in published `wtf-pi@2.10.4` were still pinned to `2.10.2`, causing users to install the broken engine binaries that 2.10.4 was meant to fix (#276)
+- Auto-resolve `.wtf/` planning artifact conflicts during slice merge (#264)
 - Use version ranges for native engine optional dependencies (#286)
 - Guard publish against uncommitted version sync changes
 - Show 'keep current' option in config when already authenticated (#283)
@@ -2175,12 +2175,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - Native Rust TTSR regex engine — pre-compiles all stream rule conditions into a single `RegexSet` for one-pass DFA matching instead of O(rules × conditions) JS regex iteration
 - Native Rust diff engine — fuzzy text matching (`fuzzyFindText`, `normalizeForFuzzyMatch`) and unified diff generation (`generateDiff`) via the `similar` crate, replacing the `diff` npm package
-- Native Rust GSD file parser — frontmatter parsing, section extraction, batch `.gsd/` directory parsing, and structured roadmap parsing with transparent JS fallback
+- Native Rust WTF file parser — frontmatter parsing, section extraction, batch `.wtf/` directory parsing, and structured roadmap parsing with transparent JS fallback
 
 ## [2.10.1] - 2026-03-13
 
 ### Fixed
-- `@gsd/native` package ships pre-compiled JavaScript instead of raw TypeScript, fixing startup crashes on Node.js 20, 22, and 24 (#248)
+- `@wtf/native` package ships pre-compiled JavaScript instead of raw TypeScript, fixing startup crashes on Node.js 20, 22, and 24 (#248)
 
 ## [2.10.0] - 2026-03-13
 
@@ -2222,11 +2222,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - LSP tool — full Language Server Protocol integration with diagnostics, go-to-definition, references, hover, document/workspace symbols, rename, code actions, type definition, and implementation support
 - `/thinking` slash command for toggling thinking level during sessions
-- Interactive wizard mode for `/gsd prefs` with guided configuration
+- Interactive wizard mode for `/wtf prefs` with guided configuration
 - Startup update check with 24-hour cache — notifies when a new version is available
 
 ### Fixed
-- TypeScript type errors across gsd, browser-tools, search-the-web, and misc extension files
+- TypeScript type errors across wtf, browser-tools, search-the-web, and misc extension files
 - Milestone ID generation uses max-based approach instead of length+1 (prevents ID collisions)
 - Non-thinking models handled correctly in `/thinking` command
 - Auto-mode pauses on provider errors to prevent reassess-roadmap loop
@@ -2244,7 +2244,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Provider-aware model resolution for per-phase preferences (respects `provider` field instead of parsing model name prefixes)
 - Execute-task artifact verification aligned with `deriveState` — adds self-repair for missing artifacts
 - Research phase infinite loop broken; state synced on stop
-- Auto-resolve merge conflicts on `.gsd/` runtime files
+- Auto-resolve merge conflicts on `.wtf/` runtime files
 - Auto-switch model after `/login` and `/logout` to prevent API key errors
 - Anthropic provider detection uses `provider` field instead of model name prefix matching
 
@@ -2258,7 +2258,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Windows NUL redirects sanitized to /dev/null in Git Bash environments
 
 ### Changed
-- `.claude/` and `.gsd/` directories untracked from repo, `*.tgz` gitignored
+- `.claude/` and `.wtf/` directories untracked from repo, `*.tgz` gitignored
 
 ## [2.8.1] - 2026-03-13
 
@@ -2274,7 +2274,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Auto-detect headless environment for Playwright browser launch
 - UAT artifact verified before marking complete-slice done
 - Prior slices must complete on main before next slice dispatches
-- smartStage fallback bypasses runtime exclusions when `.gsd/` is gitignored
+- smartStage fallback bypasses runtime exclusions when `.wtf/` is gitignored
 - `/exit` uses graceful shutdown instead of hard kill
 
 ## [2.8.0] - 2026-03-13
@@ -2296,11 +2296,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.7.1] - 2026-03-13
 
 ### Added
-- Model fallback support for auto-mode phases — if the configured model fails, GSD tries alternate models before stopping
+- Model fallback support for auto-mode phases — if the configured model fails, WTF tries alternate models before stopping
 - `/kill` command for immediate process termination
 
 ### Fixed
-- `npm install -g gsd-pi` now works — workspace packages bundled in npm tarball via `bundleDependencies`
+- `npm install -g wtf-pi` now works — workspace packages bundled in npm tarball via `bundleDependencies`
 - External PI ecosystem packages (pi-rtk, pi-context, etc.) can now resolve `@mariozechner/*` imports through jiti aliases
 - Missing `export-html` vendor files (marked.min.js, highlight.min.js) restored
 - Skipped API keys now persist so the setup wizard doesn't repeat on every launch
@@ -2314,7 +2314,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 - Vendor Pi SDK source (tui, ai, agent-core, coding-agent) into workspace monorepo under `packages/`, replacing the compiled npm dependency and patch-package workflow. Pi internals are now directly modifiable as TypeScript source.
 - Existing patches (setModel persist option, Windows VT input caching) applied as source edits.
-- Build pipeline runs workspace packages in dependency order before GSD compilation.
+- Build pipeline runs workspace packages in dependency order before WTF compilation.
 - Removed `patch-package` from devDependencies and postinstall.
 
 ## [2.6.0] - 2026-03-12
@@ -2327,7 +2327,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Doctor post-hook no longer preempts `complete-slice` dispatch
 - `main_branch` preference restored; `runPreMergeCheck` implemented for merge safety
 - Recovery/retry prompt injection capped to prevent V8 OOM on large sessions
-- `.gsd/` excluded from pre-switch auto-commits to prevent squash merge conflicts
+- `.wtf/` excluded from pre-switch auto-commits to prevent squash merge conflicts
 
 ## [2.5.1] - 2026-03-12
 
@@ -2348,7 +2348,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Native Anthropic web search — Claude models get server-side web search automatically, no Brave API key required
 - GitService fully wired into codebase — programmatic git operations replace shell-based git commands in prompts
 - Merge guards prevent slice completion when uncommitted changes or conflicts exist
-- Snapshot support for saving and restoring `.gsd/` state
+- Snapshot support for saving and restoring `.wtf/` state
 - Auto-push after slice squash-merge to main
 - Rich commit messages with structured metadata
 
@@ -2363,7 +2363,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2.4.0] - 2026-03-12
 
 ### Added
-- Automatic migration of provider credentials from existing Pi installations — skip re-authentication when switching to GSD
+- Automatic migration of provider credentials from existing Pi installations — skip re-authentication when switching to WTF
 - Pi extensions from `~/.pi/agent/extensions/` discoverable in interactive mode
 - GitService core implementation for programmatic git operations
 
@@ -2379,7 +2379,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - Branded clack-based onboarding wizard on first launch — LLM provider selection (OAuth + API key), optional tool API keys, and setup summary (#118)
-- `gsd config` subcommand to re-run the setup wizard anytime
+- `wtf config` subcommand to re-run the setup wizard anytime
 - Shared `src/logo.ts` module as single source of truth for ASCII banner
 
 ### Fixed
@@ -2408,12 +2408,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Migration no longer requires ROADMAP.md — milestones inferred from phases/ directory when missing (#93, #90)
 - Worktree branch safety — proper namespacing and slice branch base selection (#92)
 - Windows: use `execFile` to avoid single-quote shell issues (#103)
-- Broken `read @GSD-WORKFLOW.md` references replaced with `/gsd` command (#88)
+- Broken `read @WTF-WORKFLOW.md` references replaced with `/wtf` command (#88)
 - Google Search extension updated to use `gemini-2.5-flash` (#83)
 - Duplicate `getCurrentBranch` import in auto.ts (#87)
 - `formatCost` crash on non-number cost values (#74)
 - Avoid `sudo` prompts in postinstall script (#73)
-- `.gsd/` folder removed from git tracking; consolidated `.gitignore` (#78)
+- `.wtf/` folder removed from git tracking; consolidated `.gitignore` (#78)
 - Multiple community-reported bugs across CLI, auto-mode, and extensions
 
 ## [2.3.8] - 2026-03-11
@@ -2468,9 +2468,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [0.3.3] - 2026-03-11
 
 ### Added
-- `/gsd next` step mode — walk through units one at a time with a wizard between each
-- `/gsd` bare command defaults to step mode
-- `/exit` command to kill the GSD process immediately
+- `/wtf next` step mode — walk through units one at a time with a wizard between each
+- `/wtf` bare command defaults to step mode
+- `/exit` command to kill the WTF process immediately
 - `/clear` as alias for `/new` (new session)
 - MCPorter extension for lazy on-demand MCP server integration
 - `/voice` extension for real-time speech-to-text
@@ -2487,7 +2487,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Pi extensions loaded from `~/.pi/agent/extensions/` (#51)
 
 ### Removed
-- `/gsd-run` command (replaced by `/gsd` and `/gsd next`)
+- `/wtf-run` command (replaced by `/wtf` and `/wtf next`)
 
 ## [0.3.1] - 2026-03-11
 
@@ -2498,17 +2498,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Managed tools bootstrap and gh auth
 - Session list scoped to current working directory
 - Bash/bg_shell hang and kill issues on Windows (#40)
-- `/gsd-run` hardcoded `~/.pi/` path (#38)
+- `/wtf-run` hardcoded `~/.pi/` path (#38)
 - Windows backspace in masked input + custom browser path support (#36, #34)
 
 ### Changed
-- Renamed "Get Stuff Done" to "Get Shit Done"
+- Renamed "Get Stuff Done" to "Work Then Finish"
 
 ## [0.3.0] - 2026-03-11
 
 ### Added
 - `/worktree` (`/wt`) — git worktree lifecycle management (#31)
-- `/gsd migrate` — `.planning` to `.gsd` migration tool (#28)
+- `/wtf migrate` — `.planning` to `.wtf` migration tool (#28)
 
 ### Fixed
 - Skipped API keys now persist so wizard doesn't repeat on every launch (#27)
@@ -2545,9 +2545,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Postinstall banner with version and next-step hint
 
 ### Fixed
-- All `.pi/` paths updated to `.gsd/`
+- All `.pi/` paths updated to `.wtf/`
 - Default model matching by `id.includes('sonnet')` for dated API IDs
-- Circular gsd-pi self-dependency removed
+- Circular wtf-pi self-dependency removed
 - Pi SDK version check suppressed
 - Selected options stay lit when notes field is focused
 
@@ -2557,10 +2557,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - GitHub extension tool suite with confirmation gate
 - Bundled skills: frontend-design, swiftui, debug-like-expert
 - Skills trigger table in system prompt
-- Resource loader syncs bundled skills to `~/.gsd/agent/skills/`
+- Resource loader syncs bundled skills to `~/.wtf/agent/skills/`
 
 ### Fixed
-- `~/.gsd/agent/` paths in prompt templates instead of `~/.pi/agent/` (#10)
+- `~/.wtf/agent/` paths in prompt templates instead of `~/.pi/agent/` (#10)
 - Guard against re-injecting discuss prompt when session already in flight
 
 ### Changed

@@ -1,9 +1,9 @@
-// GSD Extension — Desktop Notification Helper
+// WTF Extension — Desktop Notification Helper
 // Cross-platform desktop notifications for auto-mode events.
 
 import { execFileSync } from "node:child_process";
 import type { NotificationPreferences } from "../domain/types.ts";
-import { loadEffectiveGSDPreferences } from "../preferences/preferences.ts";
+import { loadEffectiveWTFPreferences } from "../preferences/preferences.ts";
 import { CmuxClient, emitOsc777Notification, resolveCmuxConfig } from "../cmux/index.ts";
 
 export type NotifyLevel = "info" | "success" | "warning" | "error";
@@ -25,12 +25,12 @@ export function sendDesktopNotification(
   kind: NotificationKind = "complete",
   projectName?: string,
 ): void {
-  // When a projectName is provided and the title is the default "GSD",
+  // When a projectName is provided and the title is the default "WTF",
   // replace it with a project-qualified title for multi-project clarity.
-  if (projectName && title === "GSD") {
+  if (projectName && title === "WTF") {
     title = formatNotificationTitle(projectName);
   }
-  const loaded = loadEffectiveGSDPreferences()?.preferences;
+  const loaded = loadEffectiveWTFPreferences()?.preferences;
   if (!shouldSendDesktopNotification(kind, loaded?.notifications)) return;
 
   const cmux = resolveCmuxConfig(loaded);
@@ -51,7 +51,7 @@ export function sendDesktopNotification(
 
 export function shouldSendDesktopNotification(
   kind: NotificationKind,
-  preferences: NotificationPreferences | undefined = loadEffectiveGSDPreferences()?.preferences.notifications,
+  preferences: NotificationPreferences | undefined = loadEffectiveWTFPreferences()?.preferences.notifications,
 ): boolean {
   if (preferences?.enabled === false) return false;
 
@@ -72,12 +72,12 @@ export function shouldSendDesktopNotification(
 
 /**
  * Format a notification title that includes the project name for context.
- * Returns "GSD — projectName" when a project name is available, otherwise "GSD".
+ * Returns "WTF — projectName" when a project name is available, otherwise "WTF".
  */
 export function formatNotificationTitle(projectName?: string): string {
   const trimmed = projectName?.trim();
-  if (trimmed) return `GSD — ${trimmed}`;
-  return "GSD";
+  if (trimmed) return `WTF — ${trimmed}`;
+  return "WTF";
 }
 
 export function buildDesktopNotificationCommand(

@@ -1,4 +1,4 @@
-// GSD Markdown Renderer — DB → Markdown file generation
+// WTF Markdown Renderer — DB → Markdown file generation
 //
 // Transforms DB state into correct markdown files on disk.
 // Each render function reads from DB (with disk fallback),
@@ -23,15 +23,15 @@ import {
   getArtifact,
   insertArtifact,
   getGateResults,
-} from "../persistence/gsd-db.ts";
-import type { MilestoneRow, SliceRow, TaskRow } from "../persistence/gsd-db.ts";
+} from "../persistence/wtf-db.ts";
+import type { MilestoneRow, SliceRow, TaskRow } from "../persistence/wtf-db.ts";
 import type { GateRow } from "../domain/types.ts";
 import {
   resolveMilestoneFile,
   resolveSliceFile,
   resolveSlicePath,
   resolveTasksDir,
-  gsdRoot,
+  wtfRoot,
   buildTaskFileName,
   buildSliceFileName,
 } from "../persistence/paths.ts";
@@ -42,11 +42,11 @@ import { clearPathCache } from "../persistence/paths.ts";
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
 /**
- * Convert an absolute file path to a .gsd-relative artifact path.
- * E.g. "/project/.gsd/milestones/M001/M001-ROADMAP.md" → "milestones/M001/M001-ROADMAP.md"
+ * Convert an absolute file path to a .wtf-relative artifact path.
+ * E.g. "/project/.wtf/milestones/M001/M001-ROADMAP.md" → "milestones/M001/M001-ROADMAP.md"
  */
 function toArtifactPath(absPath: string, basePath: string): string {
-  const root = gsdRoot(basePath);
+  const root = wtfRoot(basePath);
   const rel = relative(root, absPath);
   // Normalize to forward slashes for consistent DB keys
   return rel.replace(/\\/g, "/");
@@ -377,7 +377,7 @@ export async function renderPlanFromDb(
   }
 
   const slicePath = resolveSlicePath(basePath, milestoneId, sliceId)
-    ?? join(gsdRoot(basePath), "milestones", milestoneId, "slices", sliceId);
+    ?? join(wtfRoot(basePath), "milestones", milestoneId, "slices", sliceId);
   const absPath = resolveSliceFile(basePath, milestoneId, sliceId, "PLAN")
     ?? join(slicePath, `${sliceId}-PLAN.md`);
   const artifactPath = toArtifactPath(absPath, basePath);
@@ -411,7 +411,7 @@ export async function renderTaskPlanFromDb(
   }
 
   const tasksDir = resolveTasksDir(basePath, milestoneId, sliceId)
-    ?? join(gsdRoot(basePath), "milestones", milestoneId, "slices", sliceId, "tasks");
+    ?? join(wtfRoot(basePath), "milestones", milestoneId, "slices", sliceId, "tasks");
   mkdirSync(tasksDir, { recursive: true });
   const absPath = join(tasksDir, buildTaskFileName(taskId, "PLAN"));
   const artifactPath = toArtifactPath(absPath, basePath);
@@ -439,7 +439,7 @@ export async function renderRoadmapFromDb(
 
   const slices = getMilestoneSlices(milestoneId);
   const absPath = resolveMilestoneFile(basePath, milestoneId, "ROADMAP") ??
-    join(gsdRoot(basePath), "milestones", milestoneId, `${milestoneId}-ROADMAP.md`);
+    join(wtfRoot(basePath), "milestones", milestoneId, `${milestoneId}-ROADMAP.md`);
   const artifactPath = toArtifactPath(absPath, basePath);
   const content = renderRoadmapMarkdown(milestone, slices);
 
@@ -1056,7 +1056,7 @@ export async function renderReplanFromDb(
   replanData: ReplanData,
 ): Promise<{ replanPath: string; content: string }> {
   const slicePath = resolveSlicePath(basePath, milestoneId, sliceId)
-    ?? join(gsdRoot(basePath), "milestones", milestoneId, "slices", sliceId);
+    ?? join(wtfRoot(basePath), "milestones", milestoneId, "slices", sliceId);
   const absPath = join(slicePath, `${sliceId}-REPLAN.md`);
   const artifactPath = toArtifactPath(absPath, basePath);
 
@@ -1095,7 +1095,7 @@ export async function renderAssessmentFromDb(
   assessmentData: AssessmentData,
 ): Promise<{ assessmentPath: string; content: string }> {
   const slicePath = resolveSlicePath(basePath, milestoneId, sliceId)
-    ?? join(gsdRoot(basePath), "milestones", milestoneId, "slices", sliceId);
+    ?? join(wtfRoot(basePath), "milestones", milestoneId, "slices", sliceId);
   const absPath = join(slicePath, `${sliceId}-ASSESSMENT.md`);
   const artifactPath = toArtifactPath(absPath, basePath);
 

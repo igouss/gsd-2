@@ -1,23 +1,23 @@
 /**
- * GSD Detection — Type definitions and project file markers.
+ * WTF Detection — Type definitions and project file markers.
  */
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 
 export interface ProjectDetection {
-  /** What kind of GSD state exists in this directory */
-  state: "none" | "v1-planning" | "v2-gsd" | "v2-gsd-empty";
+  /** What kind of WTF state exists in this directory */
+  state: "none" | "v1-planning" | "v2-wtf" | "v2-wtf-empty";
 
-  /** Is this the first time GSD has been used on this machine? */
+  /** Is this the first time WTF has been used on this machine? */
   isFirstEverLaunch: boolean;
 
-  /** Does ~/.gsd/ exist with preferences? */
+  /** Does ~/.wtf/ exist with preferences? */
   hasGlobalSetup: boolean;
 
   /** v1 details (only when state === 'v1-planning') */
   v1?: V1Detection;
 
-  /** v2 details (only when state === 'v2-gsd' or 'v2-gsd-empty') */
+  /** v2 details (only when state === 'v2-wtf' or 'v2-wtf-empty') */
   v2?: V2Detection;
 
   /** Detected project ecosystem signals */

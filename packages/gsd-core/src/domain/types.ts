@@ -1,4 +1,4 @@
-// GSD Extension — Core Type Definitions
+// WTF Extension — Core Type Definitions
 // Types consumed by state derivation, file parsing, and status display.
 // Pure interfaces — no logic, no runtime dependencies.
 
@@ -43,7 +43,7 @@ export interface BoundaryMapEntry {
 }
 
 export interface Roadmap {
-  title: string; // e.g. "M001: GSD Extension — Hierarchical Planning with Auto Mode"
+  title: string; // e.g. "M001: WTF Extension — Hierarchical Planning with Auto Mode"
   vision: string;
   successCriteria: string[];
   slices: RoadmapSliceEntry[];
@@ -209,7 +209,7 @@ export interface ManifestStatus {
   existing: string[]; // key present in .env or process.env (regardless of manifest status)
 }
 
-// ─── GSD State (Derived Dashboard) ────────────────────────────────────────
+// ─── WTF State (Derived Dashboard) ────────────────────────────────────────
 
 export interface ActiveRef {
   id: string;
@@ -233,7 +233,7 @@ export interface RequirementCounts {
   total: number;
 }
 
-export interface GSDState {
+export interface WTFState {
   activeMilestone: ActiveRef | null;
   activeSlice: ActiveRef | null;
   activeTask: ActiveRef | null;
@@ -510,7 +510,7 @@ export interface BrowserFlowResult {
   duration: number;
 }
 
-// ─── Complete Task Params (gsd_complete_task tool input) ─────────────────
+// ─── Complete Task Params (wtf_complete_task tool input) ─────────────────
 
 export interface CompleteTaskParams {
   taskId: string;
@@ -542,7 +542,7 @@ export interface CompleteTaskParams {
   triggerReason?: string;
 }
 
-// ─── Complete Slice Params (gsd_complete_slice tool input) ───────────────
+// ─── Complete Slice Params (wtf_complete_slice tool input) ───────────────
 
 export interface CompleteSliceParams {
   sliceId: string;

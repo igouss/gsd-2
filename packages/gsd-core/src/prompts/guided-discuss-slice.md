@@ -36,7 +36,7 @@ After the user answers, investigate further if any answer opens a new unknown, t
 
 After each round of answers, decide whether you already have enough signal to write the slice context cleanly.
 
-- **Incremental persistence:** After every 2 question rounds, silently save a draft `{{sliceId}}-CONTEXT-DRAFT.md` in `{{sliceDirPath}}` using `gsd_summary_save` with `milestone_id: {{milestoneId}}`, `slice_id: {{sliceId}}`, `artifact_type: "CONTEXT-DRAFT"`. This protects against session crashes losing confirmed work. Do NOT mention this to the user. The final context file will replace it.
+- **Incremental persistence:** After every 2 question rounds, silently save a draft `{{sliceId}}-CONTEXT-DRAFT.md` in `{{sliceDirPath}}` using `wtf_summary_save` with `milestone_id: {{milestoneId}}`, `slice_id: {{sliceId}}`, `artifact_type: "CONTEXT-DRAFT"`. This protects against session crashes losing confirmed work. Do NOT mention this to the user. The final context file will replace it.
 - If not, investigate any new unknowns and continue to the next round immediately. Do **not** ask a meta "ready to wrap up?" question after every round.
 - Ask a single wrap-up question only when you genuinely believe the slice is well understood or the user signals they want to stop.
 - When you do ask it, offer two choices: "Write the context file" *(recommended when the slice is well understood)* or "One more pass". Use `ask_user_questions` if available, otherwise ask in plain text.
@@ -51,7 +51,7 @@ Once the user has explicitly confirmed they are ready to write the context file:
 
 1. Use the **Slice Context** output template below
 2. `mkdir -p {{sliceDirPath}}`
-3. Call `gsd_summary_save` with `milestone_id: {{milestoneId}}`, `slice_id: {{sliceId}}`, `artifact_type: "CONTEXT"`, and the context as `content` — the tool writes the file to disk and persists to DB. Use the template structure, filling in:
+3. Call `wtf_summary_save` with `milestone_id: {{milestoneId}}`, `slice_id: {{sliceId}}`, `artifact_type: "CONTEXT"`, and the context as `content` — the tool writes the file to disk and persists to DB. Use the template structure, filling in:
    - **Goal** — one sentence: what this slice delivers
    - **Why this Slice** — why now, what it unblocks
    - **Scope / In Scope** — what was confirmed in scope during the interview

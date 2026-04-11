@@ -1,5 +1,5 @@
 /**
- * GSD Detection — Project ecosystem signal detection.
+ * WTF Detection — Project ecosystem signal detection.
  *
  * detectProjectSignals is the main function: quick filesystem scan for
  * project ecosystem markers (languages, frameworks, CI, tests, etc.).

@@ -1,5 +1,5 @@
 /**
- * GSD Skill Telemetry — Track which skills are loaded per unit (#599)
+ * WTF Skill Telemetry — Track which skills are loaded per unit (#599)
  *
  * Captures skill names at dispatch time for inclusion in UnitMetrics.
  * Distinguishes between "available" skills (in system prompt) and
@@ -14,6 +14,7 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 // ─── In-memory state ──────────────────────────────────────────────────────────
 
@@ -32,7 +33,7 @@ const activelyLoadedSkills = new Set<string>();
 export function captureAvailableSkills(): void {
   const skillsDir = join(homedir(), ".agents", "skills");
   const claudeSkillsDir = join(homedir(), ".claude", "skills");
-  const legacyDir = join(homedir(), ".gsd", "agent", "skills");
+  const legacyDir = join(homedir(), PROJECT_DIR_NAME, "agent", "skills");
   const names = listSkillNames(skillsDir);
   const claudeNames = listSkillNames(claudeSkillsDir);
   // Include skills still in the legacy directory only if migration hasn't completed
@@ -109,7 +110,7 @@ export function detectStaleSkills(
   // Check all installed skills, not just those with usage data
   const skillsDir = join(homedir(), ".agents", "skills");
   const claudeSkillsDir = join(homedir(), ".claude", "skills");
-  const legacyDir = join(homedir(), ".gsd", "agent", "skills");
+  const legacyDir = join(homedir(), PROJECT_DIR_NAME, "agent", "skills");
   const legacyMigrated = existsSync(join(legacyDir, ".migrated-to-agents"));
   const legacyNames = legacyMigrated ? [] : listSkillNames(legacyDir);
   const installedSet = new Set([...listSkillNames(skillsDir), ...listSkillNames(claudeSkillsDir), ...legacyNames]);

@@ -1,5 +1,5 @@
 /**
- * GSD Prompt Loader
+ * WTF Prompt Loader
  *
  * Reads .md prompt templates from the prompts/ directory and substitutes
  * {{variable}} placeholders with provided values.
@@ -8,8 +8,8 @@
  * They use {{variableName}} syntax for substitution.
  *
  * All templates are eagerly loaded into cache at module init via warmCache().
- * This prevents a running session from being invalidated when another `gsd`
- * launch overwrites ~/.gsd/agent/ with newer templates via initResources().
+ * This prevents a running session from being invalidated when another `wtf`
+ * launch overwrites ~/.wtf/agent/ with newer templates via initResources().
  * Without eager caching, the in-memory extension code (which knows variable
  * set A) can read a newer template from disk (which expects variable set B),
  * causing a "template declares {{X}} but no value was provided" crash
@@ -18,20 +18,21 @@
  */
 
 import { readFileSync, readdirSync, existsSync } from "node:fs";
-import { GSDError, GSD_PARSE_ERROR } from "../domain/errors.ts";
+import { WTFError, WTF_PARSE_ERROR } from "../domain/errors.ts";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
 import { logWarning } from "../workflow/workflow-logger.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 /**
- * Resolve the GSD extension directory.
+ * Resolve the WTF extension directory.
  *
  * `import.meta.url` resolves to whichever copy of this module is executing.
  * On Windows (npm global install via MSYS2 / Git Bash) this can resolve to
  * the npm-global `AppData/Roaming/npm/…` path, which does NOT contain the
  * prompts/ and templates/ subtrees that initResources() copies to
- * `~/.gsd/agent/extensions/gsd/`. Detect the mismatch and fall back to
+ * `~/.wtf/agent/extensions/wtf/`. Detect the mismatch and fall back to
  * the user-local agent directory.
  */
 function resolveExtensionDir(): string {
@@ -39,9 +40,9 @@ function resolveExtensionDir(): string {
   if (existsSync(join(moduleDir, "prompts"))) return moduleDir;
 
   // Fallback: user-local agent directory
-  const gsdHome = process.env.GSD_HOME || join(homedir(), ".gsd");
-  const agentGsdDir = join(gsdHome, "agent", "extensions", "gsd");
-  if (existsSync(join(agentGsdDir, "prompts"))) return agentGsdDir;
+  const wtfHome = process.env.WTF_HOME || join(homedir(), PROJECT_DIR_NAME);
+  const agentWtfDir = join(wtfHome, "agent", "extensions", "wtf");
+  if (existsSync(join(agentWtfDir, "prompts"))) return agentWtfDir;
 
   // Last resort: return the module dir (warmCache will silently handle the miss)
   return moduleDir;
@@ -53,7 +54,7 @@ const templatesDir = join(__extensionDir, "templates");
 
 /**
  * Return the resolved templates directory path for use in prompts.
- * Avoids hardcoding `~/.gsd/agent/extensions/gsd/templates/` in templates. (#3575)
+ * Avoids hardcoding `~/.wtf/agent/extensions/wtf/templates/` in templates. (#3575)
  */
 export function getTemplatesDir(): string {
   return templatesDir;
@@ -119,7 +120,7 @@ export function loadPrompt(name: string, vars: Record<string, string> = {}): str
   }
 
   const effectiveVars = {
-    skillActivation: "If a `GSD Skill Preferences` block is present in system context, use it and the `<available_skills>` catalog in your system prompt to decide which skills to load and follow for this unit, without relaxing required verification or artifact rules.",
+    skillActivation: "If a `WTF Skill Preferences` block is present in system context, use it and the `<available_skills>` catalog in your system prompt to decide which skills to load and follow for this unit, without relaxing required verification or artifact rules.",
     ...vars,
   };
 
@@ -133,8 +134,8 @@ export function loadPrompt(name: string, vars: Record<string, string> = {}): str
       .map(m => m.slice(2, -2))
       .filter(key => !(key in effectiveVars));
     if (missing.length > 0) {
-      throw new GSDError(
-        GSD_PARSE_ERROR,
+      throw new WTFError(
+        WTF_PARSE_ERROR,
         `loadPrompt("${name}"): template declares {{${missing.join("}}, {{")}}}} but no value was provided. ` +
         `This usually means the extension code in memory is older than the template on disk. ` +
         `Restart pi to reload the extension.`,

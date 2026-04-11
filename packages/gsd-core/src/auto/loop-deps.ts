@@ -8,8 +8,8 @@
 
 import type { HarnessAdapter, OrchestratorEventSink } from "../adapters/harness-adapter.ts";
 import type { AutoSession } from "./session.ts";
-import type { GSDPreferences } from "../preferences/preferences-types.ts";
-import type { GSDState } from "../domain/types.ts";
+import type { WTFPreferences } from "../preferences/preferences-types.ts";
+import type { WTFState } from "../domain/types.ts";
 import type { SessionLockStatus } from "../session/session-lock.ts";
 import type { DispatchAction } from "./auto-dispatch.ts";
 import type { WorktreeResolver } from "../git/worktree-resolver.ts";
@@ -69,21 +69,21 @@ export interface CoreLoopDeps {
   updateProgressWidget: (
     unitType: string,
     unitId: string,
-    state: GSDState,
+    state: WTFState,
   ) => void;
-  syncCmuxSidebar: (preferences: GSDPreferences | undefined, state: GSDState) => void;
+  syncCmuxSidebar: (preferences: WTFPreferences | undefined, state: WTFState) => void;
   logCmuxEvent: (
-    preferences: GSDPreferences | undefined,
+    preferences: WTFPreferences | undefined,
     message: string,
     level?: CmuxLogLevel,
   ) => void;
 
   // ── State and cache functions ──
   invalidateAllCaches: () => void;
-  deriveState: (basePath: string) => Promise<GSDState>;
+  deriveState: (basePath: string) => Promise<WTFState>;
   rebuildState: (basePath: string) => Promise<void>;
-  loadEffectiveGSDPreferences: () =>
-    | { preferences?: GSDPreferences }
+  loadEffectiveWTFPreferences: () =>
+    | { preferences?: WTFPreferences }
     | undefined;
 
   // ── Pre-dispatch health gate ──
@@ -174,8 +174,8 @@ export interface CoreLoopDeps {
     basePath: string;
     mid: string;
     midTitle: string;
-    state: GSDState;
-    prefs: GSDPreferences | undefined;
+    state: WTFState;
+    prefs: WTFPreferences | undefined;
     session?: AutoSession;
   }) => Promise<DispatchAction>;
   runPreDispatchHooks: (
@@ -218,7 +218,7 @@ export interface CoreLoopDeps {
     unitType: string,
     unitId: string,
     basePath: string,
-    state: GSDState,
+    state: WTFState,
   ) => void;
   updateSliceProgressCache: (
     basePath: string,
@@ -231,7 +231,7 @@ export interface CoreLoopDeps {
     unitType: string,
     unitId: string,
     basePath: string,
-    prefs: GSDPreferences | undefined,
+    prefs: WTFPreferences | undefined,
     verbose: boolean,
     startModel: { provider: string; id: string } | null,
     retryContext?: { isRetry: boolean; previousTier?: string },
@@ -245,7 +245,7 @@ export interface CoreLoopDeps {
     s: AutoSession;
     unitType: string;
     unitId: string;
-    prefs: GSDPreferences | undefined;
+    prefs: WTFPreferences | undefined;
     buildSnapshotOpts: () => CloseoutOptions & Record<string, unknown>;
     buildRecoveryContext: () => unknown;
     pauseAuto: () => Promise<void>;

@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import {
-  gsdRoot,
+  wtfRoot,
   relSliceFile,
   relTaskFile,
   resolveSliceFile,
@@ -48,7 +48,7 @@ export interface AutoUnitRuntimeRecord {
 }
 
 function runtimeDir(basePath: string): string {
-  return join(gsdRoot(basePath), "runtime", "units");
+  return join(wtfRoot(basePath), "runtime", "units");
 }
 
 function runtimePath(basePath: string, unitType: string, unitId: string): string {
@@ -134,7 +134,7 @@ export async function inspectExecuteTaskDurability(
 
   const planAbs = resolveSliceFile(basePath, mid, sid, "PLAN");
   const summaryAbs = resolveTaskFile(basePath, mid, sid, tid, "SUMMARY");
-  const stateAbs = join(gsdRoot(basePath), "STATE.md");
+  const stateAbs = join(wtfRoot(basePath), "STATE.md");
 
   const planPath = relSliceFile(basePath, mid, sid, "PLAN");
   const summaryPath = relTaskFile(basePath, mid, sid, tid, "SUMMARY");

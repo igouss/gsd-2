@@ -1,4 +1,4 @@
-You are executing GSD auto-mode.
+You are executing WTF auto-mode.
 
 ## UNIT: Complete Milestone {{milestoneId}} ("{{milestoneTitle}}")
 
@@ -17,30 +17,30 @@ All relevant context has been preloaded below — the roadmap, all slice summari
 Then:
 1. Use the **Milestone Summary** output template from the inlined context above
 2. {{skillActivation}}
-3. **Verify code changes exist.** Run `git diff --stat HEAD $(git merge-base HEAD main) -- ':!.gsd/'` (or the equivalent for the integration branch). If no non-`.gsd/` files appear in the diff, the milestone produced only planning artifacts and no actual code. Record this as a **verification failure**.
+3. **Verify code changes exist.** Run `git diff --stat HEAD $(git merge-base HEAD main) -- ':!.wtf/'` (or the equivalent for the integration branch). If no non-`.wtf/` files appear in the diff, the milestone produced only planning artifacts and no actual code. Record this as a **verification failure**.
 4. Verify each **success criterion** from the milestone definition in `{{roadmapPath}}`. For each criterion, confirm it was met with specific evidence from slice summaries, test results, or observable behavior. Record any criterion that was NOT met as a **verification failure**.
 5. Verify the milestone's **definition of done** — all slices are `[x]`, all slice summaries exist, and any cross-slice integration points work correctly. Record any unmet items as a **verification failure**.
 6. If the roadmap includes a **Horizontal Checklist**, verify each item was addressed during the milestone. Note unchecked items in the milestone summary.
-7. Fill the **Decision Re-evaluation** table in the milestone summary. For each key decision from `.gsd/DECISIONS.md` made during this milestone, evaluate whether it is still valid given what was actually built. Flag decisions that should be revisited next milestone.
+7. Fill the **Decision Re-evaluation** table in the milestone summary. For each key decision from `.wtf/DECISIONS.md` made during this milestone, evaluate whether it is still valid given what was actually built. Flag decisions that should be revisited next milestone.
 8. Validate **requirement status transitions**. For each requirement that changed status during this milestone, confirm the transition is supported by evidence. Requirements can move between Active, Validated, Deferred, Blocked, or Out of Scope — but only with proof.
 
-**DB access safety:** Do NOT query `.gsd/gsd.db` directly via `sqlite3` or `node -e require('better-sqlite3')` — the engine owns the WAL connection. Use `gsd_milestone_status` to read milestone and slice state. All data you need is already inlined in the context above or accessible via the `gsd_*` tools — never via direct SQL.
+**DB access safety:** Do NOT query `.wtf/gsd.db` directly via `sqlite3` or `node -e require('better-sqlite3')` — the engine owns the WAL connection. Use `wtf_milestone_status` to read milestone and slice state. All data you need is already inlined in the context above or accessible via the `wtf_*` tools — never via direct SQL.
 
 ### Verification Gate — STOP if verification failed
 
 **If ANY verification failure was recorded in steps 3, 4, or 5, you MUST follow the failure path below. Do NOT proceed to step 10.**
 
 **Failure path** (verification failed):
-- Do NOT call `gsd_complete_milestone` — the milestone must not be marked as complete.
-- Do NOT update `.gsd/PROJECT.md` to reflect completion.
-- Do NOT update `.gsd/REQUIREMENTS.md` to mark requirements as validated.
+- Do NOT call `wtf_complete_milestone` — the milestone must not be marked as complete.
+- Do NOT update `.wtf/PROJECT.md` to reflect completion.
+- Do NOT update `.wtf/REQUIREMENTS.md` to mark requirements as validated.
 - Write a clear summary of what failed and why to help the next attempt.
 - Say: "Milestone {{milestoneId}} verification FAILED — not complete." and stop.
 
 **Success path** (all verifications passed — continue with steps 9–13):
 
-9. For each requirement whose status changed in step 8, call `gsd_requirement_update` with the requirement ID and updated `status` and `validation` fields — the tool regenerates `.gsd/REQUIREMENTS.md` automatically. Do this BEFORE completing the milestone so requirement updates are persisted.
-10. **Persist completion through `gsd_complete_milestone`.** Call it with the parameters below. The tool updates the milestone status in the DB, renders `{{milestoneSummaryPath}}`, and validates all slices are complete before proceeding.
+9. For each requirement whose status changed in step 8, call `wtf_requirement_update` with the requirement ID and updated `status` and `validation` fields — the tool regenerates `.wtf/REQUIREMENTS.md` automatically. Do this BEFORE completing the milestone so requirement updates are persisted.
+10. **Persist completion through `wtf_complete_milestone`.** Call it with the parameters below. The tool updates the milestone status in the DB, renders `{{milestoneSummaryPath}}`, and validates all slices are complete before proceeding.
 
    **Required parameters:**
    - `milestoneId` (string) — Milestone ID (e.g. M001)
@@ -58,8 +58,8 @@ Then:
    **Optional parameters:**
    - `followUps` (string) — Follow-up items for future milestones
    - `deviations` (string) — Deviations from the original plan
-11. Update `.gsd/PROJECT.md`: use the `write` tool with `path: ".gsd/PROJECT.md"` and `content` containing the full updated document reflecting milestone completion and current project state. Do NOT use the `edit` tool for this — PROJECT.md is a full-document refresh.
-12. Review all slice summaries for cross-cutting lessons, patterns, or gotchas that emerged during this milestone. Append any non-obvious, reusable insights to `.gsd/KNOWLEDGE.md`.
+11. Update `.wtf/PROJECT.md`: use the `write` tool with `path: ".wtf/PROJECT.md"` and `content` containing the full updated document reflecting milestone completion and current project state. Do NOT use the `edit` tool for this — PROJECT.md is a full-document refresh.
+12. Review all slice summaries for cross-cutting lessons, patterns, or gotchas that emerged during this milestone. Append any non-obvious, reusable insights to `.wtf/KNOWLEDGE.md`.
 13. Do not commit manually — the system auto-commits your changes after this unit completes.
 - Say: "Milestone {{milestoneId}} complete."
 

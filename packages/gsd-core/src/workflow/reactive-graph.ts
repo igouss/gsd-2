@@ -11,12 +11,13 @@
 
 import type { TaskIO, DerivedTaskNode, ReactiveExecutionState } from "../domain/types.ts";
 import { loadFile, parseTaskPlanIO } from "../persistence/files.ts";
-import { isDbAvailable, getSliceTasks } from "../persistence/gsd-db.ts";
+import { isDbAvailable, getSliceTasks } from "../persistence/wtf-db.ts";
 import { parsePlan } from "../persistence/md-parsers.ts";
 import { resolveTasksDir, resolveTaskFiles } from "../persistence/paths.ts";
 import { join } from "node:path";
 import { loadJsonFileOrNull, saveJsonFile } from "../persistence/json-persistence.ts";
 import { existsSync, unlinkSync } from "node:fs";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 // ─── Graph Construction ───────────────────────────────────────────────────
 
@@ -287,7 +288,7 @@ export async function loadSliceTaskIO(
 // ─── State Persistence ────────────────────────────────────────────────────
 
 function reactiveStatePath(basePath: string, mid: string, sid: string): string {
-  return join(basePath, ".gsd", "runtime", `${mid}-${sid}-reactive.json`);
+  return join(basePath, PROJECT_DIR_NAME, "runtime", `${mid}-${sid}-reactive.json`);
 }
 
 function isReactiveState(data: unknown): data is ReactiveExecutionState {

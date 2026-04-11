@@ -1,7 +1,7 @@
 /**
- * GSD Codebase Map Generator
+ * WTF Codebase Map Generator
  *
- * Produces .gsd/CODEBASE.md — a structural table of contents for the project.
+ * Produces .wtf/CODEBASE.md — a structural table of contents for the project.
  * Gives fresh agent contexts instant orientation without filesystem exploration.
  *
  * Generation: walk `git ls-files`, group by directory, output with descriptions.
@@ -12,7 +12,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join, dirname, extname } from "node:path";
 
 import { execSync } from "node:child_process";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -36,7 +36,7 @@ interface DirectoryGroup {
 // ─── Defaults ────────────────────────────────────────────────────────────────
 
 const DEFAULT_EXCLUDES = [
-  ".gsd/",
+  ".wtf/",
   ".planning/",
   ".plans/",
   ".claude/",
@@ -60,7 +60,7 @@ const DEFAULT_COLLAPSE_THRESHOLD = 20;
 
 /**
  * Parse an existing CODEBASE.md to extract file → description mappings.
- * Also scans <!-- gsd:collapsed-descriptions --> comment blocks to preserve
+ * Also scans <!-- wtf:collapsed-descriptions --> comment blocks to preserve
  * descriptions for files in collapsed directories across incremental updates.
  */
 export function parseCodebaseMap(content: string): Map<string, string> {
@@ -69,7 +69,7 @@ export function parseCodebaseMap(content: string): Map<string, string> {
 
   for (const line of content.split("\n")) {
     // Track collapsed-description comment blocks
-    if (line.trimStart().startsWith("<!-- gsd:collapsed-descriptions")) {
+    if (line.trimStart().startsWith("<!-- wtf:collapsed-descriptions")) {
       inCollapsedBlock = true;
       continue;
     }
@@ -210,7 +210,7 @@ function renderCodebaseMap(groups: DirectoryGroup[], totalFiles: number, truncat
         .filter((f) => f.description)
         .map((f) => `- \`${f.path}\` — ${f.description}`);
       if (descLines.length > 0) {
-        lines.push("<!-- gsd:collapsed-descriptions");
+        lines.push("<!-- wtf:collapsed-descriptions");
         lines.push(...descLines);
         lines.push("-->");
       }
@@ -260,7 +260,7 @@ export function updateCodebaseMap(
   basePath: string,
   options?: CodebaseMapOptions,
 ): { content: string; added: number; removed: number; unchanged: number; fileCount: number; truncated: boolean } {
-  const codebasePath = join(gsdRoot(basePath), "CODEBASE.md");
+  const codebasePath = join(wtfRoot(basePath), "CODEBASE.md");
 
   // Load existing descriptions
   let existingDescriptions = new Map<string, string>();
@@ -298,10 +298,10 @@ export function updateCodebaseMap(
 }
 
 /**
- * Write CODEBASE.md to .gsd/ directory.
+ * Write CODEBASE.md to .wtf/ directory.
  */
 export function writeCodebaseMap(basePath: string, content: string): string {
-  const root = gsdRoot(basePath);
+  const root = wtfRoot(basePath);
   mkdirSync(root, { recursive: true });
   const outPath = join(root, "CODEBASE.md");
   writeFileSync(outPath, content, "utf-8");
@@ -312,7 +312,7 @@ export function writeCodebaseMap(basePath: string, content: string): string {
  * Read existing CODEBASE.md, or return null if it doesn't exist.
  */
 export function readCodebaseMap(basePath: string): string | null {
-  const codebasePath = join(gsdRoot(basePath), "CODEBASE.md");
+  const codebasePath = join(wtfRoot(basePath), "CODEBASE.md");
   if (!existsSync(codebasePath)) return null;
   try {
     return readFileSync(codebasePath, "utf-8");

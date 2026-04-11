@@ -1,7 +1,7 @@
 /**
- * GSD Queue Order — Custom milestone execution ordering.
+ * WTF Queue Order — Custom milestone execution ordering.
  *
- * Stores an explicit execution order in `.gsd/QUEUE-ORDER.json`.
+ * Stores an explicit execution order in `.wtf/QUEUE-ORDER.json`.
  * When present, `findMilestoneIds()` uses this order instead of
  * the default numeric sort (milestoneIdSort).
  *
@@ -10,7 +10,7 @@
  */
 
 import { join } from "node:path";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 import { milestoneIdSort } from "../milestone/milestone-ids.ts";
 import { loadJsonFileOrNull, saveJsonFile } from "../persistence/json-persistence.ts";
 
@@ -42,7 +42,7 @@ export interface DependencyValidation {
 // ─── Path ────────────────────────────────────────────────────────────────────
 
 function queueOrderPath(basePath: string): string {
-  return join(gsdRoot(basePath), "QUEUE-ORDER.json");
+  return join(wtfRoot(basePath), "QUEUE-ORDER.json");
 }
 
 // ─── Type Guards ─────────────────────────────────────────────────────────────

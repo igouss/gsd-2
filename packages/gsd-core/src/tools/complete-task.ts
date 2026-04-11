@@ -1,5 +1,5 @@
 /**
- * complete-task handler — the core operation behind gsd_complete_task.
+ * complete-task handler — the core operation behind wtf_complete_task.
  *
  * Validates inputs, writes task row to DB in a transaction, then (outside
  * the transaction) renders SUMMARY.md to disk, toggles the plan checkbox,
@@ -24,7 +24,7 @@ import {
   updateTaskStatus,
   setTaskSummaryMd,
   deleteVerificationEvidence,
-} from "../persistence/gsd-db.ts";
+} from "../persistence/wtf-db.ts";
 import { resolveSliceFile, resolveTasksDir, clearPathCache } from "../persistence/paths.ts";
 import { checkOwnership, taskUnitKey } from "../state/unit-ownership.ts";
 import { saveFile, clearParseCache } from "../persistence/files.ts";
@@ -42,7 +42,8 @@ export interface CompleteTaskResult {
   summaryPath: string;
 }
 
-import type { TaskRow } from "../persistence/gsd-db.ts";
+import type { TaskRow } from "../persistence/wtf-db.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 /**
  * Normalize a list parameter that may arrive as a string (newline-delimited
@@ -147,7 +148,7 @@ export async function handleCompleteTask(
 
     const existingTask = getTask(params.milestoneId, params.sliceId, params.taskId);
     if (existingTask && isClosedStatus(existingTask.status)) {
-      guardError = `task ${params.taskId} is already complete — use gsd_task_reopen first if you need to redo it`;
+      guardError = `task ${params.taskId} is already complete — use wtf_task_reopen first if you need to redo it`;
       return;
     }
 
@@ -203,8 +204,8 @@ export async function handleCompleteTask(
     summaryPath = join(tasksDir, `${params.taskId}-SUMMARY.md`);
   } else {
     // Tasks dir doesn't exist on disk yet — build path manually and ensure dirs
-    const gsdDir = join(basePath, ".gsd");
-    const manualTasksDir = join(gsdDir, "milestones", params.milestoneId, "slices", params.sliceId, "tasks");
+    const wtfDir = join(basePath, PROJECT_DIR_NAME);
+    const manualTasksDir = join(wtfDir, "milestones", params.milestoneId, "slices", params.sliceId, "tasks");
     mkdirSync(manualTasksDir, { recursive: true });
     summaryPath = join(manualTasksDir, `${params.taskId}-SUMMARY.md`);
   }
@@ -218,7 +219,7 @@ export async function handleCompleteTask(
       await renderPlanCheckboxes(basePath, params.milestoneId, params.sliceId);
     } else {
       process.stderr.write(
-        `gsd-db: complete_task — could not find plan file for ${params.sliceId}/${params.milestoneId}, skipping checkbox toggle\n`,
+        `wtf-db: complete_task — could not find plan file for ${params.sliceId}/${params.milestoneId}, skipping checkbox toggle\n`,
       );
     }
   } catch (renderErr) {

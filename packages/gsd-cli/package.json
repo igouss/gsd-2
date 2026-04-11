@@ -1,7 +1,7 @@
 {
   "name": "@gsd-build/gsd-cli",
   "version": "0.1.0",
-  "description": "GSD standalone CLI — runs GSD orchestrator with Claude Code or any harness",
+  "description": "WTF standalone CLI — runs WTF orchestrator with Claude Code or any harness",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -21,7 +21,7 @@
     }
   },
   "bin": {
-    "gsd-run": "./dist/run.js"
+    "wtf-run": "./dist/run.js"
   },
   "scripts": {
     "build": "tsc",

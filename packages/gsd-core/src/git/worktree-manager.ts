@@ -1,25 +1,26 @@
 /**
- * GSD Worktree Manager
+ * WTF Worktree Manager
  *
- * Creates and manages git worktrees under .gsd/worktrees/<name>/.
+ * Creates and manages git worktrees under .wtf/worktrees/<name>/.
  * Each worktree gets its own branch (worktree/<name>) and a full
  * working copy of the project, enabling parallel work streams.
  *
- * The merge helper compares .gsd/ artifacts between a worktree and
+ * The merge helper compares .wtf/ artifacts between a worktree and
  * the main branch, then dispatches an LLM-guided merge flow.
  *
  * Flow:
- *   1. create()  — git worktree add .gsd/worktrees/<name> -b worktree/<name>
+ *   1. create()  — git worktree add .wtf/worktrees/<name> -b worktree/<name>
  *   2. user works in the worktree (new plans, milestones, etc.)
- *   3. merge()   — LLM-guided reconciliation of .gsd/ artifacts back to main
+ *   3. merge()   — LLM-guided reconciliation of .wtf/ artifacts back to main
  *   4. remove()  — git worktree remove + branch cleanup
  */
 
 import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, realpathSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join, resolve, sep } from "node:path";
-import { GSDError, GSD_PARSE_ERROR, GSD_STALE_STATE, GSD_LOCK_HELD, GSD_GIT_ERROR, GSD_MERGE_CONFLICT } from "../domain/errors.ts";
+import { WTFError, WTF_PARSE_ERROR, WTF_STALE_STATE, WTF_LOCK_HELD, WTF_GIT_ERROR, WTF_MERGE_CONFLICT } from "../domain/errors.ts";
 import { logWarning } from "../workflow/workflow-logger.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 import {
   nativeBranchDelete,
   nativeBranchExists,
@@ -55,11 +56,11 @@ export interface FileLineStat {
 }
 
 export interface WorktreeDiffSummary {
-  /** Files only in the worktree .gsd/ (new artifacts) */
+  /** Files only in the worktree .wtf/ (new artifacts) */
   added: string[];
   /** Files in both but with different content */
   modified: string[];
-  /** Files only in main .gsd/ (deleted in worktree) */
+  /** Files only in main .wtf/ (deleted in worktree) */
   removed: string[];
 }
 
@@ -104,7 +105,7 @@ export function resolveGitDir(basePath: string): string {
 }
 
 export function worktreesDir(basePath: string): string {
-  return join(basePath, ".gsd", "worktrees");
+  return join(basePath, PROJECT_DIR_NAME, "worktrees");
 }
 
 export function worktreePath(basePath: string, name: string): string {
@@ -116,7 +117,7 @@ export function worktreeBranchName(name: string): string {
 }
 
 /**
- * Validate that a path is inside the .gsd/worktrees/ directory.
+ * Validate that a path is inside the .wtf/worktrees/ directory.
  * Resolves symlinks and normalizes ".." traversals before comparison
  * so that a symlink-resolved or crafted path cannot escape containment.
  *
@@ -127,14 +128,14 @@ export function isInsideWorktreesDir(basePath: string, targetPath: string): bool
   const wtDir = resolve(worktreesDir(basePath));
   const resolved = resolve(targetPath);
   // The resolved path must start with the worktrees dir followed by a separator,
-  // not merely be a prefix match (e.g. ".gsd/worktrees-extra" must not match).
+  // not merely be a prefix match (e.g. ".wtf/worktrees-extra" must not match).
   return resolved === wtDir || resolved.startsWith(wtDir + sep);
 }
 
 // ─── Core Operations ───────────────────────────────────────────────────────
 
 /**
- * Create a new git worktree under .gsd/worktrees/<name>/ with branch worktree/<name>.
+ * Create a new git worktree under .wtf/worktrees/<name>/ with branch worktree/<name>.
  * The branch is created from the current HEAD of the main branch.
  *
  * @param opts.branch — override the default `worktree/<name>` branch name
@@ -142,7 +143,7 @@ export function isInsideWorktreesDir(basePath: string, targetPath: string): bool
 export function createWorktree(basePath: string, name: string, opts: { branch?: string; startPoint?: string; reuseExistingBranch?: boolean } = {}): WorktreeInfo {
   // Validate name: alphanumeric, hyphens, underscores only
   if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
-    throw new GSDError(GSD_PARSE_ERROR, `Invalid worktree name "${name}". Use only letters, numbers, hyphens, and underscores.`);
+    throw new WTFError(WTF_PARSE_ERROR, `Invalid worktree name "${name}". Use only letters, numbers, hyphens, and underscores.`);
   }
 
   const wtPath = worktreePath(basePath, name);
@@ -158,11 +159,11 @@ export function createWorktree(basePath: string, name: string, opts: { branch?: 
       logWarning("reconcile", `Removing stale worktree directory (no .git file): ${wtPath}`, { worktree: name });
       rmSync(wtPath, { recursive: true, force: true });
     } else {
-      throw new GSDError(GSD_STALE_STATE, `Worktree "${name}" already exists at ${wtPath}`);
+      throw new WTFError(WTF_STALE_STATE, `Worktree "${name}" already exists at ${wtPath}`);
     }
   }
 
-  // Ensure the .gsd/worktrees/ directory exists
+  // Ensure the .wtf/worktrees/ directory exists
   const wtDir = worktreesDir(basePath);
   mkdirSync(wtDir, { recursive: true });
 
@@ -182,8 +183,8 @@ export function createWorktree(basePath: string, name: string, opts: { branch?: 
     const branchInUse = worktreeEntries.some(entry => entry.branch === branch);
 
     if (branchInUse) {
-      throw new GSDError(
-        GSD_LOCK_HELD,
+      throw new WTFError(
+        WTF_LOCK_HELD,
         `Branch "${branch}" is already in use by another worktree. ` +
         `Remove the existing worktree first with /worktree remove ${name}.`,
       );
@@ -212,8 +213,8 @@ export function createWorktree(basePath: string, name: string, opts: { branch?: 
 }
 
 /**
- * List all GSD-managed worktrees.
- * Uses native worktree list and filters to those under .gsd/worktrees/.
+ * List all WTF-managed worktrees.
+ * Uses native worktree list and filters to those under .wtf/worktrees/.
  */
 export function listWorktrees(basePath: string): WorktreeInfo[] {
   const baseVariants = [resolve(basePath)];
@@ -223,7 +224,7 @@ export function listWorktrees(basePath: string): WorktreeInfo[] {
   const seenRoots = new Set<string>();
   const worktreeRoots = baseVariants
     .map(baseVariant => {
-      const path = join(baseVariant, ".gsd", "worktrees");
+      const path = join(baseVariant, PROJECT_DIR_NAME, "worktrees");
       return {
         normalized: normalizePathForComparison(path),
       };
@@ -266,7 +267,7 @@ export function listWorktrees(basePath: string): WorktreeInfo[] {
       ? normalizedEntryVariants.some(entryVariant => entryVariant.split("/").pop() === branchWorktreeName)
       : false;
 
-    // Only include worktrees under .gsd/worktrees/
+    // Only include worktrees under .wtf/worktrees/
     if (!matchedRoot && !matchesBranchLeaf) continue;
 
     const matchedEntryPath = normalizedEntryVariants.find(entryVariant =>
@@ -304,14 +305,14 @@ export function listWorktrees(basePath: string): WorktreeInfo[] {
 
 /** Directories to skip when scanning for nested .git dirs. */
 const NESTED_GIT_SKIP_DIRS = new Set([
-  ".git", ".gsd", "node_modules", ".next", ".nuxt", "dist", "build",
+  ".git", PROJECT_DIR_NAME, "node_modules", ".next", ".nuxt", "dist", "build",
   "__pycache__", ".tox", ".venv", "venv", "target", "vendor",
 ]);
 
 /**
  * Recursively find nested .git directories inside a worktree root.
  * Returns paths to directories that contain their own .git (directory, not file).
- * Skips node_modules, .gsd, and other non-project directories for performance.
+ * Skips node_modules, .wtf, and other non-project directories for performance.
  *
  * A nested .git *directory* (not a .git file — which is a legitimate worktree
  * pointer) indicates a scaffolded repo that will become an orphaned gitlink.
@@ -383,10 +384,10 @@ export function removeWorktree(
   const { deleteBranch = true, force = true } = opts;
 
   // Resolve the ACTUAL worktree path from git's worktree list.
-  // The computed path may differ when .gsd/ is (or was) a symlink to an
+  // The computed path may differ when .wtf/ is (or was) a symlink to an
   // external state directory — git resolves symlinks at worktree creation
   // time, so its registered path points to the resolved external location.
-  // If syncStateToProjectRoot later creates a real .gsd/ directory that
+  // If syncStateToProjectRoot later creates a real .wtf/ directory that
   // shadows the symlink, the computed path diverges from git's record.
   let gitReportedPath: string | null = null;
   try {
@@ -398,14 +399,14 @@ export function removeWorktree(
   } catch (e) { logWarning("worktree", `nativeWorktreeList parse failed: ${(e as Error).message}`); }
 
   // Safety gate (#2365): only use the git-reported path if it is actually
-  // inside .gsd/worktrees/.  When .gsd/ was a symlink, git may have resolved
+  // inside .wtf/worktrees/.  When .wtf/ was a symlink, git may have resolved
   // it to an external directory (e.g. a project data folder).  Using that
   // path for removal would destroy user data.
   if (gitReportedPath && isInsideWorktreesDir(basePath, gitReportedPath)) {
     wtPath = gitReportedPath;
   } else if (gitReportedPath) {
     console.error(
-      `[GSD] WARNING: git worktree list reported path outside .gsd/worktrees/: ${gitReportedPath}\n` +
+      `[WTF] WARNING: git worktree list reported path outside .wtf/worktrees/: ${gitReportedPath}\n` +
         `  Refusing to use it for removal — falling back to computed path: ${wtPath}`,
     );
     // Still tell git to unregister the worktree entry via its reported path,
@@ -416,7 +417,7 @@ export function removeWorktree(
   const resolvedWtPath = existsSync(wtPath) ? realpathSync(wtPath) : wtPath;
 
   // Double-check: the resolved path (after symlink resolution) must also be
-  // inside .gsd/worktrees/ — a symlink inside the directory could point out.
+  // inside .wtf/worktrees/ — a symlink inside the directory could point out.
   const resolvedPathSafe = isInsideWorktreesDir(basePath, resolvedWtPath);
 
   // If we're inside the worktree, move out first — git can't remove an in-use directory
@@ -454,7 +455,7 @@ export function removeWorktree(
         // The stash is created in the worktree before it's torn down.
         try {
           execFileSync(
-            "git", ["stash", "push", "-m", "gsd: auto-stash submodule changes before worktree teardown"],
+            "git", ["stash", "push", "-m", "wtf: auto-stash submodule changes before worktree teardown"],
             { cwd: resolvedWtPath, stdio: ["ignore", "pipe", "pipe"], encoding: "utf-8" },
           );
           logWarning("reconcile", `Stashed uncommitted submodule changes before worktree teardown`, { worktree: name, path: resolvedWtPath });
@@ -509,7 +510,7 @@ export function removeWorktree(
     // worktree remove), force-remove the git internal worktree metadata first,
     // then remove the filesystem directory. Without this, the .git/worktrees/<name>
     // lock prevents rmSync from cleaning up, and the orphaned worktree directory
-    // causes every subsequent `/gsd auto` to re-enter the stale worktree.
+    // causes every subsequent `/wtf auto` to re-enter the stale worktree.
     if (existsSync(resolvedWtPath)) {
       try {
         const wtInternalDir = join(basePath, ".git", "worktrees", name);
@@ -530,7 +531,7 @@ export function removeWorktree(
     // Path is outside containment — only do a non-force git worktree remove
     // (which refuses to delete dirty worktrees) and never fall back to rmSync.
     console.error(
-      `[GSD] WARNING: Resolved worktree path is outside .gsd/worktrees/: ${resolvedWtPath}\n` +
+      `[WTF] WARNING: Resolved worktree path is outside .wtf/worktrees/: ${resolvedWtPath}\n` +
         `  Skipping forced removal to prevent data loss.`,
     );
     try { nativeWorktreeRemove(basePath, resolvedWtPath, false); } catch (e) { logWarning("worktree", `non-force worktree remove failed for ${resolvedWtPath}: ${e instanceof Error ? e.message : String(e)}`); }
@@ -545,8 +546,8 @@ export function removeWorktree(
 }
 
 /** Paths to skip in all worktree diffs (internal/runtime artifacts). */
-const SKIP_PATHS = [".gsd/worktrees/", ".gsd/runtime/", ".gsd/activity/"];
-const SKIP_EXACT = [".gsd/STATE.md", ".gsd/auto.lock", ".gsd/metrics.json"];
+const SKIP_PATHS = [".wtf/worktrees/", ".wtf/runtime/", ".wtf/activity/"];
+const SKIP_EXACT = [".wtf/STATE.md", ".wtf/auto.lock", ".wtf/metrics.json"];
 
 function shouldSkipPath(filePath: string): boolean {
   if (SKIP_PATHS.some(p => filePath.startsWith(p))) return true;
@@ -578,14 +579,14 @@ function parseDiffNameStatus(entries: { status: string; path: string }[]): Workt
 }
 
 /**
- * Diff the .gsd/ directory between the worktree branch and main branch.
- * Returns a summary of added, modified, and removed GSD artifacts.
+ * Diff the .wtf/ directory between the worktree branch and main branch.
+ * Returns a summary of added, modified, and removed WTF artifacts.
  */
-export function diffWorktreeGSD(basePath: string, name: string): WorktreeDiffSummary {
+export function diffWorktreeWTF(basePath: string, name: string): WorktreeDiffSummary {
   const branch = worktreeBranchName(name);
   const mainBranch = nativeDetectMainBranch(basePath);
 
-  const entries = nativeDiffNameStatus(basePath, mainBranch, branch, ".gsd/", true);
+  const entries = nativeDiffNameStatus(basePath, mainBranch, branch, ".wtf/", true);
 
   return parseDiffNameStatus(entries);
 }
@@ -624,25 +625,25 @@ export function diffWorktreeNumstat(basePath: string, name: string): FileLineSta
 }
 
 /**
- * Get the full diff content for .gsd/ between the worktree branch and main.
+ * Get the full diff content for .wtf/ between the worktree branch and main.
  * Returns the raw unified diff for LLM consumption.
  */
-export function getWorktreeGSDDiff(basePath: string, name: string): string {
+export function getWorktreeWTFDiff(basePath: string, name: string): string {
   const branch = worktreeBranchName(name);
   const mainBranch = nativeDetectMainBranch(basePath);
 
-  return nativeDiffContent(basePath, mainBranch, branch, ".gsd/", undefined, true);
+  return nativeDiffContent(basePath, mainBranch, branch, ".wtf/", undefined, true);
 }
 
 /**
- * Get the full diff content for non-.gsd/ files between the worktree branch and main.
+ * Get the full diff content for non-.wtf/ files between the worktree branch and main.
  * Returns the raw unified diff for LLM consumption.
  */
 export function getWorktreeCodeDiff(basePath: string, name: string): string {
   const branch = worktreeBranchName(name);
   const mainBranch = nativeDetectMainBranch(basePath);
 
-  return nativeDiffContent(basePath, mainBranch, branch, undefined, ".gsd/", true);
+  return nativeDiffContent(basePath, mainBranch, branch, undefined, ".wtf/", true);
 }
 
 /**
@@ -668,12 +669,12 @@ export function mergeWorktreeToMain(basePath: string, name: string, commitMessag
   const current = nativeGetCurrentBranch(basePath);
 
   if (current !== mainBranch) {
-    throw new GSDError(GSD_GIT_ERROR, `Must be on ${mainBranch} to merge. Currently on ${current}.`);
+    throw new WTFError(WTF_GIT_ERROR, `Must be on ${mainBranch} to merge. Currently on ${current}.`);
   }
 
   const result = nativeMergeSquash(basePath, branch);
   if (!result.success) {
-    throw new GSDError(GSD_MERGE_CONFLICT, `Merge conflicts detected in: ${result.conflicts.join(", ")}`);
+    throw new WTFError(WTF_MERGE_CONFLICT, `Merge conflicts detected in: ${result.conflicts.join(", ")}`);
   }
 
   nativeCommit(basePath, commitMessage);

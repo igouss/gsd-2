@@ -1,7 +1,7 @@
 /**
  * run-manager.ts — Create and list isolated workflow run directories.
  *
- * Each run lives under `.gsd/workflow-runs/<name>/<timestamp>/` and contains:
+ * Each run lives under `.wtf/workflow-runs/<name>/<timestamp>/` and contains:
  * - DEFINITION.yaml — frozen snapshot of the workflow definition at run-creation time
  * - GRAPH.yaml — initialized step graph with all steps pending
  * - PARAMS.json — (optional) parameter overrides used for this run
@@ -20,6 +20,7 @@ import { loadDefinition, substituteParams } from "../workflow/definition-loader.
 import { initializeGraph, writeGraph, readGraph } from "../workflow/graph.ts";
 import type { WorkflowDefinition } from "../workflow/definition-loader.ts";
 import type { WorkflowGraph } from "../workflow/graph.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 // ─── Types ───────────────────────────────────────────────────────────────
 
@@ -70,9 +71,9 @@ function deriveStatus(graph: WorkflowGraph): "pending" | "running" | "complete" 
 /**
  * Create a new isolated run directory for a workflow definition.
  *
- * 1. Loads the definition from `<basePath>/.gsd/workflow-defs/<defName>.yaml`
+ * 1. Loads the definition from `<basePath>/.wtf/workflow-defs/<defName>.yaml`
  * 2. Applies parameter substitution if overrides are provided
- * 3. Creates `<basePath>/.gsd/workflow-runs/<defName>/<timestamp>/`
+ * 3. Creates `<basePath>/.wtf/workflow-runs/<defName>/<timestamp>/`
  * 4. Writes frozen DEFINITION.yaml, initialized GRAPH.yaml, and optional PARAMS.json
  *
  * @param basePath — project root directory
@@ -86,7 +87,7 @@ export function createRun(
   defName: string,
   overrides?: Record<string, string>,
 ): string {
-  const defsDir = join(basePath, ".gsd", DEFS_DIR);
+  const defsDir = join(basePath, PROJECT_DIR_NAME, DEFS_DIR);
 
   // Load and validate the definition
   const rawDef = loadDefinition(defsDir, defName);
@@ -98,7 +99,7 @@ export function createRun(
 
   // Create the run directory
   const timestamp = makeTimestamp();
-  const runDir = join(basePath, ".gsd", RUNS_DIR, defName, timestamp);
+  const runDir = join(basePath, PROJECT_DIR_NAME, RUNS_DIR, defName, timestamp);
   mkdirSync(runDir, { recursive: true });
 
   // Freeze the definition as DEFINITION.yaml
@@ -123,7 +124,7 @@ export function createRun(
 /**
  * List existing workflow runs with metadata.
  *
- * Scans `<basePath>/.gsd/workflow-runs/` for run directories. Each run's
+ * Scans `<basePath>/.wtf/workflow-runs/` for run directories. Each run's
  * GRAPH.yaml is read to derive step counts and overall status.
  *
  * @param basePath — project root directory
@@ -131,7 +132,7 @@ export function createRun(
  * @returns Array of run metadata, sorted newest-first within each definition
  */
 export function listRuns(basePath: string, defName?: string): RunMetadata[] {
-  const runsRoot = join(basePath, ".gsd", RUNS_DIR);
+  const runsRoot = join(basePath, PROJECT_DIR_NAME, RUNS_DIR);
   if (!existsSync(runsRoot)) return [];
 
   const results: RunMetadata[] = [];

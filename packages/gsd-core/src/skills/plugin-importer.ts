@@ -19,7 +19,7 @@ import {
 	type MarketplaceDiscoveryResult,
 	type DiscoveredPlugin,
 } from './marketplace-discovery.ts';
-import { GSDError, GSD_STALE_STATE } from '../domain/errors.ts';
+import { WTFError, WTF_STALE_STATE } from '../domain/errors.ts';
 import {
 	NamespacedRegistry,
 	componentsFromDiscovery,
@@ -253,7 +253,7 @@ export class PluginImporter {
 		componentFilter: (component: NamespacedComponent) => boolean
 	): NamespacedComponent[] {
 		if (!this.registry) {
-			throw new GSDError(GSD_STALE_STATE, 'Must call discover() before selectComponents()');
+			throw new WTFError(WTF_STALE_STATE, 'Must call discover() before selectComponents()');
 		}
 
 		return this.registry.getAll().filter(componentFilter);
@@ -271,7 +271,7 @@ export class PluginImporter {
 	 */
 	validateImport(selected: NamespacedComponent[]): ValidationResult {
 		if (!this.registry) {
-			throw new GSDError(GSD_STALE_STATE, 'Must call discover() before validateImport()');
+			throw new WTFError(WTF_STALE_STATE, 'Must call discover() before validateImport()');
 		}
 
 		// Create a temporary resolver for the selected components

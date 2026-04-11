@@ -1,5 +1,5 @@
 /**
- * complete-milestone handler — the core operation behind gsd_complete_milestone.
+ * complete-milestone handler — the core operation behind wtf_complete_milestone.
  *
  * Validates all slices are complete, updates milestone status in DB,
  * renders MILESTONE-SUMMARY.md to disk, stores rendered markdown in DB
@@ -15,7 +15,7 @@ import {
   getMilestoneSlices,
   getSliceTasks,
   updateMilestoneStatus,
-} from "../persistence/gsd-db.ts";
+} from "../persistence/wtf-db.ts";
 import { resolveMilestonePath, clearPathCache } from "../persistence/paths.ts";
 import { isClosedStatus } from "../domain/status-guards.ts";
 import { saveFile, clearParseCache } from "../persistence/files.ts";
@@ -24,6 +24,7 @@ import { renderAllProjections, stripIdPrefix } from "../workflow/workflow-projec
 import { writeManifest } from "../workflow/workflow-manifest.ts";
 import { appendEvent } from "../workflow/workflow-events.ts";
 import { logWarning, logError } from "../workflow/workflow-logger.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 export interface CompleteMilestoneParams {
   milestoneId: string;
@@ -196,8 +197,8 @@ export async function handleCompleteMilestone(
   if (milestoneDir) {
     summaryPath = join(milestoneDir, `${params.milestoneId}-SUMMARY.md`);
   } else {
-    const gsdDir = join(basePath, ".gsd");
-    const manualDir = join(gsdDir, "milestones", params.milestoneId);
+    const wtfDir = join(basePath, PROJECT_DIR_NAME);
+    const manualDir = join(wtfDir, "milestones", params.milestoneId);
     mkdirSync(manualDir, { recursive: true });
     summaryPath = join(manualDir, `${params.milestoneId}-SUMMARY.md`);
   }

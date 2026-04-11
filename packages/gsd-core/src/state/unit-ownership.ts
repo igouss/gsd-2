@@ -1,9 +1,9 @@
-// GSD Extension — Unit Ownership
+// WTF Extension — Unit Ownership
 // Opt-in per-unit ownership claims for multi-agent safety.
 //
 // An agent can claim a unit (task, slice) before working on it.
 // complete-task and complete-slice enforce ownership when claims exist.
-// Claims are stored in SQLite (.gsd/unit-claims.db) for atomic
+// Claims are stored in SQLite (.wtf/unit-claims.db) for atomic
 // first-writer-wins semantics via INSERT OR IGNORE.
 //
 // Unit key format:
@@ -15,6 +15,7 @@
 import { createRequire } from "node:module";
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 const _require = createRequire(import.meta.url);
 
@@ -25,7 +26,7 @@ export interface UnitClaim {
   claimed_at: string;
 }
 
-// ─── SQLite Provider (mirrors gsd-db.ts pattern) ─────────────────────────
+// ─── SQLite Provider (mirrors wtf-db.ts pattern) ─────────────────────────
 
 interface StmtLike {
   run(...params: unknown[]): unknown;
@@ -144,7 +145,7 @@ function wrapDb(rawDb: unknown): DbLike {
 const dbPool = new Map<string, DbLike>();
 
 function claimsDbPath(basePath: string): string {
-  return join(basePath, ".gsd", "unit-claims.db");
+  return join(basePath, PROJECT_DIR_NAME, "unit-claims.db");
 }
 
 function getDb(basePath: string): DbLike | null {
@@ -167,13 +168,13 @@ export function sliceUnitKey(milestoneId: string, sliceId: string): string {
 
 /**
  * Initialize the ownership SQLite database for a given basePath.
- * Creates .gsd/ directory and unit-claims.db with the unit_claims table.
+ * Creates .wtf/ directory and unit-claims.db with the unit_claims table.
  * Safe to call multiple times (idempotent).
  */
 export function initOwnershipTable(basePath: string): void {
   if (dbPool.has(basePath)) return;
 
-  const dir = join(basePath, ".gsd");
+  const dir = join(basePath, PROJECT_DIR_NAME);
   mkdirSync(dir, { recursive: true });
 
   const raw = openRawDb(claimsDbPath(basePath));

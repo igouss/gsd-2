@@ -1,5 +1,5 @@
 /**
- * harness-adapter.ts — The minimal contract between GSD orchestrator and
+ * harness-adapter.ts — The minimal contract between WTF orchestrator and
  * any execution harness (Claude Code, pi-mono, or anything with MCP).
  *
  * The orchestrator owns the loop, state machine, prompts, and dispatch logic.
@@ -27,7 +27,7 @@ export interface UnitDispatchRequest {
   /** Requested model ID (e.g. "claude-sonnet-4-20250514"). Adapter maps to its own model system. */
   modelId?: string;
 
-  /** Path to MCP config JSON pointing to GSD's unit-tools server. The harness should load this so the agent has access to GSD state mutation tools. */
+  /** Path to MCP config JSON pointing to WTF's unit-tools server. The harness should load this so the agent has access to WTF state mutation tools. */
   mcpConfigPath: string;
 
   /** Working directory for execution. The agent should operate in this directory. */
@@ -75,8 +75,8 @@ export interface UnitDispatchResult {
 // ---------------------------------------------------------------------------
 
 /**
- * A harness adapter translates GSD's dispatch requests into harness-specific
- * execution. This is the only integration point between GSD core and any
+ * A harness adapter translates WTF's dispatch requests into harness-specific
+ * execution. This is the only integration point between WTF core and any
  * external LLM execution environment.
  *
  * Lifecycle: init() → dispatchUnit() (repeated) → shutdown()

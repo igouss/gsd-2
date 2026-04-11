@@ -68,7 +68,7 @@ export async function autoLoop(
 
     try {
       // ── Blanket try/catch: one bad iteration must not kill the session
-      const prefs = deps.loadEffectiveGSDPreferences()?.preferences;
+      const prefs = deps.loadEffectiveWTFPreferences()?.preferences;
 
       // ── Check sidecar queue before deriveState ──
       let sidecarItem: SidecarItem | undefined;
@@ -108,7 +108,7 @@ export async function autoLoop(
       let iterData: IterationData;
 
       // ── Custom engine path ──────────────────────────────────────────────
-      if (s.activeEngineId != null && s.activeEngineId !== "dev" && !sidecarItem && process.env.GSD_ENGINE_BYPASS !== "1") {
+      if (s.activeEngineId != null && s.activeEngineId !== "dev" && !sidecarItem && process.env.WTF_ENGINE_BYPASS !== "1") {
         debugLog("autoLoop", { phase: "custom-engine-derive", iteration, engineId: s.activeEngineId });
 
         const { engine, policy } = resolveEngine({
@@ -135,7 +135,7 @@ export async function autoLoop(
 
         // dispatch.action === "dispatch"
         const step = dispatch.step!;
-        const gsdState = await deps.deriveState(s.basePath);
+        const wtfState = await deps.deriveState(s.basePath);
 
         iterData = {
           unitType: step.unitType,
@@ -143,7 +143,7 @@ export async function autoLoop(
           prompt: step.prompt,
           finalPrompt: step.prompt,
           pauseAfterUatDispatch: false,
-          state: gsdState,
+          state: wtfState,
           mid: s.currentMilestoneId ?? "workflow",
           midTitle: "Workflow",
           isRetry: false,

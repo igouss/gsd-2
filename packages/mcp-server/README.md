@@ -1,6 +1,6 @@
 # @gsd-build/mcp-server
 
-MCP server that gives executing agents access to GSD state-mutation tools. Runs inside the orchestrator process over SSE — single DB connection, no locking issues.
+MCP server that gives executing agents access to WTF state-mutation tools. Runs inside the orchestrator process over SSE — single DB connection, no locking issues.
 
 ## Usage
 
@@ -18,7 +18,7 @@ The orchestrator generates an MCP config for the harness:
 ```json
 {
   "mcpServers": {
-    "gsd": {
+    "wtf": {
       "type": "sse",
       "url": "http://127.0.0.1:<port>/sse"
     }
@@ -32,39 +32,39 @@ The orchestrator generates an MCP config for the harness:
 
 | Tool | Description |
 |------|-------------|
-| `gsd_task_complete` | Mark a task as complete |
-| `gsd_slice_complete` | Mark a slice as complete |
-| `gsd_complete_milestone` | Mark a milestone as complete |
-| `gsd_validate_milestone` | Run milestone validation checks |
-| `gsd_reopen_task` | Reopen a completed task |
-| `gsd_reopen_slice` | Reopen a completed slice |
-| `gsd_reopen_milestone` | Reopen a completed milestone |
+| `wtf_task_complete` | Mark a task as complete |
+| `wtf_slice_complete` | Mark a slice as complete |
+| `wtf_complete_milestone` | Mark a milestone as complete |
+| `wtf_validate_milestone` | Run milestone validation checks |
+| `wtf_reopen_task` | Reopen a completed task |
+| `wtf_reopen_slice` | Reopen a completed slice |
+| `wtf_reopen_milestone` | Reopen a completed milestone |
 
 ### Planning
 
 | Tool | Description |
 |------|-------------|
-| `gsd_plan_milestone` | Write milestone roadmap with slice breakdown |
-| `gsd_plan_slice` | Write slice plan with task breakdown |
-| `gsd_plan_task` | Write detailed task plan |
-| `gsd_replan_slice` | Rewrite a slice plan |
-| `gsd_reassess_roadmap` | Rewrite milestone roadmap |
+| `wtf_plan_milestone` | Write milestone roadmap with slice breakdown |
+| `wtf_plan_slice` | Write slice plan with task breakdown |
+| `wtf_plan_task` | Write detailed task plan |
+| `wtf_replan_slice` | Rewrite a slice plan |
+| `wtf_reassess_roadmap` | Rewrite milestone roadmap |
 
 ### Knowledge
 
 | Tool | Description |
 |------|-------------|
-| `gsd_decision_save` | Record a technical decision |
-| `gsd_requirement_save` | Record a requirement |
-| `gsd_requirement_update` | Update requirement status |
+| `wtf_decision_save` | Record a technical decision |
+| `wtf_requirement_save` | Record a requirement |
+| `wtf_requirement_update` | Update requirement status |
 
 ### Read-only
 
 | Tool | Description |
 |------|-------------|
-| `gsd_progress` | Project progress metrics |
-| `gsd_roadmap` | Full roadmap structure |
-| `gsd_knowledge` | Decisions, requirements, captures |
+| `wtf_progress` | Project progress metrics |
+| `wtf_roadmap` | Full roadmap structure |
+| `wtf_knowledge` | Decisions, requirements, captures |
 
 ## Architecture
 
@@ -79,9 +79,9 @@ gsd-cli (orchestrator)
   │
   └─ spawns claude -p --mcp-config <config>
        │
-       └─ agent calls gsd_task_complete, gsd_plan_slice, etc.
+       └─ agent calls wtf_task_complete, wtf_plan_slice, etc.
             │
-            └─ SSE → orchestrator process → gsd-core handlers → .gsd/ DB + filesystem
+            └─ SSE → orchestrator process → gsd-core handlers → .wtf/ DB + filesystem
 ```
 
 ## License

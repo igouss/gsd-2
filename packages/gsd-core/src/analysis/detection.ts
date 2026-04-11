@@ -1,5 +1,5 @@
 /**
- * GSD Detection — Project state and ecosystem detection.
+ * WTF Detection — Project state and ecosystem detection.
  *
  * Barrel re-export. All implementation lives in detection-*.ts sub-modules.
  */

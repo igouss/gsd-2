@@ -1,5 +1,5 @@
 /**
- * GSD Triage Resolution — Execute triage classifications
+ * WTF Triage Resolution — Execute triage classifications
  *
  * Provides resolution executors for each capture classification type:
  *
@@ -14,9 +14,10 @@ import { existsSync, mkdirSync, readFileSync, unlinkSync } from "node:fs";
 import { atomicWriteSync } from "../persistence/atomic-write.ts";
 import { join } from "node:path";
 import { createRequire } from "node:module";
-import { gsdRoot, milestonesDir } from "../persistence/paths.ts";
+import { wtfRoot, milestonesDir } from "../persistence/paths.ts";
 import { MILESTONE_ID_RE } from "../milestone/milestone-ids.ts";
 import type { CaptureEntry } from "./captures.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 import {
   loadAllCaptures,
   loadActionableCaptures,
@@ -39,7 +40,7 @@ export function executeInject(
 ): string | null {
   try {
     // Resolve the plan file path
-    const planPath = join(gsdRoot(basePath), "milestones", mid, "slices", sid, `${sid}-PLAN.md`);
+    const planPath = join(wtfRoot(basePath), "milestones", mid, "slices", sid, `${sid}-PLAN.md`);
     if (!existsSync(planPath)) return null;
 
     const content = readFileSync(planPath, "utf-8");
@@ -89,7 +90,7 @@ export function executeReplan(
 ): boolean {
   try {
     const triggerPath = join(
-      basePath, ".gsd", "milestones", mid, "slices", sid, `${sid}-REPLAN-TRIGGER.md`,
+      basePath, PROJECT_DIR_NAME, "milestones", mid, "slices", sid, `${sid}-REPLAN-TRIGGER.md`,
     );
     const ts = new Date().toISOString();
     const content = [
@@ -109,7 +110,7 @@ export function executeReplan(
     // Also write replan_triggered_at column for DB-backed detection
     try {
       const req = createRequire(import.meta.url);
-      const { isDbAvailable, _getAdapter } = req("./gsd-db.js");
+      const { isDbAvailable, _getAdapter } = req("./wtf-db.js");
       if (isDbAvailable()) {
         const adapter = _getAdapter();
         if (adapter) {
@@ -134,7 +135,7 @@ export function executeReplan(
  * Execute a backtrack directive — user wants to abandon current milestone
  * and return to a previous one (milestone regression).
  *
- * Writes a BACKTRACK-TRIGGER.md marker at `.gsd/BACKTRACK-TRIGGER.md` with
+ * Writes a BACKTRACK-TRIGGER.md marker at `.wtf/BACKTRACK-TRIGGER.md` with
  * the target milestone, reason, and timestamp. The state machine (deriveState)
  * detects this and transitions the project to the target milestone, resetting
  * its slices to allow re-planning.
@@ -160,7 +161,7 @@ export function executeBacktrack(
     const targetMilestoneId = uniqueTargets.length === 1 ? uniqueTargets[0]! : null;
 
     const ts = new Date().toISOString();
-    const triggerPath = join(gsdRoot(basePath), "BACKTRACK-TRIGGER.md");
+    const triggerPath = join(wtfRoot(basePath), "BACKTRACK-TRIGGER.md");
     const content = [
       `# Backtrack Trigger`,
       ``,
@@ -226,7 +227,7 @@ export function readBacktrackTrigger(basePath: string): {
   capture: string;
   triggeredAt: string;
 } | null {
-  const triggerPath = join(gsdRoot(basePath), "BACKTRACK-TRIGGER.md");
+  const triggerPath = join(wtfRoot(basePath), "BACKTRACK-TRIGGER.md");
   if (!existsSync(triggerPath)) return null;
 
   try {
@@ -250,7 +251,7 @@ export function readBacktrackTrigger(basePath: string): {
  * Remove the backtrack trigger after it has been processed.
  */
 export function clearBacktrackTrigger(basePath: string): void {
-  const triggerPath = join(gsdRoot(basePath), "BACKTRACK-TRIGGER.md");
+  const triggerPath = join(wtfRoot(basePath), "BACKTRACK-TRIGGER.md");
   try {
     if (existsSync(triggerPath)) {
       unlinkSync(triggerPath);
@@ -392,7 +393,7 @@ export function loadReplanCaptures(basePath: string): CaptureEntry[] {
  */
 export function buildQuickTaskPrompt(capture: CaptureEntry): string {
   return [
-    `You are executing a quick one-off task captured during a GSD auto-mode session.`,
+    `You are executing a quick one-off task captured during a WTF auto-mode session.`,
     ``,
     `## Quick Task`,
     ``,
@@ -406,7 +407,7 @@ export function buildQuickTaskPrompt(capture: CaptureEntry): string {
     `   the current codebase. If the issue has already been fixed (e.g., by planned`,
     `   milestone work), report "Already resolved — no changes needed." and stop.`,
     `2. Execute this task as a small, self-contained change.`,
-    `3. Do NOT modify any \`.gsd/\` plan files — this is a one-off, not a planned task.`,
+    `3. Do NOT modify any \`.wtf/\` plan files — this is a one-off, not a planned task.`,
     `4. Commit your changes with a descriptive message.`,
     `5. Keep changes minimal and focused on the capture text.`,
     `6. When done, say: "Quick task complete."`,

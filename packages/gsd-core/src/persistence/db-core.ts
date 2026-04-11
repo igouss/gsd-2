@@ -1,10 +1,10 @@
-// GSD Database Core — provider management, schema, migrations, transaction support.
+// WTF Database Core — provider management, schema, migrations, transaction support.
 // Module-level state (currentDb, currentPath) lives here.
 // All other db-*.ts modules import _getCurrentDb() to access the adapter.
 
 import { createRequire } from "node:module";
 import { existsSync, copyFileSync } from "node:fs";
-import { GSDError, GSD_STALE_STATE } from "../domain/errors.ts";
+import { WTFError, WTF_STALE_STATE } from "../domain/errors.ts";
 import { logWarning } from "../workflow/workflow-logger.ts";
 
 const _require = createRequire(import.meta.url);
@@ -76,10 +76,10 @@ function loadProvider(): void {
 
   const nodeMajor = parseInt(process.versions.node.split(".")[0]!, 10);
   const versionHint = nodeMajor < 22
-    ? ` GSD requires Node >= 22.0.0 (current: v${process.versions.node}). Upgrade Node to fix this.`
+    ? ` WTF requires Node >= 22.0.0 (current: v${process.versions.node}). Upgrade Node to fix this.`
     : "";
   process.stderr.write(
-    `gsd-db: No SQLite provider available (tried node:sqlite, better-sqlite3).${versionHint}\n`,
+    `wtf-db: No SQLite provider available (tried node:sqlite, better-sqlite3).${versionHint}\n`,
   );
 }
 
@@ -807,7 +807,7 @@ export function openDatabase(path: string): boolean {
       try {
         adapter.exec("VACUUM");
         initSchema(adapter, fileBacked);
-        process.stderr.write("gsd-db: recovered corrupt database via VACUUM\n");
+        process.stderr.write("wtf-db: recovered corrupt database via VACUUM\n");
       } catch (retryErr) {
         try { adapter.close(); } catch (e) { logWarning("db", `close after VACUUM failed: ${(e as Error).message}`); }
         throw retryErr;
@@ -849,7 +849,7 @@ export function closeDatabase(): void {
 let _txDepth = 0;
 
 export function transaction<T>(fn: () => T): T {
-  if (!currentDb) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!currentDb) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
 
   // Re-entrant: if already inside a transaction, just run fn() without
   // starting a new one. SQLite does not support nested BEGIN/COMMIT.

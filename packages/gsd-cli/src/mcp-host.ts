@@ -1,5 +1,5 @@
 /**
- * mcp-host.ts — Hosts the GSD unit-tools MCP server over SSE in the
+ * mcp-host.ts — Hosts the WTF unit-tools MCP server over SSE in the
  * orchestrator process. Claude connects to this via URL.
  *
  * This keeps the DB in one process tree and avoids the separate-process
@@ -26,7 +26,7 @@ export interface McpHostResult {
 }
 
 /**
- * Start the GSD MCP unit-tools server on a random local port using SSE transport.
+ * Start the WTF MCP unit-tools server on a random local port using SSE transport.
  * Writes an MCP config file that claude can use to connect.
  */
 export async function startMcpHost(
@@ -95,13 +95,13 @@ export async function startMcpHost(
   mkdirSync(configDir, { recursive: true });
   const mcpConfig = {
     mcpServers: {
-      gsd: {
+      wtf: {
         type: "sse",
         url,
       },
     },
   };
-  const mcpConfigPath = join(configDir, "gsd-mcp-config.json");
+  const mcpConfigPath = join(configDir, "wtf-mcp-config.json");
   writeFileSync(mcpConfigPath, JSON.stringify(mcpConfig, null, 2), "utf-8");
 
   const shutdown = async () => {

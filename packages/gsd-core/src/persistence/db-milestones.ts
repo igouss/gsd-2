@@ -1,6 +1,6 @@
-// GSD Database — Milestone CRUD
+// WTF Database — Milestone CRUD
 
-import { GSDError, GSD_STALE_STATE } from "../domain/errors.ts";
+import { WTFError, WTF_STALE_STATE } from "../domain/errors.ts";
 import { _getCurrentDb } from "./db-core.ts";
 
 export interface MilestonePlanningRecord {
@@ -67,7 +67,7 @@ export function insertMilestone(m: {
   planning?: Partial<MilestonePlanningRecord>;
 }): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `INSERT OR IGNORE INTO milestones (
       id, title, status, depends_on, created_at,
@@ -104,7 +104,7 @@ export function insertMilestone(m: {
 
 export function upsertMilestonePlanning(milestoneId: string, planning: Partial<MilestonePlanningRecord> & { title?: string; status?: string }): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `UPDATE milestones SET
       title = COALESCE(NULLIF(:title, ''), title),
@@ -161,7 +161,7 @@ export function getMilestone(id: string): MilestoneRow | null {
  */
 export function updateMilestoneStatus(milestoneId: string, status: string, completedAt?: string | null): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `UPDATE milestones SET status = :status, completed_at = :completed_at WHERE id = :id`,
   ).run({ ":status": status, ":completed_at": completedAt ?? null, ":id": milestoneId });

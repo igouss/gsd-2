@@ -37,7 +37,7 @@ export async function generateMilestoneReport(
     (m: { id: string }) => m.id === milestoneId,
   );
   const msTitle = completedMs?.title ?? milestoneId;
-  const gsdVersion = process.env.GSD_VERSION ?? "0.0.0";
+  const wtfVersion = process.env.WTF_VERSION ?? "0.0.0";
   const projName = basename(reportBasePath);
   const doneSlices = snapData.milestones.reduce(
     (acc: number, m: { slices: { done: boolean }[] }) =>
@@ -53,7 +53,7 @@ export async function generateMilestoneReport(
     html: generateHtmlReport(snapData, {
       projectName: projName,
       projectPath: reportBasePath,
-      gsdVersion,
+      wtfVersion,
       milestoneId,
       indexRelPath: "index.html",
     }),
@@ -62,7 +62,7 @@ export async function generateMilestoneReport(
     kind: "milestone",
     projectName: projName,
     projectPath: reportBasePath,
-    gsdVersion,
+    wtfVersion,
     totalCost: snapData.totals?.cost ?? 0,
     totalTokens: snapData.totals?.tokens.total ?? 0,
     totalDuration: snapData.totals?.duration ?? 0,
@@ -75,7 +75,7 @@ export async function generateMilestoneReport(
     phase: snapData.phase,
   });
   deps.events.notify(
-    `Report saved: .gsd/reports/${basename(outPath)} — open index.html to browse progression.`,
+    `Report saved: .wtf/reports/${basename(outPath)} — open index.html to browse progression.`,
     "info",
   );
 }

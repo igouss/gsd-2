@@ -1,5 +1,5 @@
 /**
- * GSD Slice Parallel Eligibility — Pure function to determine which slices
+ * WTF Slice Parallel Eligibility — Pure function to determine which slices
  * within a milestone can run in parallel based on dependency satisfaction.
  *
  * This is the slice-level equivalent of parallel-eligibility.ts (which operates

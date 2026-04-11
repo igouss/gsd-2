@@ -2,16 +2,16 @@
 
 ## Context
 
-We're extracting GSD from pi-mono into a standalone, harness-agnostic package.
+We're extracting WTF from pi-mono into a standalone, harness-agnostic package.
 `packages/gsd-core/` already exists with `src/harness-adapter.ts` (the adapter
-interface) and `src/index.ts`. The package compiles clean with zero `@gsd/pi-*` deps.
+interface) and `src/index.ts`. The package compiles clean with zero `@wtf/pi-*` deps.
 
-This phase moves the ~186 harness-free files from `src/resources/extensions/gsd/`
+This phase moves the ~186 harness-free files from `src/resources/extensions/wtf/`
 into `packages/gsd-core/src/`, preserving the same relative directory structure.
-These files have ZERO imports from `@gsd/pi-coding-agent`, `@gsd/pi-tui`, or `@gsd/pi-ai`.
+These files have ZERO imports from `@wtf/pi-coding-agent`, `@wtf/pi-tui`, or `@wtf/pi-ai`.
 
 **One exception**: `auto-prompts.ts` imports `getLoadedSkills` and `Skill` from
-`@gsd/pi-coding-agent`. This single import must be replaced with a callback
+`@wtf/pi-coding-agent`. This single import must be replaced with a callback
 parameter (see fixup section below).
 
 ## Branch
@@ -23,18 +23,18 @@ Work on branch `feat/gsd-core-extraction` (already exists, checked out from main
 ### Step 1: Copy the harness-free files
 
 Copy (not move — we'll update imports later) these 186 files from
-`src/resources/extensions/gsd/` to `packages/gsd-core/src/`, preserving
+`src/resources/extensions/wtf/` to `packages/gsd-core/src/`, preserving
 subdirectory structure. Create subdirectories as needed.
 
 ```bash
-SRC=src/resources/extensions/gsd
+SRC=src/resources/extensions/wtf
 DST=packages/gsd-core/src
 
 # Create subdirectory structure
 mkdir -p $DST/{auto,bootstrap,commands,migrate,safety,tools}
 ```
 
-**Files to copy** (relative to `src/resources/extensions/gsd/`):
+**Files to copy** (relative to `src/resources/extensions/wtf/`):
 
 #### Root-level files (143):
 ```
@@ -95,7 +95,7 @@ gitignore.ts
 git-self-heal.ts
 git-service.ts
 graph.ts
-gsd-db.ts
+wtf-db.ts
 health-widget-core.ts
 journal.ts
 jsonl-utils.ts
@@ -267,22 +267,22 @@ cp -r $SRC/templates $DST/templates
 
 In `packages/gsd-core/src/auto-prompts.ts`, find:
 ```typescript
-import { getLoadedSkills } from "@gsd/pi-coding-agent";
+import { getLoadedSkills } from "@wtf/pi-coding-agent";
 // or
-import type { Skill } from "@gsd/pi-coding-agent";
+import type { Skill } from "@wtf/pi-coding-agent";
 ```
 
 Replace with a local type definition and ensure all usages of `getLoadedSkills()`
 are replaced with a `skillsProvider` parameter that gets passed in from callers.
 
 The exact fix depends on what `Skill` looks like and how `getLoadedSkills` is
-called. The key constraint: **no imports from `@gsd/pi-coding-agent` in gsd-core**.
+called. The key constraint: **no imports from `@wtf/pi-coding-agent` in gsd-core**.
 
 ### Step 3: Verify no harness imports leaked in
 
 Run this from the repo root:
 ```bash
-grep -r "@gsd/pi-coding-agent\|@gsd/pi-tui\|@gsd/pi-ai" packages/gsd-core/src/ --include="*.ts"
+grep -r "@wtf/pi-coding-agent\|@wtf/pi-tui\|@wtf/pi-ai" packages/gsd-core/src/ --include="*.ts"
 ```
 
 This MUST return zero results.
@@ -310,22 +310,22 @@ that need a cross-package import or need to be moved too.
 
 Add key exports to `packages/gsd-core/src/index.ts` as you discover which
 types and functions are part of the public API. At minimum:
-- Types from `types.ts` (GSDState, etc.)
+- Types from `types.ts` (WTFState, etc.)
 - Tool handlers from `tools/*.ts`
 - State derivation from `state.ts`
-- DB operations from `gsd-db.ts`, `db-writer.ts`
+- DB operations from `wtf-db.ts`, `db-writer.ts`
 
 ### DO NOT
 
 - Do NOT move the 89 harness-coupled files
-- Do NOT modify files in `src/resources/extensions/gsd/` — those stay as-is for now
+- Do NOT modify files in `src/resources/extensions/wtf/` — those stay as-is for now
 - Do NOT update imports in the extension directory to point to gsd-core yet
-- Do NOT add any `@gsd/pi-*` dependencies to gsd-core's package.json
+- Do NOT add any `@wtf/pi-*` dependencies to gsd-core's package.json
 - Do NOT worry about making the full auto-loop work from gsd-core yet — that's Phase 3
 
 ### Success criteria
 
 1. All 186 files + prompts/ + templates/ copied to `packages/gsd-core/src/`
-2. Zero grep hits for `@gsd/pi-coding-agent`, `@gsd/pi-tui`, or `@gsd/pi-ai` in `packages/gsd-core/src/`
+2. Zero grep hits for `@wtf/pi-coding-agent`, `@wtf/pi-tui`, or `@wtf/pi-ai` in `packages/gsd-core/src/`
 3. `npx tsc --noEmit` in `packages/gsd-core/` passes (or has only cross-package import errors from coupled files, which is expected and documented)
-4. No changes to `src/resources/extensions/gsd/` (original files untouched)
+4. No changes to `src/resources/extensions/wtf/` (original files untouched)

@@ -1,5 +1,5 @@
 /**
- * GSD Parallel Eligibility — Milestone parallelism analysis.
+ * WTF Parallel Eligibility — Milestone parallelism analysis.
  *
  * Analyzes which milestones can safely run in parallel by checking
  * dependency satisfaction and file overlap across slice plans.
@@ -7,7 +7,7 @@
 
 import { deriveState } from "../state/state.ts";
 import { findMilestoneIds } from "../auto/guided-flow.ts";
-import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../persistence/gsd-db.ts";
+import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../persistence/wtf-db.ts";
 import type { MilestoneRegistryEntry } from "../domain/types.ts";
 
 // ─── Types ───────────────────────────────────────────────────────────────────

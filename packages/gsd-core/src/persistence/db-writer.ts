@@ -1,4 +1,4 @@
-// GSD DB Writer — Markdown generators + DB-first write helpers
+// WTF DB Writer — Markdown generators + DB-first write helpers
 //
 // The missing DB→markdown direction. S03 established markdown→DB (md-importer.ts).
 // This module generates DECISIONS.md and REQUIREMENTS.md from DB state,
@@ -11,13 +11,14 @@
 import { resolve } from 'node:path';
 import { readFileSync, existsSync, statSync } from 'node:fs';
 import type { Decision, Requirement } from '../domain/types.ts';
-import { resolveGsdRootFile } from './paths.ts';
+import { resolveWtfRootFile } from './paths.ts';
 import { saveFile } from './files.ts';
-import { GSDError, GSD_STALE_STATE, GSD_IO_ERROR } from '../domain/errors.ts';
+import { WTFError, WTF_STALE_STATE, WTF_IO_ERROR } from '../domain/errors.ts';
 import { logWarning, logError } from '../workflow/workflow-logger.ts';
 import { invalidateStateCache } from '../state/state.ts';
 import { clearPathCache } from './paths.ts';
 import { clearParseCache } from './files.ts';
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 // ─── Freeform Detection ───────────────────────────────────────────────────
 
@@ -208,7 +209,7 @@ export function generateRequirementsMd(requirements: Requirement[]): string {
  */
 export async function nextDecisionId(): Promise<string> {
   try {
-    const db = await import('./gsd-db.ts');
+    const db = await import('./wtf-db.ts');
     const adapter = db._getAdapter();
     if (!adapter) return 'D001';
 
@@ -236,7 +237,7 @@ export async function nextDecisionId(): Promise<string> {
  */
 export async function nextRequirementId(): Promise<string> {
   try {
-    const db = await import('./gsd-db.ts');
+    const db = await import('./wtf-db.ts');
     const adapter = db._getAdapter();
     if (!adapter) return 'R001';
 
@@ -283,12 +284,12 @@ export async function saveRequirementToDb(
   basePath: string,
 ): Promise<{ id: string }> {
   try {
-    const db = await import('./gsd-db.ts');
+    const db = await import('./wtf-db.ts');
 
     // Atomic ID assignment + insert inside a transaction.
     const id = db.transaction(() => {
       const adapter = db._getAdapter();
-      if (!adapter) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+      if (!adapter) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
 
       const row = adapter
         .prepare('SELECT MAX(CAST(SUBSTR(id, 2) AS INTEGER)) as max_num FROM requirements')
@@ -340,7 +341,7 @@ export async function saveRequirementToDb(
 
     const nonSuperseded = allRequirements.filter(r => r.superseded_by == null);
     const md = generateRequirementsMd(nonSuperseded);
-    const filePath = resolveGsdRootFile(basePath, 'REQUIREMENTS');
+    const filePath = resolveWtfRootFile(basePath, 'REQUIREMENTS');
     try {
       await saveFile(filePath, md);
     } catch (diskErr) {
@@ -391,13 +392,13 @@ export async function saveDecisionToDb(
   basePath: string,
 ): Promise<{ id: string }> {
   try {
-    const db = await import('./gsd-db.ts');
+    const db = await import('./wtf-db.ts');
 
     // Atomic ID assignment + insert inside a transaction to prevent
     // parallel calls from racing on the same MAX(id) value.
     const id = db.transaction(() => {
       const adapter = db._getAdapter();
-      if (!adapter) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+      if (!adapter) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
 
       const row = adapter
         .prepare('SELECT MAX(CAST(SUBSTR(id, 2) AS INTEGER)) as max_num FROM decisions')
@@ -441,7 +442,7 @@ export async function saveDecisionToDb(
       }));
     }
 
-    const filePath = resolveGsdRootFile(basePath, 'DECISIONS');
+    const filePath = resolveWtfRootFile(basePath, 'DECISIONS');
 
     // Check if existing DECISIONS.md has freeform (non-table) content.
     // If so, preserve that content and append/update the decisions table
@@ -552,17 +553,17 @@ export async function updateRequirementInDb(
   basePath: string,
 ): Promise<void> {
   try {
-    const db = await import('./gsd-db.ts');
+    const db = await import('./wtf-db.ts');
 
     let existing = db.getRequirementById(id);
 
     // If requirement doesn't exist in DB, seed the entire requirements table
     // from REQUIREMENTS.md first (#3346). This handles the standard workflow
     // where requirements are authored in markdown during discussion but never
-    // imported into the database — making gsd_requirement_update always fail
+    // imported into the database — making wtf_requirement_update always fail
     // with "not_found" at milestone completion.
     if (!existing) {
-      const reqFilePath = resolveGsdRootFile(basePath, 'REQUIREMENTS');
+      const reqFilePath = resolveWtfRootFile(basePath, 'REQUIREMENTS');
       try {
         const content = readFileSync(reqFilePath, 'utf-8');
         const { parseRequirementsSections } = await import('./md-importer.ts');
@@ -633,7 +634,7 @@ export async function updateRequirementInDb(
     const nonSuperseded = allRequirements.filter(r => r.superseded_by == null);
 
     const md = generateRequirementsMd(nonSuperseded);
-    const filePath = resolveGsdRootFile(basePath, 'REQUIREMENTS');
+    const filePath = resolveWtfRootFile(basePath, 'REQUIREMENTS');
     try {
       await saveFile(filePath, md);
     } catch (diskErr) {
@@ -667,21 +668,21 @@ export interface SaveArtifactOpts {
 
 /**
  * Save an artifact to DB and write the corresponding markdown file to disk.
- * The path is relative to .gsd/ (e.g. "milestones/M001/slices/S06/tasks/T01-SUMMARY.md").
- * The full file path is computed as basePath + '.gsd/' + path.
+ * The path is relative to .wtf/ (e.g. "milestones/M001/slices/S06/tasks/T01-SUMMARY.md").
+ * The full file path is computed as basePath + '.wtf/' + path.
  */
 export async function saveArtifactToDb(
   opts: SaveArtifactOpts,
   basePath: string,
 ): Promise<void> {
   try {
-    const db = await import('./gsd-db.ts');
+    const db = await import('./wtf-db.ts');
 
     // Guard against path traversal before any reads/writes
-    const gsdDir = resolve(basePath, '.gsd');
-    const fullPath = resolve(basePath, '.gsd', opts.path);
-    if (!fullPath.startsWith(gsdDir)) {
-      throw new GSDError(GSD_IO_ERROR, `saveArtifactToDb: path escapes .gsd/ directory: ${opts.path}`);
+    const wtfDir = resolve(basePath, PROJECT_DIR_NAME);
+    const fullPath = resolve(basePath, PROJECT_DIR_NAME, opts.path);
+    if (!fullPath.startsWith(wtfDir)) {
+      throw new WTFError(WTF_IO_ERROR, `saveArtifactToDb: path escapes .wtf/ directory: ${opts.path}`);
     }
 
     // Shrinkage guard: if the file already exists and the new content is

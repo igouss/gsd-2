@@ -75,6 +75,6 @@ pre_dispatch_hooks: []
 #   rtk: false
 ---
 
-# GSD Skill Preferences
+# WTF Skill Preferences
 
-See `~/.gsd/agent/extensions/gsd/docs/preferences-reference.md` for full field documentation and examples.
+See `~/.wtf/agent/extensions/gsd/docs/preferences-reference.md` for full field documentation and examples.

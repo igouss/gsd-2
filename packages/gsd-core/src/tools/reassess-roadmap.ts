@@ -13,13 +13,14 @@ import {
   insertAssessment,
   deleteAssessmentByScope,
   deleteSlice,
-} from "../persistence/gsd-db.ts";
+} from "../persistence/wtf-db.ts";
 import { invalidateStateCache } from "../state/state.ts";
 import { renderRoadmapFromDb, renderAssessmentFromDb } from "../reporting/markdown-renderer.ts";
 import { renderAllProjections } from "../workflow/workflow-projections.ts";
 import { writeManifest } from "../workflow/workflow-manifest.ts";
 import { appendEvent } from "../workflow/workflow-events.ts";
 import { logWarning } from "../workflow/workflow-logger.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 export interface SliceChangeInput {
   sliceId: string;
@@ -109,7 +110,7 @@ export async function handleReassessRoadmap(
   // ── Compute assessment artifact path ──────────────────────────────
   // Assessment lives in the completed slice's directory
   const assessmentRelPath = join(
-    ".gsd", "milestones", params.milestoneId,
+    PROJECT_DIR_NAME, "milestones", params.milestoneId,
     "slices", params.completedSliceId,
     `${params.completedSliceId}-ASSESSMENT.md`,
   );
@@ -247,7 +248,7 @@ export async function handleReassessRoadmap(
 
     if (hasStructuralChanges) {
       const validationFile = join(
-        basePath, ".gsd", "milestones", params.milestoneId,
+        basePath, PROJECT_DIR_NAME, "milestones", params.milestoneId,
         `${params.milestoneId}-VALIDATION.md`,
       );
       try {

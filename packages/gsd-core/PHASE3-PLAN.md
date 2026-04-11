@@ -48,9 +48,9 @@ export interface CoreLoopDeps {
   buildSnapshotOpts: (unitType: string, unitId: string) => CloseoutOptions & Record<string, unknown>;
   clearUnitTimeout: () => void;
   invalidateAllCaches: () => void;
-  deriveState: (basePath: string) => Promise<GSDState>;
+  deriveState: (basePath: string) => Promise<WTFState>;
   rebuildState: (basePath: string) => Promise<void>;
-  loadEffectiveGSDPreferences: () => { preferences?: GSDPreferences } | undefined;
+  loadEffectiveWTFPreferences: () => { preferences?: WTFPreferences } | undefined;
   preDispatchHealthGate: (basePath: string) => Promise<{ proceed: boolean; reason?: string; fixesApplied: string[] }>;
   syncProjectRootToWorktree: (originalBase: string, basePath: string, milestoneId: string | null) => void;
   checkResourcesStale: (version: string | null) => string | null;
@@ -76,14 +76,14 @@ export interface CoreLoopDeps {
   getNewBudgetAlertLevel: (lastLevel: number, pct: number) => number;
   getBudgetEnforcementAction: (enforcement: string, pct: number) => string;
   getManifestStatus: (basePath: string, mid: string | undefined, projectRoot?: string) => Promise<{ pending: unknown[] } | null>;
-  resolveDispatch: (dctx: { basePath: string; mid: string; midTitle: string; state: GSDState; prefs: GSDPreferences | undefined; session?: AutoSession }) => Promise<DispatchAction>;
+  resolveDispatch: (dctx: { basePath: string; mid: string; midTitle: string; state: WTFState; prefs: WTFPreferences | undefined; session?: AutoSession }) => Promise<DispatchAction>;
   runPreDispatchHooks: (unitType: string, unitId: string, prompt: string, basePath: string) => { firedHooks: string[]; action: string; prompt?: string; unitType?: string; model?: string };
   getPriorSliceCompletionBlocker: (basePath: string, mainBranch: string, unitType: string, unitId: string) => string | null;
   getMainBranch: (basePath: string) => string;
   recordOutcome: (unitType: string, tier: string, success: boolean) => void;
   writeLock: (lockBase: string, unitType: string, unitId: string, sessionFile?: string) => void;
   captureAvailableSkills: () => void;
-  ensurePreconditions: (unitType: string, unitId: string, basePath: string, state: GSDState) => void;
+  ensurePreconditions: (unitType: string, unitId: string, basePath: string, state: WTFState) => void;
   updateSliceProgressCache: (basePath: string, mid: string, sliceId?: string) => void;
   getDeepDiagnostic: (basePath: string) => string | null;
   isDbAvailable: () => boolean;
@@ -110,20 +110,20 @@ export interface CoreLoopDeps {
   closeoutUnit: (basePath: string, unitType: string, unitId: string, startedAt: number, opts?: CloseoutOptions & Record<string, unknown>) => Promise<void>;
   
   // Was: selectAndApplyModel(ctx, pi, ...) — becomes modelId string return
-  selectAndApplyModel: (unitType: string, unitId: string, basePath: string, prefs: GSDPreferences | undefined, verbose: boolean, startModel: { provider: string; id: string } | null, retryContext?: { isRetry: boolean; previousTier?: string }) => Promise<{ routing: { tier: string; modelDowngraded: boolean } | null; appliedModelId: string | null }>;
+  selectAndApplyModel: (unitType: string, unitId: string, basePath: string, prefs: WTFPreferences | undefined, verbose: boolean, startModel: { provider: string; id: string } | null, retryContext?: { isRetry: boolean; previousTier?: string }) => Promise<{ routing: { tier: string; modelDowngraded: boolean } | null; appliedModelId: string | null }>;
   
   // Was: startUnitSupervision({s, ctx, pi, ...}) — remove ctx/pi
-  startUnitSupervision: (sctx: { s: AutoSession; unitType: string; unitId: string; prefs: GSDPreferences | undefined; buildSnapshotOpts: () => CloseoutOptions & Record<string, unknown>; buildRecoveryContext: () => unknown; pauseAuto: () => Promise<void> }) => void;
+  startUnitSupervision: (sctx: { s: AutoSession; unitType: string; unitId: string; prefs: WTFPreferences | undefined; buildSnapshotOpts: () => CloseoutOptions & Record<string, unknown>; buildRecoveryContext: () => unknown; pauseAuto: () => Promise<void> }) => void;
 
   // Was: collectSecretsFromManifest(basePath, mid, ctx) — remove ctx
   collectSecretsFromManifest: (basePath: string, mid: string | undefined) => Promise<{ applied: unknown[]; skipped: unknown[]; existingSkipped: unknown[] } | null>;
 
   // Was: updateProgressWidget(ctx, ...) — remove ctx
-  updateProgressWidget: (unitType: string, unitId: string, state: GSDState) => void;
+  updateProgressWidget: (unitType: string, unitId: string, state: WTFState) => void;
 
   // Was: syncCmuxSidebar(prefs, state) — unchanged, already harness-free
-  syncCmuxSidebar: (preferences: GSDPreferences | undefined, state: GSDState) => void;
-  logCmuxEvent: (preferences: GSDPreferences | undefined, message: string, level?: string) => void;
+  syncCmuxSidebar: (preferences: WTFPreferences | undefined, state: WTFState) => void;
+  logCmuxEvent: (preferences: WTFPreferences | undefined, message: string, level?: string) => void;
 
   // Was: reconcileMergeState(basePath, ctx) — remove ctx
   reconcileMergeState: (basePath: string) => boolean;
@@ -176,7 +176,7 @@ export interface IterationContext {
   pi: ExtensionAPI;
   s: AutoSession;
   deps: LoopDeps;
-  prefs: GSDPreferences | undefined;
+  prefs: WTFPreferences | undefined;
   iteration: number;
   flowId: string;
   nextSeq: () => number;
@@ -186,7 +186,7 @@ export interface IterationContext {
 export interface IterationContext {
   s: AutoSession;
   deps: CoreLoopDeps;
-  prefs: GSDPreferences | undefined;
+  prefs: WTFPreferences | undefined;
   iteration: number;
   flowId: string;
   nextSeq: () => number;
@@ -199,13 +199,13 @@ through `deps.selectAndApplyModel`.
 
 ### Step 4: Rewrite `auto/loop.ts`
 
-Copy the real loop from `src/resources/extensions/gsd/auto/loop.ts` (330 lines) into
+Copy the real loop from `src/resources/extensions/wtf/auto/loop.ts` (330 lines) into
 `packages/gsd-core/src/auto/loop.ts`. Make these changes:
 
 1. **Remove harness imports**:
    ```typescript
    // DELETE this line:
-   import type { ExtensionAPI, ExtensionContext } from "@gsd/pi-coding-agent";
+   import type { ExtensionAPI, ExtensionContext } from "@wtf/pi-coding-agent";
    ```
 
 2. **Change function signature**:
@@ -258,7 +258,7 @@ Copy the real loop from `src/resources/extensions/gsd/auto/loop.ts` (330 lines) 
 
 This is the biggest file (~1640 lines). Copy from the real extension file and apply the same pattern:
 
-1. **Remove harness imports** — delete `import { importExtensionModule, type ExtensionAPI, type ExtensionContext } from "@gsd/pi-coding-agent"`
+1. **Remove harness imports** — delete `import { importExtensionModule, type ExtensionAPI, type ExtensionContext } from "@wtf/pi-coding-agent"`
 
 2. **Replace all `ctx.ui.notify(msg, level)` → `deps.events.notify(msg, level)`** (~40 call sites)
 
@@ -313,7 +313,7 @@ This is the biggest file (~1640 lines). Copy from the real extension file and ap
     }
     ```
 
-13. **In `runUnitPhase`**, the `ctx.ui.setStatus("gsd-auto", "auto")` call — replace with `deps.events.progress(...)` or remove (it's a pi-mono TUI widget concern).
+13. **In `runUnitPhase`**, the `ctx.ui.setStatus("wtf-auto", "auto")` call — replace with `deps.events.progress(...)` or remove (it's a pi-mono TUI widget concern).
 
 14. **In `runUnitPhase`**, `deps.startUnitSupervision({s, ctx, pi, ...})` — remove ctx/pi from the call.
 
@@ -364,7 +364,7 @@ Check `packages/gsd-core/src/worktree-resolver.ts`. If `mergeAndExit` and
 
 ```bash
 # 1. No harness imports in gsd-core
-grep -r "@gsd/pi-coding-agent\|@gsd/pi-tui\|@gsd/pi-ai" packages/gsd-core/src/ --include="*.ts" -l
+grep -r "@wtf/pi-coding-agent\|@wtf/pi-tui\|@wtf/pi-ai" packages/gsd-core/src/ --include="*.ts" -l
 
 # 2. Compiles
 cd packages/gsd-core && npx tsc --noEmit
@@ -377,9 +377,9 @@ All three must return zero results (except comments explaining the migration).
 
 ## DO NOT
 
-- Do NOT modify files in `src/resources/extensions/gsd/` — the original stays as-is
+- Do NOT modify files in `src/resources/extensions/wtf/` — the original stays as-is
 - Do NOT change any logic — the loop behavior must be identical
-- Do NOT add `@gsd/pi-*` imports to gsd-core
+- Do NOT add `@wtf/pi-*` imports to gsd-core
 - Do NOT worry about the pi-mono adapter wiring yet — that's deferred
 - Do NOT change `auto-post-unit.ts`, `auto-verification.ts`, `auto-timeout-recovery.ts` in the extension dir — those stay coupled for now. Their functionality flows through `CoreLoopDeps` callbacks.
 
@@ -401,7 +401,7 @@ All three must return zero results (except comments explaining the migration).
 ```
 Read packages/gsd-core/PHASE3-PLAN.md and execute it.
 You're on branch feat/gsd-core-extraction.
-The real loop/phases code is at src/resources/extensions/gsd/auto/loop.ts and 
-src/resources/extensions/gsd/auto/phases.ts — use those as source material.
+The real loop/phases code is at src/resources/extensions/wtf/auto/loop.ts and 
+src/resources/extensions/wtf/auto/phases.ts — use those as source material.
 Do not commit — just get it compiling with npx tsc --noEmit in packages/gsd-core/.
 ```

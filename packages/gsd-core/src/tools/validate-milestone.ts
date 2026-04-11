@@ -1,5 +1,5 @@
 /**
- * validate-milestone handler — the core operation behind gsd_validate_milestone.
+ * validate-milestone handler — the core operation behind wtf_validate_milestone.
  *
  * Persists milestone validation results to the assessments table and
  * quality_gates table, renders VALIDATION.md to disk, and invalidates caches.
@@ -16,13 +16,14 @@ import {
   insertAssessment,
   deleteAssessmentByScope,
   getMilestoneSlices,
-} from "../persistence/gsd-db.ts";
+} from "../persistence/wtf-db.ts";
 import { resolveMilestonePath, clearPathCache } from "../persistence/paths.ts";
 import { saveFile, clearParseCache } from "../persistence/files.ts";
 import { invalidateStateCache } from "../state/state.ts";
 import { VALIDATION_VERDICTS, isValidMilestoneVerdict } from "../analysis/verdict-parser.ts";
 import { insertMilestoneValidationGates } from "../milestone/milestone-validation-gates.ts";
 import { logWarning } from "../workflow/workflow-logger.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 export interface ValidateMilestoneParams {
   milestoneId: string;
@@ -97,8 +98,8 @@ export async function handleValidateMilestone(
   if (milestoneDir) {
     validationPath = join(milestoneDir, `${params.milestoneId}-VALIDATION.md`);
   } else {
-    const gsdDir = join(basePath, ".gsd");
-    const manualDir = join(gsdDir, "milestones", params.milestoneId);
+    const wtfDir = join(basePath, PROJECT_DIR_NAME);
+    const manualDir = join(wtfDir, "milestones", params.milestoneId);
     validationPath = join(manualDir, `${params.milestoneId}-VALIDATION.md`);
   }
 

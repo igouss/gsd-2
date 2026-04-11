@@ -3,11 +3,11 @@ import { join } from "node:path";
 
 import { loadFile, parseSummary, saveFile, parseTaskPlanMustHaves, countMustHavesMentionedInSummary } from "../persistence/files.ts";
 import { parseRoadmap, parsePlan } from "../persistence/md-parsers.ts";
-import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../persistence/gsd-db.ts";
-import { resolveMilestoneFile, resolveMilestonePath, resolveSliceFile, resolveSlicePath, resolveTaskFile, resolveTasksDir, milestonesDir, gsdRoot, relMilestoneFile, relSliceFile, relTaskFile, relSlicePath, relGsdRootFile, resolveGsdRootFile, relMilestonePath } from "../persistence/paths.ts";
+import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../persistence/wtf-db.ts";
+import { resolveMilestoneFile, resolveMilestonePath, resolveSliceFile, resolveSlicePath, resolveTaskFile, resolveTasksDir, milestonesDir, wtfRoot, relMilestoneFile, relSliceFile, relTaskFile, relSlicePath, relWtfRootFile, resolveWtfRootFile, relMilestonePath } from "../persistence/paths.ts";
 import { deriveState, isMilestoneComplete } from "../state/state.ts";
 import { invalidateAllCaches } from "../state/cache.ts";
-import { loadEffectiveGSDPreferences, type GSDPreferences } from "../preferences/preferences.ts";
+import { loadEffectiveWTFPreferences, type WTFPreferences } from "../preferences/preferences.ts";
 
 import type { DoctorIssue, DoctorIssueCode, DoctorReport } from "./doctor-types.ts";
 import { GLOBAL_STATE_CODES } from "./doctor-types.ts";
@@ -25,7 +25,7 @@ export { runEnvironmentChecks, runFullEnvironmentChecks, formatEnvironmentReport
 export { computeProgressScore, computeProgressScoreWithContext, formatProgressLine, formatProgressReport, type ProgressScore, type ProgressLevel } from "./progress-score.ts";
 
 /**
- * Characters that are used as delimiters in GSD state management documents
+ * Characters that are used as delimiters in WTF state management documents
  * and should not appear in milestone or slice titles.
  *
  * - "\u2014" (em dash, U+2014): used as a display separator in STATE.md and other docs.
@@ -33,13 +33,13 @@ export { computeProgressScore, computeProgressScoreWithContext, formatProgressLi
  *   and confusing the LLM agent that reads and writes these files.
  * - "\u2013" (en dash, U+2013): visually similar to em dash; same ambiguity risk.
  * - "/" (forward slash, U+002F): used as the path separator in unit IDs (M001/S01)
- *   and git branch names (gsd/M001/S01). A slash in a title can break path resolution.
+ *   and git branch names (wtf/M001/S01). A slash in a title can break path resolution.
  */
 const TITLE_DELIMITER_RE = /[\u2014\u2013/]/; // em dash, en dash, forward slash
 
 /**
  * Check whether a milestone or slice title contains characters that conflict
- * with GSD's state document delimiter conventions.
+ * with WTF's state document delimiter conventions.
  * Returns a human-readable description of the problem, or null if the title is safe.
  */
 export function validateTitle(title: string): string | null {
@@ -47,12 +47,12 @@ export function validateTitle(title: string): string | null {
     const found: string[] = [];
     if (/[\u2014\u2013]/.test(title)) found.push("em/en dash (\u2014 or \u2013)");
     if (/\//.test(title)) found.push("forward slash (/)");
-    return `title contains ${found.join(" and ")}, which conflict with GSD state document delimiters`;
+    return `title contains ${found.join(" and ")}, which conflict with WTF state document delimiters`;
   }
   return null;
 }
 
-function validatePreferenceShape(preferences: GSDPreferences): string[] {
+function validatePreferenceShape(preferences: WTFPreferences): string[] {
   const issues: string[] = [];
   const listFields = ["always_use_skills", "prefer_skills", "avoid_skills", "custom_instructions"] as const;
   for (const field of listFields) {
@@ -90,7 +90,7 @@ function validatePreferenceShape(preferences: GSDPreferences): string[] {
 /** Build STATE.md content from derived state. Exported for guided-flow pre-dispatch rebuild (#3475). */
 export function buildStateMarkdown(state: Awaited<ReturnType<typeof deriveState>>): string {
   const lines: string[] = [];
-  lines.push("# GSD State", "");
+  lines.push("# WTF State", "");
 
   const activeMilestone = state.activeMilestone
     ? `${state.activeMilestone.id}: ${state.activeMilestone.title}`
@@ -139,7 +139,7 @@ export function buildStateMarkdown(state: Awaited<ReturnType<typeof deriveState>
 
 async function updateStateFile(basePath: string, fixesApplied: string[]): Promise<void> {
   const state = await deriveState(basePath);
-  const path = resolveGsdRootFile(basePath, "STATE");
+  const path = resolveWtfRootFile(basePath, "STATE");
   await saveFile(path, buildStateMarkdown(state));
   fixesApplied.push(`updated ${path}`);
 }
@@ -148,7 +148,7 @@ async function updateStateFile(basePath: string, fixesApplied: string[]): Promis
 export async function rebuildState(basePath: string): Promise<void> {
   invalidateAllCaches();
   const state = await deriveState(basePath);
-  const path = resolveGsdRootFile(basePath, "STATE");
+  const path = resolveWtfRootFile(basePath, "STATE");
   await saveFile(path, buildStateMarkdown(state));
 }
 
@@ -177,7 +177,7 @@ function auditRequirements(content: string | null): DoctorIssue[] {
         scope: "project",
         unitId: requirementId,
         message: `${requirementId} is Active but has no primary owning slice`,
-        file: relGsdRootFile("REQUIREMENTS"),
+        file: relWtfRootFile("REQUIREMENTS"),
         fixable: false,
       });
     }
@@ -189,7 +189,7 @@ function auditRequirements(content: string | null): DoctorIssue[] {
         scope: "project",
         unitId: requirementId,
         message: `${requirementId} is Blocked but has no reason in Notes`,
-        file: relGsdRootFile("REQUIREMENTS"),
+        file: relWtfRootFile("REQUIREMENTS"),
         fixable: false,
       });
     }
@@ -269,7 +269,7 @@ export interface DoctorHistoryEntry {
 
 async function appendDoctorHistory(basePath: string, report: DoctorReport): Promise<void> {
   try {
-    const historyPath = join(gsdRoot(basePath), "doctor-history.jsonl");
+    const historyPath = join(wtfRoot(basePath), "doctor-history.jsonl");
     const errorCount = report.issues.filter(i => i.severity === "error").length;
     const warningCount = report.issues.filter(i => i.severity === "warning").length;
     const issueDetails = report.issues
@@ -315,14 +315,14 @@ async function appendDoctorHistory(basePath: string, report: DoctorReport): Prom
 /** Read the last N doctor history entries. Returns most-recent-first. */
 export async function readDoctorHistory(basePath: string, lastN = 50): Promise<DoctorHistoryEntry[]> {
   try {
-    const historyPath = join(gsdRoot(basePath), "doctor-history.jsonl");
+    const historyPath = join(wtfRoot(basePath), "doctor-history.jsonl");
     if (!existsSync(historyPath)) return [];
     const lines = readFileSync(historyPath, "utf-8").split("\n").filter(l => l.trim());
     return lines.slice(-lastN).reverse().map(l => JSON.parse(l) as DoctorHistoryEntry);
   } catch { return []; }
 }
 
-export async function runGSDDoctor(basePath: string, options?: { fix?: boolean; dryRun?: boolean; scope?: string; fixLevel?: "task" | "all"; isolationMode?: "none" | "worktree" | "branch"; includeBuild?: boolean; includeTests?: boolean }): Promise<DoctorReport> {
+export async function runWTFDoctor(basePath: string, options?: { fix?: boolean; dryRun?: boolean; scope?: string; fixLevel?: "task" | "all"; isolationMode?: "none" | "worktree" | "branch"; includeBuild?: boolean; includeTests?: boolean }): Promise<DoctorReport> {
   const issues: DoctorIssue[] = [];
   const fixesApplied: string[] = [];
   const fix = options?.fix === true;
@@ -342,7 +342,7 @@ export async function runGSDDoctor(basePath: string, options?: { fix?: boolean; 
     return true;
   };
 
-  const prefs = loadEffectiveGSDPreferences();
+  const prefs = loadEffectiveWTFPreferences();
   if (prefs) {
     const prefIssues = validatePreferenceShape(prefs.preferences);
     for (const issue of prefIssues) {
@@ -351,7 +351,7 @@ export async function runGSDDoctor(basePath: string, options?: { fix?: boolean; 
         code: "invalid_preferences",
         scope: "project",
         unitId: "project",
-        message: `GSD preferences invalid: ${issue}`,
+        message: `WTF preferences invalid: ${issue}`,
         file: prefs.path,
         fixable: false,
       });
@@ -388,12 +388,12 @@ export async function runGSDDoctor(basePath: string, options?: { fix?: boolean; 
 
   const milestonesPath = milestonesDir(basePath);
   if (!existsSync(milestonesPath)) {
-    const report: DoctorReport = { ok: issues.every(i => i.severity !== "error"), basePath, issues, fixesApplied, timing: { git: gitMs, runtime: runtimeMs, environment: envMs, gsdState: 0 } };
+    const report: DoctorReport = { ok: issues.every(i => i.severity !== "error"), basePath, issues, fixesApplied, timing: { git: gitMs, runtime: runtimeMs, environment: envMs, wtfState: 0 } };
     await appendDoctorHistory(basePath, report);
     return report;
   }
 
-  const requirementsPath = resolveGsdRootFile(basePath, "REQUIREMENTS");
+  const requirementsPath = resolveWtfRootFile(basePath, "REQUIREMENTS");
   const requirementsContent = await loadFile(requirementsPath);
   issues.push(...auditRequirements(requirementsContent));
 
@@ -802,7 +802,7 @@ export async function runGSDDoctor(basePath: string, options?: { fix?: boolean; 
     basePath,
     issues,
     fixesApplied,
-    timing: { git: gitMs, runtime: runtimeMs, environment: envMs, gsdState: Math.max(0, Date.now() - t0env - envMs) },
+    timing: { git: gitMs, runtime: runtimeMs, environment: envMs, wtfState: Math.max(0, Date.now() - t0env - envMs) },
   };
   await appendDoctorHistory(basePath, report);
   return report;

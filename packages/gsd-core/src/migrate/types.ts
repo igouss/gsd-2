@@ -256,20 +256,20 @@ export interface PlanningPhaseFile {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// GSD Output Types — produced by transformer, consumed by writer (S03)
-// Mirror GSD-2 runtime shapes so deriveState() works on migrated output.
+// WTF Output Types — produced by transformer, consumed by writer (S03)
+// Mirror WTF-2 runtime shapes so deriveState() works on migrated output.
 // ═══════════════════════════════════════════════════════════════════════════
 
-export interface GSDProject {
-  milestones: GSDMilestone[];
+export interface WTFProject {
+  milestones: WTFMilestone[];
   /** Raw PROJECT.md text (pass through from old format) */
   projectContent: string;
-  requirements: GSDRequirement[];
+  requirements: WTFRequirement[];
   /** Empty or pass-through from old project key decisions */
   decisionsContent: string;
 }
 
-export interface GSDMilestone {
+export interface WTFMilestone {
   /** e.g. "M001", "M002" */
   id: string;
   /** From old milestone section title or roadmap H1 */
@@ -278,14 +278,14 @@ export interface GSDMilestone {
   vision: string;
   /** Empty [] if none found */
   successCriteria: string[];
-  slices: GSDSlice[];
+  slices: WTFSlice[];
   /** Consolidated research blob, null if no research */
   research: string | null;
   /** Empty [] — old format has no boundary map equivalent */
-  boundaryMap: GSDBoundaryEntry[];
+  boundaryMap: WTFBoundaryEntry[];
 }
 
-export interface GSDSlice {
+export interface WTFSlice {
   /** e.g. "S01", "S02" */
   id: string;
   /** Titlecased from phase slug */
@@ -300,14 +300,14 @@ export interface GSDSlice {
   demo: string;
   /** Same as demo or phase slug */
   goal: string;
-  tasks: GSDTask[];
+  tasks: WTFTask[];
   /** Per-phase research content, null if none */
   research: string | null;
   /** Only populated if done */
-  summary: GSDSliceSummaryData | null;
+  summary: WTFSliceSummaryData | null;
 }
 
-export interface GSDTask {
+export interface WTFTask {
   /** e.g. "T01", "T02" */
   id: string;
   /** From plan frontmatter or phase slug + plan number */
@@ -323,10 +323,10 @@ export interface GSDTask {
   /** From plan frontmatter must_haves.truths */
   mustHaves: string[];
   /** Only populated if done */
-  summary: GSDTaskSummaryData | null;
+  summary: WTFTaskSummaryData | null;
 }
 
-export interface GSDRequirement {
+export interface WTFRequirement {
   /** e.g. "R001" */
   id: string;
   title: string;
@@ -341,7 +341,7 @@ export interface GSDRequirement {
   primarySlice: string;
 }
 
-export interface GSDSliceSummaryData {
+export interface WTFSliceSummaryData {
   /** From last plan summary's completed field */
   completedAt: string;
   provides: string[];
@@ -353,7 +353,7 @@ export interface GSDSliceSummaryData {
   whatHappened: string;
 }
 
-export interface GSDTaskSummaryData {
+export interface WTFTaskSummaryData {
   completedAt: string;
   provides: string[];
   keyFiles: string[];
@@ -362,7 +362,7 @@ export interface GSDTaskSummaryData {
   whatHappened: string;
 }
 
-export interface GSDBoundaryEntry {
+export interface WTFBoundaryEntry {
   fromSlice: string;
   toSlice: string;
   produces: string;

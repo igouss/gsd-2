@@ -9,7 +9,7 @@ import {
   upsertSlicePlanning,
   upsertTaskPlanning,
   insertGateRow,
-} from "../persistence/gsd-db.ts";
+} from "../persistence/wtf-db.ts";
 import type { GateId } from "../domain/types.ts";
 import { invalidateStateCache } from "../state/state.ts";
 import { renderPlanFromDb } from "../reporting/markdown-renderer.ts";
@@ -162,7 +162,7 @@ export async function handlePlanSlice(
         return;
       }
       if (isClosedStatus(parentSlice.status)) {
-        guardError = `cannot re-plan slice ${params.sliceId}: it is already complete — use gsd_slice_reopen first`;
+        guardError = `cannot re-plan slice ${params.sliceId}: it is already complete — use wtf_slice_reopen first`;
         return;
       }
 

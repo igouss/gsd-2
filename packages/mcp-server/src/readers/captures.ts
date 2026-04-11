@@ -1,8 +1,8 @@
-// GSD MCP Server — captures reader
+// WTF MCP Server — captures reader
 // Copyright (c) 2026 Jeremy McSpadden <jeremy@fluxlabs.net>
 
 import { readFileSync, existsSync } from 'node:fs';
-import { resolveGsdRoot, resolveRootFile } from './paths.ts';
+import { resolveWtfRoot, resolveRootFile } from './paths.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -86,8 +86,8 @@ export function readCaptures(
   projectDir: string,
   filter: 'all' | 'pending' | 'actionable' = 'all',
 ): CapturesResult {
-  const gsd = resolveGsdRoot(projectDir);
-  const capturesPath = resolveRootFile(gsd, 'CAPTURES.md');
+  const wtf = resolveWtfRoot(projectDir);
+  const capturesPath = resolveRootFile(wtf, 'CAPTURES.md');
 
   if (!existsSync(capturesPath)) {
     return { captures: [], counts: { total: 0, pending: 0, resolved: 0, actionable: 0 } };

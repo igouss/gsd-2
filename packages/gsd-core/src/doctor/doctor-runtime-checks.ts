@@ -2,8 +2,8 @@ import { existsSync, lstatSync, readdirSync, readFileSync, realpathSync, rmSync,
 import { basename, dirname, join } from "node:path";
 
 import type { DoctorIssue, DoctorIssueCode } from "./doctor-types.ts";
-import { cleanNumberedGsdVariants } from "../git/repo-identity.ts";
-import { milestonesDir, gsdRoot, resolveGsdRootFile } from "../persistence/paths.ts";
+import { cleanNumberedWtfVariants } from "../git/repo-identity.ts";
+import { milestonesDir, wtfRoot, resolveWtfRootFile } from "../persistence/paths.ts";
 import { deriveState } from "../state/state.ts";
 import { saveFile } from "../persistence/files.ts";
 import { nativeIsRepo, nativeForEachRef, nativeUpdateRef } from "../git/native-git-bridge.ts";
@@ -11,6 +11,7 @@ import { readCrashLock, isLockProcessAlive, clearLock } from "../session/crash-r
 import { ensureGitignore } from "../git/gitignore.ts";
 import { readAllSessionStatuses, isSessionStale, removeSessionStatus } from "../session/session-status-io.ts";
 import { recoverFailedMigration } from "../persistence/migrate-external.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 export async function checkRuntimeHealth(
   basePath: string,
@@ -18,7 +19,7 @@ export async function checkRuntimeHealth(
   fixesApplied: string[],
   shouldFix: (code: DoctorIssueCode) => boolean,
 ): Promise<void> {
-  const root = gsdRoot(basePath);
+  const root = wtfRoot(basePath);
 
   // ── Stale crash lock ──────────────────────────────────────────────────
   try {
@@ -32,7 +33,7 @@ export async function checkRuntimeHealth(
           scope: "project",
           unitId: "project",
           message: `Stale auto.lock from PID ${lock.pid} (started ${lock.startedAt}, was executing ${lock.unitType} ${lock.unitId}) — process is no longer running`,
-          file: ".gsd/auto.lock",
+          file: ".wtf/auto.lock",
           fixable: true,
         });
 
@@ -47,7 +48,7 @@ export async function checkRuntimeHealth(
   }
 
   // ── Stranded lock directory ────────────────────────────────────────────
-  // proper-lockfile creates a `.gsd.lock/` directory as the OS-level lock
+  // proper-lockfile creates a `.wtf.lock/` directory as the OS-level lock
   // mechanism. If the process was SIGKILLed or crashed hard, this directory
   // can remain on disk without any live process holding it. The next session
   // fails to acquire the lock until the directory is removed (#1245).
@@ -95,7 +96,7 @@ export async function checkRuntimeHealth(
           scope: "project",
           unitId: status.milestoneId,
           message: `Stale parallel session for ${status.milestoneId} (PID ${status.pid}, started ${new Date(status.startedAt).toISOString()}, last heartbeat ${new Date(status.lastHeartbeat).toISOString()}) — process is no longer running`,
-          file: `.gsd/parallel/${status.milestoneId}.status.json`,
+          file: `.wtf/parallel/${status.milestoneId}.status.json`,
           fixable: true,
         });
 
@@ -139,7 +140,7 @@ export async function checkRuntimeHealth(
           scope: "project",
           unitId: "project",
           message: `${orphaned.length} completed-unit key(s) reference missing artifacts: ${orphaned.slice(0, 3).join(", ")}${orphaned.length > 3 ? "..." : ""}`,
-          file: ".gsd/completed-units.json",
+          file: ".wtf/completed-units.json",
           fixable: true,
         });
 
@@ -176,7 +177,7 @@ export async function checkRuntimeHealth(
             scope: "project",
             unitId: "project",
             message: `hook-state.json has ${Object.keys(state.cycleCounts).length} residual cycle count(s) from a previous session`,
-            file: ".gsd/hook-state.json",
+            file: ".wtf/hook-state.json",
             fixable: true,
           });
 
@@ -217,7 +218,7 @@ export async function checkRuntimeHealth(
           scope: "project",
           unitId: "project",
           message: `Activity logs: ${files.length} files, ${totalMB.toFixed(1)}MB (thresholds: ${BLOAT_FILE_THRESHOLD} files / ${BLOAT_SIZE_MB}MB)`,
-          file: ".gsd/activity/",
+          file: ".wtf/activity/",
           fixable: true,
         });
 
@@ -234,7 +235,7 @@ export async function checkRuntimeHealth(
 
   // ── STATE.md health ───────────────────────────────────────────────────
   try {
-    const stateFilePath = resolveGsdRootFile(basePath, "STATE");
+    const stateFilePath = resolveWtfRootFile(basePath, "STATE");
     const milestonesPath = milestonesDir(basePath);
 
     if (existsSync(milestonesPath)) {
@@ -245,7 +246,7 @@ export async function checkRuntimeHealth(
           scope: "project",
           unitId: "project",
           message: "STATE.md is missing — state display will not work",
-          file: ".gsd/STATE.md",
+          file: ".wtf/STATE.md",
           fixable: true,
         });
 
@@ -279,7 +280,7 @@ export async function checkRuntimeHealth(
             scope: "project",
             unitId: "project",
             message: `STATE.md is stale — shows "${current.phase}" but derived state is "${fresh.phase}"`,
-            file: ".gsd/STATE.md",
+            file: ".wtf/STATE.md",
             fixable: true,
           });
 
@@ -305,15 +306,15 @@ export async function checkRuntimeHealth(
 
       // Check for critical runtime patterns that must be present
       const criticalPatterns = [
-        ".gsd/activity/",
-        ".gsd/runtime/",
-        ".gsd/auto.lock",
-        ".gsd/gsd.db",
-        ".gsd/completed-units.json",
+        ".wtf/activity/",
+        ".wtf/runtime/",
+        ".wtf/auto.lock",
+        ".wtf/wtf.db",
+        ".wtf/completed-units.json",
       ];
 
-      // If blanket .gsd/ or .gsd is present, all patterns are covered
-      const hasBlanketIgnore = existingLines.has(".gsd/") || existingLines.has(".gsd");
+      // If blanket .wtf/ or .wtf is present, all patterns are covered
+      const hasBlanketIgnore = existingLines.has(".wtf/") || existingLines.has(PROJECT_DIR_NAME);
 
       if (!hasBlanketIgnore) {
         const missing = criticalPatterns.filter(p => !existingLines.has(p));
@@ -323,14 +324,14 @@ export async function checkRuntimeHealth(
             code: "gitignore_missing_patterns",
             scope: "project",
             unitId: "project",
-            message: `${missing.length} critical GSD runtime pattern(s) missing from .gitignore: ${missing.join(", ")}`,
+            message: `${missing.length} critical WTF runtime pattern(s) missing from .gitignore: ${missing.join(", ")}`,
             file: ".gitignore",
             fixable: true,
           });
 
           if (shouldFix("gitignore_missing_patterns")) {
             ensureGitignore(basePath);
-            fixesApplied.push("added missing GSD runtime patterns to .gitignore");
+            fixesApplied.push("added missing WTF runtime patterns to .gitignore");
           }
         }
       }
@@ -341,26 +342,26 @@ export async function checkRuntimeHealth(
 
   // ── External state symlink health ──────────────────────────────────────
   try {
-    const localGsd = join(basePath, ".gsd");
-    if (existsSync(localGsd)) {
-      const stat = lstatSync(localGsd);
+    const localWtf = join(basePath, PROJECT_DIR_NAME);
+    if (existsSync(localWtf)) {
+      const stat = lstatSync(localWtf);
 
-      // Check for .gsd.migrating (failed migration)
-      const migratingPath = join(basePath, ".gsd.migrating");
+      // Check for .wtf.migrating (failed migration)
+      const migratingPath = join(basePath, ".wtf.migrating");
       if (existsSync(migratingPath)) {
         issues.push({
           severity: "error",
           code: "failed_migration",
           scope: "project",
           unitId: "project",
-          message: "Found .gsd.migrating — a previous external state migration failed. State may be incomplete.",
-          file: ".gsd.migrating",
+          message: "Found .wtf.migrating — a previous external state migration failed. State may be incomplete.",
+          file: ".wtf.migrating",
           fixable: true,
         });
 
         if (shouldFix("failed_migration")) {
           if (recoverFailedMigration(basePath)) {
-            fixesApplied.push("recovered failed migration (.gsd.migrating → .gsd)");
+            fixesApplied.push("recovered failed migration (.wtf.migrating → .wtf)");
           }
         }
       }
@@ -368,15 +369,15 @@ export async function checkRuntimeHealth(
       // Check symlink target exists
       if (stat.isSymbolicLink()) {
         try {
-          realpathSync(localGsd);
+          realpathSync(localWtf);
         } catch {
           issues.push({
             severity: "error",
             code: "broken_symlink",
             scope: "project",
             unitId: "project",
-            message: ".gsd symlink target does not exist. External state directory may have been deleted.",
-            file: ".gsd",
+            message: ".wtf symlink target does not exist. External state directory may have been deleted.",
+            file: PROJECT_DIR_NAME,
             fixable: false,
           });
         }
@@ -386,30 +387,30 @@ export async function checkRuntimeHealth(
     // Non-fatal — external state check failed
   }
 
-  // ── Numbered .gsd collision variants (#2205) ───────────────────────────
-  // macOS APFS can create ".gsd 2", ".gsd 3" etc. when a directory blocks
-  // symlink creation. These must be removed so the canonical .gsd is used.
+  // ── Numbered .wtf collision variants (#2205) ───────────────────────────
+  // macOS APFS can create ".wtf 2", ".wtf 3" etc. when a directory blocks
+  // symlink creation. These must be removed so the canonical .wtf is used.
   try {
-    const variantPattern = /^\.gsd \d+$/;
+    const variantPattern = /^\.wtf \d+$/;
     const entries = readdirSync(basePath);
     const variants = entries.filter(e => variantPattern.test(e));
     if (variants.length > 0) {
       for (const v of variants) {
         issues.push({
           severity: "warning",
-          code: "numbered_gsd_variant",
+          code: "numbered_wtf_variant",
           scope: "project",
           unitId: "project",
-          message: `Found macOS collision variant "${v}" — this can cause GSD state to appear deleted.`,
+          message: `Found macOS collision variant "${v}" — this can cause WTF state to appear deleted.`,
           file: v,
           fixable: true,
         });
       }
 
-      if (shouldFix("numbered_gsd_variant")) {
-        const removed = cleanNumberedGsdVariants(basePath);
+      if (shouldFix("numbered_wtf_variant")) {
+        const removed = cleanNumberedWtfVariants(basePath);
         for (const name of removed) {
-          fixesApplied.push(`removed numbered .gsd variant: ${name}`);
+          fixesApplied.push(`removed numbered .wtf variant: ${name}`);
         }
       }
     }
@@ -431,7 +432,7 @@ export async function checkRuntimeHealth(
             scope: "project",
             unitId: "project",
             message: "metrics.json has an unexpected structure (version !== 1 or units is not an array) — metrics data may be unreliable",
-            file: ".gsd/metrics.json",
+            file: ".wtf/metrics.json",
             fixable: false,
           });
         }
@@ -442,7 +443,7 @@ export async function checkRuntimeHealth(
           scope: "project",
           unitId: "project",
           message: "metrics.json is not valid JSON — metrics data may be corrupt",
-          file: ".gsd/metrics.json",
+          file: ".wtf/metrics.json",
           fixable: false,
         });
       }
@@ -469,8 +470,8 @@ export async function checkRuntimeHealth(
             code: "metrics_ledger_bloat",
             scope: "project",
             unitId: "project",
-            message: `metrics.json has ${parsed.units.length} unit entries (${fileSizeMB}MB) — threshold is ${BLOAT_UNITS_THRESHOLD}. Run /gsd doctor --fix to prune to the newest 1500 entries.`,
-            file: ".gsd/metrics.json",
+            message: `metrics.json has ${parsed.units.length} unit entries (${fileSizeMB}MB) — threshold is ${BLOAT_UNITS_THRESHOLD}. Run /wtf doctor --fix to prune to the newest 1500 entries.`,
+            file: ".wtf/metrics.json",
             fixable: true,
           });
           if (shouldFix("metrics_ledger_bloat")) {
@@ -529,18 +530,18 @@ export async function checkRuntimeHealth(
   }
 
   // ── Snapshot ref bloat ────────────────────────────────────────────────
-  // refs/gsd/snapshots/ accumulate over time. Prune to newest 5 per label
+  // refs/wtf/snapshots/ accumulate over time. Prune to newest 5 per label
   // when total count exceeds threshold.
   try {
     if (nativeIsRepo(basePath)) {
-      const refs = nativeForEachRef(basePath, "refs/gsd/snapshots/");
+      const refs = nativeForEachRef(basePath, "refs/wtf/snapshots/");
       if (refs.length > 50) {
         issues.push({
           severity: "warning",
           code: "snapshot_ref_bloat",
           scope: "project",
           unitId: "project",
-          message: `${refs.length} snapshot refs found under refs/gsd/snapshots/ — pruning to newest 5 per label will reclaim git storage`,
+          message: `${refs.length} snapshot refs found under refs/wtf/snapshots/ — pruning to newest 5 per label will reclaim git storage`,
           fixable: true,
         });
 
@@ -579,7 +580,7 @@ export async function checkRuntimeHealth(
  */
 function buildStateMarkdownForCheck(state: Awaited<ReturnType<typeof deriveState>>): string {
   const lines: string[] = [];
-  lines.push("# GSD State", "");
+  lines.push("# WTF State", "");
 
   const activeMilestone = state.activeMilestone
     ? `${state.activeMilestone.id}: ${state.activeMilestone.title}`

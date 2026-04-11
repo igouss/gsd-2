@@ -1,4 +1,4 @@
-// GSD Extension - File Parsers
+// WTF Extension - File Parsers
 // Parsers for secrets manifest, task plan, summary, and continue files.
 
 import type {

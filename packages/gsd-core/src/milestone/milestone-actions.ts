@@ -1,5 +1,5 @@
 /**
- * GSD Milestone Actions — Park, Unpark, and Discard operations.
+ * WTF Milestone Actions — Park, Unpark, and Discard operations.
  *
  * Park: Creates a PARKED.md marker file. deriveState() skips parked milestones
  * when finding the active milestone, but keeps them in the registry.
@@ -20,7 +20,7 @@ import {
 } from "../persistence/paths.ts";
 import { invalidateAllCaches } from "../state/cache.ts";
 import { loadQueueOrder, saveQueueOrder } from "../state/queue-order.ts";
-import { isDbAvailable, updateMilestoneStatus } from "../persistence/gsd-db.ts";
+import { isDbAvailable, updateMilestoneStatus } from "../persistence/wtf-db.ts";
 import { logWarning } from "../workflow/workflow-logger.ts";
 
 // ─── Park ──────────────────────────────────────────────────────────────────

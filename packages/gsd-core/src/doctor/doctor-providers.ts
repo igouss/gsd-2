@@ -2,7 +2,7 @@
  * doctor-providers.ts — Stub for harness-coupled provider checks.
  *
  * Real implementation depends on AuthStorage and getEnvApiKey from
- * @gsd/pi-coding-agent and @gsd/pi-ai. This exports the types
+ * @wtf/pi-coding-agent and @wtf/pi-ai. This exports the types
  * and a no-op function for gsd-core compilation.
  */
 

@@ -12,7 +12,7 @@ src/**/*.d.ts.map
 # ── Repowise index (local machine-generated cache) ──
 .repowise/
 
-# ── GSD project state (development-only, lives in worktree branches) ──
+# ── WTF project state (development-only, lives in worktree branches) ──
 package-lock.json
 .claude/
 RELEASE-GUIDE.md
@@ -55,12 +55,12 @@ packages/*/node_modules/
 # ── Scratch/WIP files ──
 preflight-script.ts
 
-# ── GSD baseline (auto-generated) ──
+# ── WTF baseline (auto-generated) ──
 dist/
 !/pkg/dist/modes/
 !/pkg/dist/core/export-html/
 .bg_shell
-.gsd*.tgz
+.wtf*.tgz
 .artifacts/
 AGENTS.md
 .bg-shell/
@@ -70,15 +70,15 @@ TODOS.md
 docs/coherence-audit/
 .plans/
 
-# ── GSD project state (per-worktree, never committed) ──
-.gsd/
+# ── WTF project state (per-worktree, never committed) ──
+.wtf/
 
 # ── Stale lock files (npm is canonical) ──
 pnpm-lock.yaml
 bun.lock
 
-# ── GSD baseline (auto-generated) ──
-.gsd
+# ── WTF baseline (auto-generated) ──
+.wtf
 
-# ── GSD baseline (auto-generated) ──
-.gsd-id
+# ── WTF baseline (auto-generated) ──
+.wtf-id

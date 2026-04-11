@@ -1,5 +1,5 @@
 /**
- * GSD Doctor — Proactive Healing Layer
+ * WTF Doctor — Proactive Healing Layer
  *
  * Three mechanisms for automatic health monitoring during auto-mode:
  *
@@ -16,14 +16,14 @@
 
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { gsdRoot, resolveGsdRootFile } from "../persistence/paths.ts";
+import { wtfRoot, resolveWtfRootFile } from "../persistence/paths.ts";
 import { readCrashLock, isLockProcessAlive, clearLock } from "../session/crash-recovery.ts";
 import { abortAndReset } from "../git/git-self-heal.ts";
 import { rebuildState } from "./doctor.ts";
 import { deriveState } from "../state/state.ts";
 import { resolveMilestoneIntegrationBranch } from "../git/git-service.ts";
 import { nativeIsRepo, nativeHasChanges, nativeLastCommitEpoch, nativeGetCurrentBranch, nativeAddTracked, nativeCommit } from "../git/native-git-bridge.ts";
-import { loadEffectiveGSDPreferences } from "../preferences/preferences.ts";
+import { loadEffectiveWTFPreferences } from "../preferences/preferences.ts";
 import { runEnvironmentChecks } from "./doctor-environment.ts";
 
 // ── Health Score Tracking ──────────────────────────────────────────────────
@@ -243,7 +243,7 @@ export async function preDispatchHealthGate(basePath: string): Promise<PreDispat
           const result = abortAndReset(basePath);
           fixesApplied.push(`pre-dispatch: cleaned merge state (${result.cleaned.join(", ")})`);
         } catch {
-          issues.push(`Corrupt git state: ${blockers.join(", ")}. Run /gsd doctor fix.`);
+          issues.push(`Corrupt git state: ${blockers.join(", ")}. Run /wtf doctor fix.`);
         }
       }
     }
@@ -255,8 +255,8 @@ export async function preDispatchHealthGate(basePath: string): Promise<PreDispat
   // If STATE.md is missing, attempt to rebuild it for the next unit's context.
   // Non-blocking — fresh worktrees won't have it until the first unit completes (#889).
   try {
-    const stateFile = resolveGsdRootFile(basePath, "STATE");
-    const milestonesDir = join(gsdRoot(basePath), "milestones");
+    const stateFile = resolveWtfRootFile(basePath, "STATE");
+    const milestonesDir = join(wtfRoot(basePath), "milestones");
     if (existsSync(milestonesDir) && !existsSync(stateFile)) {
       try {
         await rebuildState(basePath);
@@ -278,7 +278,7 @@ export async function preDispatchHealthGate(basePath: string): Promise<PreDispat
     if (nativeIsRepo(basePath)) {
       const state = await deriveState(basePath);
       if (state.activeMilestone) {
-        const gitPrefs = loadEffectiveGSDPreferences()?.preferences?.git ?? {};
+        const gitPrefs = loadEffectiveWTFPreferences()?.preferences?.git ?? {};
         const resolution = resolveMilestoneIntegrationBranch(basePath, state.activeMilestone.id, gitPrefs);
         if (resolution.status === "fallback" && resolution.effectiveBranch) {
           fixesApplied.push(
@@ -286,7 +286,7 @@ export async function preDispatchHealthGate(basePath: string): Promise<PreDispat
           );
         } else if (resolution.recordedBranch && resolution.status === "missing") {
           issues.push(
-            `${resolution.reason} Restore the branch or update the integration branch before dispatching. Run /gsd doctor for details.`,
+            `${resolution.reason} Restore the branch or update the integration branch before dispatching. Run /wtf doctor for details.`,
           );
         }
       }
@@ -300,7 +300,7 @@ export async function preDispatchHealthGate(basePath: string): Promise<PreDispat
   // create a safety snapshot so work isn't lost if the next unit crashes.
   try {
     if (nativeIsRepo(basePath)) {
-      const prefs = loadEffectiveGSDPreferences()?.preferences ?? {};
+      const prefs = loadEffectiveWTFPreferences()?.preferences ?? {};
       const thresholdMinutes = prefs.stale_commit_threshold_minutes ?? 30;
 
       if (thresholdMinutes > 0 && nativeHasChanges(basePath)) {
@@ -313,14 +313,14 @@ export async function preDispatchHealthGate(basePath: string): Promise<PreDispat
           const mins = Math.floor(minutesSinceCommit);
           try {
             nativeAddTracked(basePath);
-            const commitMsg = `gsd snapshot: pre-dispatch, uncommitted changes after ${mins}m inactivity`;
+            const commitMsg = `wtf snapshot: pre-dispatch, uncommitted changes after ${mins}m inactivity`;
             const result = nativeCommit(basePath, commitMsg);
             if (result) {
-              fixesApplied.push(`pre-dispatch: created gsd snapshot after ${mins}m of uncommitted changes`);
+              fixesApplied.push(`pre-dispatch: created wtf snapshot after ${mins}m of uncommitted changes`);
             }
           } catch {
             // Non-blocking — snapshot failed but dispatch can continue
-            fixesApplied.push("pre-dispatch: gsd snapshot failed");
+            fixesApplied.push("pre-dispatch: wtf snapshot failed");
           }
         }
       }
@@ -346,7 +346,7 @@ export async function preDispatchHealthGate(basePath: string): Promise<PreDispat
   if (issues.length > 0) {
     return {
       proceed: false,
-      reason: `Pre-dispatch health check failed:\n${issues.map(i => `  - ${i}`).join("\n")}\nRun /gsd doctor fix to resolve.`,
+      reason: `Pre-dispatch health check failed:\n${issues.map(i => `  - ${i}`).join("\n")}\nRun /wtf doctor fix to resolve.`,
       issues,
       fixesApplied,
     };

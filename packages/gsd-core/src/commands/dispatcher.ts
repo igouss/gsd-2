@@ -4,10 +4,10 @@
  * Real implementation depends on ExtensionAPI/ExtensionCommandContext.
  */
 
-export async function handleGSDCommand(
+export async function handleWTFCommand(
   _args: string,
   _ctx: unknown,
   _pi: unknown,
 ): Promise<void> {
-  throw new Error("handleGSDCommand stub — requires pi-mono extension host");
+  throw new Error("handleWTFCommand stub — requires pi-mono extension host");
 }

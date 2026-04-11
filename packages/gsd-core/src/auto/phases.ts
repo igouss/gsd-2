@@ -28,7 +28,7 @@ import { MergeConflictError } from "../git/git-service.ts";
 import { join, basename, dirname, parse as parsePath } from "node:path";
 import { existsSync, cpSync, readdirSync } from "node:fs";
 import { logWarning, logError } from "../workflow/workflow-logger.ts";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 import { atomicWriteSync } from "../persistence/atomic-write.ts";
 import { verifyExpectedArtifact, buildLoopRemediationSteps } from "./auto-recovery.ts";
 import { diagnoseExpectedArtifact } from "./auto-artifact-paths.ts";
@@ -36,7 +36,7 @@ import { writeUnitRuntimeRecord } from "../state/unit-runtime.ts";
 import { withTimeout, FINALIZE_PRE_TIMEOUT_MS, FINALIZE_POST_TIMEOUT_MS } from "./finalize-timeout.ts";
 import { getEligibleSlices } from "../parallel/slice-parallel-eligibility.ts";
 import { startSliceParallel } from "../parallel/slice-parallel-orchestrator.ts";
-import { isDbAvailable, getMilestoneSlices } from "../persistence/gsd-db.ts";
+import { isDbAvailable, getMilestoneSlices } from "../persistence/wtf-db.ts";
 import { resetEvidence } from "../safety/evidence-collector.ts";
 import { createCheckpoint, cleanupCheckpoint, rollbackToCheckpoint } from "../safety/git-checkpoint.ts";
 import { resolveSafetyHarnessConfig } from "../safety/safety-harness.ts";
@@ -83,7 +83,7 @@ async function generateMilestoneReport(
     (m: { id: string }) => m.id === milestoneId,
   );
   const msTitle = completedMs?.title ?? milestoneId;
-  const gsdVersion = process.env.GSD_VERSION ?? "0.0.0";
+  const wtfVersion = process.env.WTF_VERSION ?? "0.0.0";
   const projName = basename(reportBasePath);
   const doneSlices = snapData.milestones.reduce(
     (acc: number, m: { slices: { done: boolean }[] }) =>
@@ -99,7 +99,7 @@ async function generateMilestoneReport(
     html: generateHtmlReport(snapData, {
       projectName: projName,
       projectPath: reportBasePath,
-      gsdVersion,
+      wtfVersion,
       milestoneId,
       indexRelPath: "index.html",
     }),
@@ -108,7 +108,7 @@ async function generateMilestoneReport(
     kind: "milestone",
     projectName: projName,
     projectPath: reportBasePath,
-    gsdVersion,
+    wtfVersion,
     totalCost: snapData.totals?.cost ?? 0,
     totalTokens: snapData.totals?.tokens.total ?? 0,
     totalDuration: snapData.totals?.duration ?? 0,
@@ -121,7 +121,7 @@ async function generateMilestoneReport(
     phase: snapData.phase,
   });
   deps.events.notify(
-    `Report saved: .gsd/reports/${basename(outPath)} — open index.html to browse progression.`,
+    `Report saved: .wtf/reports/${basename(outPath)} — open index.html to browse progression.`,
     "info",
   );
 }
@@ -185,7 +185,7 @@ export async function runPreDispatch(
     }
     if (!healthGate.proceed) {
       deps.events.notify(
-        healthGate.reason || "Pre-dispatch health check failed — run /gsd doctor for details.",
+        healthGate.reason || "Pre-dispatch health check failed — run /wtf doctor for details.",
         "error",
       );
       await deps.pauseAuto();
@@ -225,7 +225,7 @@ export async function runPreDispatch(
   if (
     prefs?.slice_parallel?.enabled &&
     mid &&
-    !process.env.GSD_PARALLEL_WORKER &&
+    !process.env.WTF_PARALLEL_WORKER &&
     isDbAvailable()
   ) {
     try {
@@ -283,7 +283,7 @@ export async function runPreDispatch(
       "info",
     );
     deps.sendDesktopNotification(
-      "GSD",
+      "WTF",
       `Milestone ${s.currentMilestoneId} complete!`,
       "success",
       "milestone",
@@ -297,7 +297,7 @@ export async function runPreDispatch(
 
     const vizPrefs = prefs;
     if (vizPrefs?.auto_visualize) {
-      deps.events.notify("Run /gsd visualize to see progress overview.", "info");
+      deps.events.notify("Run /wtf visualize to see progress overview.", "info");
     }
     if (vizPrefs?.auto_report !== false) {
       try {
@@ -323,7 +323,7 @@ export async function runPreDispatch(
     } catch (mergeErr) {
       if (mergeErr instanceof MergeConflictError) {
         deps.events.notify(
-          `Merge conflict: ${mergeErr.conflictedFiles.join(", ")}. Resolve conflicts manually and run /gsd auto to resume.`,
+          `Merge conflict: ${mergeErr.conflictedFiles.join(", ")}. Resolve conflicts manually and run /wtf auto to resume.`,
           "error",
         );
         await deps.stopAuto(`Merge conflict on milestone ${s.currentMilestoneId}`);
@@ -331,7 +331,7 @@ export async function runPreDispatch(
       }
       logError("engine", "Milestone merge failed with non-conflict error", { milestone: s.currentMilestoneId!, error: String(mergeErr) });
       deps.events.notify(
-        `Merge failed: ${mergeErr instanceof Error ? mergeErr.message : String(mergeErr)}. Resolve and run /gsd auto to resume.`,
+        `Merge failed: ${mergeErr instanceof Error ? mergeErr.message : String(mergeErr)}. Resolve and run /wtf auto to resume.`,
         "error",
       );
       await deps.stopAuto(`Merge error on milestone ${s.currentMilestoneId}: ${String(mergeErr)}`);
@@ -363,10 +363,10 @@ export async function runPreDispatch(
 
     // Archive the old completed-units.json instead of wiping it (#2313).
     try {
-      const completedKeysPath = join(gsdRoot(s.basePath), "completed-units.json");
+      const completedKeysPath = join(wtfRoot(s.basePath), "completed-units.json");
       if (existsSync(completedKeysPath) && s.currentMilestoneId) {
         const archivePath = join(
-          gsdRoot(s.basePath),
+          wtfRoot(s.basePath),
           `completed-units-${s.currentMilestoneId}.json`,
         );
         cpSync(completedKeysPath, archivePath);
@@ -416,7 +416,7 @@ export async function runPreDispatch(
         } catch (mergeErr) {
           if (mergeErr instanceof MergeConflictError) {
             deps.events.notify(
-              `Merge conflict: ${mergeErr.conflictedFiles.join(", ")}. Resolve conflicts manually and run /gsd auto to resume.`,
+              `Merge conflict: ${mergeErr.conflictedFiles.join(", ")}. Resolve conflicts manually and run /wtf auto to resume.`,
               "error",
             );
             await deps.stopAuto(`Merge conflict on milestone ${s.currentMilestoneId}`);
@@ -424,7 +424,7 @@ export async function runPreDispatch(
           }
           logError("engine", "Milestone merge failed with non-conflict error", { milestone: s.currentMilestoneId!, error: String(mergeErr) });
           deps.events.notify(
-            `Merge failed: ${mergeErr instanceof Error ? mergeErr.message : String(mergeErr)}. Resolve and run /gsd auto to resume.`,
+            `Merge failed: ${mergeErr instanceof Error ? mergeErr.message : String(mergeErr)}. Resolve and run /wtf auto to resume.`,
             "error",
           );
           await deps.stopAuto(`Merge error on milestone ${s.currentMilestoneId}: ${String(mergeErr)}`);
@@ -434,7 +434,7 @@ export async function runPreDispatch(
         // PR creation (auto_pr) is handled inside mergeMilestoneToMain (#2302)
       }
       deps.sendDesktopNotification(
-        "GSD",
+        "WTF",
         "All milestones complete!",
         "success",
         "milestone",
@@ -458,8 +458,8 @@ export async function runPreDispatch(
     } else if (state.phase === "blocked") {
       const blockerMsg = `Blocked: ${state.blockers.join(", ")}`;
       await deps.stopAuto(blockerMsg);
-      deps.events.notify(`${blockerMsg}. Fix and run /gsd auto.`, "warning");
-      deps.sendDesktopNotification("GSD", blockerMsg, "error", "attention", basename(s.originalBasePath || s.basePath));
+      deps.events.notify(`${blockerMsg}. Fix and run /wtf auto.`, "warning");
+      deps.sendDesktopNotification("WTF", blockerMsg, "error", "attention", basename(s.originalBasePath || s.basePath));
       deps.logCmuxEvent(prefs, blockerMsg, "error");
     } else {
       const ids = incomplete.map((m: { id: string }) => m.id).join(", ");
@@ -516,7 +516,7 @@ export async function runPreDispatch(
       } catch (mergeErr) {
         if (mergeErr instanceof MergeConflictError) {
           deps.events.notify(
-            `Merge conflict: ${mergeErr.conflictedFiles.join(", ")}. Resolve conflicts manually and run /gsd auto to resume.`,
+            `Merge conflict: ${mergeErr.conflictedFiles.join(", ")}. Resolve conflicts manually and run /wtf auto to resume.`,
             "error",
           );
           await deps.stopAuto(`Merge conflict on milestone ${s.currentMilestoneId}`);
@@ -524,7 +524,7 @@ export async function runPreDispatch(
         }
         logError("engine", "Milestone merge failed with non-conflict error", { milestone: s.currentMilestoneId!, error: String(mergeErr) });
         deps.events.notify(
-          `Merge failed: ${mergeErr instanceof Error ? mergeErr.message : String(mergeErr)}. Resolve and run /gsd auto to resume.`,
+          `Merge failed: ${mergeErr instanceof Error ? mergeErr.message : String(mergeErr)}. Resolve and run /wtf auto to resume.`,
           "error",
         );
         await deps.stopAuto(`Merge error on milestone ${s.currentMilestoneId}: ${String(mergeErr)}`);
@@ -534,7 +534,7 @@ export async function runPreDispatch(
       // PR creation (auto_pr) is handled inside mergeMilestoneToMain (#2302)
     }
     deps.sendDesktopNotification(
-      "GSD",
+      "WTF",
       `Milestone ${mid} complete!`,
       "success",
       "milestone",
@@ -555,8 +555,8 @@ export async function runPreDispatch(
   if (state.phase === "blocked") {
     const blockerMsg = `Blocked: ${state.blockers.join(", ")}`;
     await closeoutAndStop(s, deps, blockerMsg);
-    deps.events.notify(`${blockerMsg}. Fix and run /gsd auto.`, "warning");
-    deps.sendDesktopNotification("GSD", blockerMsg, "error", "attention", basename(s.originalBasePath || s.basePath));
+    deps.events.notify(`${blockerMsg}. Fix and run /wtf auto.`, "warning");
+    deps.sendDesktopNotification("WTF", blockerMsg, "error", "attention", basename(s.originalBasePath || s.basePath));
     deps.logCmuxEvent(prefs, blockerMsg, "error");
     debugLog("autoLoop", { phase: "exit", reason: "blocked" });
     deps.emitJournalEvent({ ts: new Date().toISOString(), flowId: ic.flowId, seq: ic.nextSeq(), eventType: "terminal", data: { reason: "blocked", blockers: state.blockers } });
@@ -767,7 +767,7 @@ export async function runGuards(
 
       deps.events.notify(label, "warning");
       deps.sendDesktopNotification(
-        "GSD", label, "warning", "stop-directive",
+        "WTF", label, "warning", "stop-directive",
         basename(s.originalBasePath || s.basePath),
       );
 
@@ -802,7 +802,7 @@ export async function runGuards(
   if (budgetCeiling !== undefined && budgetCeiling > 0) {
     const currentLedger = deps.getLedger() as { units: unknown } | null;
     let costUnits = currentLedger?.units;
-    if (process.env.GSD_PARALLEL_WORKER && s.autoStartTime && Array.isArray(costUnits)) {
+    if (process.env.WTF_PARALLEL_WORKER && s.autoStartTime && Array.isArray(costUnits)) {
       const sessionStartISO = new Date(s.autoStartTime).toISOString();
       costUnits = costUnits.filter(
         (u: { startedAt?: string }) => u.startedAt != null && u.startedAt >= sessionStartISO,
@@ -833,30 +833,30 @@ export async function runGuards(
       if (threshold.pct === 100 && budgetEnforcementAction !== "none") {
         const msg = `Budget ceiling ${deps.formatCost(budgetCeiling)} reached (spent ${deps.formatCost(totalCost)}).`;
         if (budgetEnforcementAction === "halt") {
-          deps.sendDesktopNotification("GSD", msg, "error", "budget", basename(s.originalBasePath || s.basePath));
+          deps.sendDesktopNotification("WTF", msg, "error", "budget", basename(s.originalBasePath || s.basePath));
           await deps.stopAuto("Budget ceiling reached");
           debugLog("autoLoop", { phase: "exit", reason: "budget-halt" });
           return { action: "break", reason: "budget-halt" };
         }
         if (budgetEnforcementAction === "pause") {
           deps.events.notify(
-            `${msg} Pausing auto-mode — /gsd auto to override and continue.`,
+            `${msg} Pausing auto-mode — /wtf auto to override and continue.`,
             "warning",
           );
-          deps.sendDesktopNotification("GSD", msg, "warning", "budget", basename(s.originalBasePath || s.basePath));
+          deps.sendDesktopNotification("WTF", msg, "warning", "budget", basename(s.originalBasePath || s.basePath));
           deps.logCmuxEvent(prefs, msg, "warning");
           await deps.pauseAuto();
           debugLog("autoLoop", { phase: "exit", reason: "budget-pause" });
           return { action: "break", reason: "budget-pause" };
         }
         deps.events.notify(`${msg} Continuing (enforcement: warn).`, "warning");
-        deps.sendDesktopNotification("GSD", msg, "warning", "budget", basename(s.originalBasePath || s.basePath));
+        deps.sendDesktopNotification("WTF", msg, "warning", "budget", basename(s.originalBasePath || s.basePath));
         deps.logCmuxEvent(prefs, msg, "warning");
       } else if (threshold.pct < 100) {
         const msg = `${threshold.label}: ${deps.formatCost(totalCost)} / ${deps.formatCost(budgetCeiling)}`;
         deps.events.notify(msg, threshold.notifyLevel);
         deps.sendDesktopNotification(
-          "GSD",
+          "WTF",
           msg,
           threshold.notifyLevel,
           "budget",
@@ -1052,12 +1052,12 @@ export async function runUnitPhase(
   s.lastBaselineCharCount = undefined;
   if (deps.isDbAvailable()) {
     try {
-      const { inlineGsdRootFile } = await import("../prompt/auto-prompts.ts");
+      const { inlineWtfRootFile } = await import("../prompt/auto-prompts.ts");
       const [decisionsContent, requirementsContent, projectContent] =
         await Promise.all([
-          inlineGsdRootFile(s.basePath, "decisions.md", "Decisions"),
-          inlineGsdRootFile(s.basePath, "requirements.md", "Requirements"),
-          inlineGsdRootFile(s.basePath, "project.md", "Project"),
+          inlineWtfRootFile(s.basePath, "decisions.md", "Decisions"),
+          inlineWtfRootFile(s.basePath, "requirements.md", "Requirements"),
+          inlineWtfRootFile(s.basePath, "project.md", "Project"),
         ]);
       s.lastBaselineCharCount =
         (decisionsContent?.length ?? 0) +

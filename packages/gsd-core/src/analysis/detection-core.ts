@@ -1,15 +1,16 @@
 /**
- * GSD Detection — Core detection orchestrator and GSD state detectors.
+ * WTF Detection — Core detection orchestrator and WTF state detectors.
  */
 
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 import type { ProjectDetection, V1Detection, V2Detection } from "./detection-types.ts";
 import { detectProjectSignals } from "./detection-signals.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
-const gsdHome = process.env.GSD_HOME || join(homedir(), ".gsd");
+const wtfHome = process.env.WTF_HOME || join(homedir(), PROJECT_DIR_NAME);
 
 // ─── Core Detection ─────────────────────────────────────────────────────────────
 
@@ -19,16 +20,16 @@ const gsdHome = process.env.GSD_HOME || join(homedir(), ".gsd");
  */
 export function detectProjectState(basePath: string): ProjectDetection {
   const v1 = detectV1Planning(basePath);
-  const v2 = detectV2Gsd(basePath);
+  const v2 = detectV2Wtf(basePath);
   const projectSignals = detectProjectSignals(basePath);
   const globalSetup = hasGlobalSetup();
   const firstEver = isFirstEverLaunch();
 
   let state: ProjectDetection["state"];
   if (v2 && v2.milestoneCount > 0) {
-    state = "v2-gsd";
+    state = "v2-wtf";
   } else if (v2 && v2.milestoneCount === 0) {
-    state = "v2-gsd-empty";
+    state = "v2-wtf-empty";
   } else if (v1) {
     state = "v1-planning";
   } else {
@@ -48,7 +49,7 @@ export function detectProjectState(basePath: string): ProjectDetection {
 // ─── V1 Planning Detection ──────────────────────────────────────────────────────
 
 /**
- * Detect a v1 .planning/ directory with GSD v1 markers.
+ * Detect a v1 .planning/ directory with WTF v1 markers.
  * Returns null if no .planning/ directory found.
  */
 export function detectV1Planning(basePath: string): V1Detection | null {
@@ -85,21 +86,21 @@ export function detectV1Planning(basePath: string): V1Detection | null {
   };
 }
 
-// ─── V2 GSD Detection ──────────────────────────────────────────────────────────
+// ─── V2 WTF Detection ──────────────────────────────────────────────────────────
 
-function detectV2Gsd(basePath: string): V2Detection | null {
-  const gsdPath = gsdRoot(basePath);
+function detectV2Wtf(basePath: string): V2Detection | null {
+  const wtfPath = wtfRoot(basePath);
 
-  if (!existsSync(gsdPath)) return null;
+  if (!existsSync(wtfPath)) return null;
 
   const hasPreferences =
-    existsSync(join(gsdPath, "PREFERENCES.md")) ||
-    existsSync(join(gsdPath, "preferences.md"));
+    existsSync(join(wtfPath, "PREFERENCES.md")) ||
+    existsSync(join(wtfPath, "preferences.md"));
 
-  const hasContext = existsSync(join(gsdPath, "CONTEXT.md"));
+  const hasContext = existsSync(join(wtfPath, "CONTEXT.md"));
 
   let milestoneCount = 0;
-  const milestonesPath = join(gsdPath, "milestones");
+  const milestonesPath = join(wtfPath, "milestones");
   if (existsSync(milestonesPath)) {
     try {
       const entries = readdirSync(milestonesPath, { withFileTypes: true });
@@ -115,32 +116,32 @@ function detectV2Gsd(basePath: string): V2Detection | null {
 // ─── Global Setup Detection ─────────────────────────────────────────────────────
 
 /**
- * Check if global GSD setup exists (has ~/.gsd/ with preferences).
+ * Check if global WTF setup exists (has ~/.wtf/ with preferences).
  */
 export function hasGlobalSetup(): boolean {
   return (
-    existsSync(join(gsdHome, "PREFERENCES.md")) ||
-    existsSync(join(gsdHome, "preferences.md"))
+    existsSync(join(wtfHome, "PREFERENCES.md")) ||
+    existsSync(join(wtfHome, "preferences.md"))
   );
 }
 
 /**
- * Check if this is the very first time GSD has been used on this machine.
- * Returns true if ~/.gsd/ doesn't exist or has no preferences or auth.
+ * Check if this is the very first time WTF has been used on this machine.
+ * Returns true if ~/.wtf/ doesn't exist or has no preferences or auth.
  */
 export function isFirstEverLaunch(): boolean {
-  if (!existsSync(gsdHome)) return true;
+  if (!existsSync(wtfHome)) return true;
 
   if (
-    existsSync(join(gsdHome, "PREFERENCES.md")) ||
-    existsSync(join(gsdHome, "preferences.md"))
+    existsSync(join(wtfHome, "PREFERENCES.md")) ||
+    existsSync(join(wtfHome, "preferences.md"))
   ) {
     return false;
   }
 
-  if (existsSync(join(gsdHome, "agent", "auth.json"))) return false;
+  if (existsSync(join(wtfHome, "agent", "auth.json"))) return false;
 
-  const legacyPath = join(homedir(), ".pi", "agent", "gsd-preferences.md");
+  const legacyPath = join(homedir(), ".pi", "agent", "wtf-preferences.md");
   if (existsSync(legacyPath)) return false;
 
   return true;

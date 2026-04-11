@@ -1,5 +1,5 @@
 /**
- * GSD Session Status I/O
+ * WTF Session Status I/O
  *
  * File-based IPC protocol for coordinator-worker communication in
  * parallel milestone orchestration. Each worker writes its status to a
@@ -17,7 +17,7 @@ import {
   existsSync,
 } from "node:fs";
 import { join } from "node:path";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 import { loadJsonFileOrNull, writeJsonFileAtomic } from "../persistence/json-persistence.ts";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -60,7 +60,7 @@ function isSignalMessage(data: unknown): data is SignalMessage {
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
 function parallelDir(basePath: string): string {
-  return join(gsdRoot(basePath), PARALLEL_DIR);
+  return join(wtfRoot(basePath), PARALLEL_DIR);
 }
 
 function statusPath(basePath: string, milestoneId: string): string {
@@ -100,7 +100,7 @@ export function readSessionStatus(basePath: string, milestoneId: string): Sessio
   return loadJsonFileOrNull(statusPath(basePath, milestoneId), isSessionStatus);
 }
 
-/** Read all session status files from .gsd/parallel/. */
+/** Read all session status files from .wtf/parallel/. */
 export function readAllSessionStatuses(basePath: string): SessionStatus[] {
   const dir = parallelDir(basePath);
   if (!existsSync(dir)) return [];

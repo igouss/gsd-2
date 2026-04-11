@@ -1,7 +1,7 @@
-// GSD Extension — State Derivation
+// WTF Extension — State Derivation
 // Barrel module: orchestrator + re-exports from split files.
 
-import type { GSDState } from '../domain/types.ts';
+import type { WTFState } from '../domain/types.ts';
 
 import {
   loadFile,
@@ -10,7 +10,7 @@ import {
 
 import {
   resolveMilestoneFile,
-  resolveGsdRootFile,
+  resolveWtfRootFile,
 } from '../persistence/paths.ts';
 
 import { findMilestoneIds } from '../milestone/milestone-ids.ts';
@@ -26,7 +26,7 @@ import {
   isDbAvailable,
   getAllMilestones,
   insertMilestone,
-} from '../persistence/gsd-db.ts';
+} from '../persistence/wtf-db.ts';
 
 import { isGhostMilestone, isMilestoneComplete } from './state-helpers.ts';
 import { CACHE_TTL_MS, getStateCache, setStateCache } from './state-cache.ts';
@@ -45,7 +45,7 @@ export { deriveStateFromDb } from './state-db.ts';
  */
 export async function getActiveMilestoneId(basePath: string): Promise<string | null> {
   // Parallel worker isolation
-  const milestoneLock = process.env.GSD_MILESTONE_LOCK;
+  const milestoneLock = process.env.WTF_MILESTONE_LOCK;
   if (milestoneLock) {
     const milestoneIds = findMilestoneIds(basePath);
     if (!milestoneIds.includes(milestoneLock)) return null;
@@ -58,7 +58,7 @@ export async function getActiveMilestoneId(basePath: string): Promise<string | n
   if (isDbAvailable()) {
     const allMilestones = getAllMilestones();
     if (allMilestones.length > 0) {
-      // Respect queue-order.json so /gsd queue reordering is honored (#2556).
+      // Respect queue-order.json so /wtf queue reordering is honored (#2556).
       // Without this, the DB path uses lexicographic sort while the dispatch
       // guard uses queue order — causing a deadlock.
       const customOrder = loadQueueOrder(basePath);
@@ -99,14 +99,14 @@ export async function getActiveMilestoneId(basePath: string): Promise<string | n
 // ─── deriveState orchestrator ─────────────────────────────────────────────
 
 /**
- * Reconstruct GSD state from the DB.
+ * Reconstruct WTF state from the DB.
  * STATE.md is a rendered cache of this output.
  *
  * Disk→DB reconciliation ensures milestones created outside the DB write
  * path are picked up automatically. When the DB is unavailable or empty
  * (no milestones on disk either), returns a minimal pre-planning state.
  */
-export async function deriveState(basePath: string): Promise<GSDState> {
+export async function deriveState(basePath: string): Promise<WTFState> {
   // Return cached result if within the TTL window for the same basePath
   const cache = getStateCache();
   if (
@@ -118,17 +118,17 @@ export async function deriveState(basePath: string): Promise<GSDState> {
   }
 
   const stopTimer = debugTime("derive-state-impl");
-  let result: GSDState;
+  let result: WTFState;
 
-  const requirements = parseRequirementCounts(await loadFile(resolveGsdRootFile(basePath, "REQUIREMENTS")));
-  const emptyState: GSDState = {
+  const requirements = parseRequirementCounts(await loadFile(resolveWtfRootFile(basePath, "REQUIREMENTS")));
+  const emptyState: WTFState = {
     activeMilestone: null,
     activeSlice: null,
     activeTask: null,
     phase: 'pre-planning',
     recentDecisions: [],
     blockers: [],
-    nextAction: 'No milestones found. Run /gsd to create one.',
+    nextAction: 'No milestones found. Run /wtf to create one.',
     registry: [],
     requirements,
     progress: { milestones: { done: 0, total: 0 } },

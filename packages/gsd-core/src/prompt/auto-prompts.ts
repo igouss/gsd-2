@@ -14,13 +14,13 @@ import {
   resolveMilestoneFile, resolveSliceFile, resolveSlicePath,
   resolveTasksDir, resolveTaskFiles, resolveTaskFile,
   relMilestoneFile, relSliceFile, relSlicePath, relMilestonePath,
-  resolveGsdRootFile, relGsdRootFile, resolveRuntimeFile,
+  resolveWtfRootFile, relWtfRootFile, resolveRuntimeFile,
 } from "../persistence/paths.ts";
-import { resolveSkillDiscoveryMode, resolveInlineLevel, loadEffectiveGSDPreferences, resolveAllSkillReferences } from "../preferences/preferences.ts";
+import { resolveSkillDiscoveryMode, resolveInlineLevel, loadEffectiveWTFPreferences, resolveAllSkillReferences } from "../preferences/preferences.ts";
 import { parseRoadmap } from "../persistence/md-parsers.ts";
-import type { GSDState, InlineLevel } from "../domain/types.ts";
-import type { GSDPreferences } from "../preferences/preferences.ts";
-/** Minimal Skill shape needed by prompt builders — mirrors @gsd/pi-coding-agent's Skill. */
+import type { WTFState, InlineLevel } from "../domain/types.ts";
+import type { WTFPreferences } from "../preferences/preferences.ts";
+/** Minimal Skill shape needed by prompt builders — mirrors @wtf/pi-coding-agent's Skill. */
 export interface Skill {
 	name: string;
 	description: string;
@@ -32,7 +32,7 @@ export interface Skill {
 import { join, basename } from "node:path";
 import { existsSync } from "node:fs";
 import { computeBudgets, resolveExecutorContextWindow, truncateAtSectionBoundary } from "./context-budget.ts";
-import { getPendingGates } from "../persistence/gsd-db.ts";
+import { getPendingGates } from "../persistence/wtf-db.ts";
 import { formatDecisionsCompact, formatRequirementsCompact } from "../reporting/structured-data-formatter.ts";
 import { readPhaseAnchor, formatAnchorForPrompt } from "../execution/phase-anchor.ts";
 import { logWarning } from "../workflow/workflow-logger.ts";
@@ -56,7 +56,7 @@ function capPreamble(preamble: string): string {
 function formatExecutorConstraints(): string {
   let windowTokens: number;
   try {
-    const prefs = loadEffectiveGSDPreferences();
+    const prefs = loadEffectiveWTFPreferences();
     windowTokens = resolveExecutorContextWindow(undefined, prefs?.preferences);
   } catch (e) {
     logWarning("prompt", `resolveExecutorContextWindow failed: ${(e as Error).message}`);
@@ -83,24 +83,24 @@ function buildSourceFilePaths(
 ): string {
   const paths: string[] = [];
 
-  const projectPath = resolveGsdRootFile(base, "PROJECT");
+  const projectPath = resolveWtfRootFile(base, "PROJECT");
   if (existsSync(projectPath)) {
-    paths.push(`- **Project**: \`${relGsdRootFile("PROJECT")}\``);
+    paths.push(`- **Project**: \`${relWtfRootFile("PROJECT")}\``);
   }
 
-  const requirementsPath = resolveGsdRootFile(base, "REQUIREMENTS");
+  const requirementsPath = resolveWtfRootFile(base, "REQUIREMENTS");
   if (existsSync(requirementsPath)) {
-    paths.push(`- **Requirements**: \`${relGsdRootFile("REQUIREMENTS")}\``);
+    paths.push(`- **Requirements**: \`${relWtfRootFile("REQUIREMENTS")}\``);
   }
 
-  const decisionsPath = resolveGsdRootFile(base, "DECISIONS");
+  const decisionsPath = resolveWtfRootFile(base, "DECISIONS");
   if (existsSync(decisionsPath)) {
-    paths.push(`- **Decisions**: \`${relGsdRootFile("DECISIONS")}\``);
+    paths.push(`- **Decisions**: \`${relWtfRootFile("DECISIONS")}\``);
   }
 
-  const queuePath = resolveGsdRootFile(base, "QUEUE");
+  const queuePath = resolveWtfRootFile(base, "QUEUE");
   if (existsSync(queuePath)) {
-    paths.push(`- **Queue**: \`${relGsdRootFile("QUEUE")}\``);
+    paths.push(`- **Queue**: \`${relWtfRootFile("QUEUE")}\``);
   }
 
   const contextPath = resolveMilestoneFile(base, mid, "CONTEXT");
@@ -199,7 +199,7 @@ export async function inlineDependencySummaries(
   // DB primary path — get slice depends directly
   let depends: string[] | null = null;
   try {
-    const { isDbAvailable, getSlice } = await import("../persistence/gsd-db.ts");
+    const { isDbAvailable, getSlice } = await import("../persistence/wtf-db.ts");
     if (isDbAvailable()) {
       const slice = getSlice(mid, sid);
       if (slice) {
@@ -253,23 +253,23 @@ export async function inlineDependencySummaries(
 }
 
 /**
- * Load a well-known .gsd/ root file for optional inlining.
+ * Load a well-known .wtf/ root file for optional inlining.
  * Handles the existsSync check internally.
  */
-export async function inlineGsdRootFile(
+export async function inlineWtfRootFile(
   base: string, filename: string, label: string,
 ): Promise<string | null> {
   const key = filename.replace(/\.md$/i, "").toUpperCase() as "PROJECT" | "DECISIONS" | "QUEUE" | "STATE" | "REQUIREMENTS" | "KNOWLEDGE";
-  const absPath = resolveGsdRootFile(base, key);
+  const absPath = resolveWtfRootFile(base, key);
   if (!existsSync(absPath)) return null;
-  return inlineFileOptional(absPath, relGsdRootFile(key), label);
+  return inlineFileOptional(absPath, relWtfRootFile(key), label);
 }
 
 // ─── DB-Aware Inline Helpers ──────────────────────────────────────────────
 
 /**
  * Inline decisions with optional milestone scoping from the DB.
- * Falls back to filesystem via inlineGsdRootFile only when DB is unavailable.
+ * Falls back to filesystem via inlineWtfRootFile only when DB is unavailable.
  *
  * Cascade logic (R005):
  * 1. Query with { milestoneId, scope } if scope provided
@@ -281,7 +281,7 @@ export async function inlineDecisionsFromDb(
 ): Promise<string | null> {
   const inlineLevel = level ?? resolveInlineLevel();
   try {
-    const { isDbAvailable } = await import("../persistence/gsd-db.ts");
+    const { isDbAvailable } = await import("../persistence/wtf-db.ts");
     if (isDbAvailable()) {
       const { queryDecisions, formatDecisionsForPrompt } = await import("../persistence/context-store.ts");
 
@@ -298,7 +298,7 @@ export async function inlineDecisionsFromDb(
         const formatted = inlineLevel !== "full"
           ? formatDecisionsCompact(decisions)
           : formatDecisionsForPrompt(decisions);
-        return `### Decisions\nSource: \`.gsd/DECISIONS.md\`\n\n${formatted}`;
+        return `### Decisions\nSource: \`.wtf/DECISIONS.md\`\n\n${formatted}`;
       }
       // DB available but cascade returned empty — intentional per D020, don't fall back to file
       return null;
@@ -307,19 +307,19 @@ export async function inlineDecisionsFromDb(
     logWarning("prompt", `inlineDecisionsFromDb failed: ${err instanceof Error ? err.message : String(err)}`);
   }
   // DB unavailable — fall back to filesystem
-  return inlineGsdRootFile(base, "decisions.md", "Decisions");
+  return inlineWtfRootFile(base, "decisions.md", "Decisions");
 }
 
 /**
  * Inline requirements with optional milestone and slice scoping from the DB.
- * Falls back to filesystem via inlineGsdRootFile when DB unavailable or empty.
+ * Falls back to filesystem via inlineWtfRootFile when DB unavailable or empty.
  */
 export async function inlineRequirementsFromDb(
   base: string, milestoneId?: string, sliceId?: string, level?: InlineLevel,
 ): Promise<string | null> {
   const inlineLevel = level ?? resolveInlineLevel();
   try {
-    const { isDbAvailable } = await import("../persistence/gsd-db.ts");
+    const { isDbAvailable } = await import("../persistence/wtf-db.ts");
     if (isDbAvailable()) {
       const { queryRequirements, formatRequirementsForPrompt } = await import("../persistence/context-store.ts");
       const requirements = queryRequirements({ milestoneId, sliceId });
@@ -328,35 +328,35 @@ export async function inlineRequirementsFromDb(
         const formatted = inlineLevel !== "full"
           ? formatRequirementsCompact(requirements)
           : formatRequirementsForPrompt(requirements);
-        return `### Requirements\nSource: \`.gsd/REQUIREMENTS.md\`\n\n${formatted}`;
+        return `### Requirements\nSource: \`.wtf/REQUIREMENTS.md\`\n\n${formatted}`;
       }
     }
   } catch (err) {
     logWarning("prompt", `inlineRequirementsFromDb failed: ${err instanceof Error ? err.message : String(err)}`);
   }
-  return inlineGsdRootFile(base, "requirements.md", "Requirements");
+  return inlineWtfRootFile(base, "requirements.md", "Requirements");
 }
 
 /**
  * Inline project context from the DB.
- * Falls back to filesystem via inlineGsdRootFile when DB unavailable or empty.
+ * Falls back to filesystem via inlineWtfRootFile when DB unavailable or empty.
  */
 export async function inlineProjectFromDb(
   base: string,
 ): Promise<string | null> {
   try {
-    const { isDbAvailable } = await import("../persistence/gsd-db.ts");
+    const { isDbAvailable } = await import("../persistence/wtf-db.ts");
     if (isDbAvailable()) {
       const { queryProject } = await import("../persistence/context-store.ts");
       const content = queryProject();
       if (content) {
-        return `### Project\nSource: \`.gsd/PROJECT.md\`\n\n${content}`;
+        return `### Project\nSource: \`.wtf/PROJECT.md\`\n\n${content}`;
       }
     }
   } catch (err) {
     logWarning("prompt", `inlineProjectFromDb failed: ${err instanceof Error ? err.message : String(err)}`);
   }
-  return inlineGsdRootFile(base, "project.md", "Project");
+  return inlineWtfRootFile(base, "project.md", "Project");
 }
 
 // ─── Stopwords for keyword extraction ─────────────────────────────────────
@@ -441,7 +441,7 @@ export async function inlineKnowledgeScoped(
   base: string,
   keywords: string[],
 ): Promise<string | null> {
-  const knowledgePath = resolveGsdRootFile(base, "KNOWLEDGE");
+  const knowledgePath = resolveWtfRootFile(base, "KNOWLEDGE");
   if (!existsSync(knowledgePath)) return null;
 
   const content = await loadFile(knowledgePath);
@@ -454,7 +454,7 @@ export async function inlineKnowledgeScoped(
   // Return null if no sections matched (empty string from queryKnowledge)
   if (!scoped) return null;
 
-  return `### Project Knowledge (scoped)\nSource: \`${relGsdRootFile("KNOWLEDGE")}\`\n\n${scoped.trim()}`;
+  return `### Project Knowledge (scoped)\nSource: \`${relWtfRootFile("KNOWLEDGE")}\`\n\n${scoped.trim()}`;
 }
 
 /**
@@ -535,7 +535,7 @@ function skillMatchesContext(skill: Skill, contextTokens: Set<string>): boolean 
 
 function resolvePreferenceSkillNames(refs: string[], base: string): string[] {
   if (refs.length === 0) return [];
-  const prefs: GSDPreferences = { always_use_skills: refs };
+  const prefs: WTFPreferences = { always_use_skills: refs };
   const report = resolveAllSkillReferences(prefs, base);
   return refs.map(ref => {
     const resolution = report.resolutions.get(ref);
@@ -551,7 +551,7 @@ function ruleMatchesContext(when: string, contextTokens: Set<string>): boolean {
 }
 
 function resolveSkillRuleMatches(
-  prefs: GSDPreferences | undefined,
+  prefs: WTFPreferences | undefined,
   contextTokens: Set<string>,
   base: string,
 ): { include: string[]; avoid: string[] } {
@@ -568,7 +568,7 @@ function resolveSkillRuleMatches(
 }
 
 function resolvePreferredSkillNames(
-  prefs: GSDPreferences | undefined,
+  prefs: WTFPreferences | undefined,
   visibleSkills: Skill[],
   contextTokens: Set<string>,
   base: string,
@@ -604,10 +604,10 @@ export function buildSkillActivationBlock(params: {
   taskTitle?: string;
   extraContext?: string[];
   taskPlanContent?: string | null;
-  preferences?: GSDPreferences;
+  preferences?: WTFPreferences;
   skillsProvider?: () => Skill[];
 }): string {
-  const prefs = params.preferences ?? loadEffectiveGSDPreferences()?.preferences;
+  const prefs = params.preferences ?? loadEffectiveWTFPreferences()?.preferences;
   const contextTokens = tokenizeSkillContext(
     params.milestoneId,
     params.milestoneTitle,
@@ -869,11 +869,11 @@ export async function getDependencyTaskSummaryPaths(
  * - All slices are complete (milestone done — no point reassessing)
  */
 export async function checkNeedsReassessment(
-  base: string, mid: string, _state: GSDState,
+  base: string, mid: string, _state: WTFState,
 ): Promise<{ sliceId: string } | null> {
   // DB primary path — fall through to file-based when DB has no data for this milestone
   try {
-    const { isDbAvailable, getMilestoneSlices } = await import("../persistence/gsd-db.ts");
+    const { isDbAvailable, getMilestoneSlices } = await import("../persistence/wtf-db.ts");
     if (isDbAvailable()) {
       const slices = getMilestoneSlices(mid);
       if (slices.length > 0) {
@@ -925,11 +925,11 @@ export async function checkNeedsReassessment(
  * - UAT result file already exists (idempotent — already ran)
  */
 export async function checkNeedsRunUat(
-  base: string, mid: string, _state: GSDState, prefs: GSDPreferences | undefined,
+  base: string, mid: string, _state: WTFState, prefs: WTFPreferences | undefined,
 ): Promise<{ sliceId: string; uatType: UatType } | null> {
   // DB primary path — fall through to file-based when DB has no data for this milestone
   try {
-    const { isDbAvailable, getMilestoneSlices } = await import("../persistence/gsd-db.ts");
+    const { isDbAvailable, getMilestoneSlices } = await import("../persistence/wtf-db.ts");
     if (isDbAvailable()) {
       const slices = getMilestoneSlices(mid);
       if (slices.length > 0) {
@@ -947,7 +947,7 @@ export async function checkNeedsRunUat(
         // If the UAT file already contains a verdict, UAT has been run — skip
         if (hasVerdict(uatContent)) return null;
         // Also check the ASSESSMENT file — the run-uat prompt writes the verdict
-        // there (via gsd_summary_save artifact_type:"ASSESSMENT"), not into the
+        // there (via wtf_summary_save artifact_type:"ASSESSMENT"), not into the
         // UAT spec file. Without this check the unit re-dispatches indefinitely.
         const assessmentFile = resolveSliceFile(base, mid, sid, "ASSESSMENT");
         if (assessmentFile) {
@@ -1011,7 +1011,7 @@ export async function buildDiscussMilestonePrompt(mid: string, midTitle: string,
   if (decisionsInline) inlined.push(decisionsInline);
   const requirementsInline = await inlineRequirementsFromDb(base, mid);
   if (requirementsInline) inlined.push(requirementsInline);
-  const knowledgeInline = await inlineGsdRootFile(base, "knowledge.md", "Project Knowledge");
+  const knowledgeInline = await inlineWtfRootFile(base, "knowledge.md", "Project Knowledge");
   if (knowledgeInline) inlined.push(knowledgeInline);
 
   const inlinedContext = inlined.length > 0
@@ -1023,7 +1023,7 @@ export async function buildDiscussMilestonePrompt(mid: string, midTitle: string,
     milestoneTitle: midTitle,
     inlinedTemplates: discussTemplates,
     inlinedContext,
-    commitInstruction: "Do not commit planning artifacts — .gsd/ is managed externally.",
+    commitInstruction: "Do not commit planning artifacts — .wtf/ is managed externally.",
   });
 
   // If a CONTEXT-DRAFT.md exists, append it as seed material
@@ -1049,7 +1049,7 @@ export async function buildResearchMilestonePrompt(mid: string, midTitle: string
   if (requirementsInline) inlined.push(requirementsInline);
   const decisionsInline = await inlineDecisionsFromDb(base, mid);
   if (decisionsInline) inlined.push(decisionsInline);
-  const knowledgeInlineRM = await inlineGsdRootFile(base, "knowledge.md", "Project Knowledge");
+  const knowledgeInlineRM = await inlineWtfRootFile(base, "knowledge.md", "Project Knowledge");
   if (knowledgeInlineRM) inlined.push(knowledgeInlineRM);
   inlined.push(inlineTemplate("research", "Research"));
 
@@ -1100,17 +1100,17 @@ export async function buildPlanMilestonePrompt(mid: string, midTitle: string, ba
     const decisionsInline = await inlineDecisionsFromDb(base, mid, undefined, inlineLevel);
     if (decisionsInline) inlined.push(decisionsInline);
   }
-  const queuePath = resolveGsdRootFile(base, "QUEUE");
+  const queuePath = resolveWtfRootFile(base, "QUEUE");
   if (existsSync(queuePath)) {
     const queueInline = await inlineFileSmart(
       queuePath,
-      relGsdRootFile("QUEUE"),
+      relWtfRootFile("QUEUE"),
       "Project Queue",
       `${mid} ${midTitle}`,
     );
     inlined.push(queueInline);
   }
-  const knowledgeInlinePM = await inlineGsdRootFile(base, "knowledge.md", "Project Knowledge");
+  const knowledgeInlinePM = await inlineWtfRootFile(base, "knowledge.md", "Project Knowledge");
   if (knowledgeInlinePM) inlined.push(knowledgeInlinePM);
   inlined.push(inlineTemplate("roadmap", "Roadmap"));
   if (inlineLevel === "full") {
@@ -1291,7 +1291,7 @@ export async function buildPlanSlicePrompt(
   const executorContextConstraints = formatExecutorConstraints();
 
   const outputRelPath = relSliceFile(base, mid, sid, "PLAN");
-  const commitInstruction = "Do not commit — .gsd/ planning docs are managed externally and not tracked in git.";
+  const commitInstruction = "Do not commit — .wtf/ planning docs are managed externally and not tracked in git.";
   return loadPrompt("plan-slice", {
     workingDirectory: base,
     milestoneId: mid, sliceId: sid, sliceTitle: sTitle,
@@ -1379,11 +1379,11 @@ export async function buildExecuteTaskPrompt(
   const carryForwardSection = await buildCarryForwardSection(effectivePriorSummaries, base);
 
   // Inline project knowledge if available (smart-chunked for relevance)
-  const knowledgeAbsPath = resolveGsdRootFile(base, "KNOWLEDGE");
+  const knowledgeAbsPath = resolveWtfRootFile(base, "KNOWLEDGE");
   const knowledgeInlineET = existsSync(knowledgeAbsPath)
     ? await inlineFileSmart(
         knowledgeAbsPath,
-        relGsdRootFile("KNOWLEDGE"),
+        relWtfRootFile("KNOWLEDGE"),
         "Project Knowledge",
         `${tTitle} ${sTitle}`,  // use task + slice title as relevance query
       )
@@ -1405,7 +1405,7 @@ export async function buildExecuteTaskPrompt(
   const overridesSection = formatOverridesSection(activeOverrides);
 
   // Compute verification budget for the executor's context window (issue #707)
-  const prefs = loadEffectiveGSDPreferences();
+  const prefs = loadEffectiveWTFPreferences();
   const contextWindow = resolveExecutorContextWindow(undefined, prefs?.preferences);
   const budgets = computeBudgets(contextWindow);
   const verificationBudget = `~${Math.round(budgets.verificationBudgetChars / 1000)}K chars`;
@@ -1421,7 +1421,7 @@ export async function buildExecuteTaskPrompt(
   const runtimePath = resolveRuntimeFile(base);
   const runtimeContent = existsSync(runtimePath) ? await loadFile(runtimePath) : null;
   const runtimeContext = runtimeContent
-    ? `### Runtime Context\nSource: \`.gsd/RUNTIME.md\`\n\n${runtimeContent.trim()}`
+    ? `### Runtime Context\nSource: \`.wtf/RUNTIME.md\`\n\n${runtimeContent.trim()}`
     : "";
 
   const phaseAnchorSection = planAnchor ? formatAnchorForPrompt(planAnchor) : "";
@@ -1477,7 +1477,7 @@ export async function buildCompleteSlicePrompt(
     const requirementsInline = await inlineRequirementsFromDb(base, mid, sid, inlineLevel);
     if (requirementsInline) inlined.push(requirementsInline);
   }
-  const knowledgeInlineCS = await inlineGsdRootFile(base, "knowledge.md", "Project Knowledge");
+  const knowledgeInlineCS = await inlineWtfRootFile(base, "knowledge.md", "Project Knowledge");
   if (knowledgeInlineCS) inlined.push(knowledgeInlineCS);
 
   // Inline all task summaries for this slice
@@ -1532,7 +1532,7 @@ export async function buildCompleteMilestonePrompt(
   // Inline all slice summaries (deduplicated by slice ID)
   let sliceIds: string[] = [];
   try {
-    const { isDbAvailable, getMilestoneSlices } = await import("../persistence/gsd-db.ts");
+    const { isDbAvailable, getMilestoneSlices } = await import("../persistence/wtf-db.ts");
     if (isDbAvailable()) {
       sliceIds = getMilestoneSlices(mid).map(s => s.id);
     }
@@ -1555,7 +1555,7 @@ export async function buildCompleteMilestonePrompt(
     inlined.push(await inlineFile(summaryPath, summaryRel, `${sid} Summary`));
   }
 
-  // Inline root GSD files (skip for minimal — completion can read these if needed)
+  // Inline root WTF files (skip for minimal — completion can read these if needed)
   if (inlineLevel !== "minimal") {
     const requirementsInline = await inlineRequirementsFromDb(base, mid, undefined, inlineLevel);
     if (requirementsInline) inlined.push(requirementsInline);
@@ -1564,9 +1564,9 @@ export async function buildCompleteMilestonePrompt(
     const projectInline = await inlineProjectFromDb(base);
     if (projectInline) inlined.push(projectInline);
   }
-  const knowledgeInlineCM = await inlineGsdRootFile(base, "knowledge.md", "Project Knowledge");
+  const knowledgeInlineCM = await inlineWtfRootFile(base, "knowledge.md", "Project Knowledge");
   if (knowledgeInlineCM) inlined.push(knowledgeInlineCM);
-  // Inline milestone context file (milestone-level, not GSD root)
+  // Inline milestone context file (milestone-level, not WTF root)
   const contextPath = resolveMilestoneFile(base, mid, "CONTEXT");
   const contextRel = relMilestoneFile(base, mid, "CONTEXT");
   const contextInline = await inlineFileOptional(contextPath, contextRel, "Milestone Context");
@@ -1605,7 +1605,7 @@ export async function buildValidateMilestonePrompt(
 
   // Inline verification classes from planning (if available in DB)
   try {
-    const { isDbAvailable, getMilestone } = await import("../persistence/gsd-db.ts");
+    const { isDbAvailable, getMilestone } = await import("../persistence/wtf-db.ts");
     if (isDbAvailable()) {
       const milestone = getMilestone(mid);
       if (milestone) {
@@ -1626,7 +1626,7 @@ export async function buildValidateMilestonePrompt(
   // Inline all slice summaries and UAT results
   let valSliceIds: string[] = [];
   try {
-    const { isDbAvailable, getMilestoneSlices } = await import("../persistence/gsd-db.ts");
+    const { isDbAvailable, getMilestoneSlices } = await import("../persistence/wtf-db.ts");
     if (isDbAvailable()) {
       valSliceIds = getMilestoneSlices(mid).map(s => s.id);
     }
@@ -1680,7 +1680,7 @@ export async function buildValidateMilestonePrompt(
     inlined.push(`### Previous Validation (re-validation round ${remediationRound})\nSource: \`${validationRel}\`\n\n${validationContent.trim()}`);
   }
 
-  // Inline root GSD files
+  // Inline root WTF files
   if (inlineLevel !== "minimal") {
     const requirementsInline = await inlineRequirementsFromDb(base, mid, undefined, inlineLevel);
     if (requirementsInline) inlined.push(requirementsInline);
@@ -1689,7 +1689,7 @@ export async function buildValidateMilestonePrompt(
     const projectInline = await inlineProjectFromDb(base);
     if (projectInline) inlined.push(projectInline);
   }
-  const knowledgeInline = await inlineGsdRootFile(base, "knowledge.md", "Project Knowledge");
+  const knowledgeInline = await inlineWtfRootFile(base, "knowledge.md", "Project Knowledge");
   if (knowledgeInline) inlined.push(knowledgeInline);
   // Inline milestone context file
   const contextPath = resolveMilestoneFile(base, mid, "CONTEXT");
@@ -1863,7 +1863,7 @@ export async function buildReassessRoadmapPrompt(
     const decisionsInline = await inlineDecisionsFromDb(base, mid, undefined, inlineLevel);
     if (decisionsInline) inlined.push(decisionsInline);
   }
-  const knowledgeInlineRA = await inlineGsdRootFile(base, "knowledge.md", "Project Knowledge");
+  const knowledgeInlineRA = await inlineWtfRootFile(base, "knowledge.md", "Project Knowledge");
   if (knowledgeInlineRA) inlined.push(knowledgeInlineRA);
 
   const inlinedContext = capPreamble(`## Inlined Context (preloaded — do not re-read these files)\n\n${inlined.join("\n\n---\n\n")}`);
@@ -1884,7 +1884,7 @@ export async function buildReassessRoadmapPrompt(
     logWarning("prompt", `loadDeferredCaptures failed: ${err instanceof Error ? err.message : String(err)}`);
   }
 
-  const reassessCommitInstruction = "Do not commit — .gsd/ planning docs are managed externally and not tracked in git.";
+  const reassessCommitInstruction = "Do not commit — .wtf/ planning docs are managed externally and not tracked in git.";
 
   return loadPrompt("reassess-roadmap", {
     workingDirectory: base,
@@ -2017,7 +2017,7 @@ export async function buildParallelResearchSlicesPrompt(
     subagentSections.push([
       `### ${slice.id}: ${slice.title}`,
       "",
-      "Use this as the prompt for a `subagent` call (agent: `gsd-executor` or the default agent):",
+      "Use this as the prompt for a `subagent` call (agent: `wtf-executor` or the default agent):",
       "",
       "```",
       slicePrompt,
@@ -2068,7 +2068,7 @@ export async function buildGateEvaluatePrompt(
       "## Instructions",
       "",
       "Analyze the slice plan above and answer the gate question.",
-      `Call the \`gsd_save_gate_result\` tool with:`,
+      `Call the \`wtf_save_gate_result\` tool with:`,
       `- \`milestoneId\`: "${mid}"`,
       `- \`sliceId\`: "${sid}"`,
       `- \`gateId\`: "${gate.gate_id}"`,
@@ -2121,7 +2121,7 @@ export async function buildRewriteDocsPrompt(
         // DB primary path — get incomplete tasks
         let incompleteTasks: { id: string }[] | null = null;
         try {
-          const { isDbAvailable, getSliceTasks } = await import("../persistence/gsd-db.ts");
+          const { isDbAvailable, getSliceTasks } = await import("../persistence/wtf-db.ts");
           if (isDbAvailable()) {
             incompleteTasks = getSliceTasks(mid, sid)
               .filter(t => t.status !== "complete" && t.status !== "done")
@@ -2149,12 +2149,12 @@ export async function buildRewriteDocsPrompt(
     }
   }
 
-  const decisionsPath = resolveGsdRootFile(base, "DECISIONS");
-  if (existsSync(decisionsPath)) docList.push(`- Decisions: \`${relGsdRootFile("DECISIONS")}\``);
-  const requirementsPath = resolveGsdRootFile(base, "REQUIREMENTS");
-  if (existsSync(requirementsPath)) docList.push(`- Requirements: \`${relGsdRootFile("REQUIREMENTS")}\``);
-  const projectPath = resolveGsdRootFile(base, "PROJECT");
-  if (existsSync(projectPath)) docList.push(`- Project: \`${relGsdRootFile("PROJECT")}\``);
+  const decisionsPath = resolveWtfRootFile(base, "DECISIONS");
+  if (existsSync(decisionsPath)) docList.push(`- Decisions: \`${relWtfRootFile("DECISIONS")}\``);
+  const requirementsPath = resolveWtfRootFile(base, "REQUIREMENTS");
+  if (existsSync(requirementsPath)) docList.push(`- Requirements: \`${relWtfRootFile("REQUIREMENTS")}\``);
+  const projectPath = resolveWtfRootFile(base, "PROJECT");
+  if (existsSync(projectPath)) docList.push(`- Project: \`${relWtfRootFile("PROJECT")}\``);
   const contextPath = resolveMilestoneFile(base, mid, "CONTEXT");
   const contextRel = relMilestoneFile(base, mid, "CONTEXT");
   if (contextPath) docList.push(`- Milestone context (reference only): \`${contextRel}\``);
@@ -2178,7 +2178,7 @@ export async function buildRewriteDocsPrompt(
     sliceTitle: sTitle,
     overrideContent,
     documentList,
-    overridesPath: relGsdRootFile("OVERRIDES"),
+    overridesPath: relWtfRootFile("OVERRIDES"),
   });
 }
 

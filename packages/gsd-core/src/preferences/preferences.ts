@@ -1,5 +1,5 @@
 /**
- * GSD Preferences -- loading, merging, and rendering.
+ * WTF Preferences -- loading, merging, and rendering.
  *
  * This module is the primary entry point for preference operations.
  * Type definitions live in ./preferences-types.js, validation in
@@ -14,7 +14,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 import { parse as parseYaml } from "yaml";
 import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile } from "../domain/types.ts";
 import type { DynamicRoutingConfig } from "../routing/model-router.ts";
@@ -26,12 +26,13 @@ import {
   KNOWN_PREFERENCE_KEYS,
   MODE_DEFAULTS,
   type WorkflowMode,
-  type GSDPreferences,
-  type LoadedGSDPreferences,
+  type WTFPreferences,
+  type LoadedWTFPreferences,
   type SkillResolution,
 } from "./preferences-types.ts";
 import { validatePreferences } from "./preferences-validation.ts";
 import { formatSkillRef } from "./preferences-skills.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 // ─── Re-exports: types ──────────────────────────────────────────────────────
 // Every type/interface that was previously exported from this file is
@@ -40,18 +41,18 @@ import { formatSkillRef } from "./preferences-skills.ts";
 
 export type {
   WorkflowMode,
-  GSDSkillRule,
-  GSDPhaseModelConfig,
-  GSDModelConfig,
-  GSDModelConfigV2,
+  WTFSkillRule,
+  WTFPhaseModelConfig,
+  WTFModelConfig,
+  WTFModelConfigV2,
   ResolvedModelConfig,
   SkillDiscoveryMode,
   AutoSupervisorConfig,
   RemoteQuestionsConfig,
   CmuxPreferences,
   CodebaseMapPreferences,
-  GSDPreferences,
-  LoadedGSDPreferences,
+  WTFPreferences,
+  LoadedWTFPreferences,
   SkillResolution,
   SkillResolutionReport,
 } from "./preferences-types.ts";
@@ -85,62 +86,62 @@ export {
 
 // ─── Path Constants & Getters ───────────────────────────────────────────────
 
-function gsdHome(): string {
-  return process.env.GSD_HOME || join(homedir(), ".gsd");
+function wtfHome(): string {
+  return process.env.WTF_HOME || join(homedir(), PROJECT_DIR_NAME);
 }
 
 function globalPreferencesPath(): string {
-  return join(gsdHome(), "preferences.md");
+  return join(wtfHome(), "preferences.md");
 }
 
 function legacyGlobalPreferencesPath(): string {
-  return join(homedir(), ".pi", "agent", "gsd-preferences.md");
+  return join(homedir(), ".pi", "agent", "wtf-preferences.md");
 }
 
 function projectPreferencesPath(): string {
-  return join(gsdRoot(process.cwd()), "preferences.md");
+  return join(wtfRoot(process.cwd()), "preferences.md");
 }
 // Bootstrap in gitignore.ts historically created PREFERENCES.md (uppercase) by mistake.
 // Check uppercase as a fallback so those files aren't silently ignored.
 function globalPreferencesPathUppercase(): string {
-  return join(gsdHome(), "PREFERENCES.md");
+  return join(wtfHome(), "PREFERENCES.md");
 }
 function projectPreferencesPathUppercase(): string {
-  return join(gsdRoot(process.cwd()), "PREFERENCES.md");
+  return join(wtfRoot(process.cwd()), "PREFERENCES.md");
 }
 
-export function getGlobalGSDPreferencesPath(): string {
+export function getGlobalWTFPreferencesPath(): string {
   return globalPreferencesPath();
 }
 
-export function getLegacyGlobalGSDPreferencesPath(): string {
+export function getLegacyGlobalWTFPreferencesPath(): string {
   return legacyGlobalPreferencesPath();
 }
 
-export function getProjectGSDPreferencesPath(): string {
+export function getProjectWTFPreferencesPath(): string {
   return projectPreferencesPath();
 }
 
 // ─── Loading ────────────────────────────────────────────────────────────────
 
-export function loadGlobalGSDPreferences(): LoadedGSDPreferences | null {
+export function loadGlobalWTFPreferences(): LoadedWTFPreferences | null {
   return loadPreferencesFile(globalPreferencesPath(), "global")
     ?? loadPreferencesFile(globalPreferencesPathUppercase(), "global")
     ?? loadPreferencesFile(legacyGlobalPreferencesPath(), "global");
 }
 
-export function loadProjectGSDPreferences(): LoadedGSDPreferences | null {
+export function loadProjectWTFPreferences(): LoadedWTFPreferences | null {
   return loadPreferencesFile(projectPreferencesPath(), "project")
     ?? loadPreferencesFile(projectPreferencesPathUppercase(), "project");
 }
 
-export function loadEffectiveGSDPreferences(): LoadedGSDPreferences | null {
-  const globalPreferences = loadGlobalGSDPreferences();
-  const projectPreferences = loadProjectGSDPreferences();
+export function loadEffectiveWTFPreferences(): LoadedWTFPreferences | null {
+  const globalPreferences = loadGlobalWTFPreferences();
+  const projectPreferences = loadProjectWTFPreferences();
 
   if (!globalPreferences && !projectPreferences) return null;
 
-  let result: LoadedGSDPreferences;
+  let result: LoadedWTFPreferences;
   if (!globalPreferences) {
     result = projectPreferences!;
   } else if (!projectPreferences) {
@@ -166,7 +167,7 @@ export function loadEffectiveGSDPreferences(): LoadedGSDPreferences | null {
     const profileDefaults = _resolveProfileDefaults(profile);
     result = {
       ...result,
-      preferences: mergePreferences(profileDefaults as GSDPreferences, result.preferences),
+      preferences: mergePreferences(profileDefaults as WTFPreferences, result.preferences),
     };
   }
 
@@ -181,7 +182,7 @@ export function loadEffectiveGSDPreferences(): LoadedGSDPreferences | null {
   return result;
 }
 
-function loadPreferencesFile(path: string, scope: "global" | "project"): LoadedGSDPreferences | null {
+function loadPreferencesFile(path: string, scope: "global" | "project"): LoadedWTFPreferences | null {
   if (!existsSync(path)) return null;
 
   const raw = readFileSync(path, "utf-8");
@@ -210,7 +211,7 @@ export function _resetParseWarningFlag(): void {
 }
 
 /** @internal Exported for testing only */
-export function parsePreferencesMarkdown(content: string): GSDPreferences | null {
+export function parsePreferencesMarkdown(content: string): WTFPreferences | null {
   // Use indexOf instead of [\s\S]*? regex to avoid backtracking (#468)
   const startMarker = content.startsWith('---\r\n') ? '---\r\n' : '---\n';
   if (content.startsWith(startMarker)) {
@@ -222,7 +223,7 @@ export function parsePreferencesMarkdown(content: string): GSDPreferences | null
   }
 
   // Fallback: heading+list format (e.g. "## Git\n- isolation: none") (#2036)
-  // GSD agents may write preferences files without frontmatter delimiters.
+  // WTF agents may write preferences files without frontmatter delimiters.
   if (/^##\s+\w/m.test(content)) {
     return parseHeadingListFormat(content);
   }
@@ -231,7 +232,7 @@ export function parsePreferencesMarkdown(content: string): GSDPreferences | null
   if (content.trim().length > 0 && !_warnedUnrecognizedFormat) {
     _warnedUnrecognizedFormat = true;
     console.warn(
-      "[GSD] Warning: preferences file has unrecognized format — content does not use YAML frontmatter delimiters (---). " +
+      "[WTF] Warning: preferences file has unrecognized format — content does not use YAML frontmatter delimiters (---). " +
       "Wrap your preferences in --- fences. See https://github.com/gsd-build/gsd-2/issues/2036",
     );
   }
@@ -239,25 +240,25 @@ export function parsePreferencesMarkdown(content: string): GSDPreferences | null
 }
 
 let _warnedFrontmatterParse = false;
-function parseFrontmatterBlock(frontmatter: string): GSDPreferences {
+function parseFrontmatterBlock(frontmatter: string): WTFPreferences {
   try {
     const parsed = parseYaml(frontmatter);
     if (typeof parsed !== 'object' || parsed === null) {
-      return {} as GSDPreferences;
+      return {} as WTFPreferences;
     }
-    return parsed as GSDPreferences;
+    return parsed as WTFPreferences;
   } catch (e) {
     // Warn at most once per session to avoid flooding TUI (#3376)
     if (!_warnedFrontmatterParse) {
       _warnedFrontmatterParse = true;
       logWarning("guided", `YAML parse error in preferences frontmatter (suppressing further): ${(e as Error).message}`);
     }
-    return {} as GSDPreferences;
+    return {} as WTFPreferences;
   }
 }
 
 /**
- * Parse heading+list format into a nested object, then cast to GSDPreferences.
+ * Parse heading+list format into a nested object, then cast to WTFPreferences.
  * Handles markdown like:
  *   ## Git
  *   - isolation: none
@@ -265,7 +266,7 @@ function parseFrontmatterBlock(frontmatter: string): GSDPreferences {
  *   ## Models
  *   - planner: sonnet
  */
-function parseHeadingListFormat(content: string): GSDPreferences {
+function parseHeadingListFormat(content: string): WTFPreferences {
   const result: Record<string, string[]> = {};
   let currentSection: string | null = null;
 
@@ -318,7 +319,7 @@ function parseHeadingListFormat(content: string): GSDPreferences {
     }
   }
 
-  return typed as GSDPreferences;
+  return typed as WTFPreferences;
 }
 
 // ─── Merging ────────────────────────────────────────────────────────────────
@@ -327,13 +328,13 @@ function parseHeadingListFormat(content: string): GSDPreferences {
  * Apply mode defaults as the lowest-priority layer.
  * Mode defaults fill in undefined fields; any explicit user value wins.
  */
-export function applyModeDefaults(mode: WorkflowMode, prefs: GSDPreferences): GSDPreferences {
+export function applyModeDefaults(mode: WorkflowMode, prefs: WTFPreferences): WTFPreferences {
   const defaults = MODE_DEFAULTS[mode];
   if (!defaults) return prefs;
   return mergePreferences(defaults, prefs);
 }
 
-function mergePreferences(base: GSDPreferences, override: GSDPreferences): GSDPreferences {
+function mergePreferences(base: WTFPreferences, override: WTFPreferences): WTFPreferences {
   return {
     version: override.version ?? base.version,
     mode: override.mode ?? base.mode,
@@ -456,9 +457,9 @@ function mergePreDispatchHooks(
 
 // ─── System Prompt Rendering ──────────────────────────────────────────────────
 
-export function renderPreferencesForSystemPrompt(preferences: GSDPreferences, resolutions?: Map<string, SkillResolution>): string {
+export function renderPreferencesForSystemPrompt(preferences: WTFPreferences, resolutions?: Map<string, SkillResolution>): string {
   const validated = validatePreferences(preferences);
-  const lines: string[] = ["## GSD Skill Preferences"];
+  const lines: string[] = ["## WTF Skill Preferences"];
 
   if (validated.errors.length > 0) {
     lines.push("- Validation: some preference values were ignored because they were invalid.");
@@ -470,7 +471,7 @@ export function renderPreferencesForSystemPrompt(preferences: GSDPreferences, re
   preferences = validated.preferences;
 
   lines.push(
-    "- Treat these as explicit skill-selection policy for GSD work.",
+    "- Treat these as explicit skill-selection policy for WTF work.",
     "- If a listed skill exists and is relevant, load and follow it instead of treating it as a vague suggestion.",
     "- Current user instructions still override these defaults.",
   );
@@ -531,7 +532,7 @@ export function renderPreferencesForSystemPrompt(preferences: GSDPreferences, re
  * Returns an empty array when no hooks are configured.
  */
 export function resolvePostUnitHooks(): PostUnitHookConfig[] {
-  const prefs = loadEffectiveGSDPreferences();
+  const prefs = loadEffectiveWTFPreferences();
   return (prefs?.preferences.post_unit_hooks ?? [])
     .filter(h => h.enabled !== false);
 }
@@ -541,7 +542,7 @@ export function resolvePostUnitHooks(): PostUnitHookConfig[] {
  * Returns an empty array when no hooks are configured.
  */
 export function resolvePreDispatchHooks(): PreDispatchHookConfig[] {
-  const prefs = loadEffectiveGSDPreferences();
+  const prefs = loadEffectiveWTFPreferences();
   return (prefs?.preferences.pre_dispatch_hooks ?? [])
     .filter(h => h.enabled !== false);
 }
@@ -552,18 +553,18 @@ export function resolvePreDispatchHooks(): PreDispatchHookConfig[] {
  * Resolve the effective git isolation mode from preferences.
  * Returns "none" (default), "worktree", or "branch".
  *
- * Default is "none" so GSD works out of the box without preferences.md.
+ * Default is "none" so WTF works out of the box without preferences.md.
  * Worktree isolation requires explicit opt-in because it depends on git
  * branch infrastructure that must be set up before use.
  */
 export function getIsolationMode(): "none" | "worktree" | "branch" {
-  const prefs = loadEffectiveGSDPreferences()?.preferences?.git;
+  const prefs = loadEffectiveWTFPreferences()?.preferences?.git;
   if (prefs?.isolation === "worktree") return "worktree";
   if (prefs?.isolation === "branch") return "branch";
   return "none"; // default — no isolation, work on current branch
 }
 
-export function resolveParallelConfig(prefs: GSDPreferences | undefined): import("../domain/types.ts").ParallelConfig {
+export function resolveParallelConfig(prefs: WTFPreferences | undefined): import("../domain/types.ts").ParallelConfig {
   return {
     enabled: prefs?.parallel?.enabled ?? false,
     max_workers: Math.max(1, Math.min(4, prefs?.parallel?.max_workers ?? 2)),

@@ -6,8 +6,8 @@
  */
 
 import type { AutoSession } from "./session.ts";
-import type { GSDPreferences } from "../preferences/preferences-types.ts";
-import type { GSDState } from "../domain/types.ts";
+import type { WTFPreferences } from "../preferences/preferences-types.ts";
+import type { WTFState } from "../domain/types.ts";
 import type { CmuxLogLevel } from "../cmux/index.ts";
 import type { CoreLoopDeps } from "./loop-deps.ts";
 
@@ -77,7 +77,7 @@ export type PhaseResult<T = void> =
 export interface IterationContext {
   s: AutoSession;
   deps: CoreLoopDeps;
-  prefs: GSDPreferences | undefined;
+  prefs: WTFPreferences | undefined;
   iteration: number;
   /** UUID grouping all journal events for this iteration. */
   flowId: string;
@@ -96,7 +96,7 @@ export interface LoopState {
 export const MAX_FINALIZE_TIMEOUTS = 3;
 
 export interface PreDispatchData {
-  state: GSDState;
+  state: WTFState;
   mid: string;
   midTitle: string;
 }
@@ -107,7 +107,7 @@ export interface IterationData {
   prompt: string;
   finalPrompt: string;
   pauseAfterUatDispatch: boolean;
-  state: GSDState;
+  state: WTFState;
   mid: string | undefined;
   midTitle: string | undefined;
   isRetry: boolean;

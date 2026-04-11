@@ -1,10 +1,10 @@
-// GSD Extension — Complexity Classifier
+// WTF Extension — Complexity Classifier
 // Classifies unit complexity for dynamic model routing.
 // Pure heuristics + adaptive learning — no LLM calls. Sub-millisecond classification.
 
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 import { getAdaptiveTierAdjustment } from "../routing/routing-history.ts";
 import { parseUnitId } from "../domain/unit-id.ts";
 
@@ -198,7 +198,7 @@ function analyzePlanComplexity(
 
   // For slice planning, try to read the context/research to gauge complexity
   // If research exists and is large, bump to heavy
-  const researchPath = join(gsdRoot(basePath), mid, "slices", sid, "RESEARCH.md");
+  const researchPath = join(wtfRoot(basePath), mid, "slices", sid, "RESEARCH.md");
   try {
     if (existsSync(researchPath)) {
       const content = readFileSync(researchPath, "utf-8");
@@ -221,7 +221,7 @@ export function extractTaskMetadata(unitId: string, basePath: string): TaskMetad
   const meta: TaskMetadata = {};
   const { milestone: mid, slice: sid, task: tid } = parseUnitId(unitId);
   if (!mid || !sid || !tid) return meta;
-  const taskPlanPath = join(gsdRoot(basePath), mid, "slices", sid, "tasks", `${tid}-PLAN.md`);
+  const taskPlanPath = join(wtfRoot(basePath), mid, "slices", sid, "tasks", `${tid}-PLAN.md`);
 
   try {
     if (!existsSync(taskPlanPath)) return meta;

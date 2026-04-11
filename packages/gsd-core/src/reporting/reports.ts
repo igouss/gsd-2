@@ -1,22 +1,22 @@
 /**
- * GSD Reports Registry
+ * WTF Reports Registry
  *
- * Manages .gsd/reports/ — the persistent progression log of HTML snapshots.
+ * Manages .wtf/reports/ — the persistent progression log of HTML snapshots.
  *
  * Layout:
- *   .gsd/reports/
+ *   .wtf/reports/
  *     reports.json          lightweight metadata index (never re-parses HTML)
  *     index.html            auto-regenerated on every new snapshot
  *     M001-20260101T120000.html    per-milestone snapshot
  *     final-20260201T090000.html   full-project final snapshot
  *
  * Auto-triggered: after each milestone completion (when auto_report: true).
- * Manual: /gsd export --html
+ * Manual: /wtf export --html
  */
 
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { gsdRoot } from '../persistence/paths.ts';
+import { wtfRoot } from '../persistence/paths.ts';
 import { formatCost, formatTokenCount } from './metrics.ts';
 import { formatDateShort, formatDuration } from '../shared/format-utils.ts';
 
@@ -50,14 +50,14 @@ export interface ReportsIndex {
   version: 1;
   projectName: string;
   projectPath: string;
-  gsdVersion: string;
+  wtfVersion: string;
   entries: ReportEntry[];
 }
 
 // ─── Paths ────────────────────────────────────────────────────────────────────
 
 export function reportsDir(basePath: string): string {
-  return join(gsdRoot(basePath), 'reports');
+  return join(wtfRoot(basePath), 'reports');
 }
 
 function reportsIndexPath(basePath: string): string {
@@ -96,7 +96,7 @@ export interface WriteReportSnapshotArgs {
   kind: 'milestone' | 'manual' | 'final';
   projectName: string;
   projectPath: string;
-  gsdVersion: string;
+  wtfVersion: string;
   // metrics
   totalCost: number;
   totalTokens: number;
@@ -109,7 +109,7 @@ export interface WriteReportSnapshotArgs {
 }
 
 /**
- * Write a report snapshot to .gsd/reports/, update reports.json, regenerate index.html.
+ * Write a report snapshot to .wtf/reports/, update reports.json, regenerate index.html.
  * Returns the path of the written report file.
  */
 export function writeReportSnapshot(args: WriteReportSnapshotArgs): string {
@@ -129,14 +129,14 @@ export function writeReportSnapshot(args: WriteReportSnapshotArgs): string {
     version: 1,
     projectName: args.projectName,
     projectPath: args.projectPath,
-    gsdVersion: args.gsdVersion,
+    wtfVersion: args.wtfVersion,
     entries: [],
   };
 
   // Keep metadata fresh
   index.projectName = args.projectName;
   index.projectPath = args.projectPath;
-  index.gsdVersion = args.gsdVersion;
+  index.wtfVersion = args.wtfVersion;
 
   const label = args.milestoneId === 'final'
     ? 'Final Report'
@@ -174,7 +174,7 @@ export function regenerateHtmlIndex(basePath: string, index: ReportsIndex): void
 }
 
 function buildIndexHtml(index: ReportsIndex): string {
-  const { projectName, projectPath, gsdVersion, entries } = index;
+  const { projectName, projectPath, wtfVersion, entries } = index;
   const generated = new Date().toISOString();
 
   // Sort oldest → newest for the progression timeline
@@ -277,15 +277,15 @@ function buildIndexHtml(index: ReportsIndex): string {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GSD Reports — ${esc(projectName)}</title>
+<title>WTF Reports — ${esc(projectName)}</title>
 <style>${INDEX_CSS}</style>
 </head>
 <body>
 <header>
   <div class="hdr-inner">
     <div class="branding">
-      <span class="logo">GSD</span>
-      <span class="ver">v${esc(gsdVersion)}</span>
+      <span class="logo">WTF</span>
+      <span class="ver">v${esc(wtfVersion)}</span>
     </div>
     <div class="hdr-meta">
       <h1>${esc(projectName)} <span class="hdr-subtitle">Reports</span></h1>
@@ -317,14 +317,14 @@ function buildIndexHtml(index: ReportsIndex): string {
       <h2>Progression <span class="sec-count">${entries.length}</span></h2>
       ${sorted.length > 0
         ? `<div class="cards-grid">${cardHtml}</div>`
-        : '<p class="empty">No reports generated yet. Run <code>/gsd export --html</code> or enable <code>auto_report: true</code>.</p>'}
+        : '<p class="empty">No reports generated yet. Run <code>/wtf export --html</code> or enable <code>auto_report: true</code>.</p>'}
     </section>
   </main>
 </div>
 
 <footer>
   <div class="ftr-inner">
-    <span class="ftr-brand">GSD v${esc(gsdVersion)}</span>
+    <span class="ftr-brand">WTF v${esc(wtfVersion)}</span>
     <span class="ftr-sep">—</span>
     <span>${esc(projectName)}</span>
     <span class="ftr-sep">—</span>

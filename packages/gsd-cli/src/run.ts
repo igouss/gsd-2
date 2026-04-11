@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * gsd-run — Standalone GSD orchestrator CLI.
+ * wtf-run — Standalone WTF orchestrator CLI.
  *
  * Usage:
- *   gsd-run <projectDir> [options]
+ *   wtf-run <projectDir> [options]
  *
  * Options:
  *   --model <id>         Default model (default: claude-sonnet-4-6)
@@ -13,9 +13,9 @@
  *   --verbose            Show debug output
  *   --dry-run            Resolve next dispatch without executing
  *
- * The orchestrator derives state from .gsd/, builds prompts, and dispatches
+ * The orchestrator derives state from .wtf/, builds prompts, and dispatches
  * units to Claude Code via the ClaudeCodeAdapter. The executing agent has
- * access to GSD state-mutation tools via an MCP server started automatically.
+ * access to WTF state-mutation tools via an MCP server started automatically.
  */
 
 import { resolve } from "node:path";
@@ -23,6 +23,7 @@ import { existsSync } from "node:fs";
 
 import {
   ClaudeCodeAdapter,
+  PROJECT_DIR_NAME,
 } from "@gsd-build/gsd-core";
 import type { ClaudeCodeAdapterOptions } from "@gsd-build/gsd-core";
 import { consoleEventSink } from "@gsd-build/gsd-tui";
@@ -97,7 +98,7 @@ function parseArgs(): CliArgs {
 
 function printUsage(): void {
   process.stderr.write(`
-Usage: gsd-run <projectDir> [options]
+Usage: wtf-run <projectDir> [options]
 
 Options:
   --model <id>         Default model (default: claude-sonnet-4-6)
@@ -123,13 +124,13 @@ export async function run(): Promise<void> {
     process.exit(1);
   }
 
-  const gsdDir = resolve(args.projectDir, ".gsd");
-  if (!existsSync(gsdDir)) {
-    events.notify(`No .gsd/ directory found in ${args.projectDir} — run 'gsd init' first`, "error");
+  const wtfDir = resolve(args.projectDir, PROJECT_DIR_NAME);
+  if (!existsSync(wtfDir)) {
+    events.notify(`No .wtf/ directory found in ${args.projectDir} — run 'wtf init' first`, "error");
     process.exit(1);
   }
 
-  events.notify(`GSD orchestrator starting for ${args.projectDir}`, "info");
+  events.notify(`WTF orchestrator starting for ${args.projectDir}`, "info");
   events.notify(`Model: ${args.model}`, "info");
 
   // Set up adapter
@@ -152,7 +153,7 @@ export async function run(): Promise<void> {
   // Start MCP unit-tools server in this process (SSE transport)
   const mcpHost = await startMcpHost(
     args.projectDir,
-    resolve(args.projectDir, ".gsd", ".tmp"),
+    resolve(args.projectDir, PROJECT_DIR_NAME, ".tmp"),
     events,
   );
   events.notify(`MCP config: ${mcpHost.mcpConfigPath}`, "info");
@@ -171,8 +172,8 @@ export async function run(): Promise<void> {
     // Resolve templates dir from gsd-core package
     const { createRequire } = await import("node:module");
     const require_ = createRequire(import.meta.url);
-    const gsdCorePkg = require_.resolve("@gsd-build/gsd-core/package.json");
-    const templatesDir = resolve(gsdCorePkg, "..", "dist", "templates");
+    const wtfCorePkg = require_.resolve("@gsd-build/gsd-core/package.json");
+    const templatesDir = resolve(wtfCorePkg, "..", "dist", "templates");
 
     await minimalLoop({
       adapter,

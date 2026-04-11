@@ -1,5 +1,5 @@
 /**
- * complete-slice handler — the core operation behind gsd_slice_complete.
+ * complete-slice handler — the core operation behind wtf_slice_complete.
  *
  * Validates inputs, checks all tasks are complete, writes slice row to DB in
  * a transaction, then (outside the transaction) renders SUMMARY.md + UAT.md
@@ -21,7 +21,7 @@ import {
   getMilestone,
   updateSliceStatus,
   setSliceSummaryMd,
-} from "../persistence/gsd-db.ts";
+} from "../persistence/wtf-db.ts";
 import { resolveSlicePath, clearPathCache } from "../persistence/paths.ts";
 import { checkOwnership, sliceUnitKey } from "../state/unit-ownership.ts";
 import { saveFile, clearParseCache } from "../persistence/files.ts";
@@ -31,6 +31,7 @@ import { renderAllProjections } from "../workflow/workflow-projections.ts";
 import { writeManifest } from "../workflow/workflow-manifest.ts";
 import { appendEvent } from "../workflow/workflow-events.ts";
 import { logWarning, logError } from "../workflow/workflow-logger.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 export interface CompleteSliceResult {
   sliceId: string;
@@ -259,7 +260,7 @@ export async function handleCompleteSlice(
 
     const slice = getSlice(params.milestoneId, params.sliceId);
     if (slice && isClosedStatus(slice.status)) {
-      guardError = `slice ${params.sliceId} is already complete — use gsd_slice_reopen first if you need to redo it`;
+      guardError = `slice ${params.sliceId} is already complete — use wtf_slice_reopen first if you need to redo it`;
       return;
     }
 
@@ -301,8 +302,8 @@ export async function handleCompleteSlice(
     summaryPath = join(sliceDir, `${params.sliceId}-SUMMARY.md`);
   } else {
     // Slice dir doesn't exist on disk yet — build path manually and ensure dirs
-    const gsdDir = join(basePath, ".gsd");
-    const manualSliceDir = join(gsdDir, "milestones", params.milestoneId, "slices", params.sliceId);
+    const wtfDir = join(basePath, PROJECT_DIR_NAME);
+    const manualSliceDir = join(wtfDir, "milestones", params.milestoneId, "slices", params.sliceId);
     mkdirSync(manualSliceDir, { recursive: true });
     summaryPath = join(manualSliceDir, `${params.sliceId}-SUMMARY.md`);
   }

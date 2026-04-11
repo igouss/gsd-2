@@ -1,8 +1,8 @@
 /**
  * dev-workflow-engine.ts — DevWorkflowEngine implementation.
  *
- * Implements WorkflowEngine by delegating to existing GSD state derivation
- * and dispatch logic. This is the "dev" engine — it wraps the current GSD
+ * Implements WorkflowEngine by delegating to existing WTF state derivation
+ * and dispatch logic. This is the "dev" engine — it wraps the current WTF
  * auto-mode behavior behind the engine-polymorphic interface.
  */
 
@@ -14,17 +14,17 @@ import type {
   ReconcileResult,
   DisplayMetadata,
 } from "../routing/engine-types.ts";
-import type { GSDState } from "../domain/types.ts";
+import type { WTFState } from "../domain/types.ts";
 import type { DispatchAction, DispatchContext } from "../auto/auto-dispatch.ts";
 
 import { deriveState } from "../state/state.ts";
 import { resolveDispatch } from "../auto/auto-dispatch.ts";
-import { loadEffectiveGSDPreferences } from "../preferences/preferences.ts";
+import { loadEffectiveWTFPreferences } from "../preferences/preferences.ts";
 
 // ─── Bridge: DispatchAction → EngineDispatchAction ────────────────────────
 
 /**
- * Map a GSD-specific DispatchAction (which carries `matchedRule`, `unitType`,
+ * Map a WTF-specific DispatchAction (which carries `matchedRule`, `unitType`,
  * etc.) to the engine-generic EngineDispatchAction discriminated union.
  *
  * Exported for unit testing.
@@ -57,14 +57,14 @@ export class DevWorkflowEngine implements WorkflowEngine {
   readonly engineId = "dev" as const;
 
   async deriveState(basePath: string): Promise<EngineState> {
-    const gsd: GSDState = await deriveState(basePath);
+    const wtf: WTFState = await deriveState(basePath);
     return {
-      phase: gsd.phase,
-      currentMilestoneId: gsd.activeMilestone?.id ?? null,
-      activeSliceId: gsd.activeSlice?.id ?? null,
-      activeTaskId: gsd.activeTask?.id ?? null,
-      isComplete: gsd.phase === "complete",
-      raw: gsd,
+      phase: wtf.phase,
+      currentMilestoneId: wtf.activeMilestone?.id ?? null,
+      activeSliceId: wtf.activeSlice?.id ?? null,
+      activeTaskId: wtf.activeTask?.id ?? null,
+      isComplete: wtf.phase === "complete",
+      raw: wtf,
     };
   }
 
@@ -72,17 +72,17 @@ export class DevWorkflowEngine implements WorkflowEngine {
     state: EngineState,
     context: { basePath: string },
   ): Promise<EngineDispatchAction> {
-    const gsd = state.raw as GSDState;
-    const mid = gsd.activeMilestone?.id ?? "";
-    const midTitle = gsd.activeMilestone?.title ?? "";
-    const loaded = loadEffectiveGSDPreferences();
+    const wtf = state.raw as WTFState;
+    const mid = wtf.activeMilestone?.id ?? "";
+    const midTitle = wtf.activeMilestone?.title ?? "";
+    const loaded = loadEffectiveWTFPreferences();
     const prefs = loaded?.preferences ?? undefined;
 
     const dispatchCtx: DispatchContext = {
       basePath: context.basePath,
       mid,
       midTitle,
-      state: gsd,
+      state: wtf,
       prefs,
     };
 
@@ -101,7 +101,7 @@ export class DevWorkflowEngine implements WorkflowEngine {
 
   getDisplayMetadata(state: EngineState): DisplayMetadata {
     return {
-      engineLabel: "GSD Dev",
+      engineLabel: "WTF Dev",
       currentPhase: state.phase,
       progressSummary: `${state.currentMilestoneId ?? "no milestone"} / ${state.activeSliceId ?? "—"} / ${state.activeTaskId ?? "—"}`,
       stepCount: null,

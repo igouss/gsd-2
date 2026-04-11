@@ -1,7 +1,7 @@
 import { clearParseCache } from "../persistence/files.ts";
 import { isClosedStatus } from "../domain/status-guards.ts";
 import { isNonEmptyString, validateStringArray } from "../verification/validation.ts";
-import { transaction, getSlice, getTask, insertTask, upsertTaskPlanning } from "../persistence/gsd-db.ts";
+import { transaction, getSlice, getTask, insertTask, upsertTaskPlanning } from "../persistence/wtf-db.ts";
 import { invalidateStateCache } from "../state/state.ts";
 import { renderTaskPlanFromDb } from "../reporting/markdown-renderer.ts";
 import { renderAllProjections } from "../workflow/workflow-projections.ts";
@@ -85,7 +85,7 @@ export async function handlePlanTask(
 
       const existingTask = getTask(params.milestoneId, params.sliceId, params.taskId);
       if (existingTask && isClosedStatus(existingTask.status)) {
-        guardError = `cannot re-plan task ${params.taskId}: it is already complete — use gsd_task_reopen first`;
+        guardError = `cannot re-plan task ${params.taskId}: it is already complete — use wtf_task_reopen first`;
         return;
       }
 

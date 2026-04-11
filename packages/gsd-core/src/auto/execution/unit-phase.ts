@@ -164,12 +164,12 @@ export async function runUnitPhase(
   s.lastBaselineCharCount = undefined;
   if (deps.isDbAvailable()) {
     try {
-      const { inlineGsdRootFile } = await import("../../prompt/auto-prompts.ts");
+      const { inlineWtfRootFile } = await import("../../prompt/auto-prompts.ts");
       const [decisionsContent, requirementsContent, projectContent] =
         await Promise.all([
-          inlineGsdRootFile(s.basePath, "decisions.md", "Decisions"),
-          inlineGsdRootFile(s.basePath, "requirements.md", "Requirements"),
-          inlineGsdRootFile(s.basePath, "project.md", "Project"),
+          inlineWtfRootFile(s.basePath, "decisions.md", "Decisions"),
+          inlineWtfRootFile(s.basePath, "requirements.md", "Requirements"),
+          inlineWtfRootFile(s.basePath, "project.md", "Project"),
         ]);
       s.lastBaselineCharCount =
         (decisionsContent?.length ?? 0) +

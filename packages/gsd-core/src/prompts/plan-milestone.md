@@ -1,4 +1,4 @@
-You are executing GSD auto-mode.
+You are executing WTF auto-mode.
 
 ## UNIT: Plan Milestone {{milestoneId}} ("{{milestoneTitle}}")
 
@@ -23,7 +23,7 @@ Before decomposing, build your understanding:
 1. **Codebase exploration.** For small/familiar codebases, use `rg`, `find`, and targeted reads. For large or unfamiliar codebases, use `scout` to build a broad map efficiently before diving in.
 2. **Library docs.** Use `resolve_library` / `get_library_docs` for unfamiliar libraries — skip this for libraries already used in the codebase.
 3. **Skill Discovery ({{skillDiscoveryMode}}):**{{skillDiscoveryInstructions}}
-4. **Requirements analysis.** If `.gsd/REQUIREMENTS.md` exists, research against it. Identify which Active requirements are table stakes, likely omissions, overbuilt risks, or domain-standard behaviors.
+4. **Requirements analysis.** If `.wtf/REQUIREMENTS.md` exists, research against it. Identify which Active requirements are table stakes, likely omissions, overbuilt risks, or domain-standard behaviors.
 
 ### Strategic Questions to Answer
 
@@ -47,8 +47,8 @@ Then:
 2. {{skillActivation}}
 3. Create the roadmap: decompose into demoable vertical slices — as many as the work genuinely needs, no more. A simple feature might be 1 slice. Don't decompose for decomposition's sake.
 4. Order by risk (high-risk first)
-5. Call `gsd_plan_milestone` to persist the milestone planning fields, slice rows, and **horizontal checklist** in the DB-backed planning path. Do **not** write `{{outputPath}}`, `ROADMAP.md`, or other planning artifacts manually — the planning tool owns roadmap rendering and persistence.
-6. If planning produced structural decisions (e.g. slice ordering rationale, technology choices, scope exclusions), call `gsd_decision_save` for each decision — the tool auto-assigns IDs and regenerates `.gsd/DECISIONS.md` automatically.
+5. Call `wtf_plan_milestone` to persist the milestone planning fields, slice rows, and **horizontal checklist** in the DB-backed planning path. Do **not** write `{{outputPath}}`, `ROADMAP.md`, or other planning artifacts manually — the planning tool owns roadmap rendering and persistence.
+6. If planning produced structural decisions (e.g. slice ordering rationale, technology choices, scope exclusions), call `wtf_decision_save` for each decision — the tool auto-assigns IDs and regenerates `.wtf/DECISIONS.md` automatically.
 
 ## Requirement Mapping Rules
 
@@ -57,7 +57,7 @@ Then:
 - Product-facing milestones should cover launchability, primary user loop, continuity, and failure visibility when relevant.
 - A slice may support multiple requirements, but should not exist with no requirement justification unless it is clearly enabling work for a mapped requirement.
 - Include a compact coverage summary in the roadmap so omissions are mechanically visible.
-- If `.gsd/REQUIREMENTS.md` exists and an Active requirement has no credible path, surface that clearly. Do not silently ignore orphaned Active requirements.
+- If `.wtf/REQUIREMENTS.md` exists and an Active requirement has no credible path, surface that clearly. Do not silently ignore orphaned Active requirements.
 
 ## Planning Doctrine
 
@@ -82,7 +82,7 @@ Apply these when decomposing and ordering slices:
 
 If the roadmap has only one slice, also plan the slice and its tasks inline during this unit — don't leave them for a separate planning session.
 
-1. After `gsd_plan_milestone` returns, immediately call `gsd_plan_slice` for S01 with the full task breakdown
+1. After `wtf_plan_milestone` returns, immediately call `wtf_plan_slice` for S01 with the full task breakdown
 2. Use the **Slice Plan** and **Task Plan** output templates from the inlined context above to structure the tool call parameters
 3. For simple slices, keep the plan lean — omit Proof Level, Integration Closure, and Observability sections if they would all be "none". Executable verification commands are sufficient.
 

@@ -1,4 +1,4 @@
-// GSD Database — Worktree DB reconciliation
+// WTF Database — Worktree DB reconciliation
 
 import { existsSync, realpathSync } from "node:fs";
 import { logError, logWarning } from "../workflow/workflow-logger.ts";

@@ -1,5 +1,5 @@
 /**
- * GSD Prompt Validation — Validates enhanced context output before writing.
+ * WTF Prompt Validation — Validates enhanced context output before writing.
  *
  * Implements R109 validation requirement: CONTEXT.md must have required sections
  * before being written to disk.

@@ -1,6 +1,6 @@
-// GSD Database — Artifact CRUD
+// WTF Database — Artifact CRUD
 
-import { GSDError, GSD_STALE_STATE } from "../domain/errors.ts";
+import { WTFError, WTF_STALE_STATE } from "../domain/errors.ts";
 import { logWarning } from "../workflow/workflow-logger.ts";
 import { _getCurrentDb } from "./db-core.ts";
 
@@ -19,7 +19,7 @@ export function insertArtifact(a: {
   full_content: string;
 }): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `INSERT OR REPLACE INTO artifacts (path, artifact_type, milestone_id, slice_id, task_id, full_content, imported_at)
      VALUES (:path, :artifact_type, :milestone_id, :slice_id, :task_id, :full_content, :imported_at)`,

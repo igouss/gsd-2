@@ -1,4 +1,4 @@
-// Native GSD Parser Bridge
+// Native WTF Parser Bridge
 // Provides drop-in replacements for the JS parsing functions in files.ts,
 // backed by the Rust native parser for better performance on large projects.
 //
@@ -8,13 +8,13 @@ import type { Roadmap, RiskLevel } from '../domain/types.ts';
 
 // Issue #453: auto-mode post-turn reconciliation must stay on the stable JS path
 // unless the native parser is explicitly requested.
-const NATIVE_GSD_PARSER_ENABLED = process.env.GSD_ENABLE_NATIVE_GSD_PARSER === "1";
+const NATIVE_WTF_PARSER_ENABLED = process.env.WTF_ENABLE_NATIVE_WTF_PARSER === "1";
 
 let nativeModule: {
   parseFrontmatter: (content: string) => { metadata: string; body: string };
   extractSection: (content: string, heading: string, level?: number) => { content: string; found: boolean };
   extractAllSections: (content: string, level?: number) => string;
-  batchParseGsdFiles: (directory: string) => { files: Array<{ path: string; metadata: string; body: string; sections: string; rawContent: string }>; count: number };
+  batchParseWtfFiles: (directory: string) => { files: Array<{ path: string; metadata: string; body: string; sections: string; rawContent: string }>; count: number };
   parseRoadmapFile: (content: string) => {
     title: string;
     vision: string;
@@ -22,7 +22,7 @@ let nativeModule: {
     slices: Array<{ id: string; title: string; risk: string; depends: string[]; done: boolean; demo: string }>;
     boundaryMap: Array<{ fromSlice: string; toSlice: string; produces: string; consumes: string }>;
   };
-  scanGsdTree: (directory: string) => Array<{ path: string; name: string; isDir: boolean }>;
+  scanWtfTree: (directory: string) => Array<{ path: string; name: string; isDir: boolean }>;
   parseJsonlTail: (filePath: string, maxBytes?: number, maxEntries?: number) => { entries: string; count: number; truncated: boolean };
   parsePlanFile: (content: string) => NativePlanResult;
   parseSummaryFile: (content: string) => NativeSummaryResult;
@@ -33,13 +33,13 @@ let loadAttempted = false;
 function loadNative(): typeof nativeModule {
   if (loadAttempted) return nativeModule;
   loadAttempted = true;
-  if (!NATIVE_GSD_PARSER_ENABLED) return nativeModule;
+  if (!NATIVE_WTF_PARSER_ENABLED) return nativeModule;
 
   try {
     // Dynamic import to avoid hard dependency - fails gracefully if native module not built
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('@gsd/native');
-    if (mod.parseFrontmatter && mod.extractSection && mod.batchParseGsdFiles) {
+    const mod = require('@wtf/native');
+    if (mod.parseFrontmatter && mod.extractSection && mod.batchParseWtfFiles) {
       nativeModule = mod;
     }
   } catch {
@@ -121,14 +121,14 @@ export interface BatchParsedFile {
 }
 
 /**
- * Batch-parse all .md files in a .gsd/ directory tree using the native parser.
+ * Batch-parse all .md files in a .wtf/ directory tree using the native parser.
  * Returns null if native module unavailable.
  */
-export function nativeBatchParseGsdFiles(directory: string): BatchParsedFile[] | null {
+export function nativeBatchParseWtfFiles(directory: string): BatchParsedFile[] | null {
   const native = loadNative();
   if (!native) return null;
 
-  const result = native.batchParseGsdFiles(directory);
+  const result = native.batchParseWtfFiles(directory);
   return result.files.map(f => ({
     path: f.path,
     metadata: JSON.parse(f.metadata) as Record<string, unknown>,
@@ -147,20 +147,20 @@ export function isNativeParserAvailable(): boolean {
 
 // ─── Tree Scanning ────────────────────────────────────────────────────────────
 
-export interface GsdTreeEntry {
+export interface WtfTreeEntry {
   path: string;
   name: string;
   isDir: boolean;
 }
 
 /**
- * Native-backed directory tree scan of a .gsd/ directory.
+ * Native-backed directory tree scan of a .wtf/ directory.
  * Returns a flat list of all entries, or null if native module unavailable.
  */
-export function nativeScanGsdTree(directory: string): GsdTreeEntry[] | null {
+export function nativeScanWtfTree(directory: string): WtfTreeEntry[] | null {
   const native = loadNative();
   if (!native) return null;
-  return native.scanGsdTree(directory);
+  return native.scanWtfTree(directory);
 }
 
 // ─── JSONL Parsing ────────────────────────────────────────────────────────────

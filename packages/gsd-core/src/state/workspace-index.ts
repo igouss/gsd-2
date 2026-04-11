@@ -1,5 +1,5 @@
 import { loadFile } from "../persistence/files.ts";
-import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../persistence/gsd-db.ts";
+import { isDbAvailable, getMilestoneSlices, getSliceTasks } from "../persistence/wtf-db.ts";
 import { parseRoadmap, parsePlan } from "../persistence/md-parsers.ts";
 import {
   resolveMilestoneFile,
@@ -40,7 +40,7 @@ export interface WorkspaceMilestoneTarget {
   id: string;
   title: string;
   roadmapPath?: string;
-  /** Authoritative milestone lifecycle status from the GSD state registry. */
+  /** Authoritative milestone lifecycle status from the WTF state registry. */
   status?: "complete" | "active" | "pending" | "parked";
   /** Milestone validation verdict, when validation has been performed. */
   validationVerdict?: "pass" | "needs-attention" | "needs-remediation";
@@ -53,7 +53,7 @@ export interface WorkspaceScopeTarget {
   kind: "project" | "milestone" | "slice" | "task";
 }
 
-export interface GSDWorkspaceIndex {
+export interface WTFWorkspaceIndex {
   milestones: WorkspaceMilestoneTarget[];
   active: {
     milestoneId?: string;
@@ -137,7 +137,7 @@ export interface IndexWorkspaceOptions {
   validate?: boolean;
 }
 
-export async function indexWorkspace(basePath: string, _opts: IndexWorkspaceOptions = {}): Promise<GSDWorkspaceIndex> {
+export async function indexWorkspace(basePath: string, _opts: IndexWorkspaceOptions = {}): Promise<WTFWorkspaceIndex> {
   const milestoneIds = findMilestoneIds(basePath);
   const milestones: WorkspaceMilestoneTarget[] = [];
 
@@ -260,10 +260,10 @@ export async function getSuggestedNextCommands(basePath: string): Promise<string
     : index.active.milestoneId;
 
   const commands = new Set<string>();
-  if (index.active.phase === "planning") commands.add("/gsd");
-  if (index.active.phase === "executing" || index.active.phase === "summarizing") commands.add("/gsd auto");
-  if (scope) commands.add(`/gsd doctor ${scope}`);
-  if (scope) commands.add(`/gsd doctor fix ${scope}`);
-  commands.add("/gsd status");
+  if (index.active.phase === "planning") commands.add("/wtf");
+  if (index.active.phase === "executing" || index.active.phase === "summarizing") commands.add("/wtf auto");
+  if (scope) commands.add(`/wtf doctor ${scope}`);
+  if (scope) commands.add(`/wtf doctor fix ${scope}`);
+  commands.add("/wtf status");
   return [...commands];
 }

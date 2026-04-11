@@ -1,9 +1,10 @@
 /**
- * GSD Detection — Marker constants, scan limits, and shared low-level utilities.
+ * WTF Detection — Marker constants, scan limits, and shared low-level utilities.
  */
 
 import { openSync, readSync, closeSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 // ─── Language & Marker Maps ─────────────────────────────────────────────────────
 
@@ -88,7 +89,7 @@ export const VUE_EXTENSIONS = [".vue"] as const;
 /** Directories skipped during bounded recursive project scans. */
 export const RECURSIVE_SCAN_IGNORED_DIRS = new Set([
   ".git",
-  ".gsd",
+  PROJECT_DIR_NAME,
   ".planning",
   ".plans",
   ".claude",

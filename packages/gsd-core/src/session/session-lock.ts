@@ -1,12 +1,12 @@
 /**
- * GSD Session Lock — OS-level exclusive locking for auto-mode sessions.
+ * WTF Session Lock — OS-level exclusive locking for auto-mode sessions.
  *
- * Prevents multiple GSD processes from running auto-mode concurrently on
+ * Prevents multiple WTF processes from running auto-mode concurrently on
  * the same project. Uses proper-lockfile for OS-level file locking (flock/
  * lockfile) which eliminates the TOCTOU race condition that existed with
  * the old advisory JSON lock approach.
  *
- * The lock file (.gsd/auto.lock) contains JSON metadata (PID, start time,
+ * The lock file (.wtf/auto.lock) contains JSON metadata (PID, start time,
  * unit info) for diagnostics, but the actual exclusion is enforced by the
  * OS-level lock held via proper-lockfile.
  *
@@ -19,8 +19,9 @@
 import { createRequire } from "node:module";
 import { existsSync, readFileSync, readdirSync, mkdirSync, unlinkSync, rmSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 import { atomicWriteSync } from "../persistence/atomic-write.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 const _require = createRequire(import.meta.url);
 
@@ -69,12 +70,12 @@ let _lockCompromised: boolean = false;
 /** Whether we've already registered a process.on('exit') handler. */
 let _exitHandlerRegistered: boolean = false;
 
-/** Registry of all gsdDir paths where locks were created during this session.
- *  The exit handler cleans ALL of these, not just the current gsdRoot(). (#1578) */
+/** Registry of all wtfDir paths where locks were created during this session.
+ *  The exit handler cleans ALL of these, not just the current wtfRoot(). (#1578) */
 const _lockDirRegistry: Set<string> = new Set();
 
 /** Snapshotted lock file path — captured at acquireSessionLock time to avoid
- *  gsdRoot() resolving differently in worktree vs project root contexts (#1363). */
+ *  wtfRoot() resolving differently in worktree vs project root contexts (#1363). */
 let _snapshotLockPath: string | null = null;
 
 /** Timestamp when the session lock was acquired — used to detect false-positive
@@ -85,29 +86,29 @@ const LOCK_FILE = "auto.lock";
 
 /**
  * Derive the effective lock file name for the current process.
- * In parallel worker mode (GSD_PARALLEL_WORKER + GSD_MILESTONE_LOCK),
+ * In parallel worker mode (WTF_PARALLEL_WORKER + WTF_MILESTONE_LOCK),
  * each worker uses a per-milestone lock file (`auto-<milestoneId>.lock`)
- * to avoid contending on the shared `.gsd/auto.lock` (#2184).
+ * to avoid contending on the shared `.wtf/auto.lock` (#2184).
  */
 export function effectiveLockFile(): string {
-  const mid = process.env.GSD_PARALLEL_WORKER ? process.env.GSD_MILESTONE_LOCK : null;
+  const mid = process.env.WTF_PARALLEL_WORKER ? process.env.WTF_MILESTONE_LOCK : null;
   return mid ? `auto-${mid}.lock` : LOCK_FILE;
 }
 
 /**
  * Derive the OS-level lock target directory for the current process.
- * In parallel worker mode, uses `.gsd/parallel/<milestoneId>/` instead of
- * `.gsd/` so workers don't contend on the same proper-lockfile directory (#2184).
+ * In parallel worker mode, uses `.wtf/parallel/<milestoneId>/` instead of
+ * `.wtf/` so workers don't contend on the same proper-lockfile directory (#2184).
  */
-export function effectiveLockTarget(gsdDir: string): string {
-  const mid = process.env.GSD_PARALLEL_WORKER ? process.env.GSD_MILESTONE_LOCK : null;
-  return mid ? join(gsdDir, "parallel", mid) : gsdDir;
+export function effectiveLockTarget(wtfDir: string): string {
+  const mid = process.env.WTF_PARALLEL_WORKER ? process.env.WTF_MILESTONE_LOCK : null;
+  return mid ? join(wtfDir, "parallel", mid) : wtfDir;
 }
 
 function lockPath(basePath: string): string {
   // If we have a snapshotted path from acquisition, use it for consistency
   if (_snapshotLockPath) return _snapshotLockPath;
-  return join(gsdRoot(basePath), effectiveLockFile());
+  return join(wtfRoot(basePath), effectiveLockFile());
 }
 
 // ─── Stray Lock Cleanup ─────────────────────────────────────────────────────
@@ -117,32 +118,32 @@ function lockPath(basePath: string): string {
  * that accumulate from macOS file conflict resolution (iCloud/Dropbox/OneDrive)
  * or other filesystem-level copy-on-conflict behavior (#1315).
  *
- * Also removes stray proper-lockfile directories beyond the canonical `.gsd.lock/`.
+ * Also removes stray proper-lockfile directories beyond the canonical `.wtf.lock/`.
  */
 export function cleanupStrayLockFiles(basePath: string): void {
-  const gsdDir = gsdRoot(basePath);
+  const wtfDir = wtfRoot(basePath);
 
-  // Clean numbered auto lock files inside .gsd/
+  // Clean numbered auto lock files inside .wtf/
   try {
-    if (existsSync(gsdDir)) {
-      for (const entry of readdirSync(gsdDir)) {
+    if (existsSync(wtfDir)) {
+      for (const entry of readdirSync(wtfDir)) {
         // Match "auto <N>.lock" or "auto (<N>).lock" variants but NOT the canonical "auto.lock"
         if (entry !== LOCK_FILE && /^auto\s.+\.lock$/i.test(entry)) {
-          try { unlinkSync(join(gsdDir, entry)); } catch { /* best-effort */ }
+          try { unlinkSync(join(wtfDir, entry)); } catch { /* best-effort */ }
         }
       }
     }
   } catch { /* non-fatal: directory read failure */ }
 
-  // Clean stray proper-lockfile directories (e.g. ".gsd 2.lock/")
-  // The canonical one is ".gsd.lock/" — anything else is stray.
+  // Clean stray proper-lockfile directories (e.g. ".wtf 2.lock/")
+  // The canonical one is ".wtf.lock/" — anything else is stray.
   try {
-    const parentDir = dirname(gsdDir);
-    const gsdDirName = gsdDir.split("/").pop() || ".gsd";
+    const parentDir = dirname(wtfDir);
+    const wtfDirName = wtfDir.split("/").pop() || PROJECT_DIR_NAME;
     if (existsSync(parentDir)) {
       for (const entry of readdirSync(parentDir)) {
-        // Match ".gsd <N>.lock" or ".gsd (<N>).lock" directories but NOT ".gsd.lock"
-        if (entry !== `${gsdDirName}.lock` && entry.startsWith(gsdDirName) && entry.endsWith(".lock")) {
+        // Match ".wtf <N>.lock" or ".wtf (<N>).lock" directories but NOT ".wtf.lock"
+        if (entry !== `${wtfDirName}.lock` && entry.startsWith(wtfDirName) && entry.endsWith(".lock")) {
           const fullPath = join(parentDir, entry);
           try {
             const stat = statSync(fullPath);
@@ -161,9 +162,9 @@ export function cleanupStrayLockFiles(basePath: string): void {
  * Uses module-level references so it always operates on current state.
  * Only registers once — subsequent calls are no-ops.
  */
-function ensureExitHandler(_gsdDir: string): void {
-  // Register the gsdDir so exit cleanup covers it
-  _lockDirRegistry.add(_gsdDir);
+function ensureExitHandler(_wtfDir: string): void {
+  // Register the wtfDir so exit cleanup covers it
+  _lockDirRegistry.add(_wtfDir);
 
   if (_exitHandlerRegistered) return;
   _exitHandlerRegistered = true;
@@ -173,7 +174,7 @@ function ensureExitHandler(_gsdDir: string): void {
       if (_releaseFunction) { _releaseFunction(); _releaseFunction = null; }
     } catch { /* best-effort */ }
     // Clean ALL registered lock paths, not just the current one (#1578).
-    // Lock files accumulate across main project .gsd/, worktree .gsd/,
+    // Lock files accumulate across main project .wtf/, worktree .wtf/,
     // and projects registry paths — cleanup must cover all of them.
     for (const dir of _lockDirRegistry) {
       try {
@@ -210,14 +211,14 @@ function createLockCompromisedHandler(lockFilePath: string): () => void {
     const elapsed = Date.now() - _lockAcquiredAt;
     if (elapsed < 1_800_000) {
       process.stderr.write(
-        `[gsd] Lock heartbeat caught up after ${Math.round(elapsed / 1000)}s — long LLM call, no action needed.\n`,
+        `[wtf] Lock heartbeat caught up after ${Math.round(elapsed / 1000)}s — long LLM call, no action needed.\n`,
       );
       return;
     }
     const existing = readExistingLockDataWithRetry(lockFilePath);
     if (existing && existing.pid === process.pid) {
       process.stderr.write(
-        `[gsd] Lock heartbeat mismatch after ${Math.round(elapsed / 1000)}s — lock file still owned by PID ${process.pid}, treating as false positive.\n`,
+        `[wtf] Lock heartbeat mismatch after ${Math.round(elapsed / 1000)}s — lock file still owned by PID ${process.pid}, treating as false positive.\n`,
       );
       return;
     }
@@ -285,13 +286,13 @@ export function acquireSessionLock(basePath: string): SessionLockResult {
     return acquireFallbackLock(basePath, lp, lockData);
   }
 
-  const gsdDir = gsdRoot(basePath);
-  const lockTarget = effectiveLockTarget(gsdDir);
+  const wtfDir = wtfRoot(basePath);
+  const lockTarget = effectiveLockTarget(wtfDir);
 
   // #3218: Pre-flight stale lock cleanup — if the .lock/ directory exists but
   // no auto.lock metadata is present (or the PID is dead), remove the lock
   // directory before attempting acquisition. This prevents the 30-min stale
-  // window from blocking /gsd after crashes, SIGKILL, or laptop sleep.
+  // window from blocking /wtf after crashes, SIGKILL, or laptop sleep.
   const lockDir = lockTarget + ".lock";
   if (existsSync(lockDir)) {
     const existingData = readExistingLockData(lp);
@@ -306,7 +307,7 @@ export function acquireSessionLock(basePath: string): SessionLockResult {
     // Try to acquire an exclusive OS-level lock on the lock target.
     // We lock a directory since proper-lockfile works best on directories,
     // and the lock file itself may not exist yet.
-    // In parallel worker mode, lockTarget is .gsd/parallel/<MID>/ (#2184).
+    // In parallel worker mode, lockTarget is .wtf/parallel/<MID>/ (#2184).
     mkdirSync(lockTarget, { recursive: true });
 
     const release = lockfile.lockSync(lockTarget, {
@@ -327,7 +328,7 @@ export function acquireSessionLock(basePath: string): SessionLockResult {
 
     return { acquired: true };
   } catch (err) {
-    // Lock is held by another process — or the .gsd.lock/ directory is stranded.
+    // Lock is held by another process — or the .wtf.lock/ directory is stranded.
     // Check: if auto.lock is gone and no process is alive, the lock dir is stale.
     const existingData = readExistingLockData(lp);
     const existingPid = existingData?.pid;
@@ -451,7 +452,7 @@ export function getSessionLockStatus(basePath: string): SessionLockStatus {
         const result = acquireSessionLock(basePath);
         if (result.acquired) {
           process.stderr.write(
-            `[gsd] Lock recovered after onCompromised — lock file PID matched, re-acquired.\n`,
+            `[wtf] Lock recovered after onCompromised — lock file PID matched, re-acquired.\n`,
           );
           return { valid: true, recovered: true };
         }
@@ -523,9 +524,9 @@ export function releaseSessionLock(basePath: string): void {
   }
 
   // Remove the proper-lockfile directory for the current lock target.
-  // In parallel worker mode, this is .gsd/parallel/<MID>.lock/ (#2184).
-  const gsdDir = gsdRoot(basePath);
-  const lockTarget = effectiveLockTarget(gsdDir);
+  // In parallel worker mode, this is .wtf/parallel/<MID>.lock/ (#2184).
+  const wtfDir = wtfRoot(basePath);
+  const lockTarget = effectiveLockTarget(wtfDir);
   try {
     const lockDir = join(lockTarget + ".lock");
     if (existsSync(lockDir)) rmSync(lockDir, { recursive: true, force: true });
@@ -533,7 +534,7 @@ export function releaseSessionLock(basePath: string): void {
     // Non-fatal
   }
   // Also clean the per-milestone parallel directory itself if it exists
-  if (lockTarget !== gsdDir) {
+  if (lockTarget !== wtfDir) {
     try {
       if (existsSync(lockTarget)) rmSync(lockTarget, { recursive: true, force: true });
     } catch {
@@ -542,7 +543,7 @@ export function releaseSessionLock(basePath: string): void {
   }
 
   // Clean ALL registered lock paths (#1578) — lock files accumulate across
-  // main project .gsd/, worktree .gsd/, and projects registry paths.
+  // main project .wtf/, worktree .wtf/, and projects registry paths.
   for (const dir of _lockDirRegistry) {
     try {
       const lockFile = join(dir, LOCK_FILE);

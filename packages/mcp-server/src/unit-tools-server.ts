@@ -1,12 +1,12 @@
 /**
- * unit-tools-server.ts — MCP server exposing GSD state-mutation tools for
+ * unit-tools-server.ts — MCP server exposing WTF state-mutation tools for
  * executing agents. This is the tool server that runs alongside the
- * orchestrator and provides agents with the ability to mutate GSD state
+ * orchestrator and provides agents with the ability to mutate WTF state
  * (complete tasks, save decisions, plan slices, etc.).
  *
  * Unlike the session-management server (server.ts), this server is
  * "unit-scoped" — it operates on a fixed project directory and exposes
- * tools that modify .gsd/ state directly. The executing agent (Claude Code,
+ * tools that modify .wtf/ state directly. The executing agent (Claude Code,
  * pi-mono, or any MCP-capable harness) connects to this server via the
  * mcpConfigPath passed in UnitDispatchRequest.
  *
@@ -21,7 +21,7 @@ import { z } from 'zod';
 // ---------------------------------------------------------------------------
 
 const MCP_PKG = '@modelcontextprotocol/sdk';
-const SERVER_NAME = 'gsd-unit-tools';
+const SERVER_NAME = 'wtf-unit-tools';
 const SERVER_VERSION = '0.1.0';
 
 // ---------------------------------------------------------------------------
@@ -118,7 +118,7 @@ function wrapHandler(
 // ---------------------------------------------------------------------------
 
 /**
- * Create an MCP server with GSD state-mutation tools scoped to a project dir.
+ * Create an MCP server with WTF state-mutation tools scoped to a project dir.
  *
  * The projectDir is baked in at creation time — all tool calls operate on that
  * directory. This is the server that executing agents connect to via mcpConfigPath.
@@ -168,21 +168,21 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   // =====================================================================
 
   server.tool(
-    'gsd_task_complete',
+    'wtf_task_complete',
     'Mark a task as complete with summary, narrative, and verification evidence. This is the primary way agents report task completion.',
     taskCompleteSchema,
     taskCompleteHandler,
   );
 
   server.tool(
-    'gsd_complete_task',
-    'Alias for gsd_task_complete.',
+    'wtf_complete_task',
+    'Alias for wtf_task_complete.',
     taskCompleteSchema,
     taskCompleteHandler,
   );
 
   server.tool(
-    'gsd_reopen_task',
+    'wtf_reopen_task',
     'Reopen a previously completed task so it can be re-executed.',
     {
       taskId: z.string().describe('Task ID'),
@@ -200,7 +200,7 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   // =====================================================================
 
   server.tool(
-    'gsd_slice_complete',
+    'wtf_slice_complete',
     'Mark a slice as complete with summary, UAT content, and requirement tracking. All tasks in the slice should be complete before calling this.',
     {
       sliceId: z.string().describe('Slice ID'),
@@ -226,7 +226,7 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   );
 
   server.tool(
-    'gsd_reopen_slice',
+    'wtf_reopen_slice',
     'Reopen a previously completed slice so it can be re-executed.',
     {
       sliceId: z.string().describe('Slice ID'),
@@ -260,8 +260,8 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
     return handleCompleteMilestone(args as any, basePath);
   });
 
-  server.tool('gsd_complete_milestone', 'Mark a milestone as complete. All slices should be complete before calling this.', completeMilestoneSchema, completeMilestoneHandler);
-  server.tool('gsd_milestone_complete', 'Alias for gsd_complete_milestone.', completeMilestoneSchema, completeMilestoneHandler);
+  server.tool('wtf_complete_milestone', 'Mark a milestone as complete. All slices should be complete before calling this.', completeMilestoneSchema, completeMilestoneHandler);
+  server.tool('wtf_milestone_complete', 'Alias for wtf_complete_milestone.', completeMilestoneSchema, completeMilestoneHandler);
 
   const validateMilestoneSchema = {
     milestoneId: z.string().describe('Milestone ID'),
@@ -279,11 +279,11 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
     return handleValidateMilestone(args as any, basePath);
   });
 
-  server.tool('gsd_validate_milestone', 'Write a milestone validation report.', validateMilestoneSchema, validateMilestoneHandler);
-  server.tool('gsd_milestone_validate', 'Alias for gsd_validate_milestone.', validateMilestoneSchema, validateMilestoneHandler);
+  server.tool('wtf_validate_milestone', 'Write a milestone validation report.', validateMilestoneSchema, validateMilestoneHandler);
+  server.tool('wtf_milestone_validate', 'Alias for wtf_validate_milestone.', validateMilestoneSchema, validateMilestoneHandler);
 
   server.tool(
-    'gsd_reopen_milestone',
+    'wtf_reopen_milestone',
     'Reopen a previously completed milestone.',
     {
       milestoneId: z.string().describe('Milestone ID'),
@@ -299,7 +299,7 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   // =====================================================================
 
   server.tool(
-    'gsd_plan_milestone',
+    'wtf_plan_milestone',
     'Plan a milestone with a structured roadmap of slices. Creates directory structure and ROADMAP.md.',
     {
       milestoneId: z.string().describe('Milestone ID (e.g. "M001")'),
@@ -326,7 +326,7 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   );
 
   server.tool(
-    'gsd_plan_slice',
+    'wtf_plan_slice',
     'Plan a slice with a structured task breakdown. Creates PLAN.md and task entries in the DB.',
     {
       milestoneId: z.string().describe('Milestone ID (e.g. "M001")'),
@@ -353,7 +353,7 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   );
 
   server.tool(
-    'gsd_plan_task',
+    'wtf_plan_task',
     'Write a detailed task plan. Creates TASK-PLAN.md in the task directory.',
     {
       milestoneId: z.string().describe('Milestone ID'),
@@ -392,8 +392,8 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
     return handleReplanSlice(args as any, basePath);
   });
 
-  server.tool('gsd_replan_slice', 'Rewrite a slice plan with a new task breakdown.', replanSliceSchema, replanSliceHandler);
-  server.tool('gsd_slice_replan', 'Alias for gsd_replan_slice.', replanSliceSchema, replanSliceHandler);
+  server.tool('wtf_replan_slice', 'Rewrite a slice plan with a new task breakdown.', replanSliceSchema, replanSliceHandler);
+  server.tool('wtf_slice_replan', 'Alias for wtf_replan_slice.', replanSliceSchema, replanSliceHandler);
 
   const reassessRoadmapSchema = {
     milestoneId: z.string().describe('Milestone ID'),
@@ -417,16 +417,16 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
     return handleReassessRoadmap(args as any, basePath);
   });
 
-  server.tool('gsd_reassess_roadmap', 'Reassess and rewrite the milestone roadmap.', reassessRoadmapSchema, reassessRoadmapHandler);
-  server.tool('gsd_roadmap_reassess', 'Alias for gsd_reassess_roadmap.', reassessRoadmapSchema, reassessRoadmapHandler);
+  server.tool('wtf_reassess_roadmap', 'Reassess and rewrite the milestone roadmap.', reassessRoadmapSchema, reassessRoadmapHandler);
+  server.tool('wtf_roadmap_reassess', 'Alias for wtf_reassess_roadmap.', reassessRoadmapSchema, reassessRoadmapHandler);
 
   // =====================================================================
   // DECISIONS & REQUIREMENTS
   // =====================================================================
 
   server.tool(
-    'gsd_decision_save',
-    'Save a technical decision to the GSD database. Decisions track architectural choices and their rationale.',
+    'wtf_decision_save',
+    'Save a technical decision to the WTF database. Decisions track architectural choices and their rationale.',
     {
       scope: z.string().describe('Scope: "project", "milestone", or "slice"'),
       decision: z.string().describe('What was decided'),
@@ -453,8 +453,8 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   );
 
   server.tool(
-    'gsd_requirement_save',
-    'Save a new requirement to the GSD database.',
+    'wtf_requirement_save',
+    'Save a new requirement to the WTF database.',
     {
       class: z.string().describe('Requirement class (e.g. "functional", "non-functional", "constraint")'),
       description: z.string().describe('Detailed description of the requirement'),
@@ -485,7 +485,7 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   );
 
   server.tool(
-    'gsd_requirement_update',
+    'wtf_requirement_update',
     'Update an existing requirement status or details.',
     {
       id: z.string().describe('Requirement ID (e.g. "R001")'),
@@ -506,7 +506,7 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   // =====================================================================
 
   server.tool(
-    'gsd_progress',
+    'wtf_progress',
     'Get structured project progress: active milestone/slice/task, phase, completion counts, and next action.',
     {
       // No params — uses the server's projectDir
@@ -523,7 +523,7 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   );
 
   server.tool(
-    'gsd_roadmap',
+    'wtf_roadmap',
     'Get the full roadmap structure: milestones, slices, tasks with their statuses.',
     {
       // No params
@@ -540,7 +540,7 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   );
 
   server.tool(
-    'gsd_knowledge',
+    'wtf_knowledge',
     'Get project knowledge entries (decisions, requirements, captures).',
     {
       // No params
@@ -557,14 +557,14 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   );
 
   // =====================================================================
-  // ALIAS: gsd_complete_slice → gsd_slice_complete
-  // Some prompts reference gsd_complete_slice, server registers gsd_slice_complete.
+  // ALIAS: wtf_complete_slice → wtf_slice_complete
+  // Some prompts reference wtf_complete_slice, server registers wtf_slice_complete.
   // Register the alias so agents using either name succeed.
   // =====================================================================
 
   server.tool(
-    'gsd_complete_slice',
-    'Alias for gsd_slice_complete — mark a slice as complete.',
+    'wtf_complete_slice',
+    'Alias for wtf_slice_complete — mark a slice as complete.',
     {
       sliceId: z.string().describe('Slice ID'),
       milestoneId: z.string().describe('Milestone ID'),
@@ -589,12 +589,12 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   );
 
   // =====================================================================
-  // ARTIFACT PERSISTENCE — gsd_summary_save
+  // ARTIFACT PERSISTENCE — wtf_summary_save
   // =====================================================================
 
   server.tool(
-    'gsd_summary_save',
-    'Save a GSD artifact (CONTEXT, RESEARCH, SUMMARY, ASSESSMENT, etc.) to both disk and database. ' +
+    'wtf_summary_save',
+    'Save a WTF artifact (CONTEXT, RESEARCH, SUMMARY, ASSESSMENT, etc.) to both disk and database. ' +
     'Computes the file path from milestone/slice/task IDs and artifact_type. ' +
     'This is the primary way agents persist research, context, summaries, and other structured markdown.',
     {
@@ -611,7 +611,7 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
       const sliceId = args.slice_id as string | undefined;
       const taskId = args.task_id as string | undefined;
 
-      // Compute the relative path within .gsd/
+      // Compute the relative path within .wtf/
       let path: string;
       if (taskId && sliceId) {
         path = `milestones/${milestoneId}/slices/${sliceId}/tasks/${sliceId}${taskId}-${artifactType}.md`;
@@ -625,16 +625,16 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
         { path, artifact_type: artifactType, content, milestone_id: milestoneId, slice_id: sliceId, task_id: taskId },
         basePath,
       );
-      return { saved: true, path: `.gsd/${path}` };
+      return { saved: true, path: `.wtf/${path}` };
     }),
   );
 
   // =====================================================================
-  // MILESTONE ID GENERATION — gsd_milestone_generate_id
+  // MILESTONE ID GENERATION — wtf_milestone_generate_id
   // =====================================================================
 
   server.tool(
-    'gsd_milestone_generate_id',
+    'wtf_milestone_generate_id',
     'Generate the next milestone ID. Scans existing milestone directories and returns the next sequential ID. ' +
     'Never invent milestone IDs manually — always use this tool.',
     {
@@ -648,11 +648,11 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   );
 
   // =====================================================================
-  // MILESTONE STATUS QUERY — gsd_milestone_status
+  // MILESTONE STATUS QUERY — wtf_milestone_status
   // =====================================================================
 
   server.tool(
-    'gsd_milestone_status',
+    'wtf_milestone_status',
     'Get structured milestone and slice status from the database. ' +
     'Use this instead of direct DB access for reading project state.',
     {
@@ -691,11 +691,11 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   );
 
   // =====================================================================
-  // SKIP SLICE — gsd_skip_slice
+  // SKIP SLICE — wtf_skip_slice
   // =====================================================================
 
   server.tool(
-    'gsd_skip_slice',
+    'wtf_skip_slice',
     'Mark a slice as skipped so auto-mode advances past it without executing. ' +
     'This is a permanent DB operation — the prompt enforces user confirmation before calling.',
     {
@@ -727,11 +727,11 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   );
 
   // =====================================================================
-  // JOURNAL QUERY — gsd_journal_query
+  // JOURNAL QUERY — wtf_journal_query
   // =====================================================================
 
   server.tool(
-    'gsd_journal_query',
+    'wtf_journal_query',
     'Query the execution journal for structured event history. ' +
     'Use this instead of direct JSONL file reads.',
     {
@@ -757,11 +757,11 @@ export async function createUnitToolsServer(projectDir: string): Promise<{
   );
 
   // =====================================================================
-  // GATE RESULT — gsd_save_gate_result
+  // GATE RESULT — wtf_save_gate_result
   // =====================================================================
 
   server.tool(
-    'gsd_save_gate_result',
+    'wtf_save_gate_result',
     'Save the result of a quality gate evaluation (verification check).',
     {
       milestoneId: z.string().describe('Milestone ID'),

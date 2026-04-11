@@ -1,7 +1,7 @@
-// GSD Database — Quality gate operations
+// WTF Database — Quality gate operations
 
 import type { GateRow, GateId, GateScope, GateStatus, GateVerdict } from "../domain/types.ts";
-import { GSDError, GSD_STALE_STATE } from "../domain/errors.ts";
+import { WTFError, WTF_STALE_STATE } from "../domain/errors.ts";
 import { _getCurrentDb } from "./db-core.ts";
 
 function rowToGate(row: Record<string, unknown>): GateRow {
@@ -28,7 +28,7 @@ export function insertGateRow(g: {
   status?: GateStatus;
 }): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `INSERT OR IGNORE INTO quality_gates (milestone_id, slice_id, gate_id, scope, task_id, status)
      VALUES (:mid, :sid, :gid, :scope, :tid, :status)`,
@@ -52,7 +52,7 @@ export function saveGateResult(g: {
   findings: string;
 }): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `UPDATE quality_gates
      SET status = 'complete', verdict = :verdict, rationale = :rationale,

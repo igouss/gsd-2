@@ -1,6 +1,6 @@
-// GSD Database — Verification evidence, replan history, assessments
+// WTF Database — Verification evidence, replan history, assessments
 
-import { GSDError, GSD_STALE_STATE } from "../domain/errors.ts";
+import { WTFError, WTF_STALE_STATE } from "../domain/errors.ts";
 import { _getCurrentDb } from "./db-core.ts";
 
 export function insertVerificationEvidence(e: {
@@ -13,7 +13,7 @@ export function insertVerificationEvidence(e: {
   durationMs: number;
 }): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `INSERT OR IGNORE INTO verification_evidence (task_id, slice_id, milestone_id, command, exit_code, verdict, duration_ms, created_at)
      VALUES (:task_id, :slice_id, :milestone_id, :command, :exit_code, :verdict, :duration_ms, :created_at)`,
@@ -52,7 +52,7 @@ export function getVerificationEvidence(milestoneId: string, sliceId: string, ta
 
 export function deleteVerificationEvidence(milestoneId: string, sliceId: string, taskId: string): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `DELETE FROM verification_evidence WHERE milestone_id = :mid AND slice_id = :sid AND task_id = :tid`,
   ).run({ ":mid": milestoneId, ":sid": sliceId, ":tid": taskId });
@@ -69,7 +69,7 @@ export function insertReplanHistory(entry: {
   replacementArtifactPath?: string | null;
 }): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   // INSERT OR REPLACE: idempotent on (milestone_id, slice_id, task_id) via schema v11 unique index.
   // Retrying the same replan silently updates summary instead of accumulating duplicate rows.
   db.prepare(
@@ -96,7 +96,7 @@ export function insertAssessment(entry: {
   fullContent: string;
 }): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `INSERT OR REPLACE INTO assessments (path, milestone_id, slice_id, task_id, status, scope, full_content, created_at)
      VALUES (:path, :milestone_id, :slice_id, :task_id, :status, :scope, :full_content, :created_at)`,
@@ -114,7 +114,7 @@ export function insertAssessment(entry: {
 
 export function deleteAssessmentByScope(milestoneId: string, scope: string): void {
   const db = _getCurrentDb();
-  if (!db) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
+  if (!db) throw new WTFError(WTF_STALE_STATE, "wtf-db: No database open");
   db.prepare(
     `DELETE FROM assessments WHERE milestone_id = :mid AND scope = :scope`,
   ).run({ ":mid": milestoneId, ":scope": scope });

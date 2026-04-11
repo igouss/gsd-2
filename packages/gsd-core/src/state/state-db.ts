@@ -1,7 +1,7 @@
 // DB-backed state derivation — primary path for migrated projects.
 
 import type {
-  GSDState,
+  WTFState,
   ActiveRef,
   MilestoneRegistryEntry,
 } from '../domain/types.ts';
@@ -23,7 +23,7 @@ import {
   resolveSliceFile,
   resolveTaskFile,
   resolveTasksDir,
-  resolveGsdRootFile,
+  resolveWtfRootFile,
 } from '../persistence/paths.ts';
 
 import { findMilestoneIds } from '../milestone/milestone-ids.ts';
@@ -48,7 +48,7 @@ import {
   getPendingSliceGateCount,
   type MilestoneRow,
   type SliceRow,
-} from '../persistence/gsd-db.ts';
+} from '../persistence/wtf-db.ts';
 
 import {
   isGhostMilestone,
@@ -59,22 +59,22 @@ import {
 } from './state-helpers.ts';
 
 /**
- * Derive GSD state from the milestones/slices/tasks DB tables.
+ * Derive WTF state from the milestones/slices/tasks DB tables.
  * Flag files (PARKED, VALIDATION, CONTINUE, REPLAN, REPLAN-TRIGGER, CONTEXT-DRAFT)
  * are still checked on the filesystem since they aren't in DB tables.
  * Requirements also stay file-based via parseRequirementCounts().
  *
  * Primary state derivation path — DB is the source of truth.
  */
-export async function deriveStateFromDb(basePath: string): Promise<GSDState> {
-  const requirements = parseRequirementCounts(await loadFile(resolveGsdRootFile(basePath, "REQUIREMENTS")));
+export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
+  const requirements = parseRequirementCounts(await loadFile(resolveWtfRootFile(basePath, "REQUIREMENTS")));
 
   let allMilestones = getAllMilestones();
 
   // Incremental disk→DB sync: milestone directories created outside the DB
-  // write path (via /gsd queue, manual mkdir, or complete-milestone writing the
+  // write path (via /wtf queue, manual mkdir, or complete-milestone writing the
   // next CONTEXT.md) are never inserted by the initial migration guard in
-  // auto-start.ts because that guard only runs when gsd.db doesn't exist yet.
+  // auto-start.ts because that guard only runs when wtf.db doesn't exist yet.
   // Reconcile here so deriveStateFromDb never silently misses queued milestones.
   // insertMilestone uses INSERT OR IGNORE, so this is safe to call every time.
   const dbIdSet = new Set(allMilestones.map(m => m.id));
@@ -145,7 +145,7 @@ export async function deriveStateFromDb(basePath: string): Promise<GSDState> {
   for (const id of sortedIds) allMilestones.push(byId.get(id)!);
 
   // Parallel worker isolation: when locked, filter to just the locked milestone
-  const milestoneLock = process.env.GSD_MILESTONE_LOCK;
+  const milestoneLock = process.env.WTF_MILESTONE_LOCK;
   const milestones = milestoneLock
     ? allMilestones.filter(m => m.id === milestoneLock)
     : allMilestones;
@@ -158,7 +158,7 @@ export async function deriveStateFromDb(basePath: string): Promise<GSDState> {
       phase: 'pre-planning',
       recentDecisions: [],
       blockers: [],
-      nextAction: 'No milestones found. Run /gsd to create one.',
+      nextAction: 'No milestones found. Run /wtf to create one.',
       registry: [],
       requirements,
       progress: { milestones: { done: 0, total: 0 } },
@@ -350,7 +350,7 @@ export async function deriveStateFromDb(basePath: string): Promise<GSDState> {
         activeMilestone: null, activeSlice: null, activeTask: null,
         phase: 'pre-planning',
         recentDecisions: [], blockers: [],
-        nextAction: `All remaining milestones are parked (${parkedIds}). Run /gsd unpark <id> or create a new milestone.`,
+        nextAction: `All remaining milestones are parked (${parkedIds}). Run /wtf unpark <id> or create a new milestone.`,
         registry, requirements,
         progress: { milestones: milestoneProgress },
       };
@@ -361,7 +361,7 @@ export async function deriveStateFromDb(basePath: string): Promise<GSDState> {
         activeMilestone: null, activeSlice: null, activeTask: null,
         phase: 'pre-planning',
         recentDecisions: [], blockers: [],
-        nextAction: 'No milestones found. Run /gsd to create one.',
+        nextAction: 'No milestones found. Run /wtf to create one.',
         registry: [], requirements,
         progress: { milestones: { done: 0, total: 0 } },
       };
@@ -464,20 +464,20 @@ export async function deriveStateFromDb(basePath: string): Promise<GSDState> {
   let activeSlice: ActiveRef | null = null;
 
   // ── Slice-level parallel worker isolation ─────────────────────────────
-  // When GSD_SLICE_LOCK is set, this process is a parallel worker scoped
+  // When WTF_SLICE_LOCK is set, this process is a parallel worker scoped
   // to a single slice. Override activeSlice to only the locked slice ID.
-  const sliceLock = process.env.GSD_SLICE_LOCK;
+  const sliceLock = process.env.WTF_SLICE_LOCK;
   if (sliceLock) {
     const lockedSlice = activeMilestoneSlices.find(s => s.id === sliceLock);
     if (lockedSlice) {
       activeSlice = { id: lockedSlice.id, title: lockedSlice.title };
     } else {
-      logWarning("state", `GSD_SLICE_LOCK=${sliceLock} not found in active slices — worker has no assigned work`);
+      logWarning("state", `WTF_SLICE_LOCK=${sliceLock} not found in active slices — worker has no assigned work`);
       // Don't silently continue — this is a dispatch error
       return {
         activeMilestone, activeSlice: null, activeTask: null,
         phase: 'blocked',
-        recentDecisions: [], blockers: [`GSD_SLICE_LOCK=${sliceLock} not found in active milestone slices`],
+        recentDecisions: [], blockers: [`WTF_SLICE_LOCK=${sliceLock} not found in active milestone slices`],
         nextAction: 'Slice lock references a non-existent slice — check orchestrator dispatch.',
         registry, requirements,
         progress: { milestones: milestoneProgress, slices: sliceProgress },
@@ -526,7 +526,7 @@ export async function deriveStateFromDb(basePath: string): Promise<GSDState> {
 
   // ── Reconcile missing tasks: plan file has tasks but DB is empty (#3600) ──
   // When the planning agent writes S##-PLAN.md with task entries but never
-  // calls the gsd_plan_slice persistence tool, the DB has zero task rows
+  // calls the wtf_plan_slice persistence tool, the DB has zero task rows
   // even though the plan file contains valid tasks. Without this reconciliation,
   // deriveState returns phase='planning' forever — the dispatcher re-dispatches
   // plan-slice in an infinite loop.

@@ -1,5 +1,5 @@
 /**
- * GSD Slice Parallel Conflict Detection — File overlap analysis between slices.
+ * WTF Slice Parallel Conflict Detection — File overlap analysis between slices.
  *
  * Reads PLAN.md for each slice and extracts file paths mentioned in task
  * descriptions. If two slices share more than 5 file paths, they are considered
@@ -10,6 +10,7 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 // ─── File Path Extraction ─────────────────────────────────────────────────────
 
@@ -55,8 +56,8 @@ export function hasFileConflict(
   sliceA: string,
   sliceB: string,
 ): boolean {
-  const planPathA = join(basePath, ".gsd", "milestones", mid, sliceA, "PLAN.md");
-  const planPathB = join(basePath, ".gsd", "milestones", mid, sliceB, "PLAN.md");
+  const planPathA = join(basePath, PROJECT_DIR_NAME, "milestones", mid, sliceA, "PLAN.md");
+  const planPathB = join(basePath, PROJECT_DIR_NAME, "milestones", mid, sliceB, "PLAN.md");
 
   // Conservative: missing PLAN = block
   if (!existsSync(planPathA) || !existsSync(planPathB)) {

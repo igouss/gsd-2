@@ -1,7 +1,7 @@
 {
   "name": "@gsd-build/gsd-tui",
   "version": "0.1.0",
-  "description": "GSD terminal UI — console event sink and terminal output",
+  "description": "WTF terminal UI — console event sink and terminal output",
   "license": "MIT",
   "repository": {
     "type": "git",

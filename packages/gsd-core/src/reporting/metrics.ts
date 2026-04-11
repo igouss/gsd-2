@@ -7,7 +7,7 @@
  */
 
 import { join } from "node:path";
-import { gsdRoot } from "../persistence/paths.ts";
+import { wtfRoot } from "../persistence/paths.ts";
 import { loadJsonFileOrNull } from "../persistence/json-persistence.ts";
 import { parseUnitId } from "../domain/unit-id.ts";
 
@@ -96,7 +96,7 @@ export function formatCost(cost: number): string {
 // ─── Disk I/O ────────────────────────────────────────────────────────────────
 
 function metricsPath(base: string): string {
-  return join(gsdRoot(base), "metrics.json");
+  return join(wtfRoot(base), "metrics.json");
 }
 
 function isMetricsLedger(data: unknown): data is MetricsLedger {

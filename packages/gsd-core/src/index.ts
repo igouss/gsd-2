@@ -1,5 +1,5 @@
 /**
- * @gsd-build/gsd-core — Harness-agnostic GSD orchestration engine.
+ * @gsd-build/gsd-core — Harness-agnostic WTF orchestration engine.
  *
  * This package contains the core orchestration logic: auto-loop, state machine,
  * dispatch, prompt building, DB, journal, recovery — everything that does NOT
@@ -40,7 +40,7 @@ export { saveDecisionToDb, saveRequirementToDb, updateRequirementInDb, saveArtif
 export type { SaveArtifactOpts } from "./persistence/db-writer.ts";
 
 // DB — lifecycle and direct access
-export { openDatabase, closeDatabase, isDbAvailable, updateSliceStatus, saveGateResult } from "./persistence/gsd-db.ts";
+export { openDatabase, closeDatabase, isDbAvailable, updateSliceStatus, saveGateResult } from "./persistence/wtf-db.ts";
 
 // State derivation
 export { deriveState, invalidateStateCache } from "./state/state.ts";
@@ -53,7 +53,7 @@ export { clearParseCache } from "./persistence/files.ts";
 export { resolveDispatch } from "./auto/auto-dispatch.ts";
 
 // Preferences
-export { loadEffectiveGSDPreferences } from "./preferences/preferences.ts";
+export { loadEffectiveWTFPreferences } from "./preferences/preferences.ts";
 
 // Session locking
 export { acquireSessionLock, releaseSessionLock } from "./session/session-lock.ts";
@@ -63,6 +63,9 @@ export { nextMilestoneId, findMilestoneIds } from "./milestone/milestone-ids.ts"
 
 // Journal
 export { queryJournal } from "./persistence/journal.ts";
+
+// Constants
+export { PROJECT_DIR_NAME } from "./domain/constants.ts";
 
 // Types
 export type { CompleteTaskParams, CompleteSliceParams } from "./domain/types.ts";

@@ -1,8 +1,8 @@
-// GSD Extension — Workflow Logger
+// WTF Extension — Workflow Logger
 // Centralized warning/error accumulator for the workflow engine pipeline.
 // Captures structured entries that the auto-loop can drain after each unit
 // to surface root causes for stuck loops, silent degradation, and blocked writes.
-// Error-severity entries are persisted to .gsd/audit-log.jsonl (sanitized) for
+// Error-severity entries are persisted to .wtf/audit-log.jsonl (sanitized) for
 // post-mortem analysis. Warnings are ephemeral (stderr + buffer only) to avoid
 // log amplification from expected-control-flow catch paths.
 //
@@ -20,6 +20,7 @@ import { appendFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
 import { appendNotification } from "../notification/notification-store.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 
 // ─── Types ──────────────────────────────────────────────────────────────
 
@@ -36,7 +37,7 @@ export type LogComponent =
   | "tool"          // Tool handler errors
   | "compaction"    // Event compaction
   | "reconcile"     // Worktree reconciliation
-  | "db"            // Database operations (gsd-db)
+  | "db"            // Database operations (wtf-db)
   | "dispatch"      // Auto-dispatch rule evaluation
   | "recovery"      // Auto-recovery and timeout recovery
   | "session"       // Session lock and session state I/O
@@ -202,7 +203,7 @@ export function formatForNotification(entries: readonly LogEntry[]): string {
 export function readAuditLog(basePath?: string): LogEntry[] {
   const bp = basePath ?? _auditBasePath;
   if (!bp) return [];
-  const auditPath = join(bp, ".gsd", "audit-log.jsonl");
+  const auditPath = join(bp, PROJECT_DIR_NAME, "audit-log.jsonl");
   if (!existsSync(auditPath)) return [];
   try {
     const content = readFileSync(auditPath, "utf-8");
@@ -245,7 +246,7 @@ function _push(
   // Always forward to stderr so terminal watchers see it (see module header for policy)
   const prefix = severity === "error" ? "ERROR" : "WARN";
   const ctxStr = context ? ` ${JSON.stringify(context)}` : "";
-  process.stderr.write(`[gsd:${component}] ${prefix}: ${message}${ctxStr}\n`);
+  process.stderr.write(`[wtf:${component}] ${prefix}: ${message}${ctxStr}\n`);
 
   // Persist to notification store (both warnings and errors)
   try {
@@ -255,7 +256,7 @@ function _push(
       "workflow-logger",
     );
   } catch (notifErr) {
-    process.stderr.write(`[gsd:workflow-logger] notification-store append failed: ${(notifErr as Error).message}\n`);
+    process.stderr.write(`[wtf:workflow-logger] notification-store append failed: ${(notifErr as Error).message}\n`);
   }
 
   // Buffer for auto-loop to drain
@@ -264,18 +265,18 @@ function _push(
     _buffer.shift();
   }
 
-  // Persist errors to .gsd/audit-log.jsonl so they survive context resets.
+  // Persist errors to .wtf/audit-log.jsonl so they survive context resets.
   // Only error-severity entries are persisted — warnings are ephemeral (stderr + buffer)
   // to avoid log amplification from expected-control-flow catch paths.
   if (_auditBasePath && severity === "error") {
     try {
-      const auditDir = join(_auditBasePath, ".gsd");
+      const auditDir = join(_auditBasePath, PROJECT_DIR_NAME);
       mkdirSync(auditDir, { recursive: true });
       const sanitized = _sanitizeForAudit(entry);
       appendFileSync(join(auditDir, "audit-log.jsonl"), JSON.stringify(sanitized) + "\n", "utf-8");
     } catch (auditErr) {
       // Best-effort — never let audit write failures bubble up
-      process.stderr.write(`[gsd:audit] failed to persist log entry: ${(auditErr as Error).message}\n`);
+      process.stderr.write(`[wtf:audit] failed to persist log entry: ${(auditErr as Error).message}\n`);
     }
   }
 }

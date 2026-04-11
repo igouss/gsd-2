@@ -1,5 +1,5 @@
-// GSD Markdown Importer
-// Parses DECISIONS.md, REQUIREMENTS.md, and hierarchy artifacts from a .gsd/ tree,
+// WTF Markdown Importer
+// Parses DECISIONS.md, REQUIREMENTS.md, and hierarchy artifacts from a .wtf/ tree,
 // then upserts everything into the SQLite database.
 //
 // Exports: parseDecisionsTable, parseRequirementsSections, migrateFromMarkdown
@@ -17,14 +17,14 @@ import {
   openDatabase,
   transaction,
   _getAdapter,
-} from './gsd-db.ts';
+} from './wtf-db.ts';
 import {
-  resolveGsdRootFile,
+  resolveWtfRootFile,
   resolveMilestoneFile,
   resolveSliceFile,
   resolveTasksDir,
   milestonesDir,
-  gsdRoot,
+  wtfRoot,
   resolveTaskFiles,
 } from './paths.ts';
 import { findMilestoneIds } from '../auto/guided-flow.ts';
@@ -270,8 +270,8 @@ export function parseRequirementsSections(content: string): Requirement[] {
  * Import decisions from DECISIONS.md into the database.
  * Handles supersession chains.
  */
-function importDecisions(gsdDir: string): number {
-  const filePath = resolveGsdRootFile(gsdDir, 'DECISIONS');
+function importDecisions(wtfDir: string): number {
+  const filePath = resolveWtfRootFile(wtfDir, 'DECISIONS');
   if (!existsSync(filePath)) return 0;
 
   const content = readFileSync(filePath, 'utf-8');
@@ -287,8 +287,8 @@ function importDecisions(gsdDir: string): number {
 /**
  * Import requirements from REQUIREMENTS.md into the database.
  */
-function importRequirements(gsdDir: string): number {
-  const filePath = resolveGsdRootFile(gsdDir, 'REQUIREMENTS');
+function importRequirements(wtfDir: string): number {
+  const filePath = resolveWtfRootFile(wtfDir, 'REQUIREMENTS');
   if (!existsSync(filePath)) return 0;
 
   const content = readFileSync(filePath, 'utf-8');
@@ -309,17 +309,17 @@ const SLICE_SUFFIXES = ['PLAN', 'SUMMARY', 'RESEARCH', 'CONTEXT', 'ASSESSMENT', 
 const TASK_SUFFIXES = ['PLAN', 'SUMMARY', 'CONTINUE', 'CONTEXT', 'RESEARCH'];
 
 /**
- * Import hierarchy artifacts (roadmaps, plans, summaries, etc.) from the .gsd/ tree.
+ * Import hierarchy artifacts (roadmaps, plans, summaries, etc.) from the .wtf/ tree.
  * Walks milestones → slices → tasks directories.
  */
-function importHierarchyArtifacts(gsdDir: string): number {
+function importHierarchyArtifacts(wtfDir: string): number {
   let count = 0;
-  const gsdPath = gsdRoot(gsdDir);
+  const wtfPath = wtfRoot(wtfDir);
 
   // Root-level artifacts: PROJECT.md, QUEUE.md
   const rootFiles = ['PROJECT.md', 'QUEUE.md', 'SECRETS-MANIFEST.md'];
   for (const fileName of rootFiles) {
-    const filePath = join(gsdPath, fileName);
+    const filePath = join(wtfPath, fileName);
     if (existsSync(filePath)) {
       const content = readFileSync(filePath, 'utf-8');
       const artifactType = fileName.replace('.md', '').replace('-', '_');
@@ -336,8 +336,8 @@ function importHierarchyArtifacts(gsdDir: string): number {
   }
 
   // Walk milestones
-  const milestoneIds = findMilestoneIds(gsdDir);
-  const msDir = milestonesDir(gsdDir);
+  const milestoneIds = findMilestoneIds(wtfDir);
+  const msDir = milestonesDir(wtfDir);
 
   for (const milestoneId of milestoneIds) {
     // Find the actual milestone directory name (handles legacy naming)
@@ -492,7 +492,7 @@ function findFileByPrefixAndSuffix(dir: string, idPrefix: string, suffix: string
 // ─── Hierarchy Migration (milestones/slices/tasks from roadmaps+plans) ────
 
 /**
- * Walk .gsd/milestones/ dirs, parse roadmaps and plans, and populate
+ * Walk .wtf/milestones/ dirs, parse roadmaps and plans, and populate
  * the milestones/slices/tasks DB tables.
  *
  * - Milestone title: from roadmap H1 (e.g. "# M001: Title") or CONTEXT.md
@@ -635,7 +635,7 @@ export function migrateHierarchyToDb(basePath: string): {
             if (!existsSync(summaryFile)) {
               taskStatus = 'pending';
               process.stderr.write(
-                `gsd-migrate: ${milestoneId}/${sliceEntry.id}/${taskEntry.id} marked done but missing summary — importing as pending\n`,
+                `wtf-migrate: ${milestoneId}/${sliceEntry.id}/${taskEntry.id} marked done but missing summary — importing as pending\n`,
               );
             }
           }
@@ -677,7 +677,7 @@ export function migrateHierarchyToDb(basePath: string): {
               `UPDATE slices SET status = 'complete' WHERE id = :sid AND milestone_id = :mid`,
             ).run({ ':sid': sliceEntry.id, ':mid': milestoneId });
             process.stderr.write(
-              `gsd-migrate: ${milestoneId}/${sliceEntry.id} all tasks + slice summary complete — upgrading slice to complete\n`,
+              `wtf-migrate: ${milestoneId}/${sliceEntry.id} all tasks + slice summary complete — upgrading slice to complete\n`,
             );
           }
         }
@@ -691,19 +691,19 @@ export function migrateHierarchyToDb(basePath: string): {
 // ─── Orchestrator ──────────────────────────────────────────────────────────
 
 /**
- * Import all markdown artifacts from a .gsd/ directory into the database.
+ * Import all markdown artifacts from a .wtf/ directory into the database.
  * Opens the DB if not already open. Wraps all imports in a single transaction.
  * Returns counts of imported items for logging.
  *
  * Missing files are skipped gracefully — no errors produced.
  */
-export function migrateFromMarkdown(gsdDir: string): {
+export function migrateFromMarkdown(wtfDir: string): {
   decisions: number;
   requirements: number;
   artifacts: number;
   hierarchy: { milestones: number; slices: number; tasks: number };
 } {
-  const dbPath = join(gsdRoot(gsdDir), 'gsd.db');
+  const dbPath = join(wtfRoot(wtfDir), 'wtf.db');
 
   // Open DB if not already open
   if (!_getAdapter()) {
@@ -717,32 +717,32 @@ export function migrateFromMarkdown(gsdDir: string): {
 
   transaction(() => {
     try {
-      decisions = importDecisions(gsdDir);
+      decisions = importDecisions(wtfDir);
     } catch (err) {
       logWarning("migration", `skipping decisions import: ${(err as Error).message}`);
     }
 
     try {
-      requirements = importRequirements(gsdDir);
+      requirements = importRequirements(wtfDir);
     } catch (err) {
       logWarning("migration", `skipping requirements import: ${(err as Error).message}`);
     }
 
     try {
-      artifacts = importHierarchyArtifacts(gsdDir);
+      artifacts = importHierarchyArtifacts(wtfDir);
     } catch (err) {
       logWarning("migration", `skipping artifacts import: ${(err as Error).message}`);
     }
 
     try {
-      hierarchy = migrateHierarchyToDb(gsdDir);
+      hierarchy = migrateHierarchyToDb(wtfDir);
     } catch (err) {
       logWarning("migration", `skipping hierarchy migration: ${(err as Error).message}`);
     }
   });
 
   process.stderr.write(
-    `gsd-migrate: imported ${decisions} decisions, ${requirements} requirements, ${artifacts} artifacts, ${hierarchy.milestones}M/${hierarchy.slices}S/${hierarchy.tasks}T hierarchy\n`,
+    `wtf-migrate: imported ${decisions} decisions, ${requirements} requirements, ${artifacts} artifacts, ${hierarchy.milestones}M/${hierarchy.slices}S/${hierarchy.tasks}T hierarchy\n`,
   );
 
   return { decisions, requirements, artifacts, hierarchy };

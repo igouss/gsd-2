@@ -7,7 +7,7 @@ import type {
 
 import {
   resolveMilestoneFile,
-  gsdRoot,
+  wtfRoot,
 } from '../persistence/paths.ts';
 
 import { isClosedStatus } from '../domain/status-guards.ts';
@@ -16,7 +16,7 @@ import { extractVerdict } from '../analysis/verdict-parser.ts';
 import {
   isDbAvailable,
   getMilestone,
-} from '../persistence/gsd-db.ts';
+} from '../persistence/wtf-db.ts';
 
 import { join } from 'path';
 import { existsSync } from 'node:fs';
@@ -41,7 +41,7 @@ import { existsSync } from 'node:fs';
 export function isGhostMilestone(basePath: string, mid: string): boolean {
   // If the milestone has a DB row, it's usually a known milestone — not a ghost.
   // Exception: a "queued" row with no disk artifacts is a phantom from
-  // gsd_milestone_generate_id that was never planned (#3645).
+  // wtf_milestone_generate_id that was never planned (#3645).
   if (isDbAvailable()) {
     const dbRow = getMilestone(mid);
     if (dbRow) {
@@ -56,7 +56,7 @@ export function isGhostMilestone(basePath: string, mid: string): boolean {
   }
 
   // If a worktree exists for this milestone, it was legitimately created.
-  const root = gsdRoot(basePath);
+  const root = wtfRoot(basePath);
   const wtPath = join(root, 'worktrees', mid);
   if (existsSync(wtPath)) return false;
 

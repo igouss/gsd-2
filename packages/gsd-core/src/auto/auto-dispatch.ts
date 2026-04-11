@@ -1,7 +1,7 @@
 /**
  * Auto-mode Dispatch Table — declarative phase → unit mapping.
  *
- * Each rule maps a GSD state to the unit type, unit ID, and prompt builder
+ * Each rule maps a WTF state to the unit type, unit ID, and prompt builder
  * that should be dispatched. Rules are evaluated in order; the first match wins.
  *
  * This replaces the 130-line if-else chain in dispatchNextUnit with a
@@ -9,14 +9,14 @@
  * without modifying orchestration code.
  */
 
-import type { GSDState } from "../domain/types.ts";
-import type { GSDPreferences } from "../preferences/preferences.ts";
+import type { WTFState } from "../domain/types.ts";
+import type { WTFPreferences } from "../preferences/preferences.ts";
 import { loadFile, extractUatType, loadActiveOverrides } from "../persistence/files.ts";
-import { isDbAvailable, getMilestoneSlices, getPendingGates, markAllGatesOmitted, getMilestone } from "../persistence/gsd-db.ts";
+import { isDbAvailable, getMilestoneSlices, getPendingGates, markAllGatesOmitted, getMilestone } from "../persistence/wtf-db.ts";
 import { extractVerdict, isAcceptableUatVerdict } from "../analysis/verdict-parser.ts";
 
 import {
-  gsdRoot,
+  wtfRoot,
   resolveMilestoneFile,
   resolveMilestonePath,
   resolveSliceFile,
@@ -69,8 +69,8 @@ export interface DispatchContext {
   basePath: string;
   mid: string;
   midTitle: string;
-  state: GSDState;
-  prefs: GSDPreferences | undefined;
+  state: WTFState;
+  prefs: WTFPreferences | undefined;
   session?: import("../auto/session.ts").AutoSession;
 }
 
@@ -84,7 +84,7 @@ export interface DispatchRule {
 function missingSliceStop(mid: string, phase: string): DispatchAction {
   return {
     action: "stop",
-    reason: `${mid}: phase "${phase}" has no active slice — run /gsd doctor.`,
+    reason: `${mid}: phase "${phase}" has no active slice — run /wtf doctor.`,
     level: "error",
   };
 }
@@ -119,7 +119,7 @@ const MAX_REWRITE_ATTEMPTS = 3;
 // step-mode). Storing it on the in-memory session object caused the circuit
 // breaker to never trip — see https://github.com/gsd-build/gsd-2/issues/2203
 function rewriteCountPath(basePath: string): string {
-  return join(gsdRoot(basePath), "runtime", "rewrite-count.json");
+  return join(wtfRoot(basePath), "runtime", "rewrite-count.json");
 }
 
 export function getRewriteCount(basePath: string): number {
@@ -133,7 +133,7 @@ export function getRewriteCount(basePath: string): number {
 
 export function setRewriteCount(basePath: string, count: number): void {
   const filePath = rewriteCountPath(basePath);
-  mkdirSync(join(gsdRoot(basePath), "runtime"), { recursive: true });
+  mkdirSync(join(wtfRoot(basePath), "runtime"), { recursive: true });
   writeFileSync(filePath, JSON.stringify({ count, updatedAt: new Date().toISOString() }) + "\n");
 }
 
@@ -143,7 +143,7 @@ export function setRewriteCount(basePath: string, count: number): void {
 const MAX_UAT_ATTEMPTS = 3;
 
 function uatCountPath(basePath: string, mid: string, sid: string): string {
-  return join(gsdRoot(basePath), "runtime", `uat-count-${mid}-${sid}.json`);
+  return join(wtfRoot(basePath), "runtime", `uat-count-${mid}-${sid}.json`);
 }
 
 export function getUatCount(basePath: string, mid: string, sid: string): number {
@@ -158,7 +158,7 @@ export function getUatCount(basePath: string, mid: string, sid: string): number 
 export function incrementUatCount(basePath: string, mid: string, sid: string): number {
   const count = getUatCount(basePath, mid, sid) + 1;
   const filePath = uatCountPath(basePath, mid, sid);
-  mkdirSync(join(gsdRoot(basePath), "runtime"), { recursive: true });
+  mkdirSync(join(wtfRoot(basePath), "runtime"), { recursive: true });
   writeFileSync(filePath, JSON.stringify({ count, updatedAt: new Date().toISOString() }) + "\n");
   return count;
 }
@@ -259,7 +259,7 @@ export const DISPATCH_RULES: DispatchRule[] = [
           uatContent ?? "",
           basePath,
         ),
-        pauseAfterDispatch: !process.env.GSD_HEADLESS && uatType !== "artifact-driven" && uatType !== "browser-executable" && uatType !== "runtime-executable",
+        pauseAfterDispatch: !process.env.WTF_HEADLESS && uatType !== "artifact-driven" && uatType !== "browser-executable" && uatType !== "runtime-executable",
       };
     },
   },
@@ -290,7 +290,7 @@ export const DISPATCH_RULES: DispatchRule[] = [
         if (verdict && !isAcceptableUatVerdict(verdict, uatType)) {
           return {
             action: "stop" as const,
-            reason: `UAT verdict for ${sliceId} is "${verdict}" — blocking progression until resolved.\nReview the UAT result and update the verdict to PASS, or re-run /gsd auto after fixing.`,
+            reason: `UAT verdict for ${sliceId} is "${verdict}" — blocking progression until resolved.\nReview the UAT result and update the verdict to PASS, or re-run /wtf auto after fixing.`,
             level: "warning" as const,
           };
         }
@@ -581,7 +581,7 @@ export const DISPATCH_RULES: DispatchRule[] = [
         // Log graph metrics for observability
         const metrics = graphMetrics(graph);
         process.stderr.write(
-          `gsd-reactive: ${mid}/${sid} graph — tasks:${metrics.taskCount} edges:${metrics.edgeCount} ` +
+          `wtf-reactive: ${mid}/${sid} graph — tasks:${metrics.taskCount} edges:${metrics.edgeCount} ` +
           `ready:${metrics.readySetSize} dispatching:${selected.length} ambiguous:${metrics.ambiguous}\n`,
         );
 
@@ -754,19 +754,19 @@ export const DISPATCH_RULES: DispatchRule[] = [
       if (missingSlices.length > 0) {
         return {
           action: "stop",
-          reason: `Cannot complete milestone ${mid}: slices ${missingSlices.join(", ")} are missing SUMMARY files. Run /gsd doctor to diagnose.`,
+          reason: `Cannot complete milestone ${mid}: slices ${missingSlices.join(", ")} are missing SUMMARY files. Run /wtf doctor to diagnose.`,
           level: "error",
         };
       }
 
       // Safety guard (#1703): verify the milestone produced implementation
-      // artifacts (non-.gsd/ files). A milestone with only plan files and
+      // artifacts (non-.wtf/ files). A milestone with only plan files and
       // zero implementation code should not be marked complete.
       const artifactCheck = hasImplementationArtifacts(basePath);
       if (artifactCheck === "absent") {
         return {
           action: "stop",
-          reason: `Cannot complete milestone ${mid}: no implementation files found outside .gsd/. The milestone has only plan files — actual code changes are required.`,
+          reason: `Cannot complete milestone ${mid}: no implementation files found outside .wtf/. The milestone has only plan files — actual code changes are required.`,
           level: "error",
         };
       }
@@ -868,7 +868,7 @@ export async function resolveDispatch(
   // No rule matched — unhandled phase
   return {
     action: "stop",
-    reason: `Unhandled phase "${ctx.state.phase}" — run /gsd doctor to diagnose.`,
+    reason: `Unhandled phase "${ctx.state.phase}" — run /wtf doctor to diagnose.`,
     level: "info",
     matchedRule: "<no-match>",
   };

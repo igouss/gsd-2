@@ -1,8 +1,8 @@
-// GSD MCP Server — metrics/history reader
+// WTF MCP Server — metrics/history reader
 // Copyright (c) 2026 Jeremy McSpadden <jeremy@fluxlabs.net>
 
 import { readFileSync, existsSync } from 'node:fs';
-import { resolveGsdRoot, resolveRootFile } from './paths.ts';
+import { resolveWtfRoot, resolveRootFile } from './paths.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -72,10 +72,10 @@ function parseMetricsJson(content: string): MetricsUnit[] {
 // ---------------------------------------------------------------------------
 
 export function readHistory(projectDir: string, limit?: number): HistoryResult {
-  const gsd = resolveGsdRoot(projectDir);
+  const wtf = resolveWtfRoot(projectDir);
 
   // metrics.json (primary)
-  const metricsPath = resolveRootFile(gsd, 'metrics.json');
+  const metricsPath = resolveRootFile(wtf, 'metrics.json');
   let units: MetricsUnit[] = [];
 
   if (existsSync(metricsPath)) {

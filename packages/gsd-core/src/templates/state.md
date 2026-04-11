@@ -1,4 +1,4 @@
-# GSD State
+# WTF State
 
 **Active Milestone:** {{milestoneId}}: {{milestoneTitle}}
 **Active Slice:** {{sliceId}}: {{sliceTitle}}

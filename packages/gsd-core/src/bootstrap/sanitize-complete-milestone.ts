@@ -1,5 +1,5 @@
 /**
- * Input sanitization for gsd_complete_milestone parameters.
+ * Input sanitization for wtf_complete_milestone parameters.
  *
  * The Claude SDK deserializes tool-call JSON before the handler runs.
  * When an LLM (especially smaller models like haiku) generates large markdown

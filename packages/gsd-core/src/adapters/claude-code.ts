@@ -1,8 +1,8 @@
 /**
- * ClaudeCodeAdapter — dispatches GSD units to the Claude Code CLI.
+ * ClaudeCodeAdapter — dispatches WTF units to the Claude Code CLI.
  *
  * Each unit is executed as: claude -p <prompt> --output-format json
- * with an MCP config pointing to the GSD unit-tools server.
+ * with an MCP config pointing to the WTF unit-tools server.
  *
  * Completion is detected by process exit. Cost/tokens are parsed from
  * the JSON result.
@@ -109,7 +109,7 @@ export class ClaudeCodeAdapter implements HarnessAdapter {
     };
     this.events = options.events ?? nullEventSink;
     this.verbose = options.verbose ?? false;
-    this.tempDir = join(tmpdir(), `gsd-claude-${randomUUID().slice(0, 8)}`);
+    this.tempDir = join(tmpdir(), `wtf-claude-${randomUUID().slice(0, 8)}`);
   }
 
   async init(projectDir: string): Promise<void> {

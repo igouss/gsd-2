@@ -18,11 +18,11 @@ import { MergeConflictError } from "../../git/git-service.ts";
 import { join, basename } from "node:path";
 import { existsSync, cpSync } from "node:fs";
 import { logWarning, logError } from "../../workflow/workflow-logger.ts";
-import { gsdRoot } from "../../persistence/paths.ts";
+import { wtfRoot } from "../../persistence/paths.ts";
 import { atomicWriteSync } from "../../persistence/atomic-write.ts";
 import { getEligibleSlices } from "../../parallel/slice-parallel-eligibility.ts";
 import { startSliceParallel } from "../../parallel/slice-parallel-orchestrator.ts";
-import { isDbAvailable, getMilestoneSlices } from "../../persistence/gsd-db.ts";
+import { isDbAvailable, getMilestoneSlices } from "../../persistence/wtf-db.ts";
 
 /**
  * Phase 1: Pre-dispatch — resource guard, health gate, state derivation,
@@ -58,7 +58,7 @@ export async function runPreDispatch(
     }
     if (!healthGate.proceed) {
       deps.events.notify(
-        healthGate.reason || "Pre-dispatch health check failed — run /gsd doctor for details.",
+        healthGate.reason || "Pre-dispatch health check failed — run /wtf doctor for details.",
         "error",
       );
       await deps.pauseAuto();
@@ -98,7 +98,7 @@ export async function runPreDispatch(
   if (
     prefs?.slice_parallel?.enabled &&
     mid &&
-    !process.env.GSD_PARALLEL_WORKER &&
+    !process.env.WTF_PARALLEL_WORKER &&
     isDbAvailable()
   ) {
     try {
@@ -156,7 +156,7 @@ export async function runPreDispatch(
       "info",
     );
     deps.sendDesktopNotification(
-      "GSD",
+      "WTF",
       `Milestone ${s.currentMilestoneId} complete!`,
       "success",
       "milestone",
@@ -170,7 +170,7 @@ export async function runPreDispatch(
 
     const vizPrefs = prefs;
     if (vizPrefs?.auto_visualize) {
-      deps.events.notify("Run /gsd visualize to see progress overview.", "info");
+      deps.events.notify("Run /wtf visualize to see progress overview.", "info");
     }
     if (vizPrefs?.auto_report !== false) {
       try {
@@ -196,7 +196,7 @@ export async function runPreDispatch(
     } catch (mergeErr) {
       if (mergeErr instanceof MergeConflictError) {
         deps.events.notify(
-          `Merge conflict: ${mergeErr.conflictedFiles.join(", ")}. Resolve conflicts manually and run /gsd auto to resume.`,
+          `Merge conflict: ${mergeErr.conflictedFiles.join(", ")}. Resolve conflicts manually and run /wtf auto to resume.`,
           "error",
         );
         await deps.stopAuto(`Merge conflict on milestone ${s.currentMilestoneId}`);
@@ -204,7 +204,7 @@ export async function runPreDispatch(
       }
       logError("engine", "Milestone merge failed with non-conflict error", { milestone: s.currentMilestoneId!, error: String(mergeErr) });
       deps.events.notify(
-        `Merge failed: ${mergeErr instanceof Error ? mergeErr.message : String(mergeErr)}. Resolve and run /gsd auto to resume.`,
+        `Merge failed: ${mergeErr instanceof Error ? mergeErr.message : String(mergeErr)}. Resolve and run /wtf auto to resume.`,
         "error",
       );
       await deps.stopAuto(`Merge error on milestone ${s.currentMilestoneId}: ${String(mergeErr)}`);
@@ -236,10 +236,10 @@ export async function runPreDispatch(
 
     // Archive the old completed-units.json instead of wiping it (#2313).
     try {
-      const completedKeysPath = join(gsdRoot(s.basePath), "completed-units.json");
+      const completedKeysPath = join(wtfRoot(s.basePath), "completed-units.json");
       if (existsSync(completedKeysPath) && s.currentMilestoneId) {
         const archivePath = join(
-          gsdRoot(s.basePath),
+          wtfRoot(s.basePath),
           `completed-units-${s.currentMilestoneId}.json`,
         );
         cpSync(completedKeysPath, archivePath);
@@ -289,7 +289,7 @@ export async function runPreDispatch(
         } catch (mergeErr) {
           if (mergeErr instanceof MergeConflictError) {
             deps.events.notify(
-              `Merge conflict: ${mergeErr.conflictedFiles.join(", ")}. Resolve conflicts manually and run /gsd auto to resume.`,
+              `Merge conflict: ${mergeErr.conflictedFiles.join(", ")}. Resolve conflicts manually and run /wtf auto to resume.`,
               "error",
             );
             await deps.stopAuto(`Merge conflict on milestone ${s.currentMilestoneId}`);
@@ -297,7 +297,7 @@ export async function runPreDispatch(
           }
           logError("engine", "Milestone merge failed with non-conflict error", { milestone: s.currentMilestoneId!, error: String(mergeErr) });
           deps.events.notify(
-            `Merge failed: ${mergeErr instanceof Error ? mergeErr.message : String(mergeErr)}. Resolve and run /gsd auto to resume.`,
+            `Merge failed: ${mergeErr instanceof Error ? mergeErr.message : String(mergeErr)}. Resolve and run /wtf auto to resume.`,
             "error",
           );
           await deps.stopAuto(`Merge error on milestone ${s.currentMilestoneId}: ${String(mergeErr)}`);
@@ -307,7 +307,7 @@ export async function runPreDispatch(
         // PR creation (auto_pr) is handled inside mergeMilestoneToMain (#2302)
       }
       deps.sendDesktopNotification(
-        "GSD",
+        "WTF",
         "All milestones complete!",
         "success",
         "milestone",
@@ -331,8 +331,8 @@ export async function runPreDispatch(
     } else if (state.phase === "blocked") {
       const blockerMsg = `Blocked: ${state.blockers.join(", ")}`;
       await deps.stopAuto(blockerMsg);
-      deps.events.notify(`${blockerMsg}. Fix and run /gsd auto.`, "warning");
-      deps.sendDesktopNotification("GSD", blockerMsg, "error", "attention", basename(s.originalBasePath || s.basePath));
+      deps.events.notify(`${blockerMsg}. Fix and run /wtf auto.`, "warning");
+      deps.sendDesktopNotification("WTF", blockerMsg, "error", "attention", basename(s.originalBasePath || s.basePath));
       deps.logCmuxEvent(prefs, blockerMsg, "error");
     } else {
       const ids = incomplete.map((m: { id: string }) => m.id).join(", ");
@@ -389,7 +389,7 @@ export async function runPreDispatch(
       } catch (mergeErr) {
         if (mergeErr instanceof MergeConflictError) {
           deps.events.notify(
-            `Merge conflict: ${mergeErr.conflictedFiles.join(", ")}. Resolve conflicts manually and run /gsd auto to resume.`,
+            `Merge conflict: ${mergeErr.conflictedFiles.join(", ")}. Resolve conflicts manually and run /wtf auto to resume.`,
             "error",
           );
           await deps.stopAuto(`Merge conflict on milestone ${s.currentMilestoneId}`);
@@ -397,7 +397,7 @@ export async function runPreDispatch(
         }
         logError("engine", "Milestone merge failed with non-conflict error", { milestone: s.currentMilestoneId!, error: String(mergeErr) });
         deps.events.notify(
-          `Merge failed: ${mergeErr instanceof Error ? mergeErr.message : String(mergeErr)}. Resolve and run /gsd auto to resume.`,
+          `Merge failed: ${mergeErr instanceof Error ? mergeErr.message : String(mergeErr)}. Resolve and run /wtf auto to resume.`,
           "error",
         );
         await deps.stopAuto(`Merge error on milestone ${s.currentMilestoneId}: ${String(mergeErr)}`);
@@ -407,7 +407,7 @@ export async function runPreDispatch(
       // PR creation (auto_pr) is handled inside mergeMilestoneToMain (#2302)
     }
     deps.sendDesktopNotification(
-      "GSD",
+      "WTF",
       `Milestone ${mid} complete!`,
       "success",
       "milestone",
@@ -428,8 +428,8 @@ export async function runPreDispatch(
   if (state.phase === "blocked") {
     const blockerMsg = `Blocked: ${state.blockers.join(", ")}`;
     await closeoutAndStop(s, deps, blockerMsg);
-    deps.events.notify(`${blockerMsg}. Fix and run /gsd auto.`, "warning");
-    deps.sendDesktopNotification("GSD", blockerMsg, "error", "attention", basename(s.originalBasePath || s.basePath));
+    deps.events.notify(`${blockerMsg}. Fix and run /wtf auto.`, "warning");
+    deps.sendDesktopNotification("WTF", blockerMsg, "error", "attention", basename(s.originalBasePath || s.basePath));
     deps.logCmuxEvent(prefs, blockerMsg, "error");
     debugLog("autoLoop", { phase: "exit", reason: "blocked" });
     deps.emitJournalEvent({ ts: new Date().toISOString(), flowId: ic.flowId, seq: ic.nextSeq(), eventType: "terminal", data: { reason: "blocked", blockers: state.blockers } });

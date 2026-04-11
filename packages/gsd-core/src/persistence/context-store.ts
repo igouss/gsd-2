@@ -1,10 +1,10 @@
-// GSD Context Store — Query Layer & Formatters
+// WTF Context Store — Query Layer & Formatters
 //
 // Typed query functions for decisions and requirements from the DB views,
 // with optional filtering. Format functions produce prompt-injectable markdown.
 // All functions degrade gracefully: return empty results when DB unavailable, never throw.
 
-import { isDbAvailable, _getAdapter } from './gsd-db.ts';
+import { isDbAvailable, _getAdapter } from './wtf-db.ts';
 import type { Decision, Requirement } from '../domain/types.ts';
 
 // ─── Query Functions ───────────────────────────────────────────────────────

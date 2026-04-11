@@ -1,5 +1,5 @@
 /**
- * GSD Detection — Framework-specific dependency detection (FastAPI, Spring Boot).
+ * WTF Detection — Framework-specific dependency detection (FastAPI, Spring Boot).
  */
 
 import { join } from "node:path";

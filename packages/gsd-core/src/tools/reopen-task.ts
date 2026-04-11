@@ -1,5 +1,5 @@
 /**
- * reopen-task handler — the core operation behind gsd_task_reopen.
+ * reopen-task handler — the core operation behind wtf_task_reopen.
  *
  * Resets a completed task back to "pending" so it can be re-done
  * without manual SQL surgery. The parent slice and milestone must
@@ -7,7 +7,7 @@
  * closed slice.
  */
 
-// GSD — reopen-task tool handler
+// WTF — reopen-task tool handler
 // Copyright (c) 2026 Jeremy McSpadden <jeremy@fluxlabs.net>
 
 import {
@@ -16,7 +16,7 @@ import {
   getTask,
   updateTaskStatus,
   transaction,
-} from "../persistence/gsd-db.ts";
+} from "../persistence/wtf-db.ts";
 import { invalidateStateCache } from "../state/state.ts";
 import { isClosedStatus } from "../domain/status-guards.ts";
 import { renderAllProjections } from "../workflow/workflow-projections.ts";
@@ -79,7 +79,7 @@ export async function handleReopenTask(
       return;
     }
     if (isClosedStatus(slice.status)) {
-      guardError = `cannot reopen task in a closed slice: ${params.sliceId} (status: ${slice.status}) — use gsd_slice_reopen first`;
+      guardError = `cannot reopen task in a closed slice: ${params.sliceId} (status: ${slice.status}) — use wtf_slice_reopen first`;
       return;
     }
 

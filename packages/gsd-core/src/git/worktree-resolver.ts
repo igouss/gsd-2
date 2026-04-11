@@ -59,7 +59,7 @@ export interface WorktreeResolverDeps {
   ) => string | null;
   readFileSync: (path: string, encoding: string) => string;
   GitServiceImpl: new (basePath: string, gitConfig: unknown) => unknown;
-  loadEffectiveGSDPreferences: () =>
+  loadEffectiveWTFPreferences: () =>
     | { preferences?: { git?: Record<string, unknown> } }
     | undefined;
   invalidateAllCaches: () => void;
@@ -110,7 +110,7 @@ export class WorktreeResolver {
 
   private rebuildGitService(): void {
     const gitConfig =
-      this.deps.loadEffectiveGSDPreferences()?.preferences?.git ?? {};
+      this.deps.loadEffectiveWTFPreferences()?.preferences?.git ?? {};
     this.s.gitService = new this.deps.GitServiceImpl(
       this.s.basePath,
       gitConfig,
@@ -406,7 +406,7 @@ export class WorktreeResolver {
 
       // Resolve roadmap — try project root first, then worktree path as fallback.
       // The worktree may hold the only copy when syncWorktreeStateBack fails
-      // silently or .gsd/ is not symlinked. Without the fallback, a missing
+      // silently or .wtf/ is not symlinked. Without the fallback, a missing
       // roadmap triggers bare teardown which deletes the branch and orphans all
       // milestone commits (#1573).
       let roadmapPath = this.deps.resolveMilestoneFile(
@@ -457,12 +457,12 @@ export class WorktreeResolver {
             "info",
           );
         } else {
-          // (#1906) Milestone produced only .gsd/ metadata — no actual code was
+          // (#1906) Milestone produced only .wtf/ metadata — no actual code was
           // merged. This typically means the LLM wrote planning artifacts
           // (summaries, roadmaps) but never implemented the code. Surface this
           // clearly so the user knows the milestone is not truly complete.
           ctx.notify(
-            `WARNING: Milestone ${milestoneId} merged to main but contained NO code changes — only .gsd/ metadata files. ` +
+            `WARNING: Milestone ${milestoneId} merged to main but contained NO code changes — only .wtf/ metadata files. ` +
               `The milestone summary may describe planned work that was never implemented. ` +
               `Review the milestone output and re-run if code is missing.`,
             "warning",
@@ -497,11 +497,11 @@ export class WorktreeResolver {
       });
       // Surface a clear, actionable error. The worktree and milestone branch are
       // intentionally preserved — nothing has been deleted. The user can retry
-      // /gsd dispatch complete-milestone or merge manually once the underlying
+      // /wtf dispatch complete-milestone or merge manually once the underlying
       // issue is fixed (e.g. checkout to wrong branch, unresolved conflicts).
       // (#1668, #1891)
       ctx.notify(
-        `Milestone merge failed: ${msg}. Your worktree and milestone branch are preserved — retry with \`/gsd dispatch complete-milestone\` or merge manually.`,
+        `Milestone merge failed: ${msg}. Your worktree and milestone branch are preserved — retry with \`/wtf dispatch complete-milestone\` or merge manually.`,
         "warning",
       );
 
@@ -592,7 +592,7 @@ export class WorktreeResolver {
         );
       } else {
         ctx.notify(
-          `WARNING: Milestone ${milestoneId} merged (branch mode) but contained NO code changes — only .gsd/ metadata. ` +
+          `WARNING: Milestone ${milestoneId} merged (branch mode) but contained NO code changes — only .wtf/ metadata. ` +
             `Review the milestone output and re-run if code is missing.`,
           "warning",
         );

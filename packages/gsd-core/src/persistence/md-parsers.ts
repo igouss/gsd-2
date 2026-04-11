@@ -1,4 +1,4 @@
-// Markdown parsers for GSD roadmap and plan files.
+// Markdown parsers for WTF roadmap and plan files.
 // parseRoadmap() and parsePlan() try the native Rust parser first,
 // falling back to a JS implementation when unavailable.
 

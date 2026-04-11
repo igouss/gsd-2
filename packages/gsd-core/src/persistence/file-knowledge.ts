@@ -1,8 +1,8 @@
-// GSD Extension - Knowledge and Overrides
+// WTF Extension - Knowledge and Overrides
 // CRUD for overrides, knowledge entries, and manifest status.
 
 import { resolve } from 'node:path';
-import { resolveMilestoneFile, resolveGsdRootFile } from './paths.ts';
+import { resolveMilestoneFile, resolveWtfRootFile } from './paths.ts';
 
 import type {
   ManifestStatus,
@@ -72,7 +72,7 @@ export interface Override {
 }
 
 export async function appendOverride(basePath: string, change: string, appliedAt: string): Promise<void> {
-  const overridesPath = resolveGsdRootFile(basePath, "OVERRIDES");
+  const overridesPath = resolveWtfRootFile(basePath, "OVERRIDES");
   const timestamp = new Date().toISOString();
   const entry = [
     `## Override: ${timestamp}`,
@@ -90,7 +90,7 @@ export async function appendOverride(basePath: string, change: string, appliedAt
     await saveFile(overridesPath, existing.trimEnd() + "\n\n" + entry);
   } else {
     const header = [
-      "# GSD Overrides",
+      "# WTF Overrides",
       "",
       "User-issued overrides that supersede plan document content.",
       "",
@@ -107,7 +107,7 @@ export async function appendKnowledge(
   entry: string,
   scope: string,
 ): Promise<void> {
-  const knowledgePath = resolveGsdRootFile(basePath, "KNOWLEDGE");
+  const knowledgePath = resolveWtfRootFile(basePath, "KNOWLEDGE");
   const existing = await loadFile(knowledgePath);
 
   if (existing) {
@@ -224,7 +224,7 @@ export async function appendKnowledge(
 }
 
 export async function loadActiveOverrides(basePath: string): Promise<Override[]> {
-  const overridesPath = resolveGsdRootFile(basePath, "OVERRIDES");
+  const overridesPath = resolveWtfRootFile(basePath, "OVERRIDES");
   const content = await loadFile(overridesPath);
   if (!content) return [];
   return parseOverrides(content).filter(o => o.scope === "active");
@@ -277,7 +277,7 @@ export function formatOverridesSection(overrides: Override[]): string {
 }
 
 export async function resolveAllOverrides(basePath: string): Promise<void> {
-  const overridesPath = resolveGsdRootFile(basePath, "OVERRIDES");
+  const overridesPath = resolveWtfRootFile(basePath, "OVERRIDES");
   const content = await loadFile(overridesPath);
   if (!content) return;
   const updated = content.replace(/\*\*Scope:\*\* active/g, "**Scope:** resolved");

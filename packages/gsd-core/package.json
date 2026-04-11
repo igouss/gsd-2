@@ -1,7 +1,7 @@
 {
   "name": "@gsd-build/gsd-core",
   "version": "0.1.0",
-  "description": "GSD orchestration core — harness-agnostic task execution engine",
+  "description": "WTF orchestration core — harness-agnostic task execution engine",
   "license": "MIT",
   "repository": {
     "type": "git",

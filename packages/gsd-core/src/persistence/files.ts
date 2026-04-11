@@ -1,4 +1,4 @@
-// GSD Extension - File Parsing and I/O (barrel)
+// WTF Extension - File Parsing and I/O (barrel)
 // Re-exports from focused sub-modules. All downstream imports unchanged.
 
 export {

@@ -1,10 +1,10 @@
-// GSD Extension — Debug Logger
-// Structured JSONL debug logging for diagnosing stuck/slow GSD sessions.
+// WTF Extension — Debug Logger
+// Structured JSONL debug logging for diagnosing stuck/slow WTF sessions.
 // Zero overhead when disabled — all public functions are no-ops.
 
 import { appendFileSync, mkdirSync, readdirSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
-import { gsdRoot } from '../persistence/paths.ts';
+import { wtfRoot } from '../persistence/paths.ts';
 
 // ─── State ────────────────────────────────────────────────────────────────────
 
@@ -34,10 +34,10 @@ const MAX_DEBUG_LOGS = 5;
 
 /**
  * Enable debug logging. Creates the log file and prunes old logs.
- * Can be activated via `--debug` flag or `GSD_DEBUG=1` env var.
+ * Can be activated via `--debug` flag or `WTF_DEBUG=1` env var.
  */
 export function enableDebug(basePath: string): void {
-  const debugDir = join(gsdRoot(basePath), 'debug');
+  const debugDir = join(wtfRoot(basePath), 'debug');
   mkdirSync(debugDir, { recursive: true });
 
   // Prune old debug logs
@@ -98,7 +98,7 @@ export function debugLog(event: string, data?: Record<string, unknown>): void {
   try {
     appendFileSync(_logPath, JSON.stringify(entry) + '\n');
   } catch {
-    // Silently ignore write failures — debug logging must never break GSD
+    // Silently ignore write failures — debug logging must never break WTF
   }
 }
 
