@@ -75,7 +75,7 @@ function validatePreferenceShape(preferences: WTFPreferences): string[] {
           issues.push(`skill_rules[${index}].when must be a string`);
         }
         for (const key of ["use", "prefer", "avoid"] as const) {
-          const value = (rule as unknown as Record<string, unknown>)[key];
+          const value = rule[key];
           if (value !== undefined && !Array.isArray(value)) {
             issues.push(`skill_rules[${index}].${key} must be a list`);
           }
@@ -111,14 +111,6 @@ export function buildStateMarkdown(state: Awaited<ReturnType<typeof deriveState>
   for (const entry of state.registry) {
     const glyph = entry.status === "complete" ? "\u2705" : entry.status === "active" ? "\uD83D\uDD04" : entry.status === "parked" ? "\u23F8\uFE0F" : "\u2B1C";
     lines.push(`- ${glyph} **${entry.id}:** ${entry.title}`);
-  }
-
-  lines.push("");
-  lines.push("## Recent Decisions");
-  if (state.recentDecisions.length > 0) {
-    for (const decision of state.recentDecisions) lines.push(`- ${decision}`);
-  } else {
-    lines.push("- None recorded");
   }
 
   lines.push("");

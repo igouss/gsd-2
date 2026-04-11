@@ -4,12 +4,8 @@
 // registry instance; these exported functions delegate through getOrCreateRegistry()
 // so existing call-sites and tests work without modification.
 
-import type {
-  HookExecutionState,
-  HookDispatchResult,
-  PreDispatchResult,
-  HookStatusEntry,
-} from "../domain/types.ts";
+import type { HookDispatchResult, PreDispatchResult } from "./hooks-config.types.ts";
+import type { HookExecutionState, HookStatusEntry } from "./hooks-state.types.ts";
 import { getOrCreateRegistry } from "../rules/rule-registry.ts";
 
 // Re-export resolveHookArtifactPath so existing importers still work.

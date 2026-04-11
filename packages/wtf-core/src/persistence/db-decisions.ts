@@ -1,28 +1,16 @@
 // WTF Database — Decision + Requirement CRUD
 
-import type { Decision, Requirement, RequirementClass, RequirementStatus } from "../domain/types.ts";
+import type { Decision, Requirement } from "../domain/types.ts";
 import { WTFError, WTF_STALE_STATE } from "../domain/errors.ts";
 import { _getCurrentDb } from "./db-core.ts";
+import { rowToRequirement } from "./row-mappers.ts";
 
 export function getRequirementById(id: string): Requirement | null {
   const db = _getCurrentDb();
   if (!db) return null;
   const row = db.prepare("SELECT * FROM requirements WHERE id = ?").get(id);
   if (!row) return null;
-  return {
-    id: row["id"] as string,
-    class: row["class"] as RequirementClass | "",
-    status: row["status"] as RequirementStatus,
-    description: row["description"] as string,
-    why: row["why"] as string,
-    source: row["source"] as string,
-    primary_owner: row["primary_owner"] as string,
-    supporting_slices: row["supporting_slices"] as string,
-    validation: row["validation"] as string,
-    notes: row["notes"] as string,
-    full_content: row["full_content"] as string,
-    superseded_by: (row["superseded_by"] as string) ?? null,
-  };
+  return rowToRequirement(row as Record<string, unknown>);
 }
 
 export function upsertDecision(d: Omit<Decision, "seq">): void {

@@ -9,7 +9,7 @@
  * The `loadSliceTaskIO` loader at the bottom is the only async/IO function.
  */
 
-import type { TaskIO, DerivedTaskNode, ReactiveExecutionState } from "../domain/types.ts";
+import type { TaskIO, DerivedTaskNode, ReactiveExecutionState } from "./reactive.types.ts";
 import { loadFile, parseTaskPlanIO } from "../persistence/files.ts";
 import { isDbAvailable, getSliceTasks } from "../persistence/wtf-db.ts";
 import { parsePlan } from "../persistence/md-parsers.ts";

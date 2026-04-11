@@ -35,11 +35,3 @@ export interface VerificationResult {
   runtimeErrors?: RuntimeError[]; // optional — populated by captureRuntimeErrors()
   auditWarnings?: AuditWarning[]; // optional — populated by runDependencyAudit()
 }
-
-export interface BrowserFlowResult {
-  url: string;
-  passed: boolean;
-  checksTotal: number;
-  checksPassed: number;
-  duration: number;
-}

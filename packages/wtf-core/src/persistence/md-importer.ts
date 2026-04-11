@@ -77,6 +77,9 @@ export function parseDecisionsTable(content: string): Omit<Decision, 'seq'>[] {
     const revisable = cells[6]!.trim();
     // Made By column is optional for backward compatibility — defaults to 'agent'
     const rawMadeBy = cells.length >= 8 ? cells[7]!.trim().toLowerCase() : 'agent';
+    if (!VALID_MADE_BY.has(rawMadeBy)) {
+      logWarning('manifest', `Decision ${id}: unrecognized made_by "${rawMadeBy}", defaulting to "agent"`, { fn: 'parseDecisionsTable' });
+    }
     const made_by = (VALID_MADE_BY.has(rawMadeBy) ? rawMadeBy : 'agent') as import('../domain/types.ts').DecisionMadeBy;
 
     // Detect (amends DXXX) in the Decision column

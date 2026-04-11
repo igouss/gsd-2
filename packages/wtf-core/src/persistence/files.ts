@@ -3,7 +3,7 @@
 
 export {
   splitFrontmatter, parseFrontmatterMap,
-  cachedParse,
+  cacheKey, cachedParse,
   registerCacheClearCallback, clearParseCache,
   formatShortcut,
   extractSection, extractAllSections,

@@ -1,4 +1,10 @@
 // WTF state types: phase machine, active references, milestone registry, dashboard state.
+//
+// WTFState is composed from focused sub-interfaces so consumers can depend on
+// only the slice they need. The full WTFState union is still the canonical
+// return type of deriveState() for backwards compatibility.
+
+// ─── Phase Machine ───────────────────────────────────────────────────────────
 
 export type Phase =
   | "pre-planning"
@@ -18,10 +24,30 @@ export type Phase =
   | "paused"
   | "blocked";
 
+// ─── Active Navigation ───────────────────────────────────────────────────────
+
 export interface ActiveRef {
   id: string;
   title: string;
 }
+
+/** Which work unit is currently active (milestone → slice → task). */
+export interface ActiveNavigation {
+  activeMilestone: ActiveRef | null;
+  activeSlice: ActiveRef | null;
+  activeTask: ActiveRef | null;
+}
+
+// ─── Phase + Operational State ───────────────────────────────────────────────
+
+/** Current phase machine position, blockers, and next action. */
+export interface PhaseState {
+  phase: Phase;
+  blockers: string[];
+  nextAction: string;
+}
+
+// ─── Milestone Registry ──────────────────────────────────────────────────────
 
 export interface MilestoneRegistryEntry {
   id: string;
@@ -30,6 +56,8 @@ export interface MilestoneRegistryEntry {
   /** Milestone IDs that must be complete before this milestone becomes active. Populated from CONTEXT.md YAML frontmatter. */
   dependsOn?: string[];
 }
+
+// ─── Progress / Dashboard ────────────────────────────────────────────────────
 
 export interface RequirementCounts {
   active: number;
@@ -51,18 +79,16 @@ export interface WTFProgress {
   tasks?: ProgressCounts;
 }
 
-export interface WTFState {
-  activeMilestone: ActiveRef | null;
-  activeSlice: ActiveRef | null;
-  activeTask: ActiveRef | null;
-  phase: Phase;
-  recentDecisions: string[];
-  blockers: string[];
-  nextAction: string;
-  activeWorkspace?: string;
+/** Read-only dashboard view: registry, requirements, progress counts. */
+export interface ProgressSnapshot {
   registry: MilestoneRegistryEntry[];
   requirements?: RequirementCounts;
   progress?: WTFProgress;
+}
+
+// ─── Composed State ──────────────────────────────────────────────────────────
+
+export interface WTFState extends ActiveNavigation, PhaseState, ProgressSnapshot {
   /** When phase=complete, holds the last completed milestone (instead of activeMilestone). */
   lastCompletedMilestone?: ActiveRef | null;
 }

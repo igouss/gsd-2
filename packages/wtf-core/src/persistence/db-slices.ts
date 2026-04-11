@@ -1,8 +1,8 @@
 // WTF Database — Slice CRUD + dependencies
 
 import { WTFError, WTF_STALE_STATE } from "../domain/errors.ts";
-import { _getCurrentDb } from "./db-core.ts";
-import { transaction } from "./db-core.ts";
+import { _getCurrentDb, transaction } from "./db-core.ts";
+import { rowToSlice } from "./row-mappers.ts";
 
 export interface SlicePlanningRecord {
   goal: string;
@@ -31,29 +31,6 @@ export interface SliceRow {
   observability_impact: string;
   sequence: number;
   replan_triggered_at: string | null;
-}
-
-function rowToSlice(row: Record<string, unknown>): SliceRow {
-  return {
-    milestone_id: row["milestone_id"] as string,
-    id: row["id"] as string,
-    title: row["title"] as string,
-    status: row["status"] as string,
-    risk: row["risk"] as string,
-    depends: JSON.parse((row["depends"] as string) || "[]"),
-    demo: (row["demo"] as string) ?? "",
-    created_at: row["created_at"] as string,
-    completed_at: (row["completed_at"] as string) ?? null,
-    full_summary_md: (row["full_summary_md"] as string) ?? "",
-    full_uat_md: (row["full_uat_md"] as string) ?? "",
-    goal: (row["goal"] as string) ?? "",
-    success_criteria: (row["success_criteria"] as string) ?? "",
-    proof_level: (row["proof_level"] as string) ?? "",
-    integration_closure: (row["integration_closure"] as string) ?? "",
-    observability_impact: (row["observability_impact"] as string) ?? "",
-    sequence: (row["sequence"] as number) ?? 0,
-    replan_triggered_at: (row["replan_triggered_at"] as string) ?? null,
-  };
 }
 
 export function insertSlice(s: {

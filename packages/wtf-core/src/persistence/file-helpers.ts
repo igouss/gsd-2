@@ -3,7 +3,8 @@
 // Pure functions, zero Pi dependencies.
 
 import { nativeExtractSection, NATIVE_UNAVAILABLE } from '../git/native-parser-bridge.ts';
-import { CACHE_MAX } from '../domain/constants.ts';
+/** Max parse-cache entries before eviction. */
+const CACHE_MAX = 50;
 import { splitFrontmatter, parseFrontmatterMap } from "../shared/frontmatter.ts";
 
 // Re-export for downstream consumers
@@ -14,7 +15,7 @@ export { splitFrontmatter, parseFrontmatterMap };
 /** Fast composite key: length + first/mid/last 100 chars. The middle sample
  *  prevents collisions when only a few characters change in the interior of
  *  a file (e.g., a checkbox [ ] → [x] that doesn't alter length or endpoints). */
-function cacheKey(content: string): string {
+export function cacheKey(content: string): string {
   const len = content.length;
   const head = content.slice(0, 100);
   const midStart = Math.max(0, Math.floor(len / 2) - 50);

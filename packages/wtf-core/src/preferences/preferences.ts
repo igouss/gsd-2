@@ -16,8 +16,11 @@ import { join } from "node:path";
 
 import { wtfRoot } from "../persistence/paths.ts";
 import { parse as parseYaml } from "yaml";
-import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile } from "../domain/types.ts";
+import type { PostUnitHookConfig, PreDispatchHookConfig } from "../execution/hooks-config.types.ts";
+import type { TokenProfile } from "../routing/routing.types.ts";
 import type { DynamicRoutingConfig } from "../routing/model-router.ts";
+import type { ParallelConfig } from "../parallel/parallel.types.ts";
+import type { GitHubSyncConfig } from "../github-sync/types.ts";
 import { normalizeStringArray } from "../shared/format-utils.ts";
 import { logWarning } from "../workflow/workflow-logger.ts";
 import { resolveProfileDefaults as _resolveProfileDefaults } from "./preferences-models.ts";
@@ -374,7 +377,7 @@ function mergePreferences(base: WTFPreferences, override: WTFPreferences): WTFPr
       ? { ...(base.phases ?? {}), ...(override.phases ?? {}) }
       : undefined,
     parallel: (base.parallel || override.parallel)
-      ? { ...(base.parallel ?? {}), ...(override.parallel ?? {}) } as import("../domain/types.ts").ParallelConfig
+      ? { ...(base.parallel ?? {}), ...(override.parallel ?? {}) } as ParallelConfig
       : undefined,
     verification_commands: mergeStringLists(base.verification_commands, override.verification_commands),
     verification_auto_fix: override.verification_auto_fix ?? base.verification_auto_fix,
@@ -388,7 +391,7 @@ function mergePreferences(base: WTFPreferences, override: WTFPreferences): WTFPr
     auto_visualize: override.auto_visualize ?? base.auto_visualize,
     auto_report: override.auto_report ?? base.auto_report,
     github: (base.github || override.github)
-      ? { ...(base.github ?? {}), ...(override.github ?? {}) } as import("../github-sync/types.ts").GitHubSyncConfig
+      ? { ...(base.github ?? {}), ...(override.github ?? {}) } as GitHubSyncConfig
       : undefined,
     service_tier: override.service_tier ?? base.service_tier,
     forensics_dedup: override.forensics_dedup ?? base.forensics_dedup,
@@ -564,7 +567,7 @@ export function getIsolationMode(): "none" | "worktree" | "branch" {
   return "none"; // default — no isolation, work on current branch
 }
 
-export function resolveParallelConfig(prefs: WTFPreferences | undefined): import("../domain/types.ts").ParallelConfig {
+export function resolveParallelConfig(prefs: WTFPreferences | undefined): ParallelConfig {
   return {
     enabled: prefs?.parallel?.enabled ?? false,
     max_workers: Math.max(1, Math.min(4, prefs?.parallel?.max_workers ?? 2)),

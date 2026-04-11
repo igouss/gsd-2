@@ -3,20 +3,6 @@ import { dirname } from "node:path"
 import { logWarning } from "../workflow/workflow-logger.ts"
 
 /**
- * Safely creates a directory. Returns true if successful, false on error.
- * Logs warnings via workflow-logger on failure.
- */
-export function safeMkdir(dirPath: string): boolean {
-  try {
-    mkdirSync(dirPath, { recursive: true })
-    return true
-  } catch (err) {
-    logWarning("fs", `mkdir failed: ${dirPath}: ${(err as Error).message}`)
-    return false
-  }
-}
-
-/**
  * Safely copies src to dst. Returns true if successful, false if src doesn't exist or copy fails.
  * Logs warnings via workflow-logger on failure.
  */

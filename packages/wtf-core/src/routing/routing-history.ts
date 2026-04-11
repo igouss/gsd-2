@@ -4,7 +4,7 @@
 
 import { join } from "node:path";
 import { wtfRoot } from "../persistence/paths.ts";
-import type { ComplexityTier } from "../domain/types.ts";
+import type { ComplexityTier } from "./routing.types.ts";
 import { loadJsonFile, saveJsonFile } from "../persistence/json-persistence.ts";
 
 // ─── Types ───────────────────────────────────────────────────────────────────

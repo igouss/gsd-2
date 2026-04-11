@@ -2,7 +2,7 @@
 // Cross-platform desktop notifications for auto-mode events.
 
 import { execFileSync } from "node:child_process";
-import type { NotificationPreferences } from "../domain/types.ts";
+import type { NotificationPreferences } from "../preferences/config.types.ts";
 import { loadEffectiveWTFPreferences } from "../preferences/preferences.ts";
 import { CmuxClient, emitOsc777Notification, resolveCmuxConfig } from "../cmux/index.ts";
 

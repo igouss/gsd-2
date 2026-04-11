@@ -126,7 +126,6 @@ export async function deriveState(basePath: string): Promise<WTFState> {
     activeSlice: null,
     activeTask: null,
     phase: 'pre-planning',
-    recentDecisions: [],
     blockers: [],
     nextAction: 'No milestones found. Run /wtf to create one.',
     registry: [],

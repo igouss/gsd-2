@@ -45,7 +45,7 @@ interface CliArgs {
 }
 
 function parseArgs(): CliArgs {
-  const args = process.argv.slice(2);
+  const argv = process.argv.slice(2);
   const result: CliArgs = {
     projectDir: "",
     model: "claude-sonnet-4-6",
@@ -54,39 +54,27 @@ function parseArgs(): CliArgs {
     dryRun: false,
   };
 
-  let i = 0;
-  while (i < args.length) {
-    const arg = args[i]!;
-    switch (arg) {
-      case "--model":
-        result.model = args[++i]!;
-        break;
-      case "--claude-bin":
-        result.claudeBin = args[++i]!;
-        break;
-      case "--max-budget":
-        result.maxBudget = parseFloat(args[++i]!);
-        break;
-      case "--verbose":
-        result.verbose = true;
-        break;
-      case "--dry-run":
-        result.dryRun = true;
-        break;
-      case "--help":
-      case "-h":
-        printUsage();
-        process.exit(0);
-        break; // unreachable, but satisfies no-fallthrough
-      default:
-        if (arg.startsWith("-")) {
-          process.stderr.write(`Unknown option: ${arg}\n`);
-          printUsage();
-          process.exit(1);
-        }
-        result.projectDir = arg;
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i]!;
+
+    if (arg === "--help" || arg === "-h") {
+      printUsage();
+      process.exit(0);
     }
-    i++;
+
+    if (arg === "--model")          { result.model = argv[++i]!; continue; }
+    if (arg === "--claude-bin")     { result.claudeBin = argv[++i]!; continue; }
+    if (arg === "--max-budget")     { result.maxBudget = parseFloat(argv[++i]!); continue; }
+    if (arg === "--verbose")        { result.verbose = true; continue; }
+    if (arg === "--dry-run")        { result.dryRun = true; continue; }
+
+    if (arg.startsWith("-")) {
+      process.stderr.write(`Unknown option: ${arg}\n`);
+      printUsage();
+      process.exit(1);
+    }
+
+    result.projectDir = arg;
   }
 
   if (!result.projectDir) {

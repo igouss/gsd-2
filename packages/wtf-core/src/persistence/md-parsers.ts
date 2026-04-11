@@ -2,11 +2,12 @@
 // parseRoadmap() and parsePlan() try the native Rust parser first,
 // falling back to a JS implementation when unavailable.
 
-import { extractSection, parseBullets, extractBoldField, extractAllSections, registerCacheClearCallback } from './files.ts';
+import { extractSection, parseBullets, extractBoldField, extractAllSections, registerCacheClearCallback, cacheKey } from './files.ts';
 import { splitFrontmatter } from "../shared/frontmatter.ts";
 import { nativeParseRoadmap, nativeParsePlanFile } from '../git/native-parser-bridge.ts';
 import { debugTime, debugCount } from '../reporting/debug-logger.ts';
-import { CACHE_MAX } from '../domain/constants.ts';
+/** Max parse-cache entries before eviction. */
+const CACHE_MAX = 50;
 
 import type {
   Roadmap, BoundaryMapEntry,
@@ -16,18 +17,6 @@ import type {
 import { parseRoadmapSlices } from '../workflow/roadmap-slices.ts';
 
 // ─── Parse Cache ─────────────────────────────────────────────────────────
-
-/** Fast composite key: length + first/mid/last 100 chars. The middle sample
- *  prevents collisions when only a few characters change in the interior of
- *  a file (e.g., a checkbox [ ] → [x] that doesn't alter length or endpoints). */
-function cacheKey(content: string): string {
-  const len = content.length;
-  const head = content.slice(0, 100);
-  const midStart = Math.max(0, Math.floor(len / 2) - 50);
-  const mid = len > 200 ? content.slice(midStart, midStart + 100) : '';
-  const tail = len > 100 ? content.slice(-100) : '';
-  return `${len}:${head}:${mid}:${tail}`;
-}
 
 const _parseCache = new Map<string, unknown>();
 

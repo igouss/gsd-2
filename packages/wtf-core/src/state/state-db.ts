@@ -156,7 +156,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
       activeSlice: null,
       activeTask: null,
       phase: 'pre-planning',
-      recentDecisions: [],
+
       blockers: [],
       nextAction: 'No milestones found. Run /wtf to create one.',
       registry: [],
@@ -335,7 +335,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
       return {
         activeMilestone: null, activeSlice: null, activeTask: null,
         phase: 'blocked',
-        recentDecisions: [], blockers: blockerDetails.length > 0
+        blockers: blockerDetails.length > 0
           ? blockerDetails
           : ['All remaining milestones are dep-blocked but no deps listed — check CONTEXT.md files'],
         nextAction: 'Resolve milestone dependencies before proceeding.',
@@ -349,7 +349,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
       return {
         activeMilestone: null, activeSlice: null, activeTask: null,
         phase: 'pre-planning',
-        recentDecisions: [], blockers: [],
+        blockers: [],
         nextAction: `All remaining milestones are parked (${parkedIds}). Run /wtf unpark <id> or create a new milestone.`,
         registry, requirements,
         progress: { milestones: milestoneProgress },
@@ -360,7 +360,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
       return {
         activeMilestone: null, activeSlice: null, activeTask: null,
         phase: 'pre-planning',
-        recentDecisions: [], blockers: [],
+        blockers: [],
         nextAction: 'No milestones found. Run /wtf to create one.',
         registry: [], requirements,
         progress: { milestones: { done: 0, total: 0 } },
@@ -378,7 +378,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
       lastCompletedMilestone: lastEntry ? { id: lastEntry.id, title: lastEntry.title } : null,
       activeSlice: null, activeTask: null,
       phase: 'complete',
-      recentDecisions: [], blockers: [],
+      blockers: [],
       nextAction: completionNote,
       registry, requirements,
       progress: { milestones: milestoneProgress },
@@ -396,7 +396,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
         : `Plan milestone ${activeMilestone.id}.`;
       return {
         activeMilestone, activeSlice: null, activeTask: null,
-        phase, recentDecisions: [], blockers: [],
+        phase, blockers: [],
         nextAction, registry, requirements,
         progress: { milestones: milestoneProgress },
       };
@@ -406,7 +406,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
     return {
       activeMilestone, activeSlice: null, activeTask: null,
       phase: 'pre-planning',
-      recentDecisions: [], blockers: [],
+      blockers: [],
       nextAction: `Milestone ${activeMilestone.id} has a roadmap but no slices defined. Add slices to the roadmap.`,
       registry, requirements,
       progress: {
@@ -434,7 +434,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
       return {
         activeMilestone, activeSlice: null, activeTask: null,
         phase: 'validating-milestone',
-        recentDecisions: [], blockers: [],
+        blockers: [],
         nextAction: `Validate milestone ${activeMilestone.id} before completion.`,
         registry, requirements,
         progress: { milestones: milestoneProgress, slices: sliceProgress },
@@ -444,7 +444,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
     return {
       activeMilestone, activeSlice: null, activeTask: null,
       phase: 'completing-milestone',
-      recentDecisions: [], blockers: [],
+      blockers: [],
       nextAction: `All slices complete in ${activeMilestone.id}. Write milestone summary.`,
       registry, requirements,
       progress: { milestones: milestoneProgress, slices: sliceProgress },
@@ -477,7 +477,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
       return {
         activeMilestone, activeSlice: null, activeTask: null,
         phase: 'blocked',
-        recentDecisions: [], blockers: [`WTF_SLICE_LOCK=${sliceLock} not found in active milestone slices`],
+        blockers: [`WTF_SLICE_LOCK=${sliceLock} not found in active milestone slices`],
         nextAction: 'Slice lock references a non-existent slice — check orchestrator dispatch.',
         registry, requirements,
         progress: { milestones: milestoneProgress, slices: sliceProgress },
@@ -501,7 +501,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
     return {
       activeMilestone, activeSlice: null, activeTask: null,
       phase: 'blocked',
-      recentDecisions: [], blockers: ['No slice eligible — check dependency ordering'],
+      blockers: ['No slice eligible — check dependency ordering'],
       nextAction: 'Resolve dependency blockers or plan next slice.',
       registry, requirements,
       progress: { milestones: milestoneProgress, slices: sliceProgress },
@@ -514,7 +514,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
     return {
       activeMilestone, activeSlice, activeTask: null,
       phase: 'planning',
-      recentDecisions: [], blockers: [],
+      blockers: [],
       nextAction: `Plan slice ${activeSlice.id} (${activeSlice.title}).`,
       registry, requirements,
       progress: { milestones: milestoneProgress, slices: sliceProgress },
@@ -600,7 +600,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
     return {
       activeMilestone, activeSlice, activeTask: null,
       phase: 'summarizing',
-      recentDecisions: [], blockers: [],
+      blockers: [],
       nextAction: `All tasks done in ${activeSlice.id}. Write slice summary and complete slice.`,
       registry, requirements,
       progress: { milestones: milestoneProgress, slices: sliceProgress, tasks: taskProgress },
@@ -612,7 +612,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
     return {
       activeMilestone, activeSlice, activeTask: null,
       phase: 'planning',
-      recentDecisions: [], blockers: [],
+      blockers: [],
       nextAction: `Slice ${activeSlice.id} has a plan file but no tasks. Add tasks to the plan.`,
       registry, requirements,
       progress: { milestones: milestoneProgress, slices: sliceProgress, tasks: taskProgress },
@@ -629,7 +629,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
       return {
         activeMilestone, activeSlice, activeTask: null,
         phase: 'planning',
-        recentDecisions: [], blockers: [],
+        blockers: [],
         nextAction: `Task plan files missing for ${activeSlice.id}. Run plan-slice to generate task plans.`,
         registry, requirements,
         progress: { milestones: milestoneProgress, slices: sliceProgress, tasks: taskProgress },
@@ -646,7 +646,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
     return {
       activeMilestone, activeSlice, activeTask: null,
       phase: 'evaluating-gates',
-      recentDecisions: [], blockers: [],
+      blockers: [],
       nextAction: `Evaluate ${pendingGateCount} quality gate(s) for ${activeSlice.id} before execution.`,
       registry, requirements,
       progress: { milestones: milestoneProgress, slices: sliceProgress, tasks: taskProgress },
@@ -681,10 +681,10 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
       return {
         activeMilestone, activeSlice, activeTask,
         phase: 'replanning-slice',
-        recentDecisions: [],
+  
         blockers: [`Task ${blockerTaskId} discovered a blocker requiring slice replan`],
         nextAction: `Task ${blockerTaskId} reported blocker_discovered. Replan slice ${activeSlice.id} before continuing.`,
-        activeWorkspace: undefined,
+
         registry, requirements,
         progress: { milestones: milestoneProgress, slices: sliceProgress, tasks: taskProgress },
       };
@@ -706,10 +706,10 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
         return {
           activeMilestone, activeSlice, activeTask,
           phase: 'replanning-slice',
-          recentDecisions: [],
+    
           blockers: ['Triage replan trigger detected — slice replan required'],
           nextAction: `Triage replan triggered for slice ${activeSlice.id}. Replan before continuing.`,
-          activeWorkspace: undefined,
+  
           registry, requirements,
           progress: { milestones: milestoneProgress, slices: sliceProgress, tasks: taskProgress },
         };
@@ -726,7 +726,7 @@ export async function deriveStateFromDb(basePath: string): Promise<WTFState> {
   return {
     activeMilestone, activeSlice, activeTask,
     phase: 'executing',
-    recentDecisions: [], blockers: [],
+    blockers: [],
     nextAction: hasInterrupted
       ? `Resume interrupted work on ${activeTask.id}: ${activeTask.title} in slice ${activeSlice.id}. Read continue.md first.`
       : `Execute ${activeTask.id}: ${activeTask.title} in slice ${activeSlice.id}.`,

@@ -10,7 +10,7 @@
 
 import { resolve } from 'node:path';
 import { readFileSync, existsSync, statSync } from 'node:fs';
-import type { Decision, Requirement, RequirementClass, RequirementStatus } from '../domain/types.ts';
+import type { Decision, Requirement } from '../domain/types.ts';
 import { resolveWtfRootFile } from './paths.ts';
 import { saveFile } from './files.ts';
 import { WTFError, WTF_STALE_STATE, WTF_IO_ERROR } from '../domain/errors.ts';
@@ -21,6 +21,7 @@ import { clearParseCache } from './files.ts';
 import { PROJECT_DIR_NAME } from "../domain/constants.ts";
 import { _getAdapter, transaction, upsertRequirement, upsertDecision, updateSliceStatus, getRequirementById, insertArtifact } from './wtf-db.ts';
 import { parseRequirementsSections } from './md-importer.ts';
+import { rowToDecision, rowToRequirement } from './row-mappers.ts';
 
 // ─── Freeform Detection ───────────────────────────────────────────────────
 
@@ -202,6 +203,33 @@ export function generateRequirementsMd(requirements: Requirement[]): string {
   return lines.join('\n') + '\n';
 }
 
+// ─── Shared Regeneration Helpers ─────────────────────────────────────────
+
+/**
+ * Fetch all requirements from DB, generate REQUIREMENTS.md, and write to disk.
+ * Used by both saveRequirementToDb and updateRequirementInDb after DB mutations.
+ * Throws on file write failure — callers are responsible for DB rollback.
+ */
+async function regenerateRequirementsMdFile(basePath: string): Promise<void> {
+  const adapter = _getAdapter();
+  let allRequirements: Requirement[] = [];
+  if (adapter) {
+    const rows = adapter.prepare('SELECT * FROM requirements ORDER BY id').all();
+    allRequirements = rows.map(row => rowToRequirement(row as Record<string, unknown>));
+  }
+  const nonSuperseded = allRequirements.filter(r => r.superseded_by == null);
+  const md = generateRequirementsMd(nonSuperseded);
+  const filePath = resolveWtfRootFile(basePath, 'REQUIREMENTS');
+  await saveFile(filePath, md);
+}
+
+/** Invalidate all file-read caches so deriveState() sees updated markdown. */
+function invalidateAllCaches(): void {
+  invalidateStateCache();
+  clearPathCache();
+  clearParseCache();
+}
+
 // ─── Next Decision ID ─────────────────────────────────────────────────────
 
 /**
@@ -258,17 +286,10 @@ export async function nextRequirementId(): Promise<string> {
 
 // ─── Save Requirement to DB + Regenerate Markdown ────────────────────────
 
-export interface SaveRequirementFields {
-  class: RequirementClass | "";
-  status?: RequirementStatus;
-  description: string;
-  why: string;
-  source: string;
-  primary_owner?: string;
-  supporting_slices?: string;
-  validation?: string;
-  notes?: string;
-}
+/** Fields for creating a new requirement. Required fields from Requirement + optional extras. */
+export type SaveRequirementFields =
+  Pick<Requirement, 'class' | 'description' | 'why' | 'source'> &
+  Partial<Pick<Requirement, 'status' | 'primary_owner' | 'supporting_slices' | 'validation' | 'notes'>>;
 
 /**
  * Save a new requirement to DB and regenerate REQUIREMENTS.md.
@@ -318,32 +339,8 @@ export async function saveRequirementToDb(
       return nextId;
     });
 
-    // Fetch all requirements for full file regeneration
-    const adapter = _getAdapter();
-    let allRequirements: Requirement[] = [];
-    if (adapter) {
-      const rows = adapter.prepare('SELECT * FROM requirements ORDER BY id').all();
-      allRequirements = rows.map(row => ({
-        id: row['id'] as string,
-        class: row['class'] as RequirementClass | "",
-        status: row['status'] as RequirementStatus,
-        description: row['description'] as string,
-        why: row['why'] as string,
-        source: row['source'] as string,
-        primary_owner: row['primary_owner'] as string,
-        supporting_slices: row['supporting_slices'] as string,
-        validation: row['validation'] as string,
-        notes: row['notes'] as string,
-        full_content: row['full_content'] as string,
-        superseded_by: (row['superseded_by'] as string) ?? null,
-      }));
-    }
-
-    const nonSuperseded = allRequirements.filter(r => r.superseded_by == null);
-    const md = generateRequirementsMd(nonSuperseded);
-    const filePath = resolveWtfRootFile(basePath, 'REQUIREMENTS');
     try {
-      await saveFile(filePath, md);
+      await regenerateRequirementsMdFile(basePath);
     } catch (diskErr) {
       logError('manifest', 'disk write failed, rolling back DB row', { fn: 'saveRequirementToDb', error: String((diskErr as Error).message) });
       try {
@@ -354,9 +351,7 @@ export async function saveRequirementToDb(
       }
       throw diskErr;
     }
-    invalidateStateCache();
-    clearPathCache();
-    clearParseCache();
+    invalidateAllCaches();
 
     return { id };
   } catch (err) {
@@ -367,15 +362,10 @@ export async function saveRequirementToDb(
 
 // ─── Save Decision to DB + Regenerate Markdown ────────────────────────────
 
-export interface SaveDecisionFields {
-  scope: string;
-  decision: string;
-  choice: string;
-  rationale: string;
-  revisable?: string;
-  when_context?: string;
-  made_by?: import('../domain/types.ts').DecisionMadeBy;
-}
+/** Fields for creating a new decision. Required fields from Decision + optional extras. */
+export type SaveDecisionFields =
+  Pick<Decision, 'scope' | 'decision' | 'choice' | 'rationale'> &
+  Partial<Pick<Decision, 'revisable' | 'when_context' | 'made_by'>>;
 
 /**
  * Save a new decision to DB and regenerate DECISIONS.md.
@@ -428,18 +418,7 @@ export async function saveDecisionToDb(
     let allDecisions: Decision[] = [];
     if (adapter) {
       const rows = adapter.prepare('SELECT * FROM decisions ORDER BY seq').all();
-      allDecisions = rows.map(row => ({
-        seq: row['seq'] as number,
-        id: row['id'] as string,
-        when_context: row['when_context'] as string,
-        scope: row['scope'] as string,
-        decision: row['decision'] as string,
-        choice: row['choice'] as string,
-        rationale: row['rationale'] as string,
-        revisable: row['revisable'] as string,
-        made_by: (row['made_by'] as string as import('../domain/types.ts').DecisionMadeBy) ?? 'agent',
-        superseded_by: (row['superseded_by'] as string) ?? null,
-      }));
+      allDecisions = rows.map(row => rowToDecision(row as Record<string, unknown>));
     }
 
     const filePath = resolveWtfRootFile(basePath, 'DECISIONS');
@@ -495,11 +474,7 @@ export async function saveDecisionToDb(
       });
     }
 
-    // Invalidate file-read caches so deriveState() sees the updated markdown.
-    // Do NOT clear the artifacts table — we just wrote to it intentionally.
-    invalidateStateCache();
-    clearPathCache();
-    clearParseCache();
+    invalidateAllCaches();
 
     return { id };
   } catch (err) {
@@ -607,35 +582,8 @@ export async function updateRequirementInDb(
 
     upsertRequirement(merged);
 
-    // Fetch ALL requirements (including superseded) for full file regeneration
-    const adapter = _getAdapter();
-    let allRequirements: Requirement[] = [];
-    if (adapter) {
-      const rows = adapter.prepare('SELECT * FROM requirements ORDER BY id').all();
-      allRequirements = rows.map(row => ({
-        id: row['id'] as string,
-        class: row['class'] as RequirementClass | "",
-        status: row['status'] as RequirementStatus,
-        description: row['description'] as string,
-        why: row['why'] as string,
-        source: row['source'] as string,
-        primary_owner: row['primary_owner'] as string,
-        supporting_slices: row['supporting_slices'] as string,
-        validation: row['validation'] as string,
-        notes: row['notes'] as string,
-        full_content: row['full_content'] as string,
-        superseded_by: (row['superseded_by'] as string) ?? null,
-      }));
-    }
-
-    // Filter to non-superseded for the markdown file
-    // (superseded requirements don't appear in section headings)
-    const nonSuperseded = allRequirements.filter(r => r.superseded_by == null);
-
-    const md = generateRequirementsMd(nonSuperseded);
-    const filePath = resolveWtfRootFile(basePath, 'REQUIREMENTS');
     try {
-      await saveFile(filePath, md);
+      await regenerateRequirementsMdFile(basePath);
     } catch (diskErr) {
       logError('manifest', 'disk write failed, reverting DB row', { fn: 'updateRequirementInDb', error: String((diskErr as Error).message) });
       if (existing) {
@@ -643,11 +591,7 @@ export async function updateRequirementInDb(
       }
       throw diskErr;
     }
-    // Invalidate file-read caches so deriveState() sees the updated markdown.
-    // Do NOT clear the artifacts table — we just wrote to it intentionally.
-    invalidateStateCache();
-    clearPathCache();
-    clearParseCache();
+    invalidateAllCaches();
   } catch (err) {
     logError('manifest', 'updateRequirementInDb failed', { fn: 'updateRequirementInDb', error: String((err as Error).message) });
     throw err;
@@ -719,11 +663,7 @@ export async function saveArtifactToDb(
         throw diskErr;
       }
     }
-    // Invalidate file-read caches so deriveState() sees the updated markdown.
-    // Do NOT clear the artifacts table — we just wrote to it intentionally.
-    invalidateStateCache();
-    clearPathCache();
-    clearParseCache();
+    invalidateAllCaches();
   } catch (err) {
     logError('manifest', 'saveArtifactToDb failed', { fn: 'saveArtifactToDb', error: String((err as Error).message) });
     throw err;

@@ -26,7 +26,7 @@ import { nativeBranchExists } from "../git/native-git-bridge.ts";
 import { readIntegrationBranch } from "../git/git-service.ts";
 import { resolveParallelConfig } from "../preferences/preferences.ts";
 import type { WTFPreferences } from "../preferences/preferences.ts";
-import type { ParallelConfig } from "../domain/types.ts";
+import type { ParallelConfig } from "./parallel.types.ts";
 import {
   writeSessionStatus,
   readAllSessionStatuses,

@@ -9,14 +9,8 @@
 import { logWarning } from "../workflow/workflow-logger.ts";
 import type { UnifiedRule } from "./rule-types.ts";
 import type { DispatchAction, DispatchContext, DispatchRule } from "../auto/auto-dispatch.ts";
-import type {
-  PostUnitHookConfig,
-  HookDispatchResult,
-  PreDispatchResult,
-  HookExecutionState,
-  PersistedHookState,
-  HookStatusEntry,
-} from "../domain/types.ts";
+import type { PostUnitHookConfig, HookDispatchResult, PreDispatchResult } from "../execution/hooks-config.types.ts";
+import type { HookExecutionState, PersistedHookState, HookStatusEntry } from "../execution/hooks-state.types.ts";
 import { resolvePostUnitHooks, resolvePreDispatchHooks } from "../preferences/preferences.ts";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";

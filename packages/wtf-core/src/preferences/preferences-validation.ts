@@ -7,9 +7,15 @@
  */
 
 import type { GitPreferences } from "../git/git-service.ts";
-import type { PostUnitHookConfig, PreDispatchHookConfig, TokenProfile, PhaseSkipPreferences } from "../domain/types.ts";
+import type { PostUnitHookConfig, PreDispatchHookConfig } from "../execution/hooks-config.types.ts";
+import type { PhaseSkipPreferences } from "./config.types.ts";
+import type { TokenProfile } from "../routing/routing.types.ts";
 import type { DynamicRoutingConfig } from "../routing/model-router.ts";
 import { VALID_BRANCH_NAME } from "../git/git-service.ts";
+import type { AutoMergeMode, MergeStrategy, ParallelConfig } from "../parallel/parallel.types.ts";
+import type { ReactiveExecutionConfig } from "../workflow/reactive.types.ts";
+import type { GateEvaluationConfig } from "../domain/types.ts";
+import type { GitHubSyncConfig } from "../github-sync/types.ts";
 import { normalizeStringArray } from "../shared/format-utils.ts";
 
 import {
@@ -17,6 +23,8 @@ import {
   KNOWN_UNIT_TYPES,
 
   SKILL_ACTIONS,
+  type ContextManagementConfig,
+  type ExperimentalPreferences,
   type WorkflowMode,
   type WTFPreferences,
   type WTFSkillRule,
@@ -29,6 +37,10 @@ export function validatePreferences(preferences: WTFPreferences): {
   errors: string[];
   warnings: string[];
 } {
+  // The input is parsed YAML — the WTFPreferences type is aspirational, not
+  // guaranteed.  Use `raw` for sub-object access so we don't need double-casts.
+  const raw = preferences as Record<string, unknown>;
+
   const errors: string[] = [];
   const warnings: string[] = [];
   const validated: WTFPreferences = {};
@@ -110,7 +122,7 @@ export function validatePreferences(preferences: WTFPreferences): {
       }
       const validatedRule: WTFSkillRule = { when };
       for (const action of SKILL_ACTIONS) {
-        const values = normalizeStringArray((rule as unknown as Record<string, unknown>)[action]);
+        const values = normalizeStringArray(rule[action]);
         if (values.length > 0) {
           validatedRule[action as keyof WTFSkillRule] = values as never;
         }
@@ -405,7 +417,7 @@ export function validatePreferences(preferences: WTFPreferences): {
   // ─── Dynamic Routing ─────────────────────────────────────────────────
   if (preferences.dynamic_routing !== undefined) {
     if (typeof preferences.dynamic_routing === "object" && preferences.dynamic_routing !== null) {
-      const dr = preferences.dynamic_routing as unknown as Record<string, unknown>;
+      const dr = raw.dynamic_routing as Record<string, unknown>;
       const validDr: Partial<DynamicRoutingConfig> = {};
 
       if (dr.enabled !== undefined) {
@@ -449,7 +461,7 @@ export function validatePreferences(preferences: WTFPreferences): {
       }
 
       if (Object.keys(validDr).length > 0) {
-        validated.dynamic_routing = validDr as unknown as DynamicRoutingConfig;
+        validated.dynamic_routing = validDr as DynamicRoutingConfig;
       }
     } else {
       errors.push("dynamic_routing must be an object");
@@ -459,8 +471,8 @@ export function validatePreferences(preferences: WTFPreferences): {
   // ─── Context Management ──────────────────────────────────────────────
   if (preferences.context_management !== undefined) {
     if (typeof preferences.context_management === "object" && preferences.context_management !== null) {
-      const cm = preferences.context_management as unknown as Record<string, unknown>;
-      const validCm: Record<string, unknown> = {};
+      const cm = raw.context_management as Record<string, unknown>;
+      const validCm: Partial<ContextManagementConfig> = {};
 
       if (cm.observation_masking !== undefined) {
         if (typeof cm.observation_masking === "boolean") validCm.observation_masking = cm.observation_masking;
@@ -483,7 +495,7 @@ export function validatePreferences(preferences: WTFPreferences): {
       }
 
       if (Object.keys(validCm).length > 0) {
-        validated.context_management = validCm as any;
+        validated.context_management = validCm as ContextManagementConfig;
       }
     } else {
       errors.push("context_management must be an object");
@@ -492,8 +504,8 @@ export function validatePreferences(preferences: WTFPreferences): {
 
   // ─── Parallel Config ────────────────────────────────────────────────────
   if (preferences.parallel && typeof preferences.parallel === "object") {
-    const p = preferences.parallel as unknown as Record<string, unknown>;
-    const parallel: Record<string, unknown> = {};
+    const p = raw.parallel as Record<string, unknown>;
+    const parallel: Partial<ParallelConfig> = {};
 
     if (p.enabled !== undefined) {
       if (typeof p.enabled === "boolean") parallel.enabled = p.enabled;
@@ -514,17 +526,17 @@ export function validatePreferences(preferences: WTFPreferences): {
       }
     }
     if (p.merge_strategy !== undefined) {
-      const validStrategies = new Set(["per-slice", "per-milestone"]);
-      if (typeof p.merge_strategy === "string" && validStrategies.has(p.merge_strategy)) {
-        parallel.merge_strategy = p.merge_strategy;
+      const validStrategies = new Set<MergeStrategy>(["per-slice", "per-milestone"]);
+      if (typeof p.merge_strategy === "string" && validStrategies.has(p.merge_strategy as MergeStrategy)) {
+        parallel.merge_strategy = p.merge_strategy as MergeStrategy;
       } else {
         errors.push("parallel.merge_strategy must be one of: per-slice, per-milestone");
       }
     }
     if (p.auto_merge !== undefined) {
-      const validModes = new Set(["auto", "confirm", "manual"]);
-      if (typeof p.auto_merge === "string" && validModes.has(p.auto_merge)) {
-        parallel.auto_merge = p.auto_merge;
+      const validModes = new Set<AutoMergeMode>(["auto", "confirm", "manual"]);
+      if (typeof p.auto_merge === "string" && validModes.has(p.auto_merge as AutoMergeMode)) {
+        parallel.auto_merge = p.auto_merge as AutoMergeMode;
       } else {
         errors.push("parallel.auto_merge must be one of: auto, confirm, manual");
       }
@@ -539,15 +551,15 @@ export function validatePreferences(preferences: WTFPreferences): {
     }
 
     if (Object.keys(parallel).length > 0) {
-      validated.parallel = parallel as unknown as import("../domain/types.ts").ParallelConfig;
+      validated.parallel = parallel as ParallelConfig;
     }
   }
 
   // ─── Reactive Execution ─────────────────────────────────────────────────
   if (preferences.reactive_execution !== undefined) {
     if (typeof preferences.reactive_execution === "object" && preferences.reactive_execution !== null) {
-      const re = preferences.reactive_execution as unknown as Record<string, unknown>;
-      const validRe: Record<string, unknown> = {};
+      const re = raw.reactive_execution as Record<string, unknown>;
+      const validRe: Partial<ReactiveExecutionConfig> = {};
 
       if (re.enabled !== undefined) {
         if (typeof re.enabled === "boolean") validRe.enabled = re.enabled;
@@ -585,7 +597,7 @@ export function validatePreferences(preferences: WTFPreferences): {
       }
 
       if (Object.keys(validRe).length > 0) {
-        validated.reactive_execution = validRe as unknown as import("../domain/types.ts").ReactiveExecutionConfig;
+        validated.reactive_execution = validRe as ReactiveExecutionConfig;
       }
     } else {
       errors.push("reactive_execution must be an object");
@@ -595,8 +607,8 @@ export function validatePreferences(preferences: WTFPreferences): {
   // ─── Gate Evaluation ─────────────────────────────────────────────────────
   if (preferences.gate_evaluation !== undefined) {
     if (typeof preferences.gate_evaluation === "object" && preferences.gate_evaluation !== null) {
-      const ge = preferences.gate_evaluation as unknown as Record<string, unknown>;
-      const validGe: Record<string, unknown> = {};
+      const ge = raw.gate_evaluation as Record<string, unknown>;
+      const validGe: Partial<GateEvaluationConfig> = {};
 
       if (ge.enabled !== undefined) {
         if (typeof ge.enabled === "boolean") validGe.enabled = ge.enabled;
@@ -622,7 +634,7 @@ export function validatePreferences(preferences: WTFPreferences): {
       }
 
       if (Object.keys(validGe).length > 0) {
-        validated.gate_evaluation = validGe as unknown as import("../domain/types.ts").GateEvaluationConfig;
+        validated.gate_evaluation = validGe as GateEvaluationConfig;
       }
     } else {
       errors.push("gate_evaluation must be an object");
@@ -791,8 +803,8 @@ export function validatePreferences(preferences: WTFPreferences): {
   // ─── GitHub Sync ────────────────────────────────────────────────────────
   if (preferences.github !== undefined) {
     if (typeof preferences.github === "object" && preferences.github !== null) {
-      const gh = preferences.github as unknown as Record<string, unknown>;
-      const validGh: Record<string, unknown> = {};
+      const gh = raw.github as Record<string, unknown>;
+      const validGh: Partial<GitHubSyncConfig> = {};
 
       if (gh.enabled !== undefined) {
         if (typeof gh.enabled === "boolean") validGh.enabled = gh.enabled;
@@ -831,7 +843,7 @@ export function validatePreferences(preferences: WTFPreferences): {
       }
 
       if (Object.keys(validGh).length > 0) {
-        validated.github = validGh as unknown as import("../github-sync/types.ts").GitHubSyncConfig;
+        validated.github = validGh as GitHubSyncConfig;
       }
     } else {
       errors.push("github must be an object");
@@ -850,8 +862,8 @@ export function validatePreferences(preferences: WTFPreferences): {
   // ─── Experimental Features ────────────────────────────────────────
   if (preferences.experimental !== undefined) {
     if (typeof preferences.experimental === "object" && preferences.experimental !== null) {
-      const exp = preferences.experimental as unknown as Record<string, unknown>;
-      const validExp: import("./preferences-types.ts").ExperimentalPreferences = {};
+      const exp = raw.experimental as Record<string, unknown>;
+      const validExp: ExperimentalPreferences = {};
 
       if (exp.rtk !== undefined) {
         if (typeof exp.rtk === "boolean") validExp.rtk = exp.rtk;

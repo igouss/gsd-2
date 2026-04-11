@@ -2,6 +2,7 @@
 
 import { WTFError, WTF_STALE_STATE } from "../domain/errors.ts";
 import { _getCurrentDb } from "./db-core.ts";
+import { rowToMilestone } from "./row-mappers.ts";
 
 export interface MilestonePlanningRecord {
   vision: string;
@@ -35,28 +36,6 @@ export interface MilestoneRow {
   definition_of_done: string[];
   requirement_coverage: string;
   boundary_map_markdown: string;
-}
-
-function rowToMilestone(row: Record<string, unknown>): MilestoneRow {
-  return {
-    id: row["id"] as string,
-    title: row["title"] as string,
-    status: row["status"] as string,
-    depends_on: JSON.parse((row["depends_on"] as string) || "[]"),
-    created_at: row["created_at"] as string,
-    completed_at: (row["completed_at"] as string) ?? null,
-    vision: (row["vision"] as string) ?? "",
-    success_criteria: JSON.parse((row["success_criteria"] as string) || "[]"),
-    key_risks: JSON.parse((row["key_risks"] as string) || "[]"),
-    proof_strategy: JSON.parse((row["proof_strategy"] as string) || "[]"),
-    verification_contract: (row["verification_contract"] as string) ?? "",
-    verification_integration: (row["verification_integration"] as string) ?? "",
-    verification_operational: (row["verification_operational"] as string) ?? "",
-    verification_uat: (row["verification_uat"] as string) ?? "",
-    definition_of_done: JSON.parse((row["definition_of_done"] as string) || "[]"),
-    requirement_coverage: (row["requirement_coverage"] as string) ?? "",
-    boundary_map_markdown: (row["boundary_map_markdown"] as string) ?? "",
-  };
 }
 
 export function insertMilestone(m: {

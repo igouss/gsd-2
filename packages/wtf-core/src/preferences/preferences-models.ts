@@ -9,7 +9,8 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import type { DynamicRoutingConfig } from "../routing/model-router.ts";
 import { defaultRoutingConfig } from "../routing/model-router.ts";
-import type { TokenProfile, InlineLevel } from "../domain/types.ts";
+import type { TokenProfile, InlineLevel } from "../routing/routing.types.ts";
+import type { ContextSelectionMode } from "../parallel/parallel.types.ts";
 
 import type {
   WTFPreferences,
@@ -387,7 +388,7 @@ export function resolveInlineLevel(): InlineLevel {
  * budget -> "smart", balanced/quality -> "full".
  * Explicit preference always wins.
  */
-export function resolveContextSelection(): import("../domain/types.ts").ContextSelectionMode {
+export function resolveContextSelection(): ContextSelectionMode {
   const prefs = loadEffectiveWTFPreferences();
   if (prefs?.preferences.context_selection) return prefs.preferences.context_selection;
   const profile = resolveEffectiveProfile();

@@ -18,7 +18,8 @@ import {
 } from "../persistence/paths.ts";
 import { resolveSkillDiscoveryMode, resolveInlineLevel, loadEffectiveWTFPreferences, resolveAllSkillReferences } from "../preferences/preferences.ts";
 import { parseRoadmap } from "../persistence/md-parsers.ts";
-import type { WTFState, InlineLevel } from "../domain/types.ts";
+import type { WTFState } from "../domain/types.ts";
+import type { InlineLevel } from "../routing/routing.types.ts";
 import type { WTFPreferences } from "../preferences/preferences.ts";
 /** Minimal Skill shape needed by prompt builders — mirrors @wtf/pi-coding-agent's Skill. */
 export interface Skill {

@@ -3,21 +3,7 @@
 import type { GateRow, GateId, GateScope, GateStatus, GateVerdict } from "../domain/types.ts";
 import { WTFError, WTF_STALE_STATE } from "../domain/errors.ts";
 import { _getCurrentDb } from "./db-core.ts";
-
-function rowToGate(row: Record<string, unknown>): GateRow {
-  return {
-    milestone_id: row["milestone_id"] as string,
-    slice_id: row["slice_id"] as string,
-    gate_id: row["gate_id"] as GateId,
-    scope: row["scope"] as GateScope,
-    task_id: (row["task_id"] as string) ?? "",
-    status: row["status"] as GateStatus,
-    verdict: (row["verdict"] as GateVerdict) || "",
-    rationale: (row["rationale"] as string) || "",
-    findings: (row["findings"] as string) || "",
-    evaluated_at: (row["evaluated_at"] as string) ?? null,
-  };
-}
+import { rowToGate } from "./row-mappers.ts";
 
 export function insertGateRow(g: {
   milestoneId: string;

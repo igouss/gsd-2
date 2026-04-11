@@ -198,7 +198,7 @@ export interface HealthInfo {
   userMessages: number;
   providers: ProviderStatusSummary[];
   skillSummary: SkillSummaryInfo;
-  environmentIssues: import("../doctor/doctor-environment.ts").EnvironmentCheckResult[];
+  environmentIssues: EnvironmentCheckResult[];
   /** Persisted doctor run history (most recent first, up to 20 entries). */
   doctorHistory?: VisualizerDoctorEntry[];
   /** Current in-memory progress score (null if auto-mode not active). */

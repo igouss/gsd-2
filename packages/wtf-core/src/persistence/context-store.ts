@@ -5,8 +5,9 @@
 // All functions degrade gracefully: return empty results when DB unavailable, never throw.
 
 import { isDbAvailable, _getAdapter } from './wtf-db.ts';
-import type { Decision, Requirement, RequirementClass, RequirementStatus } from '../domain/types.ts';
+import type { Decision, Requirement } from '../domain/types.ts';
 import { extractAllSections } from './files.ts';
+import { rowToDecision, rowToRequirement } from './row-mappers.ts';
 
 // ─── Query Functions ───────────────────────────────────────────────────────
 
@@ -50,18 +51,7 @@ export function queryDecisions(opts?: DecisionQueryOpts): Decision[] {
     const sql = `SELECT * FROM decisions WHERE ${clauses.join(' AND ')} ORDER BY seq`;
     const rows = adapter.prepare(sql).all(params);
 
-    return rows.map(row => ({
-      seq: row['seq'] as number,
-      id: row['id'] as string,
-      when_context: row['when_context'] as string,
-      scope: row['scope'] as string,
-      decision: row['decision'] as string,
-      choice: row['choice'] as string,
-      rationale: row['rationale'] as string,
-      revisable: row['revisable'] as string,
-      made_by: (row['made_by'] as string as import('../domain/types.ts').DecisionMadeBy) ?? 'agent',
-      superseded_by: null,
-    }));
+    return rows.map(row => rowToDecision(row as Record<string, unknown>));
   } catch {
     return [];
   }
@@ -107,20 +97,7 @@ export function queryRequirements(opts?: RequirementQueryOpts): Requirement[] {
     const sql = `SELECT * FROM requirements WHERE ${clauses.join(' AND ')} ORDER BY id`;
     const rows = adapter.prepare(sql).all(params);
 
-    return rows.map(row => ({
-      id: row['id'] as string,
-      class: row['class'] as RequirementClass | "",
-      status: row['status'] as RequirementStatus,
-      description: row['description'] as string,
-      why: row['why'] as string,
-      source: row['source'] as string,
-      primary_owner: row['primary_owner'] as string,
-      supporting_slices: row['supporting_slices'] as string,
-      validation: row['validation'] as string,
-      notes: row['notes'] as string,
-      full_content: row['full_content'] as string,
-      superseded_by: null,
-    }));
+    return rows.map(row => rowToRequirement(row as Record<string, unknown>));
   } catch {
     return [];
   }

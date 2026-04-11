@@ -7,8 +7,10 @@ import { spawnSync, type SpawnSyncReturns } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join, basename } from "node:path";
 import type { AuditWarning, RuntimeError, VerificationCheck, VerificationResult } from "../domain/types.ts";
-import { DEFAULT_COMMAND_TIMEOUT_MS } from "../domain/constants.ts";
 import { rewriteCommandWithRtk } from "../shared/rtk.ts";
+
+/** Default timeout for verification-gate commands (ms). */
+const DEFAULT_COMMAND_TIMEOUT_MS = 120_000;
 import { processes as bgShellProcesses } from "../bg-shell/process-manager.ts";
 import { getConsoleLogs as getBrowserConsoleLogs } from "../browser-tools/state.ts";
 

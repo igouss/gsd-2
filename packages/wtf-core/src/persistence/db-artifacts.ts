@@ -3,6 +3,7 @@
 import { WTFError, WTF_STALE_STATE } from "../domain/errors.ts";
 import { logWarning } from "../workflow/workflow-logger.ts";
 import { _getCurrentDb } from "./db-core.ts";
+import { rowToArtifact } from "./row-mappers.ts";
 
 export function clearArtifacts(): void {
   const db = _getCurrentDb();
@@ -42,18 +43,6 @@ export interface ArtifactRow {
   task_id: string | null;
   full_content: string;
   imported_at: string;
-}
-
-function rowToArtifact(row: Record<string, unknown>): ArtifactRow {
-  return {
-    path: row["path"] as string,
-    artifact_type: row["artifact_type"] as string,
-    milestone_id: (row["milestone_id"] as string) ?? null,
-    slice_id: (row["slice_id"] as string) ?? null,
-    task_id: (row["task_id"] as string) ?? null,
-    full_content: row["full_content"] as string,
-    imported_at: row["imported_at"] as string,
-  };
 }
 
 export function getArtifact(path: string): ArtifactRow | null {

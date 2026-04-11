@@ -7,18 +7,12 @@
  */
 
 import type { GitPreferences } from "../git/git-service.ts";
-import type {
-  PostUnitHookConfig,
-  PreDispatchHookConfig,
-  BudgetEnforcementMode,
-  NotificationPreferences,
-  TokenProfile,
-  PhaseSkipPreferences,
-  ParallelConfig,
-  ContextSelectionMode,
-  ReactiveExecutionConfig,
-  GateEvaluationConfig,
-} from "../domain/types.ts";
+import type { PostUnitHookConfig, PreDispatchHookConfig } from "../execution/hooks-config.types.ts";
+import type { ParallelConfig, ContextSelectionMode } from "../parallel/parallel.types.ts";
+import type { ReactiveExecutionConfig } from "../workflow/reactive.types.ts";
+import type { BudgetEnforcementMode, NotificationPreferences, PhaseSkipPreferences } from "./config.types.ts";
+import type { GateEvaluationConfig } from "../domain/types.ts";
+import type { TokenProfile } from "../routing/routing.types.ts";
 import type { DynamicRoutingConfig } from "../routing/model-router.ts";
 
 export interface ContextManagementConfig {
@@ -124,7 +118,8 @@ export const KNOWN_UNIT_TYPES = [
 export type UnitType = (typeof KNOWN_UNIT_TYPES)[number];
 
 
-export const SKILL_ACTIONS: Set<string> = new Set(["use", "prefer", "avoid"]);
+export type SkillAction = "use" | "prefer" | "avoid";
+export const SKILL_ACTIONS: Set<SkillAction> = new Set(["use", "prefer", "avoid"]);
 
 export interface WTFSkillRule {
   when: string;

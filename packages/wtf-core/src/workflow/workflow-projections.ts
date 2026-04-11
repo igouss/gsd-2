@@ -309,14 +309,6 @@ export function renderStateContent(state: WTFState): string {
   }
 
   lines.push("");
-  lines.push("## Recent Decisions");
-  if (state.recentDecisions.length > 0) {
-    for (const decision of state.recentDecisions) lines.push(`- ${decision}`);
-  } else {
-    lines.push("- None recorded");
-  }
-
-  lines.push("");
   lines.push("## Blockers");
   if (state.blockers.length > 0) {
     for (const blocker of state.blockers) lines.push(`- ${blocker}`);

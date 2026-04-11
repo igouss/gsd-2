@@ -10,6 +10,7 @@
  */
 
 import type { WTFState } from "../domain/types.ts";
+import type { AutoSession } from "../auto/session.ts";
 import type { WTFPreferences } from "../preferences/preferences.ts";
 import { loadFile, extractUatType, loadActiveOverrides, resolveAllOverrides } from "../persistence/files.ts";
 import { isDbAvailable, getMilestoneSlices, getPendingGates, markAllGatesOmitted, getMilestone } from "../persistence/wtf-db.ts";
@@ -72,7 +73,7 @@ export interface DispatchContext {
   midTitle: string;
   state: WTFState;
   prefs: WTFPreferences | undefined;
-  session?: import("../auto/session.ts").AutoSession;
+  session?: AutoSession;
 }
 
 export interface DispatchRule {

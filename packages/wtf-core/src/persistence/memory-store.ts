@@ -4,6 +4,7 @@
 // All functions degrade gracefully: return empty results when DB unavailable, never throw.
 
 import { isDbAvailable, _getAdapter, transaction } from './wtf-db.ts';
+import { rowToMemory } from './row-mappers.ts';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -62,24 +63,6 @@ const CATEGORY_PRIORITY: Record<string, number> = {
   environment: 4,
   preference: 5,
 };
-
-// ─── Row Mapping ────────────────────────────────────────────────────────────
-
-function rowToMemory(row: Record<string, unknown>): Memory {
-  return {
-    seq: row['seq'] as number,
-    id: row['id'] as string,
-    category: row['category'] as string,
-    content: row['content'] as string,
-    confidence: row['confidence'] as number,
-    source_unit_type: (row['source_unit_type'] as string) ?? null,
-    source_unit_id: (row['source_unit_id'] as string) ?? null,
-    created_at: row['created_at'] as string,
-    updated_at: row['updated_at'] as string,
-    superseded_by: (row['superseded_by'] as string) ?? null,
-    hit_count: row['hit_count'] as number,
-  };
-}
 
 // ─── Query Functions ────────────────────────────────────────────────────────
 

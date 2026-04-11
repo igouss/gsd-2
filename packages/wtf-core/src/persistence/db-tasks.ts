@@ -1,8 +1,8 @@
 // WTF Database — Task CRUD
 
 import { WTFError, WTF_STALE_STATE } from "../domain/errors.ts";
-import { _getCurrentDb } from "./db-core.ts";
-import { transaction } from "./db-core.ts";
+import { _getCurrentDb, transaction } from "./db-core.ts";
+import { rowToTask } from "./row-mappers.ts";
 
 export interface TaskPlanningRecord {
   title?: string;
@@ -42,36 +42,6 @@ export interface TaskRow {
   observability_impact: string;
   full_plan_md: string;
   sequence: number;
-}
-
-function rowToTask(row: Record<string, unknown>): TaskRow {
-  return {
-    milestone_id: row["milestone_id"] as string,
-    slice_id: row["slice_id"] as string,
-    id: row["id"] as string,
-    title: row["title"] as string,
-    status: row["status"] as string,
-    one_liner: row["one_liner"] as string,
-    narrative: row["narrative"] as string,
-    verification_result: row["verification_result"] as string,
-    duration: row["duration"] as string,
-    completed_at: (row["completed_at"] as string) ?? null,
-    blocker_discovered: (row["blocker_discovered"] as number) === 1,
-    deviations: row["deviations"] as string,
-    known_issues: row["known_issues"] as string,
-    key_files: JSON.parse((row["key_files"] as string) || "[]"),
-    key_decisions: JSON.parse((row["key_decisions"] as string) || "[]"),
-    full_summary_md: row["full_summary_md"] as string,
-    description: (row["description"] as string) ?? "",
-    estimate: (row["estimate"] as string) ?? "",
-    files: JSON.parse((row["files"] as string) || "[]"),
-    verify: (row["verify"] as string) ?? "",
-    inputs: JSON.parse((row["inputs"] as string) || "[]"),
-    expected_output: JSON.parse((row["expected_output"] as string) || "[]"),
-    observability_impact: (row["observability_impact"] as string) ?? "",
-    full_plan_md: (row["full_plan_md"] as string) ?? "",
-    sequence: (row["sequence"] as number) ?? 0,
-  };
 }
 
 export function insertTask(t: {

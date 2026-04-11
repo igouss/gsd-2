@@ -13,17 +13,12 @@ export type {
   HarnessAdapter,
   UnitDispatchRequest,
   UnitDispatchResult,
-  UnitErrorContext,
   OrchestratorEventSink,
 } from "./adapters/harness-adapter.ts";
 
-export { nullEventSink } from "./adapters/harness-adapter.ts";
-
 // Tool handlers — pure functions for state mutation
 export { handleCompleteTask } from "./tools/complete-task.ts";
-export type { CompleteTaskResult } from "./tools/complete-task.ts";
 export { handleCompleteSlice } from "./tools/complete-slice.ts";
-export type { CompleteSliceResult } from "./tools/complete-slice.ts";
 export { handleCompleteMilestone } from "./tools/complete-milestone.ts";
 export { handlePlanMilestone } from "./tools/plan-milestone.ts";
 export { handlePlanSlice } from "./tools/plan-slice.ts";
@@ -37,7 +32,6 @@ export { handleValidateMilestone } from "./tools/validate-milestone.ts";
 
 // DB operations
 export { saveDecisionToDb, saveRequirementToDb, updateRequirementInDb, saveArtifactToDb } from "./persistence/db-writer.ts";
-export type { SaveArtifactOpts } from "./persistence/db-writer.ts";
 
 // DB — lifecycle and direct access
 export { openDatabase, closeDatabase, isDbAvailable, updateSliceStatus, saveGateResult } from "./persistence/wtf-db.ts";
@@ -67,11 +61,6 @@ export { queryJournal } from "./persistence/journal.ts";
 // Constants
 export { PROJECT_DIR_NAME } from "./domain/constants.ts";
 
-// Types
-export type { CompleteTaskParams, CompleteSliceParams } from "./tools/tool-params.types.ts";
-
 // Adapters
 export { ClaudeCodeAdapter } from "./adapters/claude-code.ts";
 export type { ClaudeCodeAdapterOptions } from "./adapters/claude-code.ts";
-export { writeMcpConfig } from "./adapters/mcp-config.ts";
-export type { McpConfigOptions } from "./adapters/mcp-config.ts";

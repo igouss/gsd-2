@@ -13,7 +13,10 @@ import { readdirSync, existsSync, realpathSync, Dirent } from "node:fs";
 import { join, dirname, normalize } from "node:path";
 import { spawnSync } from "node:child_process";
 import { type WtfTreeEntry } from "../git/native-parser-bridge.ts";
-import { DIR_CACHE_MAX , PROJECT_DIR_NAME } from "../domain/constants.ts";
+import { PROJECT_DIR_NAME } from "../domain/constants.ts";
+
+/** Max directory-listing cache entries before eviction. */
+const DIR_CACHE_MAX = 200;
 
 // ─── Directory Listing Cache ──────────────────────────────────────────────────
 
