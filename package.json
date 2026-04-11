@@ -5,11 +5,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wtf-build/wtf-2.git"
+    "url": "https://github.com/wtf-build/wtf-3.git"
   },
-  "homepage": "https://github.com/wtf-build/wtf-2#readme",
+  "homepage": "https://github.com/wtf-build/wtf-3#readme",
   "bugs": {
-    "url": "https://github.com/wtf-build/wtf-2/issues"
+    "url": "https://github.com/wtf-build/wtf-3/issues"
   },
   "type": "module",
   "workspaces": [

@@ -157,7 +157,7 @@ export function getMilestone(id: string): MilestoneRow | null {
 /**
  * Update a milestone's status in the database.
  * Used by park/unpark to keep the DB in sync with the filesystem marker.
- * See: https://github.com/wtf-build/wtf-2/issues/2694
+ * See: https://github.com/wtf-build/wtf-3/issues/2694
  */
 export function updateMilestoneStatus(milestoneId: string, status: string, completedAt?: string | null): void {
   const db = _getCurrentDb();

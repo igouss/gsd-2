@@ -762,8 +762,8 @@ Use expensive models where quality matters (planning, complex execution) and che
 
 ## Star History
 
-<a href="https://star-history.com/#wtf-build/wtf-2&Date">
-  <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=wtf-build/wtf-2&type=Date" />
+<a href="https://star-history.com/#wtf-build/wtf-3&Date">
+  <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=wtf-build/wtf-3&type=Date" />
 </a>
 
 ---

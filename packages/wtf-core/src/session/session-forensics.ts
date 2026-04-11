@@ -478,7 +478,7 @@ function formatTraceSummary(trace: ExecutionTrace): string {
   // when the previous turn was truncated or malformed. Crash recovery has its
   // own path (formatCrashRecoveryBriefing) that handles lastReasoning safely
   // with explicit "Last Agent Reasoning Before Interruption" framing.
-  // See: https://github.com/wtf-build/wtf-2/issues/2195
+  // See: https://github.com/wtf-build/wtf-3/issues/2195
   return parts.join("\n");
 }
 

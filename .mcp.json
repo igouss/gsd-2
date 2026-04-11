@@ -4,7 +4,7 @@
       "command": "repowise",
       "args": [
         "mcp",
-        "/Users/jeremymcspadden/Github/gsd-2",
+        "/Users/jeremymcspadden/Github/wtf-3",
         "--transport",
         "stdio"
       ],

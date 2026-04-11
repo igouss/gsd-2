@@ -5,7 +5,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wtf-build/wtf-2.git",
+    "url": "https://github.com/wtf-build/wtf-3.git",
     "directory": "packages/mcp-server"
   },
   "publishConfig": {

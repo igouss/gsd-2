@@ -7,7 +7,7 @@
  *
  * Single entry point: classifyError(errorMsg, retryAfterMs?)
  *
- * @see https://github.com/wtf-build/wtf-2/issues/2577
+ * @see https://github.com/wtf-build/wtf-3/issues/2577
  */
 
 // ── ErrorClass discriminated union ──────────────────────────────────────────
